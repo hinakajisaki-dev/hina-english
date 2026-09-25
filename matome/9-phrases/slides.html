@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<title>日常英会話フレーズ 9選 まとめ</title>
+<style>
+  @font-face { font-family: "Nunito"; font-weight: 700; src: url("../fonts/Nunito-700.woff2") format("woff2"); }
+  @font-face { font-family: "Nunito"; font-weight: 800; src: url("../fonts/Nunito-800.woff2") format("woff2"); }
+  @font-face { font-family: "Nunito"; font-weight: 900; src: url("../fonts/Nunito-900.woff2") format("woff2"); }
+  @font-face { font-family: "Zen Maru Gothic"; font-weight: 700; src: url("../fonts/ZenMaruGothic-700.woff2") format("woff2"); }
+  @font-face { font-family: "Zen Maru Gothic"; font-weight: 900; src: url("../fonts/ZenMaruGothic-900.woff2") format("woff2"); }
+
+  @page { size: 1280px 720px; margin: 0; }
+
+  :root {
+    --bg: #FBF6EE;
+    --card: #FFFFFF;
+    --ink: #22304A;
+    --ink-2: #4A5568;
+    --muted: #8A8F9C;
+    --line: #EBE1D2;
+    --accent: #E8603C;
+    --accent-soft: #FCE4DA;
+    --marker: #FFE17A;
+    --ok: #238A5B;
+    --ok-soft: #DDF2E6;
+    --ng: #CF4B45;
+    --ng-soft: #FBE2E0;
+    --en: "Nunito", "Zen Maru Gothic", sans-serif;
+    --ja: "Zen Maru Gothic", sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { background: var(--bg); }
+  body {
+    font-family: var(--en);
+    color: var(--ink);
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  .ja { font-family: var(--ja); }
+
+  .slide {
+    width: 1280px;
+    height: 720px;
+    position: relative;
+    overflow: hidden;
+    padding: 44px 72px 40px;
+    display: flex;
+    flex-direction: column;
+    break-after: page;
+  }
+  .slide:last-child { break-after: auto; }
+
+  /* ---------- top bar ---------- */
+  .topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: var(--ja);
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--muted);
+    letter-spacing: .06em;
+  }
+  .dots { display: flex; gap: 7px; align-items: center; }
+  .dots i { width: 9px; height: 9px; border-radius: 5px; background: var(--line); }
+  .dots i.on { width: 30px; background: var(--accent); }
+
+  /* ---------- phrase header ---------- */
+  .head { display: flex; gap: 30px; margin-top: 22px; align-items: flex-start; }
+  .num {
+    font-size: 108px;
+    font-weight: 900;
+    line-height: .86;
+    color: var(--accent);
+    letter-spacing: -3px;
+    flex: none;
+    min-width: 132px;
+  }
+  .pattern {
+    font-size: 54px;
+    font-weight: 900;
+    line-height: 1.05;
+    letter-spacing: -.5px;
+  }
+  .slot { color: var(--accent); }
+  .meaning { display: flex; align-items: center; gap: 16px; margin-top: 12px; }
+  .meaning .ja { font-size: 28px; font-weight: 900; }
+  .chip {
+    font-family: var(--ja);
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--accent);
+    background: var(--accent-soft);
+    padding: 5px 14px 6px;
+    border-radius: 999px;
+    white-space: nowrap;
+  }
+  .sub { display: flex; align-items: baseline; gap: 14px; margin-top: 14px; }
+  .tag {
+    font-family: var(--ja);
+    font-size: 14px;
+    font-weight: 700;
+    color: #fff;
+    background: var(--ink);
+    padding: 4px 11px 5px;
+    border-radius: 6px;
+    align-self: center;
+    white-space: nowrap;
+  }
+  .tag.tip { background: var(--accent); }
+  .sub .en { font-size: 25px; font-weight: 800; }
+  .sub .ja { font-size: 20px; font-weight: 700; color: var(--ink-2); }
+
+  /* ---------- examples ---------- */
+  .body { flex: 1; display: flex; flex-direction: column; margin-top: 26px; min-height: 0; }
+  .body.split { display: grid; grid-template-columns: 1fr 450px; gap: 30px; }
+  .col { display: flex; flex-direction: column; min-height: 0; }
+
+  .label {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-family: var(--ja);
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: .2em;
+    color: var(--muted);
+    margin-bottom: 12px;
+  }
+  .label::after { content: ""; flex: 1; height: 2px; background: var(--line); border-radius: 1px; }
+
+  .ex { list-style: none; display: flex; flex-direction: column; gap: 14px; flex: 1; }
+  .ex li {
+    background: var(--card);
+    border-radius: 18px;
+    box-shadow: 0 1px 0 var(--line), 0 8px 22px rgba(34, 48, 74, .05);
+    display: grid;
+    align-items: center;
+    column-gap: 20px;
+    flex: 1;
+  }
+  .ex .i {
+    width: 34px; height: 34px;
+    border-radius: 50%;
+    background: var(--accent-soft);
+    color: var(--accent);
+    font-size: 17px;
+    font-weight: 900;
+    display: grid;
+    place-items: center;
+  }
+  .ex .en { font-weight: 800; letter-spacing: -.2px; }
+  .ex .ja { font-weight: 700; color: var(--ink-2); }
+
+  /* wide rows: EN left, JA right */
+  .ex.wide li { grid-template-columns: 34px 1fr 390px; min-height: 96px; padding: 16px 28px; }
+  .ex.wide .en { font-size: 31px; }
+  .ex.wide .ja { font-size: 22px; line-height: 1.45; }
+
+  /* stacked rows: EN over JA */
+  .ex.stack li { grid-template-columns: 34px 1fr; grid-template-rows: auto auto; padding: 16px 24px; row-gap: 4px; }
+  .ex.stack .i { grid-row: 1 / span 2; }
+  .ex.stack .en { font-size: 27px; }
+  .ex.stack .ja { font-size: 19px; }
+
+  mark {
+    background: linear-gradient(transparent 58%, var(--marker) 58%);
+    color: inherit;
+    padding: 0 2px;
+    margin: 0 -2px;
+  }
+  .v { color: var(--accent); }
+  .opt { color: var(--muted); font-weight: 700; }
+  .gloss {
+    display: inline-block;
+    margin-top: 6px;
+    font-family: var(--ja);
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--ink-2);
+    background: var(--bg);
+    border: 1.5px solid var(--line);
+    border-radius: 8px;
+    padding: 2px 10px 3px;
+  }
+
+  /* ---------- point panel ---------- */
+  .panel {
+    background: var(--card);
+    border: 2px solid var(--accent-soft);
+    border-radius: 22px;
+    padding: 24px 28px 26px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    flex: 1;
+  }
+  .panel.tight { gap: 15px; }
+  .panel.tight .pair { gap: 12px; }
+  .panel h3 {
+    font-family: var(--ja);
+    font-size: 21px;
+    font-weight: 900;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .panel h3 .tag { background: var(--accent); }
+  .panel hr { border: none; border-top: 2px dashed var(--line); }
+  .pair { display: flex; flex-direction: column; gap: 16px; }
+  .pair .en { font-size: 23px; font-weight: 800; }
+  .pair .ja { font-size: 17px; font-weight: 700; color: var(--ink-2); margin-top: 2px; }
+  .say { display: flex; align-items: center; justify-content: center; gap: 12px; font-size: 27px; font-weight: 900; white-space: nowrap; background: var(--bg); border-radius: 16px; padding: 12px 14px; }
+  .say .arrow { color: var(--accent); font-size: 24px; }
+  .note { font-family: var(--ja); font-size: 18px; font-weight: 700; color: var(--ink-2); line-height: 1.55; }
+
+  .art { display: grid; grid-template-columns: 76px 1fr; column-gap: 16px; row-gap: 2px; align-items: center; }
+  .art .big {
+    grid-row: 1 / span 2;
+    height: 66px;
+    border-radius: 16px;
+    background: var(--accent-soft);
+    color: var(--accent);
+    font-size: 28px;
+    font-weight: 900;
+    display: grid;
+    place-items: center;
+  }
+  .art .ja { font-size: 20px; font-weight: 900; }
+  .art .en { font-size: 20px; font-weight: 800; color: var(--ink-2); }
+
+  .ans { border-radius: 16px; padding: 18px 20px; display: grid; grid-template-columns: 56px 1fr; column-gap: 14px; align-items: center; }
+  .ans .badge {
+    grid-row: 1 / span 2;
+    height: 56px;
+    border-radius: 50%;
+    color: #fff;
+    font-size: 17px;
+    font-weight: 900;
+    display: grid;
+    place-items: center;
+  }
+  .ans .en { font-size: 24px; font-weight: 900; }
+  .ans .ja { font-size: 17px; font-weight: 700; margin-top: 2px; }
+  .ans.ok { background: var(--ok-soft); }
+  .ans.ok .badge { background: var(--ok); }
+  .ans.ok .ja { color: var(--ok); }
+  .ans.ng { background: var(--ng-soft); }
+  .ans.ng .badge { background: var(--ng); }
+  .ans.ng .ja { color: var(--ng); }
+
+  /* ---------- cover ---------- */
+  .cover { padding: 0; flex-direction: row; }
+  .cover .left {
+    flex: 1;
+    padding: 72px 40px 64px 84px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    position: relative;
+  }
+  .cover .kicker {
+    align-self: flex-start;
+    font-family: var(--ja);
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--accent);
+    background: var(--accent-soft);
+    border-radius: 999px;
+    padding: 7px 18px 8px;
+    letter-spacing: .08em;
+  }
+  .cover h1 {
+    font-family: var(--ja);
+    font-weight: 900;
+    font-size: 66px;
+    line-height: 1.22;
+    margin-top: 26px;
+    letter-spacing: .01em;
+  }
+  .cover h1 .n { font-family: var(--en); font-size: 124px; color: var(--accent); letter-spacing: -3px; line-height: 1; }
+  .cover h1 .m { display: inline-block; margin-top: 6px; }
+  .cover .lead { font-family: var(--ja); font-size: 21px; font-weight: 700; color: var(--ink-2); margin-top: 26px; line-height: 1.7; }
+  .cover .right {
+    width: 520px;
+    background: var(--ink);
+    padding: 54px 50px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 9px;
+  }
+  .toc-title { font-family: var(--ja); font-size: 15px; font-weight: 700; letter-spacing: .2em; color: #9AA5BC; margin-bottom: 8px; }
+  .toc { list-style: none; display: flex; flex-direction: column; gap: 9px; }
+  .toc li {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    background: rgba(255, 255, 255, .06);
+    border-radius: 12px;
+    padding: 10px 18px;
+    color: #fff;
+    font-size: 22px;
+    font-weight: 800;
+  }
+  .toc b { color: #FF9A7A; font-size: 17px; font-weight: 900; width: 24px; }
+
+  /* ---------- cheat sheet ---------- */
+  .sheet-title { display: flex; align-items: baseline; gap: 18px; margin-top: 18px; }
+  .sheet-title h2 { font-family: var(--ja); font-size: 40px; font-weight: 900; }
+  .sheet-title p { font-family: var(--ja); font-size: 18px; font-weight: 700; color: var(--muted); }
+  .grid {
+    flex: 1;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    gap: 16px;
+    margin-top: 20px;
+  }
+  .card {
+    background: var(--card);
+    border-radius: 18px;
+    box-shadow: 0 1px 0 var(--line), 0 8px 22px rgba(34, 48, 74, .05);
+    padding: 16px 22px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+  .card .top { display: flex; align-items: baseline; gap: 12px; }
+  .card .k { color: var(--accent); font-size: 22px; font-weight: 900; }
+  .card .p { font-size: 25px; font-weight: 900; letter-spacing: -.3px; }
+  .card .mj { font-family: var(--ja); font-size: 18px; font-weight: 900; color: var(--ink); margin-top: 2px; }
+  .card .e { margin-top: auto; padding-top: 8px; border-top: 2px dashed var(--line); font-size: 17px; font-weight: 700; color: var(--ink-2); }
+  .card .e .ja { font-size: 14px; color: var(--muted); display: block; margin-top: 1px; }
+</style>
+</head>
+<body>
+
+<!-- ============ COVER ============ -->
+<section class="slide cover">
+  <div class="left">
+    <span class="kicker">動画のおさらい</span>
+    <h1>日常英会話フレーズ<br><span class="n">9</span>選 <span class="m"><mark>まとめ</mark></span></h1>
+    <p class="lead">動画で紹介したフレーズと例文を<br>このスライドでまとめて復習しよう！</p>
+  </div>
+  <div class="right">
+    <p class="toc-title">CONTENTS</p>
+    <ol class="toc">
+      <li><b>01</b>I feel like ~ing</li>
+      <li><b>02</b>I used to ~</li>
+      <li><b>03</b>I should have ~</li>
+      <li><b>04</b>Do you wanna ~?</li>
+      <li><b>05</b>I'm looking for ~</li>
+      <li><b>06</b>I might ~</li>
+      <li><b>07</b>Do you mind if I ~?</li>
+      <li><b>08</b>I bet ~</li>
+      <li><b>09</b>I'm trying to ~</li>
+    </ol>
+  </div>
+</section>
+
+<!-- ============ 01 ============ -->
+<section class="slide">
+  <div class="topbar"><span>日常英会話フレーズ 9選 まとめ</span><div class="dots"><i class="on"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div></div>
+  <header class="head">
+    <div class="num">01</div>
+    <div>
+      <h2 class="pattern">I feel like <span class="slot">~ing</span></h2>
+      <div class="meaning"><span class="ja">〇〇な気分</span><span class="chip">＋動詞のing形</span></div>
+      <div class="sub"><span class="tag">否定</span><span class="en">I don't feel like ~ing</span><span class="ja">〇〇な気分ではない・〇〇したくない</span></div>
+    </div>
+  </header>
+  <div class="body">
+    <p class="label">例文</p>
+    <ol class="ex wide">
+      <li><span class="i">1</span><p class="en"><mark>I feel like</mark> <span class="v">eating</span> pizza today.</p><p class="ja">今日ピザを食べたい気分やわ</p></li>
+      <li><span class="i">2</span><p class="en"><mark>I don't feel like</mark> <span class="v">going</span> out today.</p><p class="ja">外に出る気にならないわ</p></li>
+      <li><span class="i">3</span><p class="en"><mark>I feel like</mark> <span class="v">watching</span> TV.</p><p class="ja">今日はテレビを見たい気分</p></li>
+    </ol>
+  </div>
+</section>
+
+<!-- ============ 02 ============ -->
+<section class="slide">
+  <div class="topbar"><span>日常英会話フレーズ 9選 まとめ</span><div class="dots"><i></i><i class="on"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div></div>
+  <header class="head">
+    <div class="num">02</div>
+    <div>
+      <h2 class="pattern">I used to <span class="slot">~</span></h2>
+      <div class="meaning"><span class="ja">昔は〇〇してた</span><span class="chip">＋動詞の原形</span></div>
+    </div>
+  </header>
+  <div class="body">
+    <p class="label">例文</p>
+    <ol class="ex wide">
+      <li><span class="i">1</span><p class="en"><mark>I used to</mark> <span class="v">play</span> basketball.</p><p class="ja">バスケ昔やっていた</p></li>
+      <li><span class="i">2</span><p class="en"><mark>I used to</mark> <span class="v">smoke</span>.</p><p class="ja">昔はタバコ吸ってた</p></li>
+      <li><span class="i">3</span><p class="en"><mark>I used to</mark> <span class="v">work</span> late <span class="opt">(often)</span>.</p><p class="ja">昔はよく残業してた</p></li>
+    </ol>
+  </div>
+</section>
+
+<!-- ============ 03 ============ -->
+<section class="slide">
+  <div class="topbar"><span>日常英会話フレーズ 9選 まとめ</span><div class="dots"><i></i><i></i><i class="on"></i><i></i><i></i><i></i><i></i><i></i><i></i></div></div>
+  <header class="head">
+    <div class="num">03</div>
+    <div>
+      <h2 class="pattern">I should have <span class="slot">~</span></h2>
+      <div class="meaning"><span class="ja">〇〇しとけばよかった</span><span class="chip">＋過去分詞</span></div>
+      <div class="sub"><span class="tag">否定</span><span class="en">I shouldn't have ~</span><span class="ja">〇〇しなければよかった</span></div>
+    </div>
+  </header>
+  <div class="body split">
+    <div class="col">
+      <p class="label">例文</p>
+      <ol class="ex stack">
+        <li><span class="i">1</span><p class="en"><mark>I should have</mark> <span class="v">left</span> earlier.</p><p class="ja">もっとはやく出とけばよかった</p></li>
+        <li><span class="i">2</span><p class="en"><mark>I should have</mark> <span class="v">bought</span> that.</p><p class="ja">あれ買えばよかったのに</p></li>
+        <li><span class="i">3</span><p class="en"><mark>I shouldn't have</mark> <span class="v">said</span> that.</p><p class="ja">言わんかったらよかったのに</p></li>
+      </ol>
+    </div>
+    <div class="col">
+    <p class="label">ポイント</p>
+    <div class="panel tight">
+      <h3><span class="tag">比較</span>ケーキで比べてみよう</h3>
+      <div class="pair">
+        <div><p class="en">I <mark>should have</mark> eaten the cake.</p><p class="ja">ケーキを食べておけばよかった</p></div>
+        <div><p class="en">I <mark>shouldn't have</mark> eaten the cake.</p><p class="ja">ケーキを食べなければよかった</p></div>
+      </div>
+      <hr>
+      <h3><span class="tag">発音</span>ネイティブはこう言う</h3>
+      <div class="say"><span>should have</span><span class="arrow">→</span><span class="v">should've</span></div>
+    </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 04 ============ -->
+<section class="slide">
+  <div class="topbar"><span>日常英会話フレーズ 9選 まとめ</span><div class="dots"><i></i><i></i><i></i><i class="on"></i><i></i><i></i><i></i><i></i><i></i></div></div>
+  <header class="head">
+    <div class="num">04</div>
+    <div>
+      <h2 class="pattern">Do you wanna <span class="slot">~</span>?</h2>
+      <div class="meaning"><span class="ja">〇〇したい？</span><span class="chip">＋動詞の原形</span></div>
+      <div class="sub"><span class="tag tip">ポイント</span><span class="en">wanna = want to</span><span class="ja">くだけた話し言葉の言い方</span></div>
+    </div>
+  </header>
+  <div class="body">
+    <p class="label">例文</p>
+    <ol class="ex wide">
+      <li><span class="i">1</span><p class="en"><mark>Do you wanna</mark> <span class="v">eat</span> out today?</p><p class="ja">今日外食せえへん？</p></li>
+      <li><span class="i">2</span><p class="en"><mark>Do you wanna</mark> <span class="v">come</span> to the party?</p><p class="ja">パーティーに来る？</p></li>
+      <li><span class="i">3</span><p class="en"><mark>Do you wanna</mark> <span class="v">eat</span> ice cream?</p><p class="ja">アイスクリーム食べたい？</p></li>
+    </ol>
+  </div>
+</section>
+
+<!-- ============ 05 ============ -->
+<section class="slide">
+  <div class="topbar"><span>日常英会話フレーズ 9選 まとめ</span><div class="dots"><i></i><i></i><i></i><i></i><i class="on"></i><i></i><i></i><i></i><i></i></div></div>
+  <header class="head">
+    <div class="num">05</div>
+    <div>
+      <h2 class="pattern">I'm looking for <span class="slot">~</span></h2>
+      <div class="meaning"><span class="ja">〇〇を探してます</span><span class="chip">＋名詞</span></div>
+    </div>
+  </header>
+  <div class="body split">
+    <div class="col">
+      <p class="label">例文</p>
+      <ol class="ex stack">
+        <li><span class="i">1</span><p class="en"><mark>I'm looking for</mark> <span class="v">a</span> bathroom.</p><p class="ja">すいません、トイレ探してるんですけど</p></li>
+        <li><span class="i">2</span><p class="en"><mark>I'm looking for</mark> <span class="v">the</span> station.</p><p class="ja">駅を探してるんですけど</p></li>
+        <li><span class="i">3</span><p class="en"><mark>I'm looking for</mark> <span class="v">my</span> phone.</p><p class="ja">私の携帯を探してます</p></li>
+      </ol>
+    </div>
+    <div class="col">
+    <p class="label">ポイント</p>
+    <div class="panel">
+      <h3><span class="tag">文法</span>冠詞 the と a の違い</h3>
+      <div class="art">
+        <span class="big">the</span>
+        <p class="ja">特定の場所</p>
+        <p class="en">I'm looking for <span class="v">the</span> station.</p>
+      </div>
+      <div class="art">
+        <span class="big">a</span>
+        <p class="ja">一般的なもの</p>
+        <p class="en">I'm looking for <span class="v">a</span> bathroom.</p>
+      </div>
+      <hr>
+      <p class="note"><span class="v">The</span> は世界遺産などの固有名詞にも使う</p>
+      <p class="en" style="font-size:22px;font-weight:800;margin-top:-10px"><span class="v">The</span> Eiffel Tower ／ <span class="v">The</span> Tokyo Tower</p>
+    </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 06 ============ -->
+<section class="slide">
+  <div class="topbar"><span>日常英会話フレーズ 9選 まとめ</span><div class="dots"><i></i><i></i><i></i><i></i><i></i><i class="on"></i><i></i><i></i><i></i></div></div>
+  <header class="head">
+    <div class="num">06</div>
+    <div>
+      <h2 class="pattern">I might <span class="slot">~</span></h2>
+      <div class="meaning"><span class="ja">〇〇するかもしれない</span><span class="chip">＋動詞の原形</span></div>
+      <div class="sub"><span class="tag">否定</span><span class="en">I might not ~</span><span class="ja">〇〇しないかも</span></div>
+    </div>
+  </header>
+  <div class="body">
+    <p class="label">例文</p>
+    <ol class="ex wide">
+      <li><span class="i">1</span><p class="en"><mark>I might</mark> <span class="v">eat</span> a cupcake.</p><p class="ja">カップケーキ食べるかも</p></li>
+      <li><span class="i">2</span><p class="en"><mark>I might</mark> <span class="v">be</span> late.</p><div class="ja">ちょっと遅れるかも<br><span class="gloss">late ＝ 遅れる〈形容詞〉</span></div></li>
+      <li><span class="i">3</span><p class="en"><mark>I might not</mark> <span class="v">go</span> today.</p><p class="ja">今日は行かないかも</p></li>
+    </ol>
+  </div>
+</section>
+
+<!-- ============ 07 ============ -->
+<section class="slide">
+  <div class="topbar"><span>日常英会話フレーズ 9選 まとめ</span><div class="dots"><i></i><i></i><i></i><i></i><i></i><i></i><i class="on"></i><i></i><i></i></div></div>
+  <header class="head">
+    <div class="num">07</div>
+    <div>
+      <h2 class="pattern">Do you mind if I <span class="slot">~</span>?</h2>
+      <div class="meaning"><span class="ja">〇〇してもいいですか？／〇〇しても構いませんか？</span></div>
+    </div>
+  </header>
+  <div class="body split">
+    <div class="col">
+      <p class="label">例文</p>
+      <ol class="ex stack">
+        <li><span class="i">1</span><p class="en"><mark>Do you mind if I</mark> <span class="v">sit</span> here?</p><p class="ja">ここに座ってもいいですか？</p></li>
+        <li><span class="i">2</span><p class="en"><mark>Do you mind if I</mark> <span class="v">open</span> the window?</p><p class="ja">窓を開けても構いませんか？</p></li>
+        <li><span class="i">3</span><p class="en"><mark>Do you mind if I</mark> <span class="v">ask</span> a question?</p><p class="ja">質問してもいいですか？</p></li>
+      </ol>
+    </div>
+    <div class="col">
+    <p class="label">ポイント</p>
+    <div class="panel">
+      <h3><span class="tag">答え方</span>聞かれたらこう返そう</h3>
+      <div class="ans ok">
+        <span class="badge">OK</span>
+        <p class="en">No. ／ Sure, go ahead!</p>
+        <p class="ja">いいえ、構いません！</p>
+      </div>
+      <div class="ans ng">
+        <span class="badge">NG</span>
+        <p class="en">Yes, I do mind.</p>
+        <p class="ja">構います（＝座らないでください）</p>
+      </div>
+      <hr>
+      <p class="note"><b style="color:var(--ink)">mind</b> ＝「気にする」なので、<br><b style="color:var(--ok)">No</b> ＝「気にしないよ」＝ どうぞ！になる</p>
+    </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 08 ============ -->
+<section class="slide">
+  <div class="topbar"><span>日常英会話フレーズ 9選 まとめ</span><div class="dots"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i class="on"></i><i></i></div></div>
+  <header class="head">
+    <div class="num">08</div>
+    <div>
+      <h2 class="pattern">I bet <span class="slot">~</span></h2>
+      <div class="meaning"><span class="ja">絶対〇〇やで</span><span class="chip">＋文（主語＋動詞）</span></div>
+    </div>
+  </header>
+  <div class="body">
+    <p class="label">例文</p>
+    <ol class="ex wide">
+      <li><span class="i">1</span><p class="en"><mark>I bet</mark> it's going to rain.</p><p class="ja">絶対に雨が降るで</p></li>
+      <li><span class="i">2</span><p class="en"><mark>I bet</mark> you'll love this movie.</p><p class="ja">この映画絶対気に入るよ</p></li>
+      <li><span class="i">3</span><p class="en"><mark>I bet</mark> he slept in.</p><p class="ja">絶対あいつ寝坊したわ</p></li>
+    </ol>
+  </div>
+</section>
+
+<!-- ============ 09 ============ -->
+<section class="slide">
+  <div class="topbar"><span>日常英会話フレーズ 9選 まとめ</span><div class="dots"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i class="on"></i></div></div>
+  <header class="head">
+    <div class="num">09</div>
+    <div>
+      <h2 class="pattern">I'm trying to <span class="slot">~</span></h2>
+      <div class="meaning"><span class="ja">〇〇しようとしている</span><span class="chip">＋動詞の原形</span></div>
+    </div>
+  </header>
+  <div class="body">
+    <p class="label">例文</p>
+    <ol class="ex wide">
+      <li><span class="i">1</span><p class="en"><mark>I'm trying to</mark> <span class="v">learn</span> English.</p><p class="ja">英語を学ぼうとしている</p></li>
+      <li><span class="i">2</span><p class="en"><mark>I'm trying to</mark> <span class="v">save</span> money.</p><div class="ja">節約しようとしている<br><span class="gloss">save ＝ 節約する</span></div></li>
+      <li><span class="i">3</span><p class="en"><mark>I'm trying to</mark> <span class="v">figure</span> it out.</p><p class="ja">今頑張って解決してるところ</p></li>
+    </ol>
+  </div>
+</section>
+
+<!-- ============ CHEAT SHEET ============ -->
+<section class="slide">
+  <div class="topbar"><span>日常英会話フレーズ 9選 まとめ</span><span>おさらい</span></div>
+  <div class="sheet-title"><h2>9フレーズ まとめ一覧</h2><p>スクショして見返してね！</p></div>
+  <div class="grid">
+    <div class="card"><div class="top"><span class="k">01</span><span class="p">I feel like ~ing</span></div><p class="mj">〇〇な気分</p><p class="e">I feel like eating pizza today.<span class="ja">今日ピザを食べたい気分やわ</span></p></div>
+    <div class="card"><div class="top"><span class="k">02</span><span class="p">I used to ~</span></div><p class="mj">昔は〇〇してた</p><p class="e">I used to play basketball.<span class="ja">バスケ昔やっていた</span></p></div>
+    <div class="card"><div class="top"><span class="k">03</span><span class="p">I should have ~</span></div><p class="mj">〇〇しとけばよかった</p><p class="e">I should have left earlier.<span class="ja">もっとはやく出とけばよかった</span></p></div>
+    <div class="card"><div class="top"><span class="k">04</span><span class="p">Do you wanna ~?</span></div><p class="mj">〇〇したい？</p><p class="e">Do you wanna eat out today?<span class="ja">今日外食せえへん？</span></p></div>
+    <div class="card"><div class="top"><span class="k">05</span><span class="p">I'm looking for ~</span></div><p class="mj">〇〇を探してます</p><p class="e">I'm looking for the station.<span class="ja">駅を探してるんですけど</span></p></div>
+    <div class="card"><div class="top"><span class="k">06</span><span class="p">I might ~</span></div><p class="mj">〇〇するかもしれない</p><p class="e">I might be late.<span class="ja">ちょっと遅れるかも</span></p></div>
+    <div class="card"><div class="top"><span class="k">07</span><span class="p">Do you mind if I ~?</span></div><p class="mj">〇〇してもいいですか？</p><p class="e">Do you mind if I sit here?<span class="ja">ここに座ってもいいですか？</span></p></div>
+    <div class="card"><div class="top"><span class="k">08</span><span class="p">I bet ~</span></div><p class="mj">絶対〇〇やで</p><p class="e">I bet you'll love this movie.<span class="ja">この映画絶対気に入るよ</span></p></div>
+    <div class="card"><div class="top"><span class="k">09</span><span class="p">I'm trying to ~</span></div><p class="mj">〇〇しようとしている</p><p class="e">I'm trying to save money.<span class="ja">節約しようとしている</span></p></div>
+  </div>
+</section>
+
+</body>
+</html>
