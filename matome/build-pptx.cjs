@@ -157,33 +157,32 @@ function extract() {
 function splitByScript(run) {
   const JA = "Zen Maru Gothic";
   if (run.latinFont === JA) return [{ ...run, font: JA }];
-  const parts = run.text.match(/[\u0000-῿]+|[^\u0000-῿]+/g) || [];
-  return parts.map((text) => ({ ...run, text, font: /^[\u0000-῿]/.test(text) ? run.latinFont : JA }));
+  const parts = run.text.match(/[\u0000-\u1fff]+|[^\u0000-\u1fff]+/g) || [];
+  return parts.map((text) => ({ ...run, text, font: /^[\u0000-\u1fff]/.test(text) ? run.latinFont : JA }));
 }
 
-// pptxgenjs always writes an (empty) notes page per slide. They are dead weight here,
-// so remove them with their references, then repack at maximum compression.
-async function withoutNotes(buffer) {
+// Slim the package down (it is small enough to upload anywhere, e.g. Google Drive):
+// pptxgenjs always writes an empty notes page per slide and some optional parts, and
+// its XML restates many defaults. None of that changes how the deck looks.
+const OPTIONAL = /^(ppt\/notes(Slides|Masters)\/|docProps\/|ppt\/(viewProps|tableStyles)\.xml$)/;
+async function slim(buffer) {
   const zip = await JSZip.loadAsync(buffer);
-  const edit = async (path, fn) => zip.file(path, fn(await zip.file(path).async("string")));
-  zip.remove("ppt/notesSlides");
-  zip.remove("ppt/notesMasters");
-  await edit("ppt/presentation.xml", (x) => x.replace(/<p:notesMasterIdLst>.*?<\/p:notesMasterIdLst>/, ""));
-  await edit("[Content_Types].xml", (x) => x.replace(/<Override PartName="\/ppt\/notes(Slides|Masters)\/[^>]*\/>/g, ""));
-  for (const path of Object.keys(zip.files)) {
-    if (/^ppt\/(slides\/)?_rels\/.*\.rels$/.test(path)) {
-      await edit(path, (x) => x.replace(/<Relationship [^>]*relationships\/notes(Slide|Master)"[^>]*\/>/g, ""));
-    }
-  }
-  // Drop attributes that only restate defaults, and leave the zip's folder entries behind.
   const out = new JSZip();
   for (const [path, entry] of Object.entries(zip.files)) {
-    if (entry.dir) continue;
+    if (entry.dir || OPTIONAL.test(path)) continue;
     let data = await entry.async("string");
-    if (/^ppt\/slides\/slide\d+\.xml$/.test(path)) {
+    if (path === "[Content_Types].xml") {
+      data = data.replace(/<Override PartName="\/(ppt\/notes(Slides|Masters)\/|docProps\/|ppt\/(viewProps|tableStyles)\.xml)[^>]*\/>/g, "");
+    } else if (path.endsWith(".rels")) {
+      data = data.replace(/<Relationship [^>]*\/(notesSlide|notesMaster|extended-properties|core-properties|viewProps|tableStyles)"[^>]*\/>/g, "");
+    } else if (path === "ppt/presentation.xml") {
+      data = data.replace(/<p:notesMasterIdLst>.*?<\/p:notesMasterIdLst>/, "");
+    } else if (/^ppt\/slides\/slide\d+\.xml$/.test(path)) {
       data = data
-        .replace(/ (dirty|rtlCol|indent|marL)="0"| lang="en-US"| pitchFamily="\d+" charset="-?\d+"/g, "")
-        .replace(/<a:buNone\/>|<a:endParaRPr[^>]*\/>|<a:cs typeface="[^"]*"\/>/g, "");
+        .replace(/ (dirty|rtlCol|indent|marL)="0"| lang="en-US"| algn="l"| pitchFamily="\d+" charset="-?\d+"/g, "")
+        .replace(/<a:buNone\/>|<a:endParaRPr[^>]*\/>|<a:cs typeface="[^"]*"\/>/g, "")
+        .replace(/ name="(Text|Shape) \d+"/g, ' name=""')
+        .replace(/<([\w:]+)([^>]*)><\/\1>/g, "<$1$2/>");
     }
     out.file(path, data, { createFolders: false });
   }
@@ -245,6 +244,6 @@ async function withoutNotes(buffer) {
     }
   }
 
-  writeFileSync(output, await withoutNotes(await pres.write({ outputType: "STREAM" })));
+  writeFileSync(output, await slim(await pres.write({ outputType: "STREAM" })));
   console.log(`wrote ${output}`);
 })();
