@@ -2,9 +2,11 @@
   "name": "hina-english",
   "private": true,
   "scripts": {
-    "matome": "node matome/build.cjs"
+    "matome": "node matome/build.cjs",
+    "matome:pptx": "node matome/build-pptx.cjs"
   },
   "devDependencies": {
-    "playwright": "1.56.1"
+    "playwright": "1.56.1",
+    "pptxgenjs": "4.0.1"
   }
 }
