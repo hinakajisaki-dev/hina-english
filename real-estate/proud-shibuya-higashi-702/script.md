@@ -1,7 +1,7 @@
 # PROUD Shibuya Higashi #702: video script and notes
 
 **Working title:** *Never Lived In: A Brand-New Corner Home 9 Minutes from Shibuya Station*
-**Planned length:** about 15–17 minutes (roughly 2,300 spoken words)
+**Planned length:** about 14–16 minutes (roughly 2,000 spoken words)
 **Source:** the seller's sales flyer (マイソク), created 2026-06-08. Anything marked ⚠️ is **not** on the flyer. Confirm it before you say it on camera.
 
 > **Series note:** this follows the same format as the BRANZ Shibuya Tokiwamatsu video: a cold open, the neighborhood, the building, the tour, the numbers, and an honest take. Most LOCAL TIPs here are **new** (trains, deliveries, "never lived in", built-in ACs, energy standards, heat shock), so the two videos don't repeat each other. The genkan and jo tips appear again in short form. Cut them if this video goes out second.
