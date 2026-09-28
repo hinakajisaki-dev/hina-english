@@ -4,7 +4,7 @@
 
 | フォルダ | 内容 |
 | --- | --- |
-| `9-phrases/` | 日常英会話フレーズ 9選（`9-phrases-matome.pdf` / 編集できる `9-phrases-matome.pptx`） |
+| `9-phrases/` | 日常英会話フレーズ 9選（`9-phrases-matome.pdf` / 編集できる `9-phrases-matome.pptx`）。スライド11枚＋練習問題45問と解答 |
 
 ## PDF の作り直し方
 

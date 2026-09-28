@@ -209,6 +209,7 @@
   .toc li { display: flex; align-items: center; gap: 18px; padding: 11px 0; font-size: 22px; }
   .toc li + li { border-top: 2px solid var(--line); }
   .toc b { color: var(--accent); font-size: 22px; width: 18px; }
+  .toc-more { font-family: var(--ja); font-size: 16px; color: var(--accent); margin-top: 14px; }
 
   /* ---------- cheat sheet ---------- */
   .sheet-title { display: flex; align-items: baseline; gap: 18px; margin-top: 16px; }
@@ -238,6 +239,66 @@
   .card .mj { font-family: var(--ja); font-size: 17px; font-weight: 900; margin-top: 2px; }
   .card .e { margin-top: auto; padding-top: 7px; border-top: 2px dashed var(--line); font-size: 16px; color: var(--ink-2); }
   .card .e .ja { font-size: 13px; color: var(--muted); display: block; margin-top: 1px; }
+
+  /* ---------- 練習問題: section cover ---------- */
+  .qcover { justify-content: center; padding-left: 96px; }
+  .qcover .kicker { font-size: 18px; letter-spacing: .25em; color: var(--accent); }
+  .qcover h1 { font-family: var(--ja); font-weight: 900; font-size: 88px; line-height: 1.15; margin-top: 10px; }
+  .qcover .rule { margin-top: 26px; }
+  .qcover .lead { font-family: var(--ja); font-size: 24px; margin-top: 26px; }
+  .steps { list-style: none; margin-top: 30px; display: flex; flex-direction: column; gap: 14px; }
+  .steps li { display: flex; align-items: center; gap: 16px; font-family: var(--ja); font-size: 21px; color: var(--ink-2); }
+  .steps b {
+    width: 38px; height: 38px; border-radius: 50%;
+    background: var(--pink-soft); color: var(--accent);
+    font-family: var(--en); font-size: 19px;
+    display: grid; place-items: center;
+  }
+
+  /* ---------- 練習問題: question pages ---------- */
+  .q-top { display: flex; align-items: center; gap: 18px; }
+  .q-kicker {
+    font-family: var(--ja); font-size: 17px; color: #fff; background: var(--accent);
+    padding: 5px 14px 6px; border-radius: 999px;
+  }
+  .q-phrase { display: flex; align-items: baseline; gap: 18px; margin-top: 14px; }
+  .q-phrase .en { font-size: 34px; }
+  .q-phrase .ja { font-size: 22px; color: var(--ink-2); }
+  .quiz .rule { margin-top: 18px; }
+  .qs { list-style: none; flex: 1; display: flex; flex-direction: column; margin-top: 20px; }
+  .qs li {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 64px 1fr;
+    column-gap: 24px;
+    align-content: center;
+    align-items: baseline;
+    row-gap: 40px;
+  }
+  .qs li.two { flex: 1.35; row-gap: 30px; }
+  .qs li > :not(.qn) { grid-column: 2; }
+  .qs .qn { grid-row: 1; font-size: 24px; color: var(--accent); }
+  .qs .qj { font-family: var(--ja); font-size: 24px; }
+  .hint {
+    display: inline-block; margin-left: 14px; vertical-align: 3px;
+    font-size: 15px; color: var(--accent); background: var(--pink-soft);
+    padding: 3px 12px 4px; border-radius: 999px;
+  }
+  .write { height: 2px; background: #EDC6D6; flex: 1; }
+  .wl { display: flex; align-items: flex-end; gap: 14px; font-size: 20px; color: var(--muted); }
+
+  /* ---------- 練習問題: answer pages ---------- */
+  .q-range { font-size: 26px; color: var(--muted); }
+  .answers .rule { margin-top: 18px; }
+  .ablocks { flex: 1; display: flex; flex-direction: column; justify-content: space-between; margin-top: 16px; }
+  .ablock + .ablock { border-top: 2px solid var(--line); padding-top: 12px; }
+  .ah { display: flex; align-items: baseline; gap: 12px; font-size: 22px; }
+  .ah .k { color: var(--accent); }
+  .ah .ja { font-size: 17px; color: var(--ink-2); }
+  .ablock ol { list-style: none; margin-top: 6px; }
+  .ablock li { display: flex; align-items: baseline; gap: 14px; font-size: 18px; line-height: 1.4; }
+  .ablock li .qn { width: 30px; color: var(--accent); font-size: 16px; }
+  .ablock li .an { font-size: 14px; color: var(--muted); }
 </style>
 </head>
 <body>
@@ -264,6 +325,7 @@
       <li><b>8</b>I bet ~</li>
       <li><b>9</b>I'm trying to ~</li>
     </ol>
+    <p class="toc-more">＋ 練習問題（全45問）と解答つき</p>
   </div>
 </section>
 
@@ -501,6 +563,272 @@
     <div class="card"><div class="top"><span class="k">7</span><span class="p">Do you mind if I ~?</span></div><p class="mj">〇〇してもいいですか？</p><p class="e">Do you mind if I sit here?<span class="ja">ここに座ってもいいですか？</span></p></div>
     <div class="card"><div class="top"><span class="k">8</span><span class="p">I bet ~</span></div><p class="mj">絶対〇〇やで</p><p class="e">I bet you'll love this movie.<span class="ja">この映画絶対気に入るよ</span></p></div>
     <div class="card"><div class="top"><span class="k">9</span><span class="p">I'm trying to ~</span></div><p class="mj">〇〇しようとしている</p><p class="e">I'm trying to save money.<span class="ja">節約しようとしている</span></p></div>
+  </div>
+</section>
+
+<!-- ============ 練習問題 ============ -->
+<section class="slide qcover">
+  <svg class="blob" viewBox="0 0 1280 720"><path d="M 820 0 C 860 96, 958 150, 1064 160 C 1172 170, 1244 232, 1280 330 L 1280 0 Z"/></svg>
+  <p class="kicker">PRACTICE</p>
+  <h1>練習問題</h1>
+  <div class="rule short"></div>
+  <p class="lead">日本語を英語にしてみよう！　各フレーズ5問 × 9 ＝ 全45問</p>
+  <ol class="steps">
+    <li><b>1</b><span>日本語を読んで、英語で書いてみる</span></li>
+    <li><b>2</b><span>書いた英語を声に出して言ってみる</span></li>
+    <li><b>3</b><span>最後の「解答」ページで答え合わせ</span></li>
+  </ol>
+</section>
+
+<!-- ============ 練習問題 1 ============ -->
+<section class="slide quiz">
+  <svg class="blob" viewBox="0 0 1280 720"><path d="M 820 0 C 860 96, 958 150, 1064 160 C 1172 170, 1244 232, 1280 330 L 1280 0 Z"/></svg>
+  <div class="q-top"><span class="num">1</span><span class="q-kicker">練習問題</span></div>
+  <div class="q-phrase"><span class="en">I feel like <span class="slot">~ing</span></span><span class="ja">〇〇な気分</span></div>
+  <div class="rule"></div>
+  <ol class="qs">
+      <li><span class="qn">Q1</span><p class="qj">今夜はお寿司を食べたい気分。</p><div class="write"></div></li>
+      <li><span class="qn">Q2</span><p class="qj">今日は料理する気分じゃない。</p><div class="write"></div></li>
+      <li><span class="qn">Q3</span><p class="qj">買い物に行きたい気分。</p><div class="write"></div></li>
+      <li><span class="qn">Q4</span><p class="qj">今は何もしたくない気分。</p><div class="write"></div></li>
+      <li><span class="qn">Q5</span><p class="qj">映画を観たい気分。</p><div class="write"></div></li>
+  </ol>
+</section>
+
+<!-- ============ 練習問題 2 ============ -->
+<section class="slide quiz">
+  <svg class="blob" viewBox="0 0 1280 720"><path d="M 820 0 C 860 96, 958 150, 1064 160 C 1172 170, 1244 232, 1280 330 L 1280 0 Z"/></svg>
+  <div class="q-top"><span class="num">2</span><span class="q-kicker">練習問題</span></div>
+  <div class="q-phrase"><span class="en">I used to <span class="slot">~</span></span><span class="ja">昔は〇〇してた</span></div>
+  <div class="rule"></div>
+  <ol class="qs">
+      <li><span class="qn">Q1</span><p class="qj">昔はピアノを弾いてた。</p><div class="write"></div></li>
+      <li><span class="qn">Q2</span><p class="qj">昔は大阪に住んでた。</p><div class="write"></div></li>
+      <li><span class="qn">Q3</span><p class="qj">昔はコーヒーを飲んでた。</p><div class="write"></div></li>
+      <li><span class="qn">Q4</span><p class="qj">昔は毎朝走ってた。</p><div class="write"></div></li>
+      <li><span class="qn">Q5</span><p class="qj">昔は犬を飼ってた。</p><div class="write"></div></li>
+  </ol>
+</section>
+
+<!-- ============ 練習問題 3 ============ -->
+<section class="slide quiz">
+  <svg class="blob" viewBox="0 0 1280 720"><path d="M 820 0 C 860 96, 958 150, 1064 160 C 1172 170, 1244 232, 1280 330 L 1280 0 Z"/></svg>
+  <div class="q-top"><span class="num">3</span><span class="q-kicker">練習問題</span></div>
+  <div class="q-phrase"><span class="en">I should have <span class="slot">~</span></span><span class="ja">〇〇しとけばよかった</span></div>
+  <div class="rule"></div>
+  <ol class="qs">
+      <li><span class="qn">Q1</span><p class="qj">もっと勉強しとけばよかった。</p><div class="write"></div></li>
+      <li><span class="qn">Q2</span><p class="qj">昨日夜ふかししなければよかった。<span class="hint">ヒント：夜ふかしする = stay up late</span></p><div class="write"></div></li>
+      <li><span class="qn">Q3</span><p class="qj">もっと早く寝とけばよかった。<span class="hint">ヒント：go → gone</span></p><div class="write"></div></li>
+      <li><span class="qn">Q4</span><p class="qj">傘を持ってくればよかった。<span class="hint">ヒント：bring → brought</span></p><div class="write"></div></li>
+      <li><span class="qn">Q5</span><p class="qj">あんなに飲まなければよかった。<span class="hint">ヒント：drink → drunk</span></p><div class="write"></div></li>
+  </ol>
+</section>
+
+<!-- ============ 練習問題 4 ============ -->
+<section class="slide quiz">
+  <svg class="blob" viewBox="0 0 1280 720"><path d="M 820 0 C 860 96, 958 150, 1064 160 C 1172 170, 1244 232, 1280 330 L 1280 0 Z"/></svg>
+  <div class="q-top"><span class="num">4</span><span class="q-kicker">練習問題</span></div>
+  <div class="q-phrase"><span class="en">Do you wanna <span class="slot">~</span>?</span><span class="ja">〇〇したい？</span></div>
+  <div class="rule"></div>
+  <ol class="qs">
+      <li><span class="qn">Q1</span><p class="qj">ビーチ行かへん？</p><div class="write"></div></li>
+      <li><span class="qn">Q2</span><p class="qj">コーヒー飲みに行かへん？</p><div class="write"></div></li>
+      <li><span class="qn">Q3</span><p class="qj">映画観る？</p><div class="write"></div></li>
+      <li><span class="qn">Q4</span><p class="qj">一緒にランチ食べへん？</p><div class="write"></div></li>
+      <li><span class="qn">Q5</span><p class="qj">明日遊ばへん？<span class="hint">ヒント：遊ぶ = hang out</span></p><div class="write"></div></li>
+  </ol>
+</section>
+
+<!-- ============ 練習問題 5 ============ -->
+<section class="slide quiz">
+  <svg class="blob" viewBox="0 0 1280 720"><path d="M 820 0 C 860 96, 958 150, 1064 160 C 1172 170, 1244 232, 1280 330 L 1280 0 Z"/></svg>
+  <div class="q-top"><span class="num">5</span><span class="q-kicker">練習問題</span></div>
+  <div class="q-phrase"><span class="en">I&#x27;m looking for <span class="slot">~</span></span><span class="ja">〇〇を探してます</span></div>
+  <div class="rule"></div>
+  <ol class="qs">
+      <li><span class="qn">Q1</span><p class="qj">鍵を探してます。</p><div class="write"></div></li>
+      <li><span class="qn">Q2</span><p class="qj">（どこでもいいから）コンビニを探してるんですけど。</p><div class="write"></div></li>
+      <li><span class="qn">Q3</span><p class="qj">エッフェル塔を探してるんですけど。</p><div class="write"></div></li>
+      <li><span class="qn">Q4</span><p class="qj">友達へのプレゼントを探してます。</p><div class="write"></div></li>
+      <li><span class="qn">Q5</span><p class="qj">出口を探してるんですけど。</p><div class="write"></div></li>
+  </ol>
+</section>
+
+<!-- ============ 練習問題 6 ============ -->
+<section class="slide quiz">
+  <svg class="blob" viewBox="0 0 1280 720"><path d="M 820 0 C 860 96, 958 150, 1064 160 C 1172 170, 1244 232, 1280 330 L 1280 0 Z"/></svg>
+  <div class="q-top"><span class="num">6</span><span class="q-kicker">練習問題</span></div>
+  <div class="q-phrase"><span class="en">I might <span class="slot">~</span></span><span class="ja">〇〇するかもしれない</span></div>
+  <div class="rule"></div>
+  <ol class="qs">
+      <li><span class="qn">Q1</span><p class="qj">パーティー行くかも。</p><div class="write"></div></li>
+      <li><span class="qn">Q2</span><p class="qj">新しい携帯買うかも。</p><div class="write"></div></li>
+      <li><span class="qn">Q3</span><p class="qj">時間ないかも。</p><div class="write"></div></li>
+      <li><span class="qn">Q4</span><p class="qj">今夜電話するかも。</p><div class="write"></div></li>
+      <li><span class="qn">Q5</span><p class="qj">週末は家にいるかも。</p><div class="write"></div></li>
+  </ol>
+</section>
+
+<!-- ============ 練習問題 7 ============ -->
+<section class="slide quiz">
+  <svg class="blob" viewBox="0 0 1280 720"><path d="M 820 0 C 860 96, 958 150, 1064 160 C 1172 170, 1244 232, 1280 330 L 1280 0 Z"/></svg>
+  <div class="q-top"><span class="num">7</span><span class="q-kicker">練習問題</span></div>
+  <div class="q-phrase"><span class="en">Do you mind if I <span class="slot">~</span>?</span><span class="ja">〇〇してもいいですか？</span></div>
+  <div class="rule"></div>
+  <ol class="qs">
+      <li><span class="qn">Q1</span><p class="qj">ドアを閉めてもいいですか？</p><div class="write"></div></li>
+      <li><span class="qn">Q2</span><p class="qj">このペン使ってもいいですか？</p><div class="write"></div></li>
+      <li><span class="qn">Q3</span><p class="qj">写真を撮ってもいいですか？</p><div class="write"></div></li>
+      <li><span class="qn">Q4</span><p class="qj">トイレを借りてもいいですか？</p><div class="write"></div></li>
+      <li class="two"><span class="qn">Q5</span><p class="qj">A「エアコンつけてもいいですか？」　B「どうぞ！」<span class="hint">ヒント：エアコンをつける = turn on the AC</span></p><div class="wl"><span>A:</span><div class="write"></div></div><div class="wl"><span>B:</span><div class="write"></div></div></li>
+  </ol>
+</section>
+
+<!-- ============ 練習問題 8 ============ -->
+<section class="slide quiz">
+  <svg class="blob" viewBox="0 0 1280 720"><path d="M 820 0 C 860 96, 958 150, 1064 160 C 1172 170, 1244 232, 1280 330 L 1280 0 Z"/></svg>
+  <div class="q-top"><span class="num">8</span><span class="q-kicker">練習問題</span></div>
+  <div class="q-phrase"><span class="en">I bet <span class="slot">~</span></span><span class="ja">絶対〇〇やで</span></div>
+  <div class="rule"></div>
+  <ol class="qs">
+      <li><span class="qn">Q1</span><p class="qj">絶対あいつ遅刻するで。</p><div class="write"></div></li>
+      <li><span class="qn">Q2</span><p class="qj">彼女絶対気に入るで。</p><div class="write"></div></li>
+      <li><span class="qn">Q3</span><p class="qj">絶対疲れてるやろ。</p><div class="write"></div></li>
+      <li><span class="qn">Q4</span><p class="qj">明日は絶対晴れるで。</p><div class="write"></div></li>
+      <li><span class="qn">Q5</span><p class="qj">あのお店、絶対混んでるわ。<span class="hint">ヒント：混んでる = crowded</span></p><div class="write"></div></li>
+  </ol>
+</section>
+
+<!-- ============ 練習問題 9 ============ -->
+<section class="slide quiz">
+  <svg class="blob" viewBox="0 0 1280 720"><path d="M 820 0 C 860 96, 958 150, 1064 160 C 1172 170, 1244 232, 1280 330 L 1280 0 Z"/></svg>
+  <div class="q-top"><span class="num">9</span><span class="q-kicker">練習問題</span></div>
+  <div class="q-phrase"><span class="en">I&#x27;m trying to <span class="slot">~</span></span><span class="ja">〇〇しようとしている</span></div>
+  <div class="rule"></div>
+  <ol class="qs">
+      <li><span class="qn">Q1</span><p class="qj">痩せようとしてる。<span class="hint">ヒント：痩せる = lose weight</span></p><div class="write"></div></li>
+      <li><span class="qn">Q2</span><p class="qj">今寝ようとしてるところ。</p><div class="write"></div></li>
+      <li><span class="qn">Q3</span><p class="qj">早起きしようとしてる。</p><div class="write"></div></li>
+      <li><span class="qn">Q4</span><p class="qj">毎日英語を話そうとしてる。</p><div class="write"></div></li>
+      <li><span class="qn">Q5</span><p class="qj">今集中しようとしてるところ。<span class="hint">ヒント：集中する = focus</span></p><div class="write"></div></li>
+  </ol>
+</section>
+
+<!-- ============ 解答 1〜3 ============ -->
+<section class="slide answers">
+  <svg class="blob" viewBox="0 0 1280 720"><path d="M 820 0 C 860 96, 958 150, 1064 160 C 1172 170, 1244 232, 1280 330 L 1280 0 Z"/></svg>
+  <div class="q-top"><span class="num ja">解答</span><span class="q-range">1〜3</span></div>
+  <div class="rule"></div>
+  <div class="ablocks">
+    <div class="ablock">
+      <p class="ah"><span class="k">1</span><span class="en">I feel like <span class="slot">~ing</span></span><span class="ja">〇〇な気分</span></p>
+      <ol>
+        <li><span class="qn">Q1</span><span class="en"><mark>I feel like</mark> eating sushi tonight.</span></li>
+        <li><span class="qn">Q2</span><span class="en"><mark>I don&#x27;t feel like</mark> cooking today.</span></li>
+        <li><span class="qn">Q3</span><span class="en"><mark>I feel like</mark> going shopping.</span></li>
+        <li><span class="qn">Q4</span><span class="en"><mark>I don&#x27;t feel like</mark> doing anything right now.</span></li>
+        <li><span class="qn">Q5</span><span class="en"><mark>I feel like</mark> watching a movie.</span></li>
+      </ol>
+    </div>
+    <div class="ablock">
+      <p class="ah"><span class="k">2</span><span class="en">I used to <span class="slot">~</span></span><span class="ja">昔は〇〇してた</span></p>
+      <ol>
+        <li><span class="qn">Q1</span><span class="en"><mark>I used to</mark> play the piano.</span></li>
+        <li><span class="qn">Q2</span><span class="en"><mark>I used to</mark> live in Osaka.</span></li>
+        <li><span class="qn">Q3</span><span class="en"><mark>I used to</mark> drink coffee.</span></li>
+        <li><span class="qn">Q4</span><span class="en"><mark>I used to</mark> run every morning.</span></li>
+        <li><span class="qn">Q5</span><span class="en"><mark>I used to</mark> have a dog.</span></li>
+      </ol>
+    </div>
+    <div class="ablock">
+      <p class="ah"><span class="k">3</span><span class="en">I should have <span class="slot">~</span></span><span class="ja">〇〇しとけばよかった</span></p>
+      <ol>
+        <li><span class="qn">Q1</span><span class="en"><mark>I should have</mark> studied more.</span></li>
+        <li><span class="qn">Q2</span><span class="en"><mark>I shouldn&#x27;t have</mark> stayed up late last night.</span></li>
+        <li><span class="qn">Q3</span><span class="en"><mark>I should have</mark> gone to bed earlier.</span></li>
+        <li><span class="qn">Q4</span><span class="en"><mark>I should have</mark> brought an umbrella.</span></li>
+        <li><span class="qn">Q5</span><span class="en"><mark>I shouldn&#x27;t have</mark> drunk so much.</span></li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 解答 4〜6 ============ -->
+<section class="slide answers">
+  <svg class="blob" viewBox="0 0 1280 720"><path d="M 820 0 C 860 96, 958 150, 1064 160 C 1172 170, 1244 232, 1280 330 L 1280 0 Z"/></svg>
+  <div class="q-top"><span class="num ja">解答</span><span class="q-range">4〜6</span></div>
+  <div class="rule"></div>
+  <div class="ablocks">
+    <div class="ablock">
+      <p class="ah"><span class="k">4</span><span class="en">Do you wanna <span class="slot">~</span>?</span><span class="ja">〇〇したい？</span></p>
+      <ol>
+        <li><span class="qn">Q1</span><span class="en"><mark>Do you wanna</mark> go to the beach?</span></li>
+        <li><span class="qn">Q2</span><span class="en"><mark>Do you wanna</mark> get coffee?</span></li>
+        <li><span class="qn">Q3</span><span class="en"><mark>Do you wanna</mark> watch a movie?</span></li>
+        <li><span class="qn">Q4</span><span class="en"><mark>Do you wanna</mark> have lunch together?</span></li>
+        <li><span class="qn">Q5</span><span class="en"><mark>Do you wanna</mark> hang out tomorrow?</span></li>
+      </ol>
+    </div>
+    <div class="ablock">
+      <p class="ah"><span class="k">5</span><span class="en">I&#x27;m looking for <span class="slot">~</span></span><span class="ja">〇〇を探してます</span></p>
+      <ol>
+        <li><span class="qn">Q1</span><span class="en"><mark>I&#x27;m looking for</mark> my keys.</span><span class="an ja">自分の鍵なので my</span></li>
+        <li><span class="qn">Q2</span><span class="en"><mark>I&#x27;m looking for</mark> a convenience store.</span><span class="an ja">一般的なもの → a</span></li>
+        <li><span class="qn">Q3</span><span class="en"><mark>I&#x27;m looking for</mark> the Eiffel Tower.</span><span class="an ja">有名な建物 → the</span></li>
+        <li><span class="qn">Q4</span><span class="en"><mark>I&#x27;m looking for</mark> a gift for my friend.</span></li>
+        <li><span class="qn">Q5</span><span class="en"><mark>I&#x27;m looking for</mark> the exit.</span><span class="an ja">特定の場所 → the</span></li>
+      </ol>
+    </div>
+    <div class="ablock">
+      <p class="ah"><span class="k">6</span><span class="en">I might <span class="slot">~</span></span><span class="ja">〇〇するかもしれない</span></p>
+      <ol>
+        <li><span class="qn">Q1</span><span class="en"><mark>I might</mark> go to the party.</span></li>
+        <li><span class="qn">Q2</span><span class="en"><mark>I might</mark> buy a new phone.</span></li>
+        <li><span class="qn">Q3</span><span class="en"><mark>I might not</mark> have time.</span></li>
+        <li><span class="qn">Q4</span><span class="en"><mark>I might</mark> call you tonight.</span></li>
+        <li><span class="qn">Q5</span><span class="en"><mark>I might</mark> stay home this weekend.</span></li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 解答 7〜9 ============ -->
+<section class="slide answers">
+  <svg class="blob" viewBox="0 0 1280 720"><path d="M 820 0 C 860 96, 958 150, 1064 160 C 1172 170, 1244 232, 1280 330 L 1280 0 Z"/></svg>
+  <div class="q-top"><span class="num ja">解答</span><span class="q-range">7〜9</span></div>
+  <div class="rule"></div>
+  <div class="ablocks">
+    <div class="ablock">
+      <p class="ah"><span class="k">7</span><span class="en">Do you mind if I <span class="slot">~</span>?</span><span class="ja">〇〇してもいいですか？</span></p>
+      <ol>
+        <li><span class="qn">Q1</span><span class="en"><mark>Do you mind if I</mark> close the door?</span></li>
+        <li><span class="qn">Q2</span><span class="en"><mark>Do you mind if I</mark> use this pen?</span></li>
+        <li><span class="qn">Q3</span><span class="en"><mark>Do you mind if I</mark> take a picture?</span></li>
+        <li><span class="qn">Q4</span><span class="en"><mark>Do you mind if I</mark> use your bathroom?</span><span class="an ja">「借りる」は borrow ではなく use</span></li>
+        <li><span class="qn">Q5</span><span class="en">A: <mark>Do you mind if I</mark> turn on the AC?　B: No, go ahead! / Sure, go ahead!</span></li>
+      </ol>
+    </div>
+    <div class="ablock">
+      <p class="ah"><span class="k">8</span><span class="en">I bet <span class="slot">~</span></span><span class="ja">絶対〇〇やで</span></p>
+      <ol>
+        <li><span class="qn">Q1</span><span class="en"><mark>I bet</mark> he&#x27;s going to be late.</span></li>
+        <li><span class="qn">Q2</span><span class="en"><mark>I bet</mark> she&#x27;ll love it.</span></li>
+        <li><span class="qn">Q3</span><span class="en"><mark>I bet</mark> you&#x27;re tired.</span></li>
+        <li><span class="qn">Q4</span><span class="en"><mark>I bet</mark> it&#x27;s going to be sunny tomorrow.</span></li>
+        <li><span class="qn">Q5</span><span class="en"><mark>I bet</mark> that restaurant is crowded.</span></li>
+      </ol>
+    </div>
+    <div class="ablock">
+      <p class="ah"><span class="k">9</span><span class="en">I&#x27;m trying to <span class="slot">~</span></span><span class="ja">〇〇しようとしている</span></p>
+      <ol>
+        <li><span class="qn">Q1</span><span class="en"><mark>I&#x27;m trying to</mark> lose weight.</span></li>
+        <li><span class="qn">Q2</span><span class="en"><mark>I&#x27;m trying to</mark> sleep.</span></li>
+        <li><span class="qn">Q3</span><span class="en"><mark>I&#x27;m trying to</mark> wake up early.</span></li>
+        <li><span class="qn">Q4</span><span class="en"><mark>I&#x27;m trying to</mark> speak English every day.</span></li>
+        <li><span class="qn">Q5</span><span class="en"><mark>I&#x27;m trying to</mark> focus.</span></li>
+      </ol>
+    </div>
   </div>
 </section>
 
