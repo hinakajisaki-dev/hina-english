@@ -7,7 +7,7 @@ const PptxGenJS = require("pptxgenjs");
 const JSZip = require("jszip");
 const { writeFileSync } = require("node:fs");
 const { resolve } = require("node:path");
-const { pathToFileURL } = require("node:url");
+const { pathToFileURL, fileURLToPath } = require("node:url");
 
 const [input, output] = process.argv.slice(2);
 if (!input || !output) {
@@ -66,6 +66,11 @@ function extract() {
     const visit = (el) => {
       const cs = getComputedStyle(el);
       if (cs.display === "none") return;
+
+      if (el.tagName === "IMG") {
+        items.push({ kind: "image", ...box(el.getBoundingClientRect()), src: el.src, alt: el.alt });
+        return;
+      }
 
       // Decorative SVG shapes (absolute M/C/L/Z paths in slide pixels) become freeform shapes.
       if (el.tagName.toLowerCase() === "svg") {
@@ -198,6 +203,10 @@ async function slim(buffer) {
   const out = new JSZip();
   for (const [path, entry] of Object.entries(zip.files)) {
     if (entry.dir || OPTIONAL.test(path)) continue;
+    if (!/\.(xml|rels)$/.test(path)) {
+      out.file(path, await entry.async("uint8array"), { createFolders: false }); // media: copy bytes as-is
+      continue;
+    }
     let data = await entry.async("string");
     if (path === "[Content_Types].xml") {
       data = data.replace(/<Override PartName="\/(ppt\/notes(Slides|Masters)\/|docProps\/|ppt\/(viewProps|tableStyles)\.xml)[^>]*\/>/g, "");
@@ -245,6 +254,8 @@ async function slim(buffer) {
           opts.rectRadius = it.radius * PX;
         }
         slide.addShape(shape, opts);
+      } else if (it.kind === "image") {
+        slide.addImage({ path: fileURLToPath(it.src), altText: it.alt, x: px(it.x), y: px(it.y), w: px(it.w), h: px(it.h) });
       } else if (it.kind === "path") {
         const points = it.segs.flatMap((seg) => {
           const [a1, a2, a3, a4, a5, a6] = seg.v.map((n) => n * PX);
@@ -264,7 +275,7 @@ async function slim(buffer) {
         });
       } else {
         // Leave slack so a slightly different text renderer never wraps a line.
-        const slack = it.w * 0.15 + 12;
+        const slack = it.w * 0.15 + 36;
         const x = it.align === "center" ? it.x - slack / 2 : it.x;
         const runs = it.runs.flatMap(splitByScript).map((run) => ({
           text: run.text,
