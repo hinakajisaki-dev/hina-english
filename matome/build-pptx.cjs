@@ -66,6 +66,30 @@ function extract() {
     const visit = (el) => {
       const cs = getComputedStyle(el);
       if (cs.display === "none") return;
+
+      // Decorative SVG shapes (absolute M/C/L/Z paths in slide pixels) become freeform shapes.
+      if (el.tagName.toLowerCase() === "svg") {
+        for (const path of el.querySelectorAll("path")) {
+          const tokens = path.getAttribute("d").match(/[MCLZ]|-?[\d.]+/gi);
+          const segs = [];
+          for (let i = 0; i < tokens.length; ) {
+            const cmd = tokens[i++].toUpperCase();
+            const n = { M: 2, L: 2, C: 6, Z: 0 }[cmd];
+            segs.push({ cmd, v: tokens.slice(i, i + n).map(Number) });
+            i += n;
+          }
+          const xs = segs.flatMap((s) => s.v.filter((_, k) => k % 2 === 0));
+          const ys = segs.flatMap((s) => s.v.filter((_, k) => k % 2 === 1));
+          const x = Math.min(...xs), y = Math.min(...ys);
+          items.push({
+            kind: "path",
+            x, y, w: Math.max(...xs) - x, h: Math.max(...ys) - y,
+            segs: segs.map((s) => ({ cmd: s.cmd, v: s.v.map((n, k) => n - (k % 2 === 0 ? x : y)) })),
+            fill: hex(getComputedStyle(path).fill),
+          });
+        }
+        return;
+      }
       const r = el.getBoundingClientRect();
       const b = box(r);
 
@@ -154,11 +178,15 @@ function extract() {
 
 // Latin glyphs come from the element's first font; everything else (kana, kanji,
 // full-width punctuation) falls back to the Japanese font, just like in the browser.
+// The PDF uses Liberation Sans, which is metric-compatible with Arial; PowerPoint and
+// Google Slides both have Arial, so the .pptx asks for that.
+const PPTX_FONT = { "Liberation Sans": "Arial" };
 function splitByScript(run) {
-  const JA = "Zen Maru Gothic";
+  const JA = "Noto Sans JP";
   if (run.latinFont === JA) return [{ ...run, font: JA }];
+  const latin = PPTX_FONT[run.latinFont] || run.latinFont;
   const parts = run.text.match(/[\u0000-\u1fff]+|[^\u0000-\u1fff]+/g) || [];
-  return parts.map((text) => ({ ...run, text, font: /^[\u0000-\u1fff]/.test(text) ? run.latinFont : JA }));
+  return parts.map((text) => ({ ...run, text, font: /^[\u0000-\u1fff]/.test(text) ? latin : JA }));
 }
 
 // Slim the package down (it is small enough to upload anywhere, e.g. Google Drive):
@@ -217,6 +245,18 @@ async function slim(buffer) {
           opts.rectRadius = it.radius * PX;
         }
         slide.addShape(shape, opts);
+      } else if (it.kind === "path") {
+        const points = it.segs.flatMap((seg) => {
+          const [a1, a2, a3, a4, a5, a6] = seg.v.map((n) => n * PX);
+          if (seg.cmd === "M") return [{ x: a1, y: a2, moveTo: true }];
+          if (seg.cmd === "L") return [{ x: a1, y: a2 }];
+          if (seg.cmd === "C") return [{ x: a5, y: a6, curve: { type: "cubic", x1: a1, y1: a2, x2: a3, y2: a4 } }];
+          return [{ close: true }];
+        });
+        slide.addShape(pres.shapes.CUSTOM_GEOMETRY, {
+          x: px(it.x), y: px(it.y), w: px(it.w), h: px(it.h), points,
+          fill: { color: it.fill.hex }, line: { type: "none" },
+        });
       } else if (it.kind === "line") {
         slide.addShape(pres.shapes.LINE, {
           x: px(it.x), y: px(it.y), w: px(it.w), h: 0,

@@ -18,7 +18,7 @@ if (!input || !output) {
   // Fonts live in matome/fonts; fail loudly instead of silently printing with a fallback font.
   const missing = await page.evaluate(() => {
     const loaded = new Set([...document.fonts].filter((f) => f.status === "loaded").map((f) => f.family.replace(/"/g, "")));
-    return ["Nunito", "Zen Maru Gothic"].filter((f) => !loaded.has(f));
+    return ["Liberation Sans", "Noto Sans JP"].filter((f) => !loaded.has(f));
   });
   if (missing.length) throw new Error(`fonts failed to load: ${missing.join(", ")}`);
   await page.pdf({

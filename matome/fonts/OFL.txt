@@ -1,12 +1,11 @@
-Nunito-*.woff2:
-Copyright 2014 The Nunito Project Authors (https://github.com/googlefonts/nunito)
+NotoSansJP-*.woff2 (Noto Sans JP, downloaded from Google Fonts, converted to WOFF2):
+(c) 2014-2021 Adobe (http://www.adobe.com/), with Reserved Font Name 'Source'.
 
-ZenMaruGothic-*.woff2:
-Copyright 2021 The Zen Maru Gothic Authors (https://github.com/googlefonts/zen-marugothic)
+LiberationSans-Bold.ttf (Liberation Sans 2.1.5, unmodified):
+Digitized data copyright (c) 2010 Google Corporation.
+Copyright (c) 2012 Red Hat, Inc.
 
-Both fonts were downloaded from Google Fonts and converted to WOFF2 unchanged.
-
-This Font Software is licensed under the SIL Open Font License, Version 1.1.
+These fonts are licensed under the SIL Open Font License, Version 1.1.
 This license is copied below, and is also available with a FAQ at:
 https://openfontlicense.org
 
