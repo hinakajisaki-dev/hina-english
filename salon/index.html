@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Hina English</title>
-<meta name="description" content="書いて、話して、学んで、もう一度使う。毎月16回のオンラインライブと6本の講義動画、5レベル・2,500語の学習アプリで、英語を暮らしの中に。Hina English のオンラインサロンです。">
+<meta name="description" content="書いて、話して、学んで、もう一度使う。毎月16回のZoomライブと6本の講義動画、5レベル・3,000語の学習アプリで、英語を暮らしの中に。Hina English のオンラインサロンです。">
 <!-- TODO: 公開するときに OGP（og:title / og:description / og:image / og:url）を追加 -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -315,7 +315,7 @@
   .pillar h3 { font-weight: 900; font-size: 21px; line-height: 1.5; }
   .pillar p { color: var(--ink-2); font-size: 15px; }
   .pillar .chip { align-self: flex-start; }
-  .pillar .label, .step-head .label { color: var(--accent-text); font-size: 13px; }
+  .pillar .label, .step-head .label, .teacher .label { color: var(--accent-text); font-size: 13px; }
 
   /* ---------- the app ---------- */
   .loop {
@@ -410,7 +410,7 @@
 
   /* five levels drawn as a staircase */
   .levels-wrap { margin-top: 24px; background: var(--card); border-radius: 26px; box-shadow: var(--shadow); padding: 24px 24px 20px; }
-  .levels { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; align-items: end; height: 230px; }
+  .levels { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); align-items: end; height: 230px; }
   .levels li {
     height: var(--h);
     display: flex;
@@ -418,7 +418,7 @@
     justify-content: flex-end;
     gap: 2px;
     min-width: 0;
-    border-radius: 16px 16px 6px 6px;
+    border-radius: 0 14px 0 0;
     padding: 12px 14px 14px;
   }
   .levels li:nth-child(1) { --h: 36%; background: #FFE6DC; }
@@ -431,6 +431,7 @@
   .levels small { font-family: var(--ja); font-size: 12px; font-weight: 900; margin-left: 1px; }
   .levels-cap { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px 16px; margin-top: 14px; font-size: 14px; color: var(--ink-2); }
   .levels-cap b { color: var(--ink); font-weight: 900; }
+  .levels li:first-child { border-bottom-left-radius: 8px; }
 
   .learn3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; align-items: start; margin-top: 28px; }
   .learn-item { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
@@ -514,6 +515,60 @@
   .chart { display: grid; grid-template-columns: repeat(14, minmax(0, 1fr)); gap: 5px; align-items: end; height: 96px; margin-top: 8px; border-bottom: 1.5px solid var(--line); }
   .chart i { height: var(--h); background: var(--accent); border-radius: 4px 4px 1px 1px; }
 
+  /* ---------- photos (placeholders until the real photos arrive) ---------- */
+  .photos-head { margin-top: 56px; display: grid; gap: 4px; }
+  .photos-head h3 { font-weight: 900; font-size: clamp(20px, 2.2vw, 24px); }
+  .photos { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 16px; margin-top: 18px; }
+  .photo { position: relative; margin: 0; border-radius: 22px; overflow: hidden; aspect-ratio: 16 / 10; min-width: 0; }
+  .photo.big { grid-row: span 2; aspect-ratio: auto; min-height: 260px; }
+  .photo img { width: 100%; height: 100%; object-fit: cover; }
+  .photo-slot {
+    width: 100%;
+    height: 100%;
+    display: grid;
+    place-content: center;
+    justify-items: center;
+    gap: 6px;
+    background: var(--tbd-bg);
+    border: 2px dashed var(--tbd-line);
+    border-radius: 22px;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--ink-2);
+    text-align: center;
+    padding: 16px;
+  }
+  .photo-slot svg { width: 30px; height: 30px; color: var(--tbd-line); }
+  .photo figcaption { position: absolute; left: 14px; bottom: 14px; }
+
+  /* ---------- teachers ---------- */
+  .teachers { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; margin-top: 44px; }
+  .teacher {
+    display: grid;
+    grid-template-columns: 88px minmax(0, 1fr);
+    gap: 18px;
+    align-items: start;
+    background: var(--card);
+    border-radius: 24px;
+    box-shadow: var(--shadow);
+    padding: 24px;
+    min-width: 0;
+  }
+  .t-photo {
+    width: 88px;
+    height: 88px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    background: var(--tbd-bg);
+    border: 2px dashed var(--tbd-line);
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--ink-2);
+  }
+  .teacher h4 { font-weight: 900; font-size: 19px; line-height: 1.5; margin-top: 2px; }
+  .teacher p:last-child { color: var(--ink-2); font-size: 15px; margin-top: 6px; }
+
   /* ---------- profile ---------- */
   .profile { display: grid; grid-template-columns: 200px minmax(0, 1fr); gap: 40px; align-items: center; }
   .portrait {
@@ -526,7 +581,9 @@
   }
   .portrait img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 0; }
   .profile h3 { display: flex; align-items: baseline; gap: 14px; font-weight: 900; font-size: 28px; }
+  .profile h3 { flex-wrap: wrap; }
   .profile h3 .script { font-size: 30px; }
+  .profile h3 .chip { align-self: center; }
   .profile-text { display: grid; gap: 14px; margin-top: 10px; color: var(--ink-2); max-width: 36em; }
   .text-link { font-weight: 700; color: var(--accent-text); text-underline-offset: 4px; }
 
@@ -623,7 +680,8 @@
     .hello { left: -22%; top: 8%; font-size: 17px; }
     .sticker { width: 52px; height: 52px; border-radius: 16px; }
     .sticker svg { width: 26px; height: 26px; }
-    .pillars, .pair, .learn3, .flow { grid-template-columns: minmax(0, 1fr); }
+    .pillars, .pair, .learn3, .flow, .teachers, .photos { grid-template-columns: minmax(0, 1fr); }
+    .photo.big { grid-row: auto; aspect-ratio: 16 / 10; min-height: 0; }
     .pair { gap: 64px; }
     .price-card { grid-template-columns: minmax(0, 1fr); }
     .final .wrap { grid-template-columns: minmax(0, 1fr) 160px; }
@@ -649,8 +707,8 @@
     .loop { padding-inline: 4px; }
     .loop li { font-size: 11px; }
     .levels-wrap { padding: 18px 14px 16px; }
-    .levels { gap: 6px; height: 190px; }
-    .levels li { padding: 8px 6px 10px; border-radius: 12px 12px 4px 4px; }
+    .levels { height: 190px; }
+    .levels li { padding: 8px 6px 10px; border-radius: 0 10px 0 0; }
     .levels b { font-size: 12px; }
     .levels span { font-size: 17px; }
     .levels small { font-size: 10px; }
@@ -697,6 +755,7 @@
     <nav class="site-nav" aria-label="ページ内リンク">
       <a href="#features">サロンの中身</a>
       <a href="#app">アプリ</a>
+      <a href="#teachers">講師</a>
       <a href="#price">料金</a>
       <a href="#faq">よくある質問</a>
       <a class="btn" href="#price">参加する</a>
@@ -713,7 +772,7 @@
         <p class="eyebrow"><span class="label">Online Salon</span><span class="chip">英語学習コミュニティ</span></p>
         <p class="script" lang="en">Small steps, big changes.</p>
         <h1>英語を、<br>暮らしの中に。</h1>
-        <p class="lead">書いて、話して、学んで、もう一度使う。毎月のオンラインライブと講義動画、5つのレベルに分かれた学習アプリで、あなたのペースで英語を続けるオンラインサロンです。</p>
+        <p class="lead">書いて、話して、学んで、もう一度使う。毎月16回のZoomライブと講義動画、5つのレベルに分かれた学習アプリで、あなたのペースで英語を続けるオンラインサロンです。</p>
         <dl class="stats">
           <div>
             <dt>オンラインライブ</dt>
@@ -726,13 +785,13 @@
           </div>
           <div>
             <dt>単語帳</dt>
-            <dd><span class="n">2,500</span>語</dd>
+            <dd><span class="n">3,000</span>語</dd>
             <dd class="chip">5レベル</dd>
           </div>
         </dl>
         <div class="cta-row">
           <a class="btn" href="#price">サロンに参加する</a>
-          <p class="cta-note">月額 <span class="tbd">¥X,XXX</span>（税込）・<span class="tbd">いつでも退会OK</span></p>
+          <p class="cta-note">月額 ¥12,000<span class="tbd">（税込）</span></p>
         </div>
       </div>
       <figure class="hero-figure">
@@ -774,7 +833,7 @@
           <p class="label">Live</p>
           <p class="big">16<small>回/月</small></p>
           <h3>オンラインライブ</h3>
-          <p>週4回ペースで開催。そのうち月4回は、ひなが担当します。質問したり、声に出して練習したり。</p>
+          <p>Zoomで、週4回ペースで開催。ひなが月4回、ほかの回はネイティブ講師と、TOEIC 900点以上の日本人講師が担当します。</p>
         </article>
         <article class="pillar">
           <p class="label">Lesson</p>
@@ -786,8 +845,28 @@
           <p class="label">App</p>
           <p class="big">5<small>レベル</small></p>
           <h3>学習アプリ Hina English</h3>
-          <p>初級1から上級まで、2,500語の単語帳。ジャーナリング、AI添削、フレーズ練習、発音・聞き取り、復習テストまで、ひとつのアプリでできます。</p>
+          <p>初級1から上級まで、3,000語の単語帳。ジャーナリング、AI添削、フレーズ練習、発音・聞き取り、復習テストまで、ひとつのアプリでできます。</p>
         </article>
+      </div>
+
+      <!-- 写真が届いたら .photo-slot を <img src="..." alt="..."> に差し替える -->
+      <div class="photos-head">
+        <p class="label">Inside the salon</p>
+        <h3>ライブと講義動画の様子</h3>
+      </div>
+      <div class="photos">
+        <figure class="photo big">
+          <div class="photo-slot"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z M12 17a4 4 0 1 0 0-8 4 4 0 0 0 0 8z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>ライブの写真が入ります</div>
+          <figcaption class="chip white">Zoomライブ</figcaption>
+        </figure>
+        <figure class="photo">
+          <div class="photo-slot"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z M12 17a4 4 0 1 0 0-8 4 4 0 0 0 0 8z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>ライブの写真が入ります</div>
+          <figcaption class="chip white">Zoomライブ</figcaption>
+        </figure>
+        <figure class="photo">
+          <div class="photo-slot"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z M12 17a4 4 0 1 0 0-8 4 4 0 0 0 0 8z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>講義動画の写真が入ります</div>
+          <figcaption class="chip white">講義動画</figcaption>
+        </figure>
       </div>
     </div>
   </section>
@@ -855,17 +934,17 @@
         <div class="step-head">
           <p class="label">03 · 学習</p>
           <h3 class="en" lang="en">Learn the English you want to use.</h3>
-          <p>初級1から上級まで、5つのレベル。それぞれのレベルに合った単語帳や教材で、ひなの音声と一緒に学びます。</p>
+          <p>初級1から上級まで、5つのレベル。それぞれのレベルに合った単語帳や教材で学びます。単語は、すべてひなの音声つきです。</p>
         </div>
-        <div class="levels-wrap" role="img" aria-label="5つのレベル。初級1、初級2、中級1、中級2、上級。各500語、合計2,500語">
+        <div class="levels-wrap" role="img" aria-label="5つのレベル。初級1は600語、初級2は650語、中級1は600語、中級2は650語、上級は500語。合計3,000語">
           <ol class="levels">
-            <li><b>初級1</b><span>500<small>語</small></span></li>
-            <li><b>初級2</b><span>500<small>語</small></span></li>
-            <li><b>中級1</b><span>500<small>語</small></span></li>
-            <li><b>中級2</b><span>500<small>語</small></span></li>
+            <li><b>初級1</b><span>600<small>語</small></span></li>
+            <li><b>初級2</b><span>650<small>語</small></span></li>
+            <li><b>中級1</b><span>600<small>語</small></span></li>
+            <li><b>中級2</b><span>650<small>語</small></span></li>
             <li><b>上級</b><span>500<small>語</small></span></li>
           </ol>
-          <p class="levels-cap"><span>レベルごとに、そのレベルに合った単語帳があります</span><b>合計 2,500語</b></p>
+          <p class="levels-cap"><span>すべての単語に、ひなの音声つき</span><b>合計 3,000語</b></p>
         </div>
 
         <div class="learn3">
@@ -968,23 +1047,42 @@
     </div>
   </section>
 
-  <!-- ============ profile ============ -->
-  <section class="section blue" id="about">
+  <!-- ============ teachers ============ -->
+  <section class="section blue" id="teachers">
     <div class="wrap">
       <header class="sec-head">
-        <p class="label">About</p>
-        <h2>サロンを運営する人</h2>
+        <p class="label">Teachers</p>
+        <h2>講師</h2>
+        <p class="sub">ひなのほかに、ネイティブ講師と、TOEIC 900点以上の日本人講師がZoomライブを担当します。</p>
       </header>
       <div class="profile">
         <div class="portrait"><img src="character.png" width="638" height="852" alt="ひなのイラスト" loading="lazy"></div>
         <div>
-          <h3>ひな<span class="script" lang="en">Hina</span></h3>
+          <h3>ひな<span class="script" lang="en">Hina</span><span class="chip">主宰・ライブ月4回</span></h3>
           <div class="profile-text">
-            <p>YouTubeで、日常でよく使う英会話フレーズを紹介しています。アプリの単語カードやフレーズ練習のお手本音声も、ひなの声です。</p>
+            <p>YouTubeで、日常でよく使う英会話フレーズを紹介しています。アプリの単語とフレーズのお手本音声は、すべてひなの声です。</p>
             <p class="tbd">ここに経歴や英語との出会い、サロンをはじめた理由を書きます。</p>
             <p><a class="text-link tbd" href="#">YouTubeチャンネルを見る →</a></p>
           </div>
         </div>
+      </div>
+      <div class="teachers">
+        <article class="teacher">
+          <div class="t-photo">写真</div>
+          <div>
+            <p class="label">Native</p>
+            <h4>ネイティブ講師</h4>
+            <p>ネイティブならではの自然な発音や言い回しに、Zoomライブでふれられます。</p>
+          </div>
+        </article>
+        <article class="teacher">
+          <div class="t-photo">写真</div>
+          <div>
+            <p class="label">TOEIC 900+</p>
+            <h4>日本人講師</h4>
+            <p>TOEIC 900点以上の日本人講師。英語を学んできた日本人の目線で、つまずきやすいところを教えます。</p>
+          </div>
+        </article>
       </div>
     </div>
   </section>
@@ -999,17 +1097,17 @@
       <div class="price-card">
         <div class="price-main">
           <p class="plan">月額プラン</p>
-          <p class="price"><span class="amount tbd">¥X,XXX</span><span class="per">/ 月（税込）</span></p>
-          <p class="price-note"><span class="tbd">いつでも退会できます。</span></p>
+          <p class="price"><span class="amount">¥12,000</span><span class="per">/ 月<span class="tbd">（税込）</span></span></p>
+          <p class="price-note">Zoomライブだけで考えても、1回あたり750円です。</p>
           <!-- TODO: 申し込みページが決まったら、そのURLに変える（今はアプリのトップ） -->
           <a class="btn" href="https://hina-english-flax.vercel.app/">サロンに参加する</a>
         </div>
         <div class="price-inc">
           <h3>プランに含まれるもの</h3>
           <ul class="inc">
-            <li><span class="label">Live</span><span><b>オンラインライブ 月16回</b><small>うち月4回はひなが担当</small></span></li>
+            <li><span class="label">Live</span><span><b>Zoomライブ 月16回</b><small>ひなが月4回、ほかの回はネイティブ講師と日本人講師が担当</small></span></li>
             <li><span class="label">Lesson</span><span><b>講義動画 毎月6本</b><small>好きな時間に、何度でも</small></span></li>
-            <li><span class="label">App</span><span><b>学習アプリ Hina English</b><small>5レベル・2,500語の単語帳、ジャーナリング、AI添削とAI相談、フレーズ練習、発音・聞き取り（91フレーズ）、復習テスト、学習のきろく</small></span></li>
+            <li><span class="label">App</span><span><b>学習アプリ Hina English</b><small>5レベル・3,000語の単語帳（すべてひなの音声つき）、ジャーナリング、AI添削とAI相談、フレーズ練習、発音・聞き取り（91フレーズ）、復習テスト、学習のきろく</small></span></li>
           </ul>
         </div>
       </div>
@@ -1026,11 +1124,11 @@
       <ol class="flow">
         <li>
           <h3><span class="step-n">1</span>申し込む</h3>
-          <p>このページのボタンから申し込みページへ。<span class="tbd">クレジットカード</span>で支払えます。</p>
+          <p>このページのボタンから申し込みページへ。お支払い情報を入力すれば、申し込み完了です。</p>
         </li>
         <li>
           <h3><span class="step-n">2</span>アプリにログイン</h3>
-          <p>登録したアカウントで、学習アプリ Hina English に入れます。<span class="tbd">ライブの予定や講義動画の見方は、アプリの使い方ガイドで案内します。</span></p>
+          <p>登録したアカウントで、学習アプリ Hina English に入れます。<span class="tbd">Zoomライブの予定と講義動画の見方は、アプリの使い方ガイドで案内します。</span></p>
         </li>
         <li>
           <h3><span class="step-n">3</span>最初のひとことを書く</h3>
@@ -1062,31 +1160,31 @@
         </details>
         <details>
           <summary>ライブはどれくらいありますか？</summary>
-          <p class="a">月16回、週4回ペースで開催しています。そのうち月4回は、ひなが担当します。</p>
+          <p class="a">Zoomで月16回、週4回ペースで開催しています。ひなが月4回、ほかの回はネイティブ講師と、TOEIC 900点以上の日本人講師が担当します。</p>
         </details>
         <details>
           <summary>ライブに参加できない日はどうなりますか？</summary>
           <p class="a"><span class="tbd">アーカイブを残すので、あとから見られます。</span></p>
         </details>
         <details>
-          <summary>顔出しや声出しは必要ですか？</summary>
-          <p class="a"><span class="tbd">必要ありません。ライブも見るだけで参加できます。</span></p>
+          <summary>スマホだけで参加できますか？</summary>
+          <p class="a">はい。アプリはスマホで使えて、ジャーナルもスマホで保存できます。ライブもZoomなので、スマホから参加できます。</p>
         </details>
         <details>
           <summary>文字が小さいと読みにくいのですが…</summary>
           <p class="a">アプリの画面上にある「文字大きく」ボタンで、文字を大きく表示できます。</p>
         </details>
         <details>
-          <summary>スマホだけで参加できますか？</summary>
-          <p class="a"><span class="tbd">はい。アプリはスマホのブラウザでも使えます。</span></p>
-        </details>
-        <details>
-          <summary>退会はいつでもできますか？</summary>
-          <p class="a"><span class="tbd">はい。いつでも退会できます。次の更新日までは、そのまま利用できます。</span></p>
+          <summary>ライブで顔出しは必要ですか？</summary>
+          <p class="a">必要ありません。</p>
         </details>
         <details>
           <summary>支払い方法を教えてください</summary>
-          <p class="a"><span class="tbd">クレジットカードに対応しています。</span></p>
+          <p class="a">オンライン決済サービスの Stripe でお支払いいただけます。</p>
+        </details>
+        <details>
+          <summary>退会するときは、どうすればいいですか？</summary>
+          <p class="a">Stripe のページから、退会の手続きができます。</p>
         </details>
       </div>
     </div>
@@ -1100,7 +1198,7 @@
         <h2>今日の小さな一歩から、<br>一緒にはじめよう。</h2>
         <div class="cta-row">
           <a class="btn" href="#price">サロンに参加する</a>
-          <p class="cta-note">月額 <span class="tbd">¥X,XXX</span>（税込）</p>
+          <p class="cta-note">月額 ¥12,000<span class="tbd">（税込）</span></p>
         </div>
       </div>
       <img src="character.png" width="638" height="852" alt="" loading="lazy">
@@ -1126,7 +1224,7 @@
 
 <!-- スマホだけ画面の下に出る申し込みボタン -->
 <div class="sticky-cta">
-  <p><b>Hina English</b>月額 <span class="tbd">¥X,XXX</span>（税込）</p>
+  <p><b>Hina English</b>月額 ¥12,000<span class="tbd">（税込）</span></p>
   <a class="btn" href="#price">参加する</a>
 </div>
 
