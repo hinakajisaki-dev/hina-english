@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Hina English</title>
-<meta name="description" content="書いて、話して、学んで、もう一度使う。毎月16回のオンラインライブと6本の講義動画、ひなの音声つき学習アプリで、英語を暮らしの中に。Hina English のオンラインサロンです。">
+<meta name="description" content="書いて、話して、学んで、もう一度使う。毎月16回のオンラインライブと6本の講義動画、5レベル・2,500語の学習アプリで、英語を暮らしの中に。Hina English のオンラインサロンです。">
 <!-- TODO: 公開するときに OGP（og:title / og:description / og:image / og:url）を追加 -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -127,10 +127,12 @@
     padding: 0 32px;
     border-radius: 18px;
     background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    border: 0;
     color: var(--on-accent);
     font-family: var(--ja);
     font-weight: 700;
     font-size: 18px;
+    cursor: pointer;
     letter-spacing: .03em;
     text-decoration: none;
     box-shadow: 0 10px 24px rgba(214, 62, 16, .28);
@@ -310,30 +312,69 @@
   }
   .pillar .big { font-family: var(--en); font-weight: 800; font-size: 64px; line-height: 1; letter-spacing: -2px; color: var(--accent); margin-top: 6px; }
   .pillar .big small { font-family: var(--ja); font-size: 20px; font-weight: 900; letter-spacing: 0; color: var(--ink); margin-left: 4px; }
-  .pillar .big.ja { font-family: var(--ja); font-weight: 900; font-size: 48px; letter-spacing: 0; line-height: 1.33; }
   .pillar h3 { font-weight: 900; font-size: 21px; line-height: 1.5; }
   .pillar p { color: var(--ink-2); font-size: 15px; }
   .pillar .chip { align-self: flex-start; }
   .pillar .label, .step-head .label { color: var(--accent-text); font-size: 13px; }
 
   /* ---------- the app ---------- */
-  .step-head { display: grid; gap: 4px; margin-bottom: 24px; }
-  .step-head h3 { font-weight: 900; font-size: clamp(22px, 2.6vw, 28px); line-height: 1.45; }
+  .loop {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    background: var(--card);
+    border-radius: 24px;
+    box-shadow: var(--shadow);
+    padding: 22px 12px 18px;
+  }
+  .loop li { position: relative; display: grid; justify-items: center; gap: 8px; font-weight: 700; font-size: 14px; text-align: center; min-width: 0; }
+  .loop li + li::before {
+    content: "";
+    position: absolute;
+    top: 17px;
+    right: 50%;
+    width: 100%;
+    height: 2px;
+    background: var(--line);
+  }
+  .loop .dot {
+    position: relative;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    font-family: var(--en);
+    font-weight: 800;
+    font-size: 15px;
+    background: var(--accent-soft);
+    color: var(--accent-text);
+    box-shadow: 0 0 0 4px var(--card);
+    z-index: 1;
+  }
+  .loop-back { display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 14px; font-size: 14px; font-weight: 700; color: var(--accent-text); }
+  .loop-back svg { width: 20px; height: 20px; flex: none; }
+
+  .app-block { margin-top: 80px; }
+  .pair { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 28px; align-items: start; }
+  .app-step { display: flex; flex-direction: column; gap: 18px; min-width: 0; }
+  .step-head { display: grid; gap: 4px; }
+  .step-head h3 { font-weight: 900; font-size: clamp(22px, 2.4vw, 26px); line-height: 1.45; }
   .step-head h3 .en { font-weight: 800; letter-spacing: -.5px; }
   .step-head p { color: var(--ink-2); max-width: 40em; }
-  .app-step + .app-step { margin-top: 72px; }
+  .callout { background: var(--accent-soft); border-radius: 18px; padding: 14px 18px 16px; font-size: 14px; line-height: 1.8; color: var(--ink-2); }
+  .callout b { display: block; font-size: 16px; font-weight: 900; color: var(--ink); }
+  .cap { font-size: 12px; color: var(--muted); }
 
-  .write { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; align-items: stretch; }
   .mock {
     background: var(--card);
     border: 1px solid #E6EDF6;
     border-radius: 26px;
     box-shadow: var(--shadow);
-    padding: 26px 26px 28px;
+    padding: 24px 24px 26px;
     min-width: 0;
   }
-  .mock-title { display: flex; align-items: center; justify-content: space-between; gap: 12px; font-weight: 900; font-size: 17px; }
-  .prompts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-top: 18px; }
+  .mock-title { display: flex; align-items: center; justify-content: space-between; gap: 12px; font-weight: 900; font-size: 16px; }
+  .prompts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-top: 16px; }
   .prompts li {
     border: 1.5px solid #E3E8EF;
     border-radius: 14px;
@@ -343,12 +384,12 @@
     line-height: 1.6;
   }
   .prompts li.on { border-color: var(--accent); background: #FFF1EC; color: var(--accent-text); }
-  .starter { margin-top: 16px; background: var(--cream); border-radius: 18px; padding: 16px 20px 18px; }
-  .starter b { display: block; font-family: var(--en); font-weight: 700; font-size: 16px; }
-  .starter small { display: block; font-size: 12px; color: var(--ink-2); margin-top: 6px; }
-  .starter p { font-family: var(--en); font-weight: 700; font-size: 20px; line-height: 1.35; margin-top: 2px; }
+  .starter { margin-top: 14px; background: var(--cream); border-radius: 18px; padding: 14px 18px 16px; }
+  .starter b { display: block; font-family: var(--en); font-weight: 700; font-size: 15px; }
+  .starter small { display: block; font-size: 12px; color: var(--ink-2); margin-top: 4px; }
+  .starter p { font-family: var(--en); font-weight: 700; font-size: 19px; line-height: 1.35; }
 
-  .mine { background: var(--bg); border-radius: 18px; padding: 14px 20px 20px; margin-top: 18px; }
+  .mine { background: var(--bg); border-radius: 18px; padding: 14px 20px 20px; margin-top: 16px; }
   .who { font-size: 12px; font-weight: 700; color: var(--muted); }
   .mine .en { font-weight: 700; font-size: 21px; line-height: 1.4; margin-top: 30px; }
   .fix { position: relative; display: inline-block; }
@@ -367,26 +408,111 @@
   .ai-body .en { display: block; font-weight: 700; font-size: 17px; color: var(--ink); margin-block: 2px 8px; }
   .ai-body .en:last-child { margin-bottom: 0; }
 
-  .learn { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; }
-  .lcard {
+  /* five levels drawn as a staircase */
+  .levels-wrap { margin-top: 24px; background: var(--card); border-radius: 26px; box-shadow: var(--shadow); padding: 24px 24px 20px; }
+  .levels { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; align-items: end; height: 230px; }
+  .levels li {
+    height: var(--h);
     display: flex;
     flex-direction: column;
-    gap: 10px;
-    border-radius: 26px;
-    padding: 24px 26px 26px;
+    justify-content: flex-end;
+    gap: 2px;
     min-width: 0;
+    border-radius: 16px 16px 6px 6px;
+    padding: 12px 14px 14px;
   }
-  .lcard.peach { background: var(--peach); }
-  .lcard.pink { background: var(--pink); }
-  .lcard.yellow { background: var(--yellow); }
-  .lcard.sky { background: var(--sky); }
-  .lcard.white { background: var(--card); box-shadow: var(--shadow); }
-  .lcard .chip { align-self: flex-start; }
-  .lcard h4 { font-weight: 900; font-size: 22px; line-height: 1.4; }
-  .lcard p { font-size: 15px; line-height: 1.75; }
-  .lcard .foot { margin-top: auto; padding-top: 8px; font-size: 13px; font-weight: 700; }
-  .lcard .num { font-family: var(--en); font-weight: 800; font-size: 40px; line-height: 1; letter-spacing: -1px; }
-  .lcard .num small { font-family: var(--ja); font-size: 15px; font-weight: 900; letter-spacing: 0; margin-left: 2px; }
+  .levels li:nth-child(1) { --h: 36%; background: #FFE6DC; }
+  .levels li:nth-child(2) { --h: 52%; background: #FFD0BC; }
+  .levels li:nth-child(3) { --h: 68%; background: #FFB592; }
+  .levels li:nth-child(4) { --h: 84%; background: #FF9668; }
+  .levels li:nth-child(5) { --h: 100%; background: #F76432; }
+  .levels b { font-weight: 900; font-size: 15px; line-height: 1.4; }
+  .levels span { font-family: var(--en); font-weight: 800; font-size: 24px; line-height: 1.1; letter-spacing: -.5px; }
+  .levels small { font-family: var(--ja); font-size: 12px; font-weight: 900; margin-left: 1px; }
+  .levels-cap { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px 16px; margin-top: 14px; font-size: 14px; color: var(--ink-2); }
+  .levels-cap b { color: var(--ink); font-weight: 900; }
+
+  .learn3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; align-items: start; margin-top: 28px; }
+  .learn-item { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+  .meta h4 { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; font-weight: 900; font-size: 20px; line-height: 1.4; }
+  .meta p { color: var(--ink-2); font-size: 15px; margin-top: 6px; }
+  .sets { display: grid; gap: 6px; margin-top: 10px; font-size: 13px; color: var(--ink-2); }
+  .sets li { display: grid; grid-template-columns: 22px minmax(0, 1fr) auto; gap: 8px; align-items: baseline; }
+  .sets i { font-style: normal; font-family: var(--en); font-weight: 800; color: var(--accent-text); }
+  .sets em { font-style: normal; font-family: var(--en); font-weight: 700; color: var(--ink); }
+
+  .mock-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; width: 100%; font-weight: 900; font-size: 14px; }
+  .bar { width: 100%; height: 6px; border-radius: 3px; background: var(--accent-soft); margin-top: 10px; }
+  .bar i { display: block; width: 20%; height: 100%; border-radius: 3px; background: var(--accent); }
+  .flash { display: grid; justify-items: center; text-align: center; }
+  .flash > .chip { margin-top: 18px; }
+  .flash .pos { font-size: 13px; font-weight: 700; color: var(--muted); margin-top: 6px; }
+  .flash .word { font-family: var(--en); font-weight: 800; font-size: 60px; line-height: 1.15; margin-block: 4px 6px; }
+  .flash .meaning { font-weight: 900; font-size: 20px; color: var(--accent-text); margin-bottom: 10px; }
+  .btn.small { min-height: 44px; padding: 0 22px; font-size: 15px; border-radius: 14px; box-shadow: none; }
+  .btn.small::after { content: none; }
+
+  .phrase { display: grid; gap: 12px; text-align: center; }
+  .phrase > .chip { justify-self: center; margin-top: 14px; }
+  .phrase .en { font-weight: 800; font-size: 19px; line-height: 1.35; }
+  .phrase .ja { color: var(--accent-text); font-weight: 700; font-size: 14px; line-height: 1.6; }
+  .audio { display: flex; align-items: center; gap: 10px; background: var(--bg); border-radius: 999px; padding: 9px 16px; font-family: var(--en); font-size: 13px; color: var(--ink-2); text-align: left; }
+  .audio::before { content: ""; border-left: 10px solid var(--ink); border-block: 6px solid transparent; }
+  .audio i { flex: 1; height: 4px; border-radius: 2px; background: var(--line); }
+  .tips { display: grid; gap: 8px; text-align: left; }
+  .tip { background: var(--bg); border-radius: 14px; padding: 10px 14px 12px; font-size: 13px; line-height: 1.7; }
+  .tip b { display: block; color: var(--accent-text); font-size: 12px; }
+
+  .order-line {
+    min-height: 96px;
+    margin-top: 14px;
+    border: 2px dashed var(--line);
+    border-radius: 16px;
+    background: var(--bg);
+    padding: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    align-content: flex-start;
+    gap: 8px;
+  }
+  .order-line:empty::before { content: attr(data-hint); align-self: center; width: 100%; text-align: center; font-size: 13px; font-weight: 700; color: var(--muted); }
+  .order-pool { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; min-height: 40px; }
+  .word-chip {
+    font-family: var(--en);
+    font-weight: 700;
+    font-size: 16px;
+    line-height: 1.2;
+    padding: 8px 12px;
+    border-radius: 12px;
+    border: 1.5px solid #E3E8EF;
+    background: var(--card);
+    color: var(--ink);
+    cursor: pointer;
+  }
+  .word-chip:hover { border-color: var(--accent); }
+  .order-foot { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; min-height: 40px; margin-top: 10px; }
+  .order-result { flex: 1 1 12em; font-size: 14px; font-weight: 700; line-height: 1.6; }
+  .order-result .script { font-size: 28px; margin-right: 6px; }
+  .text-btn { margin-left: auto; white-space: nowrap; border: 0; background: none; padding: 6px 2px; font: 700 13px var(--ja); color: var(--accent-text); text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+
+  .review { display: grid; justify-items: center; gap: 4px; text-align: center; padding-block: 30px 26px; }
+  .ok-mark { width: 64px; height: 64px; border-radius: 50%; display: grid; place-items: center; background: #E1F4EA; color: #24804F; margin-bottom: 8px; }
+  .ok-mark svg { width: 30px; height: 30px; }
+  .review b { font-weight: 900; font-size: 17px; }
+  .review small { font-size: 13px; color: var(--muted); }
+  .loop-card { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; background: var(--accent-soft); border-radius: 20px; padding: 16px 18px; }
+  .loop-card p { font-weight: 900; font-size: 15px; }
+  .loop-card small { display: block; font-weight: 500; font-size: 13px; color: var(--ink-2); }
+
+  .record-tiles { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .record-tiles div { background: var(--bg); border-radius: 16px; padding: 12px 14px; }
+  .record-tiles dt { font-size: 12px; font-weight: 700; color: var(--muted); }
+  .record-tiles dd { font-family: var(--en); font-weight: 800; font-size: 28px; line-height: 1.15; font-variant-numeric: tabular-nums; }
+  .record-tiles dd small { font-family: var(--ja); font-size: 13px; font-weight: 900; margin-left: 2px; }
+  .chart-head { display: flex; justify-content: space-between; margin-top: 16px; font-size: 13px; font-weight: 900; }
+  .chart-head span { font-weight: 500; color: var(--muted); }
+  .chart { display: grid; grid-template-columns: repeat(14, minmax(0, 1fr)); gap: 5px; align-items: end; height: 96px; margin-top: 8px; border-bottom: 1.5px solid var(--line); }
+  .chart i { height: var(--h); background: var(--accent); border-radius: 4px 4px 1px 1px; }
 
   /* ---------- profile ---------- */
   .profile { display: grid; grid-template-columns: 200px minmax(0, 1fr); gap: 40px; align-items: center; }
@@ -497,7 +623,8 @@
     .hello { left: -22%; top: 8%; font-size: 17px; }
     .sticker { width: 52px; height: 52px; border-radius: 16px; }
     .sticker svg { width: 26px; height: 26px; }
-    .pillars, .write, .learn, .flow { grid-template-columns: minmax(0, 1fr); }
+    .pillars, .pair, .learn3, .flow { grid-template-columns: minmax(0, 1fr); }
+    .pair { gap: 64px; }
     .price-card { grid-template-columns: minmax(0, 1fr); }
     .final .wrap { grid-template-columns: minmax(0, 1fr) 160px; }
   }
@@ -507,7 +634,8 @@
     .sec-head { margin-bottom: 30px; }
     .lead { font-size: 16px; }
     .stats > div { padding: 14px 12px 16px; }
-    .stats .n { font-size: 34px; }
+    .stats { grid-template-columns: minmax(0, 1fr) minmax(0, .85fr) minmax(0, 1.2fr); }
+    .stats .n { font-size: 30px; }
     .stats dt { font-size: 11px; }
     .stats .chip { font-size: 11px; padding: 2px 8px 3px; }
     .cta-row .btn { width: 100%; }
@@ -517,6 +645,15 @@
     .prompts { grid-template-columns: minmax(0, 1fr); }
     .prompts li:nth-child(n+3) { display: none; }
     .mine .en { font-size: 19px; }
+    .app-block { margin-top: 64px; }
+    .loop { padding-inline: 4px; }
+    .loop li { font-size: 11px; }
+    .levels-wrap { padding: 18px 14px 16px; }
+    .levels { gap: 6px; height: 190px; }
+    .levels li { padding: 8px 6px 10px; border-radius: 12px 12px 4px 4px; }
+    .levels b { font-size: 12px; }
+    .levels span { font-size: 17px; }
+    .levels small { font-size: 10px; }
     .profile { grid-template-columns: minmax(0, 1fr); gap: 20px; justify-items: start; }
     .portrait { width: 140px; height: 140px; }
     .price-main, .price-inc { padding: 30px 22px 32px; }
@@ -576,7 +713,7 @@
         <p class="eyebrow"><span class="label">Online Salon</span><span class="chip">英語学習コミュニティ</span></p>
         <p class="script" lang="en">Small steps, big changes.</p>
         <h1>英語を、<br>暮らしの中に。</h1>
-        <p class="lead">書いて、話して、学んで、もう一度使う。毎月のオンラインライブと講義動画、ひなの声で学べるアプリで、あなたのペースで英語を続けるオンラインサロンです。</p>
+        <p class="lead">書いて、話して、学んで、もう一度使う。毎月のオンラインライブと講義動画、5つのレベルに分かれた学習アプリで、あなたのペースで英語を続けるオンラインサロンです。</p>
         <dl class="stats">
           <div>
             <dt>オンラインライブ</dt>
@@ -588,8 +725,9 @@
             <dd><span class="n">6</span>本/月</dd>
           </div>
           <div>
-            <dt>音声つき単語</dt>
-            <dd><span class="n">666</span>語</dd>
+            <dt>単語帳</dt>
+            <dd><span class="n">2,500</span>語</dd>
+            <dd class="chip">5レベル</dd>
           </div>
         </dl>
         <div class="cta-row">
@@ -617,10 +755,10 @@
         <li>英語を勉強したいけど、何からはじめればいいかわからない</li>
         <li>単語やフレーズを覚えても、自分の言葉で書けない・話せない</li>
         <li>ひとりだと、勉強がなかなか続かない</li>
-        <li>間違えるのが恥ずかしくて、英語を口に出せない</li>
+        <li>自分の苦手がどこなのか、よくわからない</li>
         <li>忙しくて、まとまった勉強時間がとれない</li>
       </ul>
-      <p class="bridge">Hina English は、<em>今日の小さな一歩を、自分の言葉につなげる</em>場所です。<span>1日3分の単語カードから、ライブでの会話まで。あなたのペースで続けられます。</span></p>
+      <p class="bridge">Hina English は、<em>今日の小さな一歩を、自分の言葉につなげる</em>場所です。<span>1日3分の単語カードから、月16回のライブまで。あなたのペースで続けられます。</span></p>
     </div>
   </section>
 
@@ -646,9 +784,9 @@
         </article>
         <article class="pillar">
           <p class="label">App</p>
-          <p class="big ja">毎日</p>
+          <p class="big">5<small>レベル</small></p>
           <h3>学習アプリ Hina English</h3>
-          <p>ジャーナリング、AI添削、単語カード、フレーズ練習、発音・聞き取り。毎日の学習がひとつのアプリにまとまっています。</p>
+          <p>初級1から上級まで、2,500語の単語帳。ジャーナリング、AI添削、フレーズ練習、発音・聞き取り、復習テストまで、ひとつのアプリでできます。</p>
         </article>
       </div>
     </div>
@@ -660,16 +798,23 @@
       <header class="sec-head">
         <p class="label">The app</p>
         <h2>アプリで、毎日すこしずつ</h2>
-        <p class="sub">サロンのメンバーは、学習アプリ Hina English を使えます。その日の気分で、やることを選ぶだけです。</p>
+        <p class="sub">サロンのメンバーは、学習アプリ Hina English を使えます。毎日の学習は、書く・相談する・学ぶ・復習するの4ステップです。</p>
       </header>
+      <ol class="loop" aria-label="学習の4ステップ">
+        <li><span class="dot">1</span>ジャーナリング</li>
+        <li><span class="dot">2</span>AI相談</li>
+        <li><span class="dot">3</span>学習</li>
+        <li><span class="dot">4</span>復習</li>
+      </ol>
+      <p class="loop-back"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12a8 8 0 1 0 2.4-5.7M4 4v4h4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>復習した英語は、また1のジャーナルで使ってみる</p>
 
-      <div class="app-step">
-        <div class="step-head">
-          <p class="label">01 · Write</p>
-          <h3>ジャーナリングで、<span class="en nw">Write your story.</span></h3>
-          <p>お題を選んで、日本語のメモから英語のひとことへ。書き出しの一文がついているので、何を書くか迷いません。書いた英語は、AIが添削してくれます。</p>
-        </div>
-        <div class="write">
+      <div class="pair app-block">
+        <div class="app-step" id="write">
+          <div class="step-head">
+            <p class="label">01 · ジャーナリング</p>
+            <h3 class="en" lang="en">Write your story.</h3>
+            <p>お題を選んで、日本語のメモから英語のひとことへ。書き出しの一文がついているので、何を書くか迷いません。</p>
+          </div>
           <div class="mock" role="img" aria-label="ジャーナリング画面のイメージ。お題を選ぶと、書き出しの一文が表示される">
             <p class="mock-title">今日、何を書きますか？</p>
             <ul class="prompts">
@@ -683,6 +828,14 @@
               <small>この文章ではじめて：</small>
               <p lang="en">A place I would recommend is…</p>
             </div>
+          </div>
+          <p class="callout"><b>書くほど、苦手が見えてくる</b>ジャーナルを書けば書くほど、あなたの弱いところのデータがたまっていきます。</p>
+        </div>
+        <div class="app-step">
+          <div class="step-head">
+            <p class="label">02 · AI相談</p>
+            <h3>AIが添削して、一緒に考える</h3>
+            <p>書いた英語は、AIが添削。もっと自然な言い方や、わからない英語も相談できます。</p>
           </div>
           <div class="mock" role="img" aria-label="AI添削のイメージ。the best thing i ate today was pasta を、文頭の大文字とピリオドを直して The best thing I ate today was pasta. にする">
             <p class="mock-title">AIに添削してもらう<span class="chip">AI相談</span></p>
@@ -698,57 +851,118 @@
         </div>
       </div>
 
-      <div class="app-step">
+      <div class="app-block">
         <div class="step-head">
-          <p class="label">02 · Learn</p>
-          <h3>ひなの声で、<span class="en">Learn the English you want to use.</span></h3>
-          <p>単語もフレーズも、ひなの音声つき。1回数分なので、すきま時間に続けられます。</p>
+          <p class="label">03 · 学習</p>
+          <h3 class="en" lang="en">Learn the English you want to use.</h3>
+          <p>初級1から上級まで、5つのレベル。それぞれのレベルに合った単語帳や教材で、ひなの音声と一緒に学びます。</p>
         </div>
-        <div class="learn">
-          <article class="lcard peach">
-            <span class="chip white">約3分</span>
-            <h4>単語カード</h4>
-            <p class="num">666<small>語</small></p>
-            <p>ひなの音声つき666語から、今日の5語を学ぶ。</p>
-            <p class="foot">意味・例文・ひなの音声</p>
+        <div class="levels-wrap" role="img" aria-label="5つのレベル。初級1、初級2、中級1、中級2、上級。各500語、合計2,500語">
+          <ol class="levels">
+            <li><b>初級1</b><span>500<small>語</small></span></li>
+            <li><b>初級2</b><span>500<small>語</small></span></li>
+            <li><b>中級1</b><span>500<small>語</small></span></li>
+            <li><b>中級2</b><span>500<small>語</small></span></li>
+            <li><b>上級</b><span>500<small>語</small></span></li>
+          </ol>
+          <p class="levels-cap"><span>レベルごとに、そのレベルに合った単語帳があります</span><b>合計 2,500語</b></p>
+        </div>
+
+        <div class="learn3">
+          <article class="learn-item">
+            <div class="mock flash">
+              <div class="mock-top">単語カード<span class="chip">1 / 5 問</span></div>
+              <div class="bar"><i></i></div>
+              <span class="chip">初級1 · 接続詞</span>
+              <p class="pos">接続詞</p>
+              <p class="word" lang="en">if</p>
+              <p class="meaning" id="flash-meaning" hidden>もし〜なら</p>
+              <button class="btn small" type="button" id="flash-btn" aria-controls="flash-meaning" aria-expanded="false">意味を見る</button>
+            </div>
+            <div class="meta">
+              <h4>単語カード<span class="chip">約3分</span></h4>
+              <p>レベルに合った単語を、1日5語ずつ。意味と例文、ひなの音声で覚えます。</p>
+            </div>
           </article>
-          <article class="lcard pink">
-            <span class="chip white">約5分</span>
-            <h4>フレーズ練習</h4>
-            <p>ひなの音声で、日常のひとことを練習。</p>
-            <p class="foot">発音教材から出題</p>
+          <article class="learn-item">
+            <div class="mock phrase" role="img" aria-label="フレーズ練習の画面のイメージ。I don't know how to say this in English. の意味、お手本の音声、使う場面、発音のコツが表示される">
+              <div class="mock-top">フレーズ練習<span class="chip">1 / 5 問</span></div>
+              <span class="chip">初級1 · 発音課題1</span>
+              <p class="en" lang="en">I don’t know how to say this in English.</p>
+              <p class="ja">これを英語でどう言えばいいか分からない。</p>
+              <p class="audio"><span>0:00 / 0:03</span><i></i></p>
+              <div class="tips">
+                <p class="tip"><b>使う場面・解説</b>英会話中に詰まったときの救済フレーズ。</p>
+                <p class="tip"><b>発音のコツ</b><span lang="en">how to</span> は「ハウトゥ」。<span lang="en">say this</span> は <span lang="en">th</span> を軽く。</p>
+              </div>
+            </div>
+            <div class="meta">
+              <h4>フレーズ練習<span class="chip">約5分</span></h4>
+              <p>日常のひとことを、ひなのお手本音声で。使う場面と発音のコツつきです。</p>
+            </div>
           </article>
-          <article class="lcard yellow">
-            <span class="chip white">1回5分〜</span>
-            <h4>発音・聞き取り</h4>
-            <p class="num">91<small>フレーズ</small></p>
-            <p>音声を聞いて、単語を正しい順番に並べる。</p>
+          <article class="learn-item">
+            <div class="mock">
+              <div class="mock-top"><span lang="en">Listen, then build the sentence.</span></div>
+              <div class="order-line" id="order-line" data-hint="単語をタップして、文を組み立ててみよう" aria-live="polite"></div>
+              <div class="order-pool" id="order-pool"></div>
+              <div class="order-foot">
+                <p class="order-result" id="order-result" aria-live="polite"></p>
+                <button class="text-btn" type="button" id="order-reset">やりなおす</button>
+              </div>
+            </div>
+            <div class="meta">
+              <h4>発音・聞き取り<span class="chip">1回5分〜</span></h4>
+              <p>音声を聞いて、単語を正しい順番に。答えを確かめたら、ひなのコツもチェック。</p>
+              <ol class="sets">
+                <li><i>1</i><span>日常で気持ちや予定を伝える</span><em>30</em></li>
+                <li><i>2</i><span>空港・ホテル・食事・買い物で使う</span><em>31</em></li>
+                <li><i>3</i><span>文法を会話の中で使う</span><em>30</em></li>
+              </ol>
+            </div>
           </article>
         </div>
       </div>
 
-      <div class="app-step">
-        <div class="step-head">
-          <p class="label">03 · Keep going</p>
-          <h3>わからないことは聞いて、もう一度使う</h3>
-          <p>気になった英語はAIに相談。覚えたことは復習して、続けた記録も残ります。</p>
+      <div class="pair app-block">
+        <div class="app-step">
+          <div class="step-head">
+            <p class="label">04 · 復習</p>
+            <h3>苦手を、徹底的に直す</h3>
+            <p>単語は復習テストで、自分の弱いところをくり返し練習。苦手な問題がなくなるまで取り組めます。</p>
+          </div>
+          <div class="mock">
+            <div class="review">
+              <span class="ok-mark"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+              <b>苦手な問題は残っていません。</b>
+              <small>今日練習した問題を、もう一度確かめられます。</small>
+            </div>
+            <div class="loop-card">
+              <p>学んだ英語を、今日のジャーナルに。<small>ひとこと書けば、次に使いたい表現も見えてきます。</small></p>
+              <a class="btn small" href="#write">ジャーナルで使ってみる</a>
+            </div>
+          </div>
         </div>
-        <div class="learn">
-          <article class="lcard sky">
-            <span class="chip white">気になったときに</span>
-            <h4>AIに相談</h4>
-            <p>ジャーナルの表現や、わからない英語を相談。会話から、次の学びへ。</p>
-          </article>
-          <article class="lcard white">
-            <span class="chip">復習</span>
-            <h4>もう一度使う</h4>
-            <p>学んだ単語やフレーズを、くり返し練習して自分のものに。</p>
-          </article>
-          <article class="lcard white">
-            <span class="chip">学習のきろく</span>
-            <h4>続けた日が見える</h4>
-            <p>これまでのジャーナルや学習のきろくを、あとから見返せます。</p>
-          </article>
+        <div class="app-step">
+          <div class="step-head">
+            <p class="label">学習のきろく</p>
+            <h3>続けた日が、目に見える</h3>
+            <p>勉強時間、連続で学習した日数、書いたジャーナル、正解率。毎日の積み重ねがグラフで見えます。</p>
+          </div>
+          <div class="mock" role="img" aria-label="学習のきろくの画面のイメージ。今月の勉強時間、連続で学習した日数、書いたジャーナルの数、正解率と、直近14日の勉強時間のグラフ">
+            <dl class="record-tiles">
+              <div><dt>今月の勉強時間</dt><dd>6<small>時間</small>40<small>分</small></dd></div>
+              <div><dt>連続で学習</dt><dd>12<small>日</small></dd></div>
+              <div><dt>書いたジャーナル</dt><dd>18<small>件</small></dd></div>
+              <div><dt>正解率</dt><dd>86<small>%</small></dd></div>
+            </dl>
+            <p class="chart-head">毎日の勉強時間<span>直近14日</span></p>
+            <div class="chart">
+              <i style="--h: 30%"></i><i style="--h: 55%"></i><i style="--h: 40%"></i><i style="--h: 0%"></i><i style="--h: 62%"></i><i style="--h: 48%"></i><i style="--h: 75%"></i>
+              <i style="--h: 35%"></i><i style="--h: 58%"></i><i style="--h: 66%"></i><i style="--h: 44%"></i><i style="--h: 80%"></i><i style="--h: 70%"></i><i style="--h: 92%"></i>
+            </div>
+          </div>
+          <p class="cap">※ 画面のイメージです。数値は表示の例です。</p>
         </div>
       </div>
     </div>
@@ -766,7 +980,7 @@
         <div>
           <h3>ひな<span class="script" lang="en">Hina</span></h3>
           <div class="profile-text">
-            <p>YouTubeで、日常でよく使う英会話フレーズを紹介しています。アプリの単語カードとフレーズ練習の音声も、ひなの声です。</p>
+            <p>YouTubeで、日常でよく使う英会話フレーズを紹介しています。アプリの単語カードやフレーズ練習のお手本音声も、ひなの声です。</p>
             <p class="tbd">ここに経歴や英語との出会い、サロンをはじめた理由を書きます。</p>
             <p><a class="text-link tbd" href="#">YouTubeチャンネルを見る →</a></p>
           </div>
@@ -795,7 +1009,7 @@
           <ul class="inc">
             <li><span class="label">Live</span><span><b>オンラインライブ 月16回</b><small>うち月4回はひなが担当</small></span></li>
             <li><span class="label">Lesson</span><span><b>講義動画 毎月6本</b><small>好きな時間に、何度でも</small></span></li>
-            <li><span class="label">App</span><span><b>学習アプリ Hina English</b><small>ジャーナリング・AI添削とAI相談・単語カード・フレーズ練習・発音と聞き取り・復習・学習のきろく</small></span></li>
+            <li><span class="label">App</span><span><b>学習アプリ Hina English</b><small>5レベル・2,500語の単語帳、ジャーナリング、AI添削とAI相談、フレーズ練習、発音・聞き取り（91フレーズ）、復習テスト、学習のきろく</small></span></li>
           </ul>
         </div>
       </div>
@@ -836,7 +1050,11 @@
       <div class="faq">
         <details>
           <summary>英語に自信がなくても大丈夫ですか？</summary>
-          <p class="a">大丈夫です。ジャーナリングには書き出しの一文がついていて、書いた英語はAIが添削します。単語カードは1日5語、約3分からはじめられます。</p>
+          <p class="a">大丈夫です。初級1から上級まで5つのレベルがあるので、自分に合ったところからはじめられます。ジャーナリングには書き出しの一文がつき、書いた英語はAIが添削します。</p>
+        </details>
+        <details>
+          <summary>英語はある程度できます。物足りなくないですか？</summary>
+          <p class="a">レベルは初級1から上級まで5段階あり、上級にも専用の単語帳（500語）があります。ジャーナリングは書くほど苦手のデータがたまるので、自分の弱いところを集中して直せます。</p>
         </details>
         <details>
           <summary>1日にどれくらい時間が必要ですか？</summary>
@@ -911,6 +1129,63 @@
   <p><b>Hina English</b>月額 <span class="tbd">¥X,XXX</span>（税込）</p>
   <a class="btn" href="#price">参加する</a>
 </div>
+
+<script>
+  // 単語カード：意味を見る
+  (function () {
+    var btn = document.getElementById("flash-btn");
+    var meaning = document.getElementById("flash-meaning");
+    if (!btn || !meaning) return;
+    btn.addEventListener("click", function () {
+      var show = meaning.hidden;
+      meaning.hidden = !show;
+      btn.textContent = show ? "もう一度" : "意味を見る";
+      btn.setAttribute("aria-expanded", String(show));
+    });
+  })();
+
+  // 発音・聞き取り：単語を並べて文をつくる
+  (function () {
+    var answer = ["I", "don't", "know", "how", "to", "say", "this", "in", "English."];
+    var start = ["say", "I", "English.", "know", "this", "how", "don't", "in", "to"];
+    var line = document.getElementById("order-line");
+    var pool = document.getElementById("order-pool");
+    var result = document.getElementById("order-result");
+    var reset = document.getElementById("order-reset");
+    if (!line || !pool) return;
+
+    function chip(word) {
+      var b = document.createElement("button");
+      b.type = "button";
+      b.className = "word-chip";
+      b.lang = "en";
+      b.textContent = word;
+      b.addEventListener("click", function () {
+        (b.parentNode === pool ? line : pool).appendChild(b);
+        check();
+      });
+      return b;
+    }
+    function check() {
+      result.textContent = "";
+      if (pool.children.length) return;
+      var built = Array.prototype.map.call(line.children, function (c) { return c.textContent; });
+      if (built.join(" ") === answer.join(" ")) {
+        result.innerHTML = '<span class="script" lang="en">Perfect!</span>「これを英語でどう言えばいいか分からない」';
+      } else {
+        result.textContent = "おしい！ 単語をタップすると戻せます";
+      }
+    }
+    function fill() {
+      line.textContent = "";
+      pool.textContent = "";
+      result.textContent = "";
+      start.forEach(function (w) { pool.appendChild(chip(w)); });
+    }
+    reset.addEventListener("click", fill);
+    fill();
+  })();
+</script>
 
 </div>
 </body>
