@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Hina English Salon</title>
-<meta name="description" content="YouTubeで覚えた英会話フレーズを、使える英語に。限定レッスン・練習問題・英作文の添削で、ひとりでは続かない英語をみんなで続けるオンラインサロンです。">
+<meta name="description" content="YouTubeで覚えた英会話フレーズを、使える英語に。毎月16回のオンラインライブと6本の講義動画で、ひとりでは続かない英語をみんなで続けるオンラインサロンです。">
 <!-- TODO: 公開するときに OGP（og:title / og:description / og:image / og:url）を追加 -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -187,6 +187,13 @@
   }
   .hero .rule { margin-top: 26px; }
   .lead { font-size: 17px; color: var(--ink-2); margin-top: 24px; max-width: 34em; }
+  .stats { display: flex; margin-top: 28px; max-width: 34em; border-block: 2px solid var(--line); }
+  .stats > div { flex: 1 1 0; min-width: 0; display: grid; align-content: start; gap: 4px; padding-block: 14px 16px; }
+  .stats > div + div { border-left: 2px solid var(--line); padding-left: 24px; }
+  .stats dt { font-size: 13px; font-weight: 700; color: var(--ink-2); }
+  .stats dd { margin: 0; font-weight: 900; font-size: 16px; }
+  .stats .n { font-family: var(--en); font-weight: 700; font-size: 46px; line-height: 1; letter-spacing: -1px; color: var(--accent); margin-right: 4px; }
+  .stats .chip { justify-self: start; margin-top: 4px; }
   .cta-row { display: flex; flex-wrap: wrap; align-items: center; gap: 14px 22px; margin-top: 34px; }
   .cta-note { font-size: 14px; color: var(--muted); font-weight: 500; }
 
@@ -506,6 +513,8 @@
     .section { padding-block: 68px; }
     .sec-head { margin-bottom: 30px; }
     .lead { font-size: 16px; }
+    .stats .n { font-size: 40px; }
+    .stats > div + div { padding-left: 18px; }
     .cta-row .btn { width: 100%; }
     .checks { padding: 4px 20px; }
     .checks li { font-size: 16px; gap: 12px; }
@@ -565,7 +574,18 @@
         <p class="hero-en" lang="en">Do you wanna <span class="nw"><span class="slot">join us</span>?</span></p>
         <h1>一緒に英語、<br>続けへん？</h1>
         <div class="rule"></div>
-        <p class="lead">YouTubeで覚えたフレーズを、ちゃんと<mark>“使える英語”</mark>に。限定レッスン、練習問題、英作文の添削で、ひとりでは続かない英語をみんなで続けるオンラインサロンです。</p>
+        <p class="lead">YouTubeで覚えたフレーズを、ちゃんと<mark>“使える英語”</mark>に。毎月16回のオンラインライブと6本の講義動画で、ひとりでは続かない英語をみんなで続けるオンラインサロンです。</p>
+        <dl class="stats">
+          <div>
+            <dt>毎月のオンラインライブ</dt>
+            <dd><span class="n">16</span>回</dd>
+            <dd class="chip">うち4回はひなが担当</dd>
+          </div>
+          <div>
+            <dt>毎月の講義動画</dt>
+            <dd><span class="n">6</span>本</dd>
+          </div>
+        </dl>
         <div class="cta-row">
           <a class="btn" href="#price">サロンに参加する</a>
           <p class="cta-note">月額 <span class="tbd">¥X,XXX</span>（税込）・<span class="tbd">いつでも退会OK</span></p>
@@ -607,28 +627,28 @@
       </header>
       <ul class="features">
         <li>
+          <span class="tag">LIVE</span>
+          <h3>月16回のオンラインライブ</h3>
+          <p>週4回ペースで開催。そのうち月4回は、ひなが担当します。質問したり、みんなで声に出して練習したり。<span class="tbd">参加できなかった回もアーカイブで見られます。</span></p>
+        </li>
+        <li>
           <span class="tag">LESSON</span>
-          <h3>限定レッスン動画</h3>
-          <p>YouTubeでは話しきれない、フレーズの使い分けやネイティブらしい言い方を解説します。<span class="tbd">月2本</span>配信。</p>
+          <h3>毎月6本の講義動画</h3>
+          <p>YouTubeでは話しきれない、フレーズの使い分けやネイティブらしい言い方をじっくり解説します。好きな時間に、何度でも見返せます。</p>
         </li>
         <li>
           <span class="tag">PRACTICE</span>
-          <h3>まとめスライドと練習問題</h3>
+          <h3><span class="tbd">まとめスライドと練習問題</span></h3>
           <p>レッスンごとに、例文をまとめたスライドと練習問題をお届け。「日常英会話フレーズ9選」なら練習問題45問、解答つきです。</p>
         </li>
         <li>
           <span class="tag">OUTPUT</span>
-          <h3>英作文チャレンジと添削</h3>
-          <p>お題に、習ったフレーズで1文書いて投稿。ひなが添削してコメントを返します。お題は<span class="tbd">平日毎日</span>。</p>
-        </li>
-        <li>
-          <span class="tag">LIVE</span>
-          <h3><span class="tbd">月1回</span>のオンラインライブ</h3>
-          <p>質問に答えたり、みんなで声に出して練習したり。参加できなかった回もアーカイブで見られます。</p>
+          <h3><span class="tbd">英作文チャレンジと添削</span></h3>
+          <p>お題に、習ったフレーズで1文書いて投稿。ひなが添削してコメントを返します。</p>
         </li>
         <li>
           <span class="tag">COMMUNITY</span>
-          <h3>メンバー同士の交流</h3>
+          <h3><span class="tbd">メンバー同士の交流</span></h3>
           <p>同じように英語をがんばる仲間と、励まし合いながら続けられます。</p>
         </li>
       </ul>
@@ -645,7 +665,7 @@
       </header>
       <div class="how">
         <div class="how-step">
-          <h3><span class="step-n">1</span>レッスンとまとめで覚える</h3>
+          <h3><span class="step-n">1</span>講義動画とまとめで覚える</h3>
           <div class="panel mini-slide">
             <div class="top">
               <span class="num">3</span>
@@ -662,7 +682,7 @@
           </div>
         </div>
         <div class="how-step">
-          <h3><span class="step-n">2</span>お題に答えて使ってみる</h3>
+          <h3><span class="step-n">2</span><span class="tbd">お題に答えて使ってみる</span></h3>
           <div class="panel">
             <div class="prompt">
               <span class="tag pink">今日のお題</span>
@@ -718,17 +738,17 @@
           <p class="plan">月額プラン</p>
           <p class="price"><span class="amount tbd">¥X,XXX</span><span class="per">/ 月（税込）</span></p>
           <p class="price-note"><span class="tbd">いつでも退会できます。</span></p>
-          <!-- TODO: 申し込みページのURLを入れる -->
-          <a class="btn" href="#">サロンに参加する</a>
+          <!-- TODO: 申し込みページが決まったら、そのURLに変える（今はアプリのトップ） -->
+          <a class="btn" href="https://hina-english-flax.vercel.app/">サロンに参加する</a>
         </div>
         <div class="price-inc">
           <h3>プランに含まれるもの</h3>
           <ul class="inc">
-            <li><span class="tag">LESSON</span><span>限定レッスン動画</span></li>
-            <li><span class="tag">PRACTICE</span><span>まとめスライドと練習問題</span></li>
-            <li><span class="tag">OUTPUT</span><span>英作文チャレンジと添削</span></li>
-            <li><span class="tag">LIVE</span><span>オンラインライブとアーカイブ</span></li>
-            <li><span class="tag">COMMUNITY</span><span>メンバー同士の交流</span></li>
+            <li><span class="tag">LIVE</span><span>月16回のオンラインライブ（ひなは月4回）</span></li>
+            <li><span class="tag">LESSON</span><span>毎月6本の講義動画</span></li>
+            <li><span class="tag">PRACTICE</span><span class="tbd">まとめスライドと練習問題</span></li>
+            <li><span class="tag">OUTPUT</span><span class="tbd">英作文チャレンジと添削</span></li>
+            <li><span class="tag">COMMUNITY</span><span class="tbd">メンバー同士の交流</span></li>
           </ul>
         </div>
       </div>
@@ -749,8 +769,8 @@
           <p>このページのボタンから申し込みページへ。<span class="tbd">クレジットカード</span>で支払えます。</p>
         </li>
         <li>
-          <h3><span class="step-n">2</span>招待が届く</h3>
-          <p>登録したメールに、<span class="tbd">コミュニティ（Discord など）</span>への招待が届きます。</p>
+          <h3><span class="step-n">2</span>アプリにログイン</h3>
+          <p>登録したアカウントで、サロンのアプリに入れます。<span class="tbd">ライブの予定も講義動画も、アプリから見られます。</span></p>
         </li>
         <li>
           <h3><span class="step-n">3</span>自己紹介してスタート</h3>
@@ -774,16 +794,20 @@
           <p class="a">大丈夫です。中学英語のおさらいから、ゆっくり進めます。サロンは間違えるための場所なので、気軽に投稿してください。</p>
         </details>
         <details>
+          <summary>ライブはどれくらいありますか？</summary>
+          <p class="a">月16回、週4回ペースで開催しています。そのうち月4回は、ひなが担当します。</p>
+        </details>
+        <details>
           <summary>スマホだけで参加できますか？</summary>
-          <p class="a">はい。動画を見るのも、お題に投稿するのも、スマホで完結します。</p>
+          <p class="a"><span class="tbd">はい。サロンのアプリはスマホのブラウザで使えます。ライブも講義動画もスマホで見られます。</span></p>
         </details>
         <details>
           <summary>ライブに参加できない日はどうなりますか？</summary>
-          <p class="a">アーカイブを残すので、あとから見られます。</p>
+          <p class="a"><span class="tbd">アーカイブを残すので、あとから見られます。</span></p>
         </details>
         <details>
           <summary>顔出しや声出しは必要ですか？</summary>
-          <p class="a">必要ありません。ライブも見るだけで参加できます。</p>
+          <p class="a"><span class="tbd">必要ありません。ライブも見るだけで参加できます。</span></p>
         </details>
         <details>
           <summary>退会はいつでもできますか？</summary>
