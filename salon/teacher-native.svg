@@ -1,0 +1,94 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="190 150 620 620" width="620" height="620">
+  <title>ネイティブ講師（仮のキャラクター）</title>
+  <defs>
+    <linearGradient id="n-hair" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#E8C27A"/>
+      <stop offset="1" stop-color="#C99A4E"/>
+    </linearGradient>
+    <linearGradient id="n-iris" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#1D3F66"/>
+      <stop offset=".55" stop-color="#3D7DBA"/>
+      <stop offset="1" stop-color="#9ECCF0"/>
+    </linearGradient>
+    <linearGradient id="n-sweater" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#34436A"/>
+      <stop offset="1" stop-color="#263252"/>
+    </linearGradient>
+    <filter id="n-soft" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="7"/>
+    </filter>
+    <clipPath id="n-eyeclip">
+      <path d="M537 420 C537 390 555 376 578 376 C601 376 618 392 618 416 C618 446 600 462 578 462 C555 462 537 446 537 420 Z"/>
+    </clipPath>
+  </defs>
+
+  <!-- body -->
+  <g transform="translate(0 -24)">
+    <path fill="#F4D6C8" d="M466 580 L534 580 L536 720 L464 720 Z"/>
+    <path fill="url(#n-sweater)" d="M300 1030 C296 880 312 782 352 738 C392 700 446 688 470 688 L530 688 C554 688 608 700 648 738 C688 782 704 880 700 1030 Z"/>
+    <!-- shirt collar peeking out of the sweater -->
+    <path fill="#DCEBFA" stroke="#A9C6E6" stroke-width="3" stroke-linejoin="round" d="M466 684 L500 744 L456 738 L444 700 Z"/>
+    <path fill="#DCEBFA" stroke="#A9C6E6" stroke-width="3" stroke-linejoin="round" d="M534 684 L500 744 L544 738 L556 700 Z"/>
+    <path d="M362 860 C356 920 354 980 356 1030 M640 860 C646 920 648 980 646 1030" fill="none" stroke="#1C2540" stroke-width="5" stroke-linecap="round"/>
+  </g>
+
+  <g transform="translate(0 30)">
+    <!-- ears -->
+    <ellipse cx="684" cy="418" rx="20" ry="30" fill="#F8DCCD"/>
+    <ellipse cx="316" cy="418" rx="20" ry="30" fill="#F8DCCD"/>
+    <!-- face -->
+    <path fill="#FBE6DA" d="M320 360 C320 472 390 562 500 570 C610 562 680 472 680 360 C680 250 600 200 500 200 C400 200 320 250 320 360 Z"/>
+
+    <!-- blush -->
+    <ellipse cx="398" cy="482" rx="36" ry="18" fill="#F7A2B0" opacity=".45" filter="url(#n-soft)"/>
+    <ellipse cx="602" cy="482" rx="36" ry="18" fill="#F7A2B0" opacity=".45" filter="url(#n-soft)"/>
+
+    <!-- brows -->
+    <path d="M540 330 C564 320 594 320 618 328" fill="none" stroke="#A8783E" stroke-width="10" stroke-linecap="round"/>
+    <path d="M460 330 C436 320 406 320 382 328" fill="none" stroke="#A8783E" stroke-width="10" stroke-linecap="round"/>
+
+    <!-- eyes (drawn once, mirrored) -->
+    <g id="n-eye">
+      <path fill="#FFFFFF" d="M537 420 C537 390 555 376 578 376 C601 376 618 392 618 416 C618 446 600 462 578 462 C555 462 537 446 537 420 Z"/>
+      <g clip-path="url(#n-eyeclip)">
+        <ellipse cx="578" cy="424" rx="33" ry="41" fill="url(#n-iris)"/>
+        <ellipse cx="578" cy="420" rx="15" ry="19" fill="#10243D"/>
+      </g>
+      <path fill="#3A2A22" d="M532 416 C536 388 556 370 580 370 C602 370 618 382 624 400 C614 388 600 382 580 382 C560 382 545 396 540 420 Z"/>
+    </g>
+    <use href="#n-eye" transform="translate(1000 0) scale(-1 1)"/>
+    <g fill="#FFFFFF">
+      <circle cx="590" cy="406" r="11"/>
+      <circle cx="567" cy="440" r="4.5"/>
+      <circle cx="434" cy="406" r="11"/>
+      <circle cx="411" cy="440" r="4.5"/>
+    </g>
+
+    <!-- nose -->
+    <path d="M495 484 C499 489 503 489 507 484" fill="none" stroke="#E2A58F" stroke-width="4" stroke-linecap="round"/>
+
+    <!-- open smile -->
+    <path fill="#B9493E" d="M462 510 C474 540 526 540 538 510 C514 518 486 518 462 510 Z"/>
+    <path fill="#FFFFFF" d="M468 512 C488 518 512 518 532 512 L530 519 C510 524 490 524 470 519 Z"/>
+
+    <!-- short side-swept hair -->
+    <path fill="url(#n-hair)" d="M312 404 C296 250 386 160 500 158 C614 156 706 248 688 404 C676 366 664 336 644 314 L630 342 C616 312 594 294 568 284 L560 320 C540 294 516 282 488 280 L468 324 C450 298 426 286 400 288 L378 334 C362 318 346 318 336 326 C326 348 318 374 312 404 Z"/>
+    <g fill="none" stroke="#F6DDA6" stroke-linecap="round">
+      <path d="M380 218 C412 194 450 182 486 180" stroke-width="12"/>
+      <path d="M536 180 C574 186 610 202 636 226" stroke-width="10" opacity=".8"/>
+    </g>
+    <g fill="none" stroke="#B8873F" stroke-width="4" stroke-linecap="round" opacity=".8">
+      <path d="M470 220 C460 250 450 272 440 288"/>
+      <path d="M560 224 C566 250 566 268 562 284"/>
+    </g>
+
+    <!-- headset for the Zoom lives -->
+    <path d="M300 432 C276 150 724 150 700 432" fill="none" stroke="#3B4150" stroke-width="14" stroke-linecap="round"/>
+    <rect x="276" y="384" width="44" height="86" rx="20" fill="#3B4150"/>
+    <rect x="680" y="384" width="44" height="86" rx="20" fill="#3B4150"/>
+    <rect x="288" y="400" width="20" height="54" rx="10" fill="#F0521E"/>
+    <rect x="692" y="400" width="20" height="54" rx="10" fill="#F0521E"/>
+    <path d="M300 466 C308 528 364 556 426 552" fill="none" stroke="#3B4150" stroke-width="8" stroke-linecap="round"/>
+    <circle cx="432" cy="551" r="11" fill="#3B4150"/>
+  </g>
+</svg>

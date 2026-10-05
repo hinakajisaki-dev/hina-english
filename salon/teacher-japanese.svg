@@ -1,0 +1,94 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="190 150 620 620" width="620" height="620">
+  <title>日本人講師（仮のキャラクター）</title>
+  <defs>
+    <linearGradient id="j-hair" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#4A3228"/>
+      <stop offset="1" stop-color="#2E1F19"/>
+    </linearGradient>
+    <linearGradient id="j-iris" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#3E2314"/>
+      <stop offset=".55" stop-color="#7A4A26"/>
+      <stop offset="1" stop-color="#C98E52"/>
+    </linearGradient>
+    <linearGradient id="j-cardigan" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FF7A45"/>
+      <stop offset="1" stop-color="#E24D1A"/>
+    </linearGradient>
+    <filter id="j-soft" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="7"/>
+    </filter>
+    <clipPath id="j-eyeclip">
+      <path d="M535 420 C535 388 554 374 578 374 C602 374 619 391 619 415 C619 447 601 464 578 464 C554 464 535 448 535 420 Z"/>
+    </clipPath>
+  </defs>
+
+  <!-- back of the bob -->
+  <path fill="url(#j-hair)" d="M500 176 C344 176 276 280 280 430 C282 520 294 584 326 626 C368 640 410 632 432 614 L568 614 C590 632 632 640 674 626 C706 584 718 520 720 430 C724 280 656 176 500 176 Z"/>
+
+  <!-- body -->
+  <g transform="translate(0 -24)">
+    <path fill="#F4D6C8" d="M466 580 L534 580 L536 720 L464 720 Z"/>
+    <path fill="url(#j-cardigan)" d="M300 1030 C296 880 312 782 352 738 C392 700 446 688 470 688 L530 688 C554 688 608 700 648 738 C688 782 704 880 700 1030 Z"/>
+    <!-- white blouse in the cardigan's V -->
+    <path fill="#FFFFFF" d="M452 690 L548 690 L500 820 Z"/>
+    <path d="M458 700 L500 820 L542 700" fill="none" stroke="#C9400F" stroke-width="4" stroke-linejoin="round"/>
+    <path fill="#FFFFFF" stroke="#E6DCD4" stroke-width="3" d="M470 688 C448 698 438 722 450 738 C470 746 492 730 500 712 Z"/>
+    <path fill="#FFFFFF" stroke="#E6DCD4" stroke-width="3" d="M530 688 C552 698 562 722 550 738 C530 746 508 730 500 712 Z"/>
+    <circle cx="512" cy="860" r="7" fill="#FFE2D3"/>
+    <circle cx="516" cy="920" r="7" fill="#FFE2D3"/>
+  </g>
+
+  <g transform="translate(0 30)">
+    <!-- face -->
+    <path fill="#FBE6DA" d="M318 360 C318 474 392 566 500 574 C608 566 682 474 682 360 C682 250 600 200 500 200 C400 200 318 250 318 360 Z"/>
+
+    <!-- blush -->
+    <ellipse cx="398" cy="490" rx="38" ry="20" fill="#F79BB0" opacity=".5" filter="url(#j-soft)"/>
+    <ellipse cx="602" cy="490" rx="38" ry="20" fill="#F79BB0" opacity=".5" filter="url(#j-soft)"/>
+
+    <!-- brows -->
+    <path d="M546 334 C568 328 594 328 616 334" fill="none" stroke="#5B4038" stroke-width="7" stroke-linecap="round"/>
+    <path d="M454 334 C432 328 406 328 384 334" fill="none" stroke="#5B4038" stroke-width="7" stroke-linecap="round"/>
+
+    <!-- eyes (drawn once, mirrored) -->
+    <g id="j-eye">
+      <path fill="#FFFFFF" d="M535 420 C535 388 554 374 578 374 C602 374 619 391 619 415 C619 447 601 464 578 464 C554 464 535 448 535 420 Z"/>
+      <g clip-path="url(#j-eyeclip)">
+        <ellipse cx="578" cy="424" rx="35" ry="44" fill="url(#j-iris)"/>
+        <ellipse cx="578" cy="420" rx="16" ry="21" fill="#24130A"/>
+        <ellipse cx="578" cy="452" rx="22" ry="9" fill="#E6AE6E" opacity=".5"/>
+      </g>
+      <path fill="#1E1719" d="M530 416 C534 384 556 366 580 366 C604 366 620 380 626 400 C618 386 602 379 580 379 C560 379 544 393 538 420 Z"/>
+      <path d="M616 374 L626 362" stroke="#1E1719" stroke-width="4" stroke-linecap="round"/>
+    </g>
+    <use href="#j-eye" transform="translate(1000 0) scale(-1 1)"/>
+    <g fill="#FFFFFF">
+      <circle cx="591" cy="405" r="11"/>
+      <circle cx="567" cy="441" r="5"/>
+      <circle cx="435" cy="405" r="11"/>
+      <circle cx="411" cy="441" r="5"/>
+    </g>
+
+    <!-- round glasses -->
+    <g fill="#FFFFFF" fill-opacity=".14" stroke="#5A4038" stroke-width="7">
+      <circle cx="578" cy="420" r="64"/>
+      <circle cx="422" cy="420" r="64"/>
+    </g>
+    <path d="M486 412 C494 400 506 400 514 412 M642 410 L682 400 M358 410 L318 400" fill="none" stroke="#5A4038" stroke-width="7" stroke-linecap="round"/>
+
+    <!-- nose -->
+    <path d="M496 490 C499 494 503 494 506 490" fill="none" stroke="#E2A58F" stroke-width="4" stroke-linecap="round"/>
+
+    <!-- smile -->
+    <path fill="#E27560" d="M472 520 C484 516 492 516 500 521 C508 516 516 516 528 520 C524 540 512 548 500 548 C488 548 476 540 472 520 Z"/>
+    <ellipse cx="507" cy="536" rx="7" ry="3" fill="#FFFFFF" opacity=".7"/>
+
+    <!-- bob with a side part -->
+    <path fill="url(#j-hair)" d="M292 440 C284 262 384 150 500 150 C616 150 716 262 708 440 C710 506 702 556 686 596 C672 548 664 486 664 426 C658 366 632 318 590 292 C556 318 498 330 436 326 C404 334 378 356 362 388 C346 428 340 490 336 548 C330 568 322 586 314 596 C298 552 290 500 292 440 Z"/>
+    <path d="M590 292 C586 254 570 216 548 192" fill="none" stroke="#2A1B16" stroke-width="4" stroke-linecap="round"/>
+    <g fill="none" stroke="#7A5E52" stroke-linecap="round">
+      <path d="M372 230 C404 198 446 182 486 178" stroke-width="12"/>
+      <path d="M612 214 C636 232 652 252 664 276" stroke-width="10" opacity=".8"/>
+    </g>
+  </g>
+</svg>
