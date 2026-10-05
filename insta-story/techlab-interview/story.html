@@ -77,15 +77,11 @@
     width: 116px; height: 116px; border-radius: 50%; flex: none;
     background-size: 500px auto; background-position: -207px -62px;
   }
-  .points { list-style: none; border-top: 2px solid var(--line); counter-reset: p; }
-  .points li {
-    counter-increment: p;
-    display: grid; grid-template-columns: 76px 1fr; align-items: baseline;
-    padding: 24px 0; border-bottom: 2px solid var(--line);
-    font-size: 36px; font-weight: 500; line-height: 1.55;
-  }
-  .points li::before { content: "0" counter(p); font-family: "Lato", sans-serif; font-weight: 700; font-size: 30px; color: var(--oak); }
-  .points li small { display: block; font-size: 28px; font-weight: 400; color: var(--ink-2); line-height: 1.6; margin-top: 4px; letter-spacing: .05em; }
+  .perks { list-style: none; margin-top: 34px; border-top: 2px solid var(--line); counter-reset: p; }
+  .perks li { counter-increment: p; display: grid; grid-template-columns: 76px 1fr; padding: 28px 0; border-bottom: 2px solid var(--line); }
+  .perks li::before { content: "0" counter(p); font-family: "Lato", sans-serif; font-weight: 700; font-size: 30px; line-height: 60px; color: var(--oak); }
+  .perks b { display: block; font-size: 40px; font-weight: 700; line-height: 1.5; }
+  .perks p { font-size: 29px; color: var(--ink-2); line-height: 1.75; margin-top: 6px; letter-spacing: .05em; }
 
   /* ---------- 01 cover ---------- */
   .cover-photo { height: 720px; background-size: cover; background-position: 60% 30%; }
@@ -115,23 +111,16 @@
   .said { display: flex; align-items: center; gap: 30px; margin-top: 40px; }
   .said p { font-size: 40px; font-weight: 700; line-height: 1.6; letter-spacing: .05em; }
 
-  /* ---------- 03 recruiting ---------- */
-  .answer { font-size: 44px; font-weight: 500; line-height: 1.75; margin-top: 34px; letter-spacing: .05em; }
-  .answer small { display: block; font-size: 28px; font-weight: 400; color: var(--ink-2); letter-spacing: .1em; margin-bottom: 6px; }
-  .voice { margin-top: 36px; background: var(--card); border: 2px solid var(--line); border-radius: 24px; padding: 26px 40px 34px; }
-  .voice .quote { margin-top: 0; padding-top: 52px; }
-  .voice .quote::before { font-size: 150px; top: -24px; }
-  .voice .quote p { font-size: 46px; font-weight: 700; }
-  .voice .cap { font-size: 28px; color: var(--ink-2); line-height: 1.7; margin-top: 14px; letter-spacing: .05em; }
-  .frame .points.after-voice { margin-top: 34px; }
-
-  /* ---------- 04 message + CTA ---------- */
+  /* ---------- 03 / 04 for engineers ---------- */
   .msg-head { font-size: 54px; font-weight: 700; letter-spacing: .08em; line-height: 1.5; margin-top: 24px; }
-  .frame .points.msg { margin-top: 30px; }
-  .want { margin-top: 30px; background: var(--greige); border-radius: 24px; padding: 28px 40px 32px; }
-  .want .k { font-size: 26px; color: var(--oak); letter-spacing: .12em; }
-  .want p { font-size: 34px; font-weight: 500; line-height: 1.65; margin-top: 8px; }
-  .casual { font-size: 34px; font-weight: 500; margin-top: 40px; letter-spacing: .05em; }
+  .frame .msg-quote { margin-top: 56px; }
+  .msg-quote p { font-size: 42px; }
+  .want-lead { font-size: 28px; color: var(--ink-2); margin-top: 34px; letter-spacing: .1em; }
+  .want-big { font-size: 44px; font-weight: 700; line-height: 1.7; margin-top: 10px; letter-spacing: .04em; }
+  .want-sub { font-size: 30px; color: var(--ink-2); line-height: 1.8; margin-top: 22px; letter-spacing: .05em; }
+  .said.small p { font-size: 31px; font-weight: 500; line-height: 1.7; }
+  .cta { margin-top: 40px; padding-top: 34px; border-top: 2px solid var(--line); display: flex; flex-direction: column; }
+  .casual { font-size: 34px; font-weight: 500; letter-spacing: .05em; }
   .where { font-size: 27px; color: var(--ink-2); margin-top: 16px; }
   .search {
     margin-top: 16px;
@@ -191,58 +180,54 @@
   <div class="next">次へ<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg></div>
 </section>
 
-<!-- 03 how she recruits -->
+<!-- 03 for engineers: what it is like -->
 <section class="frame">
   <div class="top"><div><b>Tech Lab</b>社員インタビュー</div><div class="count"><b>03</b> / 04</div></div>
 
-  <div class="label">RECRUITING</div>
-  <h2 class="q"><span>Q.</span>採用でいちばん<br>大切にしていることは？</h2>
+  <div class="label">FOR ENGINEERS</div>
+  <h2 class="msg-head">エンジニアのみなさんへ</h2>
 
-  <p class="answer"><small>採用戦略からスカウト、面談まで全体をリード</small><span class="hl">「候補者一人ひとりに最適化した、<br>温度感のあるコミュニケーション」</span></p>
-
-  <div class="voice">
-    <div class="quote"><p>会社が一方的に選考する<br>時代は終わりました</p></div>
-    <p class="cap">面談で聞かせてほしいのは、<br>「なぜエンジニアという道を選んだのか」</p>
+  <div class="quote msg-quote">
+    <p>言葉だけではなく本当に<br><span class="hl">「エンジニアファースト」</span>の<br>文化が根付いている</p>
   </div>
 
-  <ol class="points after-voice">
-    <li>スカウトは定型文なし。一通ずつ自ら綴る</li>
-    <li>面談は「選考・評価」ではなく「対話」の場</li>
-    <li>入社はゴールではなく、新しい物語の始まり</li>
+  <ol class="perks">
+    <li><div><b>エンジニア目線の意思決定</b><p>常に「エンジニアにとって何が一番良いか」で判断。<br>社員同士が尊重し合い、安心して働ける</p></div></li>
+    <li><div><b>メリハリのある働き方</b><p>無理な残業はなく、限られた時間で成果を出す。<br>プライベートの時間も大切にできる</p></div></li>
+    <li><div><b>案件選択の自由度</b><p>「AI領域に挑戦したい」などの希望に合わせて、<br>実現できるプロジェクトを一緒に探してくれる。<br>生成AIなど新しい技術領域に関わるチャンスも</p></div></li>
   </ol>
 
   <div class="next">次へ<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg></div>
 </section>
 
-<!-- 04 message + CTA -->
+<!-- 04 for engineers: who we want + CTA -->
 <section class="frame">
   <div class="top"><div><b>Tech Lab</b>社員インタビュー</div><div class="count"><b>04</b> / 04</div></div>
 
-  <div class="label">MESSAGE</div>
-  <h2 class="msg-head">エンジニアのみなさんへ</h2>
+  <div class="label">FOR ENGINEERS</div>
+  <h2 class="msg-head">こんな方と働きたい</h2>
 
-  <ol class="points msg">
-    <li><div>本当の「エンジニアファースト」<small>「エンジニアにとって何が一番良いか」で意思決定</small></div></li>
-    <li><div>メリハリのある働き方<small>無理な残業はなく、プライベートも大切にできる</small></div></li>
-    <li><div>案件選択の自由度<small>キャリアに合わせて選べる。生成AIなど新しい領域も</small></div></li>
-  </ol>
+  <p class="want-lead">スキルセット以上に大切にしているのは</p>
+  <p class="want-big"><span class="hl">自分なりの目的意識を持って、<br>エンジニアという仕事に向き合っているか</span></p>
+  <p class="want-sub">「将来どんなエンジニアになりたいか」<br>「どの技術領域を究めたいのか」<br>主体的に動ける方にとって、Tech Lab は<br>「最高のプラットフォーム」になれる。</p>
 
-  <div class="want">
-    <div class="k">こんな方と働きたい</div>
-    <p>自分なりの目的意識を持って、<br>エンジニアという仕事に向き合っている方</p>
+  <div class="said small">
+    <div class="photo avatar"></div>
+    <p>「面談では、ぜひ『なぜエンジニアという道を<br>選んだのか』という背景をお聞かせください」</p>
   </div>
 
-  <p class="casual">「まずはカジュアルにお話しできれば嬉しいです」</p>
-  <p class="where">インタビュー全文と求人は、転職サイト Green で</p>
-  <div class="search">
-    <svg viewBox="0 0 24 24" fill="none" stroke="#A47E48" stroke-width="2.4" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5L21 21"/></svg>
-    Tech Lab
-    <span>検索</span>
-  </div>
-
-  <div class="link-hint">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v16M5 13l7 7 7-7"/></svg>
-    求人はリンクからチェック
+  <div class="cta">
+    <p class="casual">「まずはカジュアルにお話しできれば嬉しいです」</p>
+    <p class="where">インタビュー全文と求人は、転職サイト Green で</p>
+    <div class="search">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#A47E48" stroke-width="2.4" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5L21 21"/></svg>
+      Tech Lab
+      <span>検索</span>
+    </div>
+    <div class="link-hint">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v16M5 13l7 7 7-7"/></svg>
+      求人はリンクからチェック
+    </div>
   </div>
 </section>
 
