@@ -21,9 +21,6 @@
     --line: #E2DBD1;
     --oak: #A47E48;
     --oak-soft: rgba(196, 160, 106, .32);
-    /* scout reply-rate bars: one hue, dark = Tech Lab, light = industry average */
-    --bar-strong: #8C6A3A;
-    --bar-light: #CDB38C;
     --sans: "Lato", "Noto Sans JP", sans-serif;
   }
 
@@ -121,24 +118,12 @@
   /* ---------- 03 recruiting ---------- */
   .answer { font-size: 44px; font-weight: 500; line-height: 1.75; margin-top: 34px; letter-spacing: .05em; }
   .answer small { display: block; font-size: 28px; font-weight: 400; color: var(--ink-2); letter-spacing: .1em; margin-bottom: 6px; }
-  .stat { margin-top: 36px; background: var(--card); border: 2px solid var(--line); border-radius: 24px; padding: 34px 40px 36px; }
-  .stat .k { font-size: 28px; font-weight: 700; letter-spacing: .1em; }
-  .bars { display: grid; grid-template-columns: 150px 1fr; align-items: center; row-gap: 18px; margin-top: 22px; }
-  .bars dt { font-size: 27px; color: var(--ink-2); letter-spacing: .06em; }
-  .bars dd { display: flex; align-items: center; gap: 18px; }
-  /* scale: 0-36% across the track */
-  .bar { height: 34px; display: flex; gap: 2px; }
-  .bar span { height: 100%; }
-  .bar span:last-child { border-radius: 0 4px 4px 0; }
-  .bar.us span { width: calc(30 / 36 * 520px); background: var(--bar-strong); }
-  .bar.avg .lo { width: calc(10 / 36 * 520px); background: var(--bar-light); }
-  .bar.avg .hi { width: calc(5 / 36 * 520px - 2px); background: repeating-linear-gradient(135deg, var(--bar-light) 0 5px, transparent 5px 10px); }
-  .bars .v { font-family: "Lato", sans-serif; font-weight: 700; white-space: nowrap; letter-spacing: .02em; }
-  .bars .v.big { font-size: 46px; }
-  .bars .v.big small { font-family: "Noto Sans JP", sans-serif; font-size: 26px; font-weight: 500; margin-left: 2px; }
-  .bars .v.sm { font-size: 30px; color: var(--ink-2); font-weight: 400; }
-  .stat .cap { font-size: 26px; color: var(--ink-2); line-height: 1.7; margin-top: 22px; letter-spacing: .05em; }
-  .frame .points.after-stat { margin-top: 34px; }
+  .voice { margin-top: 36px; background: var(--card); border: 2px solid var(--line); border-radius: 24px; padding: 26px 40px 34px; }
+  .voice .quote { margin-top: 0; padding-top: 52px; }
+  .voice .quote::before { font-size: 150px; top: -24px; }
+  .voice .quote p { font-size: 46px; font-weight: 700; }
+  .voice .cap { font-size: 28px; color: var(--ink-2); line-height: 1.7; margin-top: 14px; letter-spacing: .05em; }
+  .frame .points.after-voice { margin-top: 34px; }
 
   /* ---------- 04 message + CTA ---------- */
   .msg-head { font-size: 54px; font-weight: 700; letter-spacing: .08em; line-height: 1.5; margin-top: 24px; }
@@ -215,18 +200,13 @@
 
   <p class="answer"><small>採用戦略からスカウト、面談まで全体をリード</small><span class="hl">「候補者一人ひとりに最適化した、<br>温度感のあるコミュニケーション」</span></p>
 
-  <div class="stat">
-    <div class="k">スカウト返信率</div>
-    <dl class="bars">
-      <dt>Tech Lab</dt>
-      <dd><div class="bar us"><span></span></div><span class="v big">30%<small>前後</small></span></dd>
-      <dt>業界平均</dt>
-      <dd><div class="bar avg"><span class="lo"></span><span class="hi"></span></div><span class="v sm">10〜15%</span></dd>
-    </dl>
-    <p class="cap">定型文は送らず、経歴や技術スタックを読み込んで自ら綴る</p>
+  <div class="voice">
+    <div class="quote"><p>会社が一方的に選考する<br>時代は終わりました</p></div>
+    <p class="cap">面談で聞かせてほしいのは、<br>「なぜエンジニアという道を選んだのか」</p>
   </div>
 
-  <ol class="points after-stat">
+  <ol class="points after-voice">
+    <li>スカウトは定型文なし。一通ずつ自ら綴る</li>
     <li>面談は「選考・評価」ではなく「対話」の場</li>
     <li>入社はゴールではなく、新しい物語の始まり</li>
   </ol>
