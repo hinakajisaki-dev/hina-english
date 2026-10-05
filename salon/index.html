@@ -5,7 +5,17 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Hina English</title>
 <meta name="description" content="書いて、話して、学んで、もう一度使う。毎月16回のZoomライブと6〜8本の講義動画、5レベル・3,000語の学習アプリで、英語を暮らしの中に。Hina English のオンラインサロンです。">
-<!-- TODO: 公開するときに OGP（og:title / og:description / og:image / og:url）を追加 -->
+<!-- SNS・LINEでシェアされたときの表示。独自ドメインにしたら og:url と og:image のURLを変える -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Hina English">
+<meta property="og:title" content="Hina English｜英語を、暮らしの中に。">
+<meta property="og:description" content="書いて、話して、学んで、もう一度使う。毎月16回のZoomライブと6〜8本の講義動画、5レベル・3,000語の学習アプリで、英語を暮らしの中に。Hina English のオンラインサロンです。">
+<meta property="og:url" content="https://hina-english-salon.vercel.app/">
+<meta property="og:image" content="https://hina-english-salon.vercel.app/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:locale" content="ja_JP">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=DM+Sans:opsz,wght@9..40,500;9..40,700;9..40,800&family=Noto+Sans+JP:wght@400;500;700;900&display=swap">
@@ -35,6 +45,9 @@
     --sky: #A9D3F3;
     --cream: #FFF0C4;
 
+
+    --tbd-bg: #FFF4CC;
+    --tbd-line: #C9962B;
 
     --en: "DM Sans", "Helvetica Neue", Arial, "Noto Sans JP", sans-serif;
     --ja: "Noto Sans JP", "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif;
@@ -106,6 +119,16 @@
   }
   .mark svg { width: 22px; height: 22px; }
 
+  /* 仮の内容。中身が決まったら class="tbd" を外して差し替える */
+  .tbd {
+    background: var(--tbd-bg);
+    outline: 2px dashed var(--tbd-line);
+    outline-offset: 1px;
+    border-radius: 4px;
+    padding: 0 4px;
+    margin-inline: 2px;
+  }
+
   .btn {
     display: inline-flex;
     align-items: center;
@@ -129,6 +152,17 @@
   .btn::after { content: "→"; font-family: var(--en); font-weight: 500; }
   .btn:hover { transform: translateY(-2px); box-shadow: 0 14px 28px rgba(214, 62, 16, .32); }
   @media (prefers-reduced-motion: reduce) { .btn { transition: none; } }
+
+  /* ---------- draft notice ---------- */
+  .draft {
+    background: var(--tbd-bg);
+    border-bottom: 1px solid var(--tbd-line);
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--ink-2);
+    text-align: center;
+    padding-block: 8px;
+  }
 
   /* ---------- header ---------- */
   .site-head { background: var(--bg); }
@@ -480,6 +514,32 @@
   .chart { display: grid; grid-template-columns: repeat(14, minmax(0, 1fr)); gap: 5px; align-items: end; height: 96px; margin-top: 8px; border-bottom: 1.5px solid var(--line); }
   .chart i { height: var(--h); background: var(--accent); border-radius: 4px 4px 1px 1px; }
 
+  /* ---------- photos (placeholders until the real photos arrive) ---------- */
+  .photos-head { margin-top: 56px; display: grid; gap: 4px; }
+  .photos-head h3 { font-weight: 900; font-size: clamp(20px, 2.2vw, 24px); }
+  .photos { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 16px; margin-top: 18px; }
+  .photo { position: relative; margin: 0; border-radius: 22px; overflow: hidden; aspect-ratio: 16 / 10; min-width: 0; }
+  .photo.big { grid-row: span 2; aspect-ratio: auto; min-height: 260px; }
+  .photo img { width: 100%; height: 100%; object-fit: cover; }
+  .photo-slot {
+    width: 100%;
+    height: 100%;
+    display: grid;
+    place-content: center;
+    justify-items: center;
+    gap: 6px;
+    background: var(--tbd-bg);
+    border: 2px dashed var(--tbd-line);
+    border-radius: 22px;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--ink-2);
+    text-align: center;
+    padding: 16px;
+  }
+  .photo-slot svg { width: 30px; height: 30px; color: var(--tbd-line); }
+  .photo figcaption { position: absolute; left: 14px; bottom: 14px; }
+
   /* ---------- teachers ---------- */
   .teachers { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; margin-top: 44px; }
   .teacher {
@@ -524,6 +584,8 @@
   .profile h3 .script { font-size: 30px; }
   .profile h3 .chip { align-self: center; }
   .profile-text { display: grid; gap: 14px; margin-top: 10px; color: var(--ink-2); max-width: 36em; }
+
+  .text-link { font-weight: 700; color: var(--accent-text); text-underline-offset: 4px; }
 
   /* ---------- price ---------- */
   .price-card {
@@ -604,6 +666,7 @@
   .foot-links { display: flex; flex-wrap: wrap; gap: 8px 22px; }
   .foot-links a { text-decoration: none; }
   .foot-links a:hover { text-decoration: underline; }
+  .site-foot .tbd { color: var(--ink); }
   .copy { width: 100%; color: var(--line); }
 
   /* ---------- phone CTA bar ---------- */
@@ -618,7 +681,8 @@
     .hello { left: -22%; top: 8%; font-size: 17px; }
     .sticker { width: 52px; height: 52px; border-radius: 16px; }
     .sticker svg { width: 26px; height: 26px; }
-    .pillars, .pair, .learn3, .flow, .teachers { grid-template-columns: minmax(0, 1fr); }
+    .pillars, .pair, .learn3, .flow, .teachers, .photos { grid-template-columns: minmax(0, 1fr); }
+    .photo.big { grid-row: auto; aspect-ratio: 16 / 10; min-height: 0; }
     .pair { gap: 64px; }
     .price-card { grid-template-columns: minmax(0, 1fr); }
     .final .wrap { grid-template-columns: minmax(0, 1fr) 160px; }
@@ -686,6 +750,9 @@
 </head>
 <body>
 <div lang="ja">
+
+<!-- 下書き用のお知らせ。公開前にこのブロックごと消す -->
+<p class="draft">下書き：<span class="tbd">点線の枠</span>は仮の内容です。決まったものから差し替えていきます。</p>
 
 <header class="site-head">
   <div class="wrap">
@@ -790,6 +857,25 @@
         </article>
       </div>
 
+      <!-- 写真が届いたら .photo-slot を <img src="..." alt="..."> に差し替える -->
+      <div class="photos-head">
+        <p class="label">Inside the salon</p>
+        <h3>ライブと講義動画の様子</h3>
+      </div>
+      <div class="photos">
+        <figure class="photo big">
+          <div class="photo-slot"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z M12 17a4 4 0 1 0 0-8 4 4 0 0 0 0 8z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>ライブの写真が入ります</div>
+          <figcaption class="chip white">Zoomライブ</figcaption>
+        </figure>
+        <figure class="photo">
+          <div class="photo-slot"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z M12 17a4 4 0 1 0 0-8 4 4 0 0 0 0 8z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>ライブの写真が入ります</div>
+          <figcaption class="chip white">Zoomライブ</figcaption>
+        </figure>
+        <figure class="photo">
+          <div class="photo-slot"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z M12 17a4 4 0 1 0 0-8 4 4 0 0 0 0 8z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>講義動画の写真が入ります</div>
+          <figcaption class="chip white">講義動画</figcaption>
+        </figure>
+      </div>
     </div>
   </section>
 
@@ -993,6 +1079,8 @@
           <h3>ひな<span class="script" lang="en">Hina</span><span class="chip">主宰・ライブ月4回</span></h3>
           <div class="profile-text">
             <p>YouTubeで、日常でよく使う英会話フレーズを紹介しています。アプリの単語とフレーズのお手本音声は、すべてひなの声です。</p>
+            <p class="tbd">ここに経歴や英語との出会い、サロンをはじめた理由を書きます。</p>
+            <p><a class="text-link tbd" href="#">YouTubeチャンネルを見る →</a></p>
           </div>
         </div>
       </div>
