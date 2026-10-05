@@ -18,7 +18,7 @@ if (!input) {
   // Fonts live in matome/fonts and insta-story/fonts; fail loudly instead of rendering with a fallback font.
   const missing = await page.evaluate(() => {
     const loaded = new Set([...document.fonts].filter((f) => f.status === "loaded").map((f) => f.family.replace(/"/g, "")));
-    return ["Space Grotesk", "Noto Sans JP"].filter((f) => !loaded.has(f));
+    return ["Lato", "Noto Sans JP"].filter((f) => !loaded.has(f));
   });
   if (missing.length) throw new Error(`fonts failed to load: ${missing.join(", ")}`);
   // Instagram's reply bar covers the bottom of a story: nothing but the "next" hint may sit below 1590px.

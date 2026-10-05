@@ -4,33 +4,32 @@
 <meta charset="utf-8">
 <title>Tech Lab 社員インタビュー ストーリー</title>
 <style>
-  @font-face { font-family: "Space Grotesk"; font-weight: 700; src: url("../fonts/SpaceGrotesk-700.woff2") format("woff2"); }
+  @font-face { font-family: "Lato"; font-weight: 400; src: url("../fonts/Lato-400.woff2") format("woff2"); }
+  @font-face { font-family: "Lato"; font-weight: 700; src: url("../fonts/Lato-700.woff2") format("woff2"); }
+  @font-face { font-family: "Noto Sans JP"; font-weight: 400; src: url("../fonts/NotoSansJP-400.woff2") format("woff2"); }
+  @font-face { font-family: "Noto Sans JP"; font-weight: 500; src: url("../fonts/NotoSansJP-500.woff2") format("woff2"); }
   @font-face { font-family: "Noto Sans JP"; font-weight: 700; src: url("../../matome/fonts/NotoSansJP-700.woff2") format("woff2"); }
-  @font-face { font-family: "Noto Sans JP"; font-weight: 900; src: url("../../matome/fonts/NotoSansJP-900.woff2") format("woff2"); }
 
+  /* Colours taken from the interview photo: warm white wall, oak table, charcoal jacket. */
   :root {
-    --navy: #0B1433;
-    --navy-2: #16214A;
-    --paper: #F2F4FA;
+    --paper: #FAF8F5;
+    --greige: #F0EBE4;
     --card: #FFFFFF;
-    --ink: #0B1433;
-    --ink-2: #4B5272;
-    --muted: #8A90AA;
-    --blue: #2D5BFF;
-    --blue-soft: #E2E8FF;
-    --lime: #D6FF3D;
-    --line: #D8DDEC;
-    --en: "Space Grotesk", "Noto Sans JP", sans-serif;
-    --ja: "Noto Sans JP", sans-serif;
+    --ink: #333333;
+    --ink-2: #5E5A55;
+    --muted: #9A948C;
+    --line: #E2DBD1;
+    --oak: #A47E48;
+    --oak-soft: rgba(196, 160, 106, .32);
+    --sans: "Lato", "Noto Sans JP", sans-serif;
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  html, body { background: #555; }
-  body { font-family: var(--ja); font-weight: 700; color: var(--ink); }
-  .en { font-family: var(--en); }
+  html, body { background: #777; }
+  body { font-family: var(--sans); font-weight: 400; color: var(--ink); letter-spacing: .08em; }
 
   /* One story = 1080x1920. Instagram covers roughly the top 250px (progress bar, account name)
-     and the bottom 300px (reply bar), so everything that matters sits between 330px and 1600px. */
+     and the bottom 300px (reply bar), so everything that matters sits between 330px and 1590px. */
   .frame {
     width: 1080px;
     height: 1920px;
@@ -42,356 +41,208 @@
     flex-direction: column;
   }
   .frame + .frame { margin-top: 40px; }
-  .frame > * { position: relative; }
-
-  .frame.dark { background: var(--navy); color: #fff; }
-  .frame .bg { position: absolute; inset: 0; pointer-events: none; }
-  .dark .bg {
-    background:
-      radial-gradient(circle at 92% 18%, rgba(45, 91, 255, .55), transparent 42%),
-      radial-gradient(circle at 0% 88%, rgba(45, 91, 255, .35), transparent 38%),
-      linear-gradient(rgba(255, 255, 255, .05) 2px, transparent 2px) 0 0 / 90px 90px,
-      linear-gradient(90deg, rgba(255, 255, 255, .05) 2px, transparent 2px) 0 0 / 90px 90px;
-  }
-  .light .bg {
-    background:
-      radial-gradient(circle at 100% 0%, rgba(45, 91, 255, .14), transparent 36%),
-      radial-gradient(rgba(11, 20, 51, .09) 2.5px, transparent 2.5px) 0 0 / 36px 36px;
-  }
+  .frame.greige { background: var(--greige); }
 
   /* ---------- header / footer shared by every frame ---------- */
   .top {
     position: absolute;
-    top: 236px; left: 88px; right: 88px;
-    display: flex; justify-content: space-between; align-items: center;
-    font-size: 28px;
+    top: 232px; left: 88px; right: 88px;
+    display: flex; justify-content: space-between; align-items: baseline;
+    font-size: 27px; color: var(--muted);
   }
-  .brand { display: flex; align-items: center; gap: 14px; }
-  .brand i { width: 22px; height: 22px; border-radius: 6px; background: var(--blue); }
-  .dark .brand i { background: var(--lime); }
-  .brand span { color: var(--ink-2); }
-  .dark .brand span { color: rgba(255, 255, 255, .7); }
-  .count { font-family: var(--en); font-size: 30px; letter-spacing: 1px; color: var(--muted); }
-  .dark .count { color: rgba(255, 255, 255, .55); }
-  .count b { color: var(--blue); }
-  .dark .count b { color: var(--lime); }
-
+  .top b { font-weight: 700; color: var(--ink); letter-spacing: .04em; margin-right: 14px; }
+  .count { letter-spacing: .12em; }
+  .count b { margin: 0; }
   .next {
     position: absolute;
     bottom: 272px; right: 88px;
-    font-size: 30px; color: var(--muted);
-    display: flex; align-items: center; gap: 12px;
+    font-size: 27px; color: var(--muted);
+    display: flex; align-items: center; gap: 10px;
   }
-  .dark .next { color: rgba(255, 255, 255, .6); }
-  .next svg { width: 34px; height: 34px; }
+  .next svg { width: 28px; height: 28px; }
 
-  /* ---------- type ---------- */
-  .chip {
-    display: inline-flex; align-items: center; gap: 12px;
-    align-self: flex-start;
-    font-family: var(--en);
-    font-size: 30px; letter-spacing: 3px;
-    color: var(--blue);
-    background: var(--blue-soft);
-    padding: 12px 26px 13px;
-    border-radius: 999px;
+  /* ---------- shared pieces ---------- */
+  .label {
+    font-family: "Lato", sans-serif; font-weight: 700;
+    font-size: 25px; letter-spacing: .32em;
+    color: var(--oak);
+    display: flex; align-items: center; gap: 22px;
   }
-  .dark .chip { color: var(--navy); background: var(--lime); }
-  .title { font-size: 72px; font-weight: 900; line-height: 1.32; letter-spacing: -1px; margin-top: 30px; }
-  .title .q { font-family: var(--en); color: var(--blue); margin-right: 10px; }
-  mark {
-    color: inherit;
-    background: linear-gradient(transparent 62%, var(--lime) 62%);
-    padding: 0 4px; margin: 0 -4px;
-  }
-  .dark mark { color: var(--lime); background: none; padding: 0; margin: 0; }
+  .label::after { content: ""; flex: 1; height: 2px; background: var(--line); }
+  .q { font-size: 54px; font-weight: 700; line-height: 1.6; letter-spacing: .06em; margin-top: 26px; }
+  .q span { font-family: "Lato", sans-serif; color: var(--oak); margin-right: 18px; }
+  .hl { background: linear-gradient(transparent 62%, var(--oak-soft) 62%); }
+  .photo { border-radius: 26px; background: url("photo.jpg") no-repeat; flex: none; }
 
   /* ---------- 01 cover ---------- */
-  .cover-head { font-size: 96px; font-weight: 900; line-height: 1.38; letter-spacing: -2px; margin-top: 54px; }
-  .cover-head .dim { color: rgba(255, 255, 255, .6); }
-  .person {
-    display: flex; align-items: center; gap: 44px;
-    margin-top: auto; margin-bottom: 150px;
-  }
-  .photo {
-    flex: none;
-    width: 270px; height: 270px; border-radius: 50%;
-    padding: 8px;
-    background: conic-gradient(from 200deg, var(--lime), var(--blue), var(--lime));
-  }
-  .photo > div {
-    width: 100%; height: 100%; border-radius: 50%;
-    position: relative; overflow: hidden;
-    background: var(--navy-2);
-    display: grid; place-items: center;
-    border: 6px solid var(--navy);
-  }
-  .photo svg { width: 110px; height: 110px; }
-  /* Drop a portrait named photo.jpg next to this file and rebuild: it covers the mic icon. */
-  .photo .img { position: absolute; inset: 0; background: url("photo.jpg") center / cover no-repeat; }
-  .who .role {
-    display: inline-block;
-    font-size: 30px; color: var(--lime);
-    border: 2px solid rgba(214, 255, 61, .6);
-    padding: 6px 20px 8px; border-radius: 10px;
-  }
-  .who .name { font-size: 80px; font-weight: 900; letter-spacing: 4px; margin-top: 18px; line-height: 1.1; }
-  .who .name small { font-size: 40px; letter-spacing: 0; margin-left: 8px; color: rgba(255, 255, 255, .7); }
-  .who .path { font-size: 32px; color: rgba(255, 255, 255, .7); margin-top: 18px; }
+  .cover-photo { height: 800px; background-size: cover; background-position: 60% 30%; }
+  .cover-label { margin-top: 52px; }
+  .cover-head { font-size: 62px; font-weight: 500; line-height: 1.6; letter-spacing: .08em; margin-top: 22px; }
+  .byline { display: flex; align-items: baseline; gap: 28px; margin-top: 34px; }
+  .byline .role { font-size: 30px; color: var(--ink-2); }
+  .byline .name { font-size: 44px; font-weight: 700; letter-spacing: .14em; }
+  .byline .name small { font-size: 28px; font-weight: 400; color: var(--ink-2); letter-spacing: .04em; margin-left: 6px; }
 
-  /* ---------- 02 company ---------- */
-  .vision {
-    margin-top: 40px;
-    background: var(--navy); color: #fff;
-    border-radius: 36px;
-    padding: 40px 48px 44px;
+  /* ---------- 02 career ---------- */
+  .timeline { list-style: none; margin-top: 46px; display: flex; flex-direction: column; gap: 34px; }
+  .timeline li { position: relative; display: grid; grid-template-columns: 30px 1fr; column-gap: 34px; }
+  .timeline li::before {
+    content: ""; width: 22px; height: 22px; border-radius: 50%;
+    border: 3px solid var(--oak); background: var(--paper);
+    margin-top: 10px; margin-left: 4px;
   }
-  .vision .label { font-family: var(--en); font-size: 28px; letter-spacing: 4px; color: var(--lime); }
-  .vision p { font-size: 48px; font-weight: 900; line-height: 1.5; margin-top: 14px; }
-  .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; margin-top: 28px; }
-  .stat {
-    background: var(--card); border-radius: 28px;
-    padding: 28px 16px 26px; text-align: center;
-    box-shadow: 0 2px 0 var(--line);
-  }
-  .stat .v { font-family: var(--ja); font-weight: 900; font-size: 76px; line-height: 1; color: var(--blue); letter-spacing: -2px; }
-  .stat .v small { font-size: 36px; font-weight: 900; letter-spacing: 0; margin-left: 2px; }
-  .stat .k { font-size: 28px; color: var(--ink-2); margin-top: 16px; }
-  .biz { margin-top: 36px; }
-  .biz h3 { font-size: 32px; color: var(--ink-2); letter-spacing: 2px; }
-  .biz ul { list-style: none; margin-top: 10px; }
-  .biz li { display: grid; grid-template-columns: 30px 1fr; column-gap: 22px; padding: 18px 0; border-top: 2px solid var(--line); }
-  .biz li i { width: 22px; height: 22px; border-radius: 6px; background: var(--blue); margin-top: 14px; }
-  .biz li b { font-size: 42px; font-weight: 900; }
-  .biz li span { grid-column: 2; font-size: 29px; color: var(--ink-2); margin-top: 4px; }
-
-  /* ---------- 03 career timeline ---------- */
-  .lead { font-size: 36px; color: var(--ink-2); margin-top: 18px; }
-  .timeline { list-style: none; margin-top: 50px; display: flex; flex-direction: column; gap: 34px; }
-  .timeline li { position: relative; display: grid; grid-template-columns: 56px 1fr; column-gap: 34px; }
   .timeline li:not(:last-child)::after {
     content: ""; position: absolute;
-    left: 25px; top: 68px; bottom: -30px;
-    width: 6px; border-radius: 3px;
-    background: #B9C6FF;
+    left: 14px; top: 44px; bottom: -32px;
+    width: 2px; background: var(--line);
   }
-  .timeline .dot {
-    width: 56px; height: 56px; border-radius: 50%;
-    background: var(--paper); border: 6px solid var(--blue);
-    margin-top: 4px;
+  .timeline li.now::before { background: var(--oak); }
+  .timeline .when { font-size: 26px; color: var(--oak); letter-spacing: .14em; }
+  .timeline .what { font-size: 42px; font-weight: 700; line-height: 1.5; margin-top: 2px; }
+  .timeline .why { font-size: 29px; color: var(--ink-2); line-height: 1.7; margin-top: 2px; letter-spacing: .06em; }
+
+  /* ---------- 03 turning point ---------- */
+  .lead { font-size: 34px; line-height: 1.95; color: var(--ink-2); margin-top: 40px; }
+  .quote { position: relative; margin-top: 70px; padding-top: 70px; }
+  .quote::before {
+    content: "\201C";
+    position: absolute; top: -40px; left: -8px;
+    font-family: "Lato", sans-serif; font-weight: 700;
+    font-size: 200px; line-height: 1; color: var(--oak); opacity: .55;
   }
-  .timeline .when { font-size: 28px; color: var(--blue); letter-spacing: 1px; }
-  .timeline .what { font-size: 48px; font-weight: 900; line-height: 1.3; margin-top: 4px; }
-  .timeline .why { font-size: 30px; color: var(--ink-2); line-height: 1.5; margin-top: 8px; }
-  .timeline li.now .dot { background: var(--blue); box-shadow: 0 0 0 12px var(--blue-soft); }
-  .timeline li.now .what { color: var(--blue); }
+  .quote p { font-size: 58px; font-weight: 500; line-height: 1.7; letter-spacing: .06em; }
+  .said { display: flex; align-items: center; gap: 26px; margin-top: 50px; }
+  .avatar {
+    width: 120px; height: 120px; border-radius: 50%;
+    background-size: 520px auto; background-position: -216px -66px;
+  }
+  .said .k { font-size: 26px; color: var(--ink-2); }
+  .said .n { font-size: 36px; font-weight: 700; letter-spacing: .14em; margin-top: 4px; }
+  .after { font-size: 34px; line-height: 1.9; margin-top: 54px; padding-top: 40px; border-top: 2px solid var(--line); }
 
   /* ---------- 04 / 05 Q&A ---------- */
-  .answer {
-    margin-top: 64px;
-    background: var(--card); border-radius: 36px;
-    padding: 54px 48px 48px;
-    position: relative;
-    box-shadow: 0 2px 0 var(--line);
+  .answer { font-size: 40px; line-height: 1.85; margin-top: 40px; letter-spacing: .07em; }
+  .answer + .answer { margin-top: 18px; }
+  .note { font-size: 30px; color: var(--ink-2); margin-top: 48px; letter-spacing: .1em; }
+  .points { list-style: none; margin-top: 14px; border-top: 2px solid var(--line); counter-reset: p; }
+  .points li {
+    counter-increment: p;
+    display: grid; grid-template-columns: 76px 1fr; align-items: baseline;
+    padding: 30px 0; border-bottom: 2px solid var(--line);
+    font-size: 40px; font-weight: 500; line-height: 1.55;
   }
-  .answer .a {
-    position: absolute; top: -34px; left: 48px;
-    width: 76px; height: 76px; border-radius: 50%;
-    background: var(--lime); color: var(--navy);
-    font-family: var(--en); font-size: 40px;
-    display: grid; place-items: center;
-  }
-  .answer p { font-size: 50px; font-weight: 900; line-height: 1.55; }
-  .answer p + p { margin-top: 18px; }
-  .answer p.soft { font-size: 36px; font-weight: 700; color: var(--ink-2); line-height: 1.6; }
-  .sub-h { font-size: 34px; color: var(--ink-2); margin-top: 52px; letter-spacing: 1px; }
-  .reasons { display: flex; flex-direction: column; gap: 18px; margin-top: 20px; }
-  .reason {
-    display: grid; grid-template-columns: 84px 1fr; align-items: center; column-gap: 24px;
-    background: var(--navy); color: #fff;
-    border-radius: 28px; padding: 34px 36px;
-  }
-  .reason .n { font-family: var(--en); font-size: 56px; color: var(--lime); line-height: 1; }
-  .reason p { font-size: 38px; font-weight: 900; line-height: 1.45; }
+  .points li::before { content: "0" counter(p); font-family: "Lato", sans-serif; font-weight: 700; font-size: 32px; color: var(--oak); }
+  .points.tight li { padding: 12px 0; }
+  .answer.big { font-size: 44px; }
+  .points.big li { font-size: 44px; padding: 36px 0; }
+  .care { margin-top: 36px; background: var(--greige); border-radius: 24px; padding: 34px 46px 38px; }
+  .care .k { font-size: 28px; color: var(--oak); letter-spacing: .14em; }
+  .care p { font-size: 44px; font-weight: 700; line-height: 1.6; margin-top: 10px; }
 
-  .steps { list-style: none; display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-top: 36px; counter-reset: s; }
-  .steps li {
-    counter-increment: s;
-    background: var(--blue); color: #fff;
-    border-radius: 26px;
-    padding: 22px 30px 26px;
-    font-size: 40px; font-weight: 900;
-  }
-  .steps li::before {
-    content: "0" counter(s);
-    display: block;
-    font-family: var(--en); font-size: 30px; color: var(--lime); letter-spacing: 2px;
-    margin-bottom: 2px;
-  }
-  .care {
-    margin-top: 36px;
-    background: var(--lime);
-    border-radius: 32px;
-    padding: 34px 44px 38px;
-  }
-  .care .k { font-size: 32px; color: var(--navy); opacity: .7; }
-  .care p { font-size: 46px; font-weight: 900; line-height: 1.45; margin-top: 8px; }
-
-  /* ---------- 06 CTA ---------- */
-  .cta-head { font-size: 104px; font-weight: 900; line-height: 1.3; letter-spacing: -2px; margin-top: 46px; }
-  .cta-sub { font-size: 40px; line-height: 1.6; color: rgba(255, 255, 255, .8); margin-top: 36px; }
-  .where { font-size: 34px; color: rgba(255, 255, 255, .7); margin-top: 52px; }
+  /* ---------- 06 about + CTA ---------- */
+  .wide-photo { height: 430px; background-size: cover; background-position: 50% 26%; }
+  .vision { font-size: 50px; font-weight: 500; line-height: 1.65; margin-top: 24px; }
+  .biz { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 26px; }
+  .biz span { font-size: 26px; color: var(--ink-2); border: 2px solid var(--line); border-radius: 999px; padding: 8px 22px 10px; letter-spacing: .06em; }
+  .where { font-size: 30px; color: var(--ink-2); margin-top: 52px; }
   .search {
-    margin-top: 18px;
+    margin-top: 16px;
     display: flex; align-items: center; gap: 22px;
-    background: #fff; color: var(--navy);
+    background: var(--card); border: 2px solid var(--line);
     border-radius: 999px;
-    padding: 14px 14px 14px 36px;
-    font-size: 42px; font-weight: 900;
+    padding: 12px 12px 12px 36px;
+    font-size: 40px; font-weight: 700; letter-spacing: .04em;
   }
-  .search svg { width: 46px; height: 46px; flex: none; }
-  .search span { margin-left: auto; background: var(--blue); color: #fff; font-size: 34px; padding: 18px 34px 20px; border-radius: 999px; }
-  .link-hint {
-    margin-top: 48px; align-self: center;
-    font-size: 36px; color: var(--lime);
-    display: flex; align-items: center; gap: 14px;
-  }
-  .link-hint svg { width: 40px; height: 40px; }
+  .search svg { width: 40px; height: 40px; flex: none; }
+  .search span { margin-left: auto; background: var(--ink); color: #fff; font-size: 30px; font-weight: 500; padding: 16px 34px 18px; border-radius: 999px; letter-spacing: .1em; }
+  .link-hint { margin-top: 44px; align-self: center; font-size: 30px; color: var(--oak); letter-spacing: .12em; display: flex; align-items: center; gap: 12px; }
+  .link-hint svg { width: 32px; height: 32px; }
 </style>
 </head>
 <body>
 
 <!-- 01 cover -->
-<section class="frame dark">
-  <div class="bg"></div>
-  <div class="top"><div class="brand"><i></i><span>Tech Lab 社員インタビュー</span></div><div class="count"><b>01</b> / 06</div></div>
+<section class="frame">
+  <div class="top"><div><b>Tech Lab</b>社員インタビュー</div><div class="count"><b>01</b> / 06</div></div>
 
-  <div class="chip">EMPLOYEE INTERVIEW</div>
-  <h1 class="cover-head">
-    <span class="dim">採用は、</span><br>
-    人の人生を<br>
-    左右する仕事。<br>
-    だから<mark>心から<br>勧められる</mark>会社へ。
-  </h1>
-
-  <div class="person">
-    <div class="photo"><div>
-      <svg viewBox="0 0 24 24" fill="none" stroke="#D6FF3D" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2.5" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21M8.5 21h7"/></svg>
-      <div class="img"></div>
-    </div></div>
-    <div class="who">
-      <div class="role">採用統括部長</div>
-      <div class="name">篠原 里菜<small>さん</small></div>
-      <div class="path">コンサル → 人事 → Tech Lab</div>
-    </div>
+  <div class="photo cover-photo"></div>
+  <div class="label cover-label">INTERVIEW</div>
+  <h1 class="cover-head">営業のトップから、<br>採用の責任者へ。</h1>
+  <div class="byline">
+    <div class="role">採用統括部長</div>
+    <div class="name">篠原 里菜<small>さん</small></div>
   </div>
 
-  <div class="next">タップして続きを読む<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg></div>
+  <div class="next">タップして読む<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg></div>
 </section>
 
-<!-- 02 company -->
-<section class="frame light">
-  <div class="bg"></div>
-  <div class="top"><div class="brand"><i></i><span>Tech Lab 社員インタビュー</span></div><div class="count"><b>02</b> / 06</div></div>
+<!-- 02 career -->
+<section class="frame">
+  <div class="top"><div><b>Tech Lab</b>社員インタビュー</div><div class="count"><b>02</b> / 06</div></div>
 
-  <div class="chip">ABOUT</div>
-  <h2 class="title">Tech Labってどんな会社？</h2>
-
-  <div class="vision">
-    <div class="label">VISION</div>
-    <p>AIの社会実装を通じて、誰ひとり<br>取り残さない社会を実現する</p>
-  </div>
-
-  <div class="stats">
-    <div class="stat"><div class="v">2023<small>年</small></div><div class="k">創業</div></div>
-    <div class="stat"><div class="v">5<small>億円</small></div><div class="k">創業2年の売上</div></div>
-    <div class="stat"><div class="v">1<small>%</small></div><div class="k">離職率</div></div>
-  </div>
-
-  <div class="biz">
-    <h3>主な事業</h3>
-    <ul>
-      <li><i></i><b>AIエージェント開発</b><span>請求書処理や勤怠管理などの業務を自動化</span></li>
-      <li><i></i><b>AXコンサルティング</b><span>AIを使った業務改革を企業と一緒に進める</span></li>
-      <li><i></i><b>データサイエンス</b><span>画像認識による不良品検出なども手がける</span></li>
-    </ul>
-  </div>
-
-  <div class="next">次へ<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg></div>
-</section>
-
-<!-- 03 career -->
-<section class="frame light">
-  <div class="bg"></div>
-  <div class="top"><div class="brand"><i></i><span>Tech Lab 社員インタビュー</span></div><div class="count"><b>03</b> / 06</div></div>
-
-  <div class="chip">CAREER</div>
-  <h2 class="title">篠原さんのキャリア</h2>
-  <p class="lead">営業のプロから、採用のプロへ。</p>
+  <div class="label">CAREER</div>
+  <h2 class="q"><span>Q.</span>入社するまで、どんな<br>キャリアを歩んできた？</h2>
 
   <ol class="timeline">
-    <li>
-      <div class="dot"></div>
-      <div><div class="when">新卒</div><div class="what">コンサルティングファームへ</div><div class="why">「営業力を徹底的に磨きたい」と入社</div></div>
-    </li>
-    <li>
-      <div class="dot"></div>
-      <div><div class="when">コンサル時代</div><div class="what">営業の最前線で成果を出す</div><div class="why">セールス戦略・データ分析・マーケティングに携わる</div></div>
-    </li>
-    <li>
-      <div class="dot"></div>
-      <div><div class="when">マネージャー</div><div class="what">組織マネジメントを経験</div><div class="why">セールスマネージャーとしてチームを率いる</div></div>
-    </li>
-    <li>
-      <div class="dot"></div>
-      <div><div class="when">キャリアチェンジ</div><div class="what">人事の道へ</div><div class="why">働く環境が人生に与える影響の大きさを実感</div></div>
-    </li>
-    <li class="now">
-      <div class="dot"></div>
-      <div><div class="when">現在</div><div class="what">Tech Lab 採用統括部長</div><div class="why">エンジニアの採用とキャリア支援をリード</div></div>
-    </li>
+    <li><div><div class="when">新卒</div><div class="what">セールスコンサルティング業界へ</div><div class="why">「営業力を徹底的に磨きたい」という思いから</div></div></li>
+    <li><div><div class="when">コンサル時代</div><div class="what">同期トップの成績を残す</div><div class="why">セールス戦略の設計から実行まで幅広く経験</div></div></li>
+    <li><div><div class="when">転職</div><div class="what">セールスマネージャーに</div><div class="why">チームマネジメントとメンバー育成に注力</div></div></li>
+    <li><div><div class="when">転機</div><div class="what">人事のキャリアへ</div><div class="why">働く環境が人の人生に与える影響の大きさを実感</div></div></li>
+    <li class="now"><div><div class="when">現在</div><div class="what">Tech Lab 採用統括部長</div><div class="why">エンジニア採用とキャリア支援に取り組む</div></div></li>
   </ol>
 
-  <div class="next">次へ<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg></div>
+  <div class="next">次へ<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg></div>
+</section>
+
+<!-- 03 turning point -->
+<section class="frame greige">
+  <div class="top"><div><b>Tech Lab</b>社員インタビュー</div><div class="count"><b>03</b> / 06</div></div>
+
+  <div class="label">TURNING POINT</div>
+  <p class="lead">マネージャー時代に直面したのは、成果のみを追求するあまり、コミュニケーションや個々のコンディションが軽視されがちな環境でした。</p>
+
+  <div class="quote">
+    <p>人を大切にしない組織では、<br>いかに優秀な人材が<br>集まっても、<span class="hl">事業の<br>持続的な成長は望めない</span></p>
+  </div>
+  <div class="said">
+    <div class="photo avatar"></div>
+    <div><div class="k">採用統括部長</div><div class="n">篠原 里菜</div></div>
+  </div>
+
+  <p class="after">この時抱いた強い危機感と実体験が、<br>いまの仕事の原点に。</p>
+
+  <div class="next">次へ<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg></div>
 </section>
 
 <!-- 04 why Tech Lab -->
-<section class="frame light">
-  <div class="bg"></div>
-  <div class="top"><div class="brand"><i></i><span>Tech Lab 社員インタビュー</span></div><div class="count"><b>04</b> / 06</div></div>
+<section class="frame">
+  <div class="top"><div><b>Tech Lab</b>社員インタビュー</div><div class="count"><b>04</b> / 06</div></div>
 
-  <div class="chip">Q&amp;A</div>
-  <h2 class="title"><span class="q">Q.</span>なぜ Tech Lab に<br>入社したの？</h2>
+  <div class="label">WHY TECH LAB</div>
+  <h2 class="q"><span>Q.</span>なぜ Tech Lab に<br>入社したの？</h2>
 
-  <div class="answer">
-    <div class="a">A.</div>
-    <p>採用は、人の人生の行き先に<br>深く関わる仕事。</p>
-    <p>だからこそ、<mark>心から<br>勧められる組織</mark>で働きたかった。</p>
-  </div>
+  <p class="answer big">採用は、人の人生の行き先に<br>深く関わる仕事。<br>だからこそ、<span class="hl">自分が心から勧められる<br>組織</span>で働きたいと考えていました。</p>
 
-  <div class="sub-h">決め手になったのは</div>
-  <div class="reasons">
-    <div class="reason"><div class="n">01</div><p>代表の想いとリーダーシップ</p></div>
-    <div class="reason"><div class="n">02</div><p>業界の構造的な課題に向き合う姿勢</p></div>
-  </div>
+  <div class="note">決め手になったのは</div>
+  <ol class="points big">
+    <li>代表の想いとリーダーシップ</li>
+    <li>業界の構造的な課題に<br>向き合う姿勢</li>
+  </ol>
 
-  <div class="next">次へ<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg></div>
+  <div class="next">次へ<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg></div>
 </section>
 
 <!-- 05 the job -->
-<section class="frame light">
-  <div class="bg"></div>
-  <div class="top"><div class="brand"><i></i><span>Tech Lab 社員インタビュー</span></div><div class="count"><b>05</b> / 06</div></div>
+<section class="frame">
+  <div class="top"><div><b>Tech Lab</b>社員インタビュー</div><div class="count"><b>05</b> / 06</div></div>
 
-  <div class="chip">Q&amp;A</div>
-  <h2 class="title"><span class="q">Q.</span>今はどんな仕事を<br>しているの？</h2>
+  <div class="label">WORK</div>
+  <h2 class="q"><span>Q.</span>いまはどんな仕事を<br>しているの？</h2>
 
-  <div class="answer">
-    <div class="a">A.</div>
-    <p>採用統括部長として、<br>戦略から面接まで一貫して担当。</p>
-  </div>
+  <p class="answer">採用統括部長として、<br><span class="hl">エンジニア採用とキャリア支援</span>に<br>取り組んでいます。</p>
 
-  <ol class="steps">
+  <div class="note">戦略から面接まで、一貫して担当</div>
+  <ol class="points tight">
     <li>採用戦略の立案</li>
     <li>ターゲット設計</li>
     <li>スカウト</li>
@@ -399,31 +250,31 @@
   </ol>
 
   <div class="care">
-    <div class="k">いちばん大切にしているのは</div>
+    <div class="k">大切にしていること</div>
     <p>候補者一人ひとりに合わせた<br>コミュニケーション</p>
   </div>
 
-  <div class="next">次へ<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg></div>
+  <div class="next">次へ<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg></div>
 </section>
 
-<!-- 06 CTA -->
-<section class="frame dark">
-  <div class="bg"></div>
-  <div class="top"><div class="brand"><i></i><span>Tech Lab 社員インタビュー</span></div><div class="count"><b>06</b> / 06</div></div>
+<!-- 06 about + CTA -->
+<section class="frame">
+  <div class="top"><div><b>Tech Lab</b>社員インタビュー</div><div class="count"><b>06</b> / 06</div></div>
 
-  <div class="chip">WE'RE HIRING</div>
-  <h2 class="cta-head">AIで、<br><mark>誰ひとり</mark><br>取り残さない<br>社会を。</h2>
-  <p class="cta-sub">Tech Lab では、このビジョンを<br>一緒にかたちにする仲間を募集中です。</p>
+  <div class="photo wide-photo"></div>
+  <div class="label" style="margin-top: 48px">ABOUT TECH LAB</div>
+  <p class="vision">AIの社会実装を通じて、<br><span class="hl">誰ひとり取り残さない</span>社会を<br>実現する。</p>
+  <div class="biz"><span>AIエージェント開発</span><span>AXコンサルティング</span><span>データサイエンス</span></div>
 
   <p class="where">インタビュー全文と求人は、転職サイト Green で</p>
   <div class="search">
-    <svg viewBox="0 0 24 24" fill="none" stroke="#2D5BFF" stroke-width="2.6" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5L21 21"/></svg>
+    <svg viewBox="0 0 24 24" fill="none" stroke="#A47E48" stroke-width="2.4" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5L21 21"/></svg>
     Tech Lab
     <span>検索</span>
   </div>
 
   <div class="link-hint">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v16M5 13l7 7 7-7"/></svg>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v16M5 13l7 7 7-7"/></svg>
     求人はリンクからチェック
   </div>
 </section>

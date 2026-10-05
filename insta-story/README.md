@@ -19,6 +19,8 @@ npm run story -- insta-story/techlab-interview/story.html
 
 文字が返信欄の位置まではみ出すと、ビルドはエラーで止まります。
 
-1枚目の丸の中はマイクのアイコンです。本人の写真を `photo.jpg` という名前で `story.html` と同じフォルダに置いて作り直すと、写真に差し替わります。
+写真は `photo.jpg`（Green のインタビュー記事の写真）を、1・3・6枚目で切り抜き位置を変えて使っています。差し替えるときは同じ名前で上書きして作り直してください。
 
-フォントは同梱しています（日本語は `matome/fonts/` の Noto Sans JP、英数字は `fonts/` の Space Grotesk。どちらも SIL Open Font License）。
+デザインは Green の記事ページに合わせています（生成りの背景、チャコールの文字、写真のテーブルから取った木目色のアクセント、字間を広めにとった細めの書体）。
+
+フォントは同梱しています（`fonts/` の Noto Sans JP 400・500 と Lato、太字は `matome/fonts/` の Noto Sans JP 700。どれも SIL Open Font License）。
