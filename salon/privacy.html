@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>プライバシーポリシー | Hina English</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,500;9..40,700&family=Noto+Sans+JP:wght@400;500;700;900&display=swap">
+<style>
+  /* Same tokens as index.html, kept to what a plain legal page needs. */
+  :root {
+    --bg: #EAF2FB;
+    --paper: #FFFCF8;
+    --card: #FFFFFF;
+    --ink: #1A2238;
+    --ink-2: #4B5569;
+    --muted: #5E6780;
+    --line: #D6E2F0;
+    --line-warm: #EFE3DA;
+    --accent: #F0521E;
+    --accent-2: #D63E10;
+    --accent-text: #C23B12;
+    --on-accent: #FFFFFF;
+    --en: "DM Sans", "Helvetica Neue", Arial, "Noto Sans JP", sans-serif;
+    --ja: "Noto Sans JP", "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif;
+    --shadow: 0 12px 32px rgba(26, 34, 56, .07);
+    color-scheme: light;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--ja); font-size: 15px; line-height: 1.85; }
+  h1, p, dl, dd { margin: 0; }
+  a { color: inherit; }
+  :focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; border-radius: 8px; }
+  .wrap { max-width: 880px; margin-inline: auto; padding-inline: 20px; }
+
+  .site-head { background: var(--bg); }
+  .site-head .wrap { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-block: 16px; }
+  .logo { display: flex; align-items: center; gap: 12px; text-decoration: none; }
+  .mark { display: grid; place-items: center; flex: none; width: 38px; height: 38px; border-radius: 12px; background: linear-gradient(145deg, #FF6A3D, var(--accent-2)); color: var(--on-accent); }
+  .mark svg { width: 20px; height: 20px; }
+  .logo-name { display: grid; line-height: 1.15; font-family: var(--en); }
+  .logo-name b { font-weight: 700; font-size: 19px; letter-spacing: -.3px; }
+  .logo-name small { font-weight: 500; font-size: 11px; color: var(--ink-2); }
+  .back { font-size: 14px; font-weight: 700; color: var(--accent-text); text-underline-offset: 4px; }
+
+  main { padding-block: 56px 80px; }
+  .label { font-family: var(--en); font-weight: 700; font-size: 13px; letter-spacing: .2em; text-transform: uppercase; color: var(--accent-text); }
+  h1 { font-weight: 900; font-size: clamp(24px, 3.4vw, 32px); line-height: 1.45; margin-top: 6px; }
+
+  .law { margin-top: 32px; background: var(--card); border-radius: 24px; box-shadow: var(--shadow); padding: 8px 32px; }
+  .law > div { display: grid; grid-template-columns: 13em minmax(0, 1fr); gap: 6px 24px; padding-block: 18px; }
+  .law > div + div { border-top: 1.5px solid var(--line-warm); }
+  .law dt { font-weight: 700; }
+  .law dd { color: var(--ink-2); min-width: 0; overflow-wrap: anywhere; }
+  .law dd p + p { margin-top: 6px; }
+  .law dd a { color: var(--accent-text); text-underline-offset: 3px; }
+  .law .strong { font-weight: 700; color: var(--ink); }
+
+
+  .site-foot { background: var(--ink); color: var(--paper); font-size: 13px; }
+  .site-foot .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px 24px; padding-block: 28px; }
+  .site-foot a { text-decoration: none; }
+  .site-foot a:hover { text-decoration: underline; }
+
+  .intro { margin-top: 18px; color: var(--ink-2); max-width: 40em; }
+  .doc { margin-top: 28px; background: var(--card); border-radius: 24px; box-shadow: var(--shadow); padding: 8px 32px; }
+  .doc section { padding-block: 22px; }
+  .doc section + section { border-top: 1.5px solid var(--line-warm); }
+  .doc h2 { margin: 0; font-weight: 900; font-size: 17px; line-height: 1.6; }
+  .doc p { color: var(--ink-2); margin-top: 8px; }
+  .doc ul { margin: 8px 0 0; padding-left: 1.3em; color: var(--ink-2); }
+  .doc li + li { margin-top: 4px; }
+  .doc li::marker { color: var(--accent); }
+  .contact { margin-top: 10px; display: grid; gap: 6px; }
+  .contact div { display: grid; grid-template-columns: 5em minmax(0, 1fr); gap: 12px; }
+  .contact dt { font-weight: 700; }
+  .contact dd { margin: 0; color: var(--ink-2); overflow-wrap: anywhere; }
+  .contact a { color: var(--accent-text); text-underline-offset: 3px; }
+  .updated { margin-top: 20px; font-size: 13px; color: var(--muted); }
+  .foot-links { display: flex; flex-wrap: wrap; gap: 8px 22px; }
+
+  @media (max-width: 640px) {
+    .doc { padding: 4px 20px; }
+    main { padding-block: 40px 64px; }
+    .law { padding: 4px 20px; }
+    .law > div { grid-template-columns: minmax(0, 1fr); gap: 4px; padding-block: 16px; }
+  }
+</style>
+</head>
+<body>
+<div lang="ja">
+
+<header class="site-head">
+  <div class="wrap">
+    <a class="logo" href="index.html">
+      <span class="mark"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5v17M3.5 12h17M6 6l12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg></span>
+      <span class="logo-name" lang="en"><b>Hina English</b><small>Learn. Write. Grow.</small></span>
+    </a>
+    <a class="back" href="index.html">← トップへ戻る</a>
+  </div>
+</header>
+
+<main>
+  <div class="wrap">
+    <p class="label">Privacy</p>
+    <h1>プライバシーポリシー</h1>
+    <p class="intro">株式会社UPSTAR（以下「当社」）は、英語学習のオンラインサロン「Hina English」（以下「本サービス」）での個人情報の取り扱いについて、次のとおり定めます。</p>
+
+    <div class="doc">
+      <section>
+        <h2>1. 取得する情報</h2>
+        <p>当社は、本サービスの提供にあたり、次の情報を取得します。</p>
+        <ul>
+          <li>お名前、メールアドレスなど、登録のときに入力いただく情報</li>
+          <li>ジャーナルの内容、AI相談で入力された内容、学習の記録（勉強時間、正解率など）</li>
+          <li>お支払いに関する情報（クレジットカード情報は決済代行会社の Stripe が取得・管理し、当社はカード番号を保持しません）</li>
+          <li>オンラインライブ（Zoom）に参加されるときの表示名など</li>
+          <li>お問い合わせの内容</li>
+          <li>端末やブラウザの種類、アクセス日時など、ご利用状況に関する情報（Cookie などを含みます）</li>
+        </ul>
+      </section>
+      <section>
+        <h2>2. 利用目的</h2>
+        <p>取得した情報は、次の目的で利用します。</p>
+        <ul>
+          <li>本サービスの提供、本人確認、ログインのため</li>
+          <li>料金の請求と決済のため</li>
+          <li>学習の記録や苦手の分析など、本サービスの機能を提供するため</li>
+          <li>お問い合わせに対応するため</li>
+          <li>ライブの予定や重要なお知らせなど、本サービスに関するご連絡のため</li>
+          <li>本サービスの改善と、新しい機能の開発のため</li>
+          <li>不正な利用を防ぎ、規約に反する行為に対応するため</li>
+        </ul>
+      </section>
+      <section>
+        <h2>3. 第三者への提供</h2>
+        <p>当社は、次の場合を除き、ご本人の同意なく個人情報を第三者に提供しません。</p>
+        <ul>
+          <li>法令に基づく場合</li>
+          <li>人の生命、身体または財産を守るために必要で、ご本人の同意を得ることが難しい場合</li>
+          <li>国の機関などが法令に定める事務を行うことに協力する必要がある場合</li>
+          <li>利用目的の達成に必要な範囲で、個人情報の取り扱いを外部に委託する場合</li>
+        </ul>
+      </section>
+      <section>
+        <h2>4. 外部サービスの利用</h2>
+        <p>当社は、本サービスの運営のため、次の外部サービスを利用し、必要な範囲で個人情報の取り扱いを委託しています。</p>
+        <ul>
+          <li>決済：Stripe（Stripe, Inc.／米国）</li>
+          <li>オンラインライブ：Zoom（Zoom Communications, Inc.／米国）</li>
+          <li>アプリのサーバー：Vercel（Vercel Inc.／米国）</li>
+          <!-- AIの提供事業者が決まったら、名前と所在国をここに足す -->
+          <li>AI添削・AI相談：入力された内容を、AIサービスの提供事業者に送って処理します</li>
+        </ul>
+        <p>これらには、日本の外（米国など）にある事業者が含まれます。各国の個人情報保護の制度は、個人情報保護委員会のウェブサイトで確認できます。当社は、委託先が個人情報を適切に取り扱うよう、必要な措置をとります。</p>
+      </section>
+      <section>
+        <h2>5. 安全管理</h2>
+        <p>当社は、個人情報の漏えい、滅失またはき損を防ぐため、アクセス権限の管理など、必要かつ適切な安全管理の措置をとります。</p>
+      </section>
+      <section>
+        <h2>6. Cookie などについて</h2>
+        <p>本サービスでは、ログイン状態の維持や利用状況の把握のために、Cookie や、端末のブラウザに保存する仕組みを使うことがあります。ブラウザの設定で Cookie を無効にできますが、その場合、本サービスの一部が使えなくなることがあります。</p>
+      </section>
+      <section>
+        <h2>7. 開示・訂正・利用停止などのご請求</h2>
+        <p>ご本人から、個人情報の開示、訂正、追加、削除、利用停止などのご請求があった場合は、ご本人であることを確認したうえで、法令に従って対応します。下記のお問い合わせ窓口までご連絡ください。</p>
+      </section>
+      <section>
+        <h2>8. このポリシーの変更</h2>
+        <p>当社は、必要に応じてこのプライバシーポリシーを変更することがあります。変更した場合は、このページでお知らせします。</p>
+      </section>
+      <section>
+        <h2>9. お問い合わせ窓口</h2>
+        <dl class="contact">
+          <div><dt>事業者</dt><dd>株式会社UPSTAR</dd></div>
+          <div><dt>責任者</dt><dd>梶崎 妃那</dd></div>
+          <div><dt>所在地</dt><dd>〒150-0044 東京都渋谷区円山町5-3 MIEUX渋谷ビル8階</dd></div>
+          <div><dt>メール</dt><dd><a href="mailto:hinatoeicpresent@gmail.com">hinatoeicpresent@gmail.com</a></dd></div>
+        </dl>
+      </section>
+    </div>
+
+    <p class="updated">2026年10月5日 制定</p>
+  </div>
+</main>
+
+<footer class="site-foot">
+  <div class="wrap">
+    <nav class="foot-links" aria-label="サイト情報">
+      <a href="index.html">Hina English トップ</a>
+      <a href="tokushoho.html">特定商取引法に基づく表記</a>
+    </nav>
+    <p>© 2026 株式会社UPSTAR</p>
+  </div>
+</footer>
+
+</div>
+</body>
+</html>

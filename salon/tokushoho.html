@@ -64,6 +64,8 @@
   .site-foot a { text-decoration: none; }
   .site-foot a:hover { text-decoration: underline; }
 
+  .foot-links { display: flex; flex-wrap: wrap; gap: 8px 22px; }
+
   @media (max-width: 640px) {
     main { padding-block: 40px 64px; }
     .law { padding: 4px 20px; }
@@ -112,7 +114,7 @@
       </div>
       <div>
         <dt>サービス名</dt>
-        <dd>hina-english（英語学習のオンラインサロン）</dd>
+        <dd>Hina English（英語学習のオンラインサロン）</dd>
       </div>
       <div>
         <dt>サービスの内容</dt>
@@ -165,7 +167,10 @@
 
 <footer class="site-foot">
   <div class="wrap">
-    <a href="index.html">Hina English トップ</a>
+    <nav class="foot-links" aria-label="サイト情報">
+      <a href="index.html">Hina English トップ</a>
+      <a href="privacy.html">プライバシーポリシー</a>
+    </nav>
     <p>© 2026 株式会社UPSTAR</p>
   </div>
 </footer>
