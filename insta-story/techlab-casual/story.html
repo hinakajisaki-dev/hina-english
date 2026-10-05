@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<title>Tech Lab 採用ストーリー（カジュアル版）</title>
+<style>
+  @font-face { font-family: "Zen Maru Gothic"; font-weight: 500; src: url("../fonts/ZenMaruGothic-500.woff2") format("woff2"); }
+  @font-face { font-family: "Zen Maru Gothic"; font-weight: 700; src: url("../fonts/ZenMaruGothic-700.woff2") format("woff2"); }
+  @font-face { font-family: "Zen Maru Gothic"; font-weight: 900; src: url("../fonts/ZenMaruGothic-900.woff2") format("woff2"); }
+  @font-face { font-family: "Yomogi"; font-weight: 400; src: url("../fonts/Yomogi-400.woff2") format("woff2"); }
+
+  :root {
+    --paper: #FBF6EE;
+    --grid: rgba(120, 90, 50, .07);
+    --ink: #2B2724;
+    --ink-2: #5F5850;
+    --marker: #FFE066;
+    --tape: rgba(255, 214, 92, .78);
+    --pen: #DE5F3E;
+    --q: #EDE4D6;
+    --round: "Zen Maru Gothic", sans-serif;
+    --hand: "Yomogi", "Zen Maru Gothic", sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { background: #777; }
+  body { font-family: var(--round); font-weight: 700; color: var(--ink); }
+
+  /* One story = 1080x1920. Instagram covers roughly the top 250px and the bottom 300px,
+     so words sit between 300px and 1590px; photos and tape may run past that. */
+  .frame {
+    width: 1080px;
+    height: 1920px;
+    position: relative;
+    overflow: hidden;
+    padding: 300px 80px 320px;
+    display: flex;
+    flex-direction: column;
+    background:
+      linear-gradient(var(--grid) 2px, transparent 2px) 0 0 / 60px 60px,
+      linear-gradient(90deg, var(--grid) 2px, transparent 2px) 0 0 / 60px 60px,
+      var(--paper);
+  }
+  .frame + .frame { margin-top: 40px; }
+  .frame > * { position: relative; }
+  .deco { position: absolute; pointer-events: none; }
+
+  /* ---------- shared pieces ---------- */
+  .print { background: #fff; padding: 16px; box-shadow: 0 14px 34px rgba(70, 45, 20, .2); flex: none; }
+  .print .img { background-repeat: no-repeat; background-size: cover; }
+  .tape { width: 190px; height: 52px; background: var(--tape); box-shadow: 0 1px 3px rgba(0, 0, 0, .08); }
+  .boxed { font-size: 66px; font-weight: 900; line-height: 1.62; letter-spacing: .02em; }
+  .boxed span {
+    background: var(--marker);
+    padding: 2px 18px 6px;
+    border-radius: 12px;
+    -webkit-box-decoration-break: clone; box-decoration-break: clone;
+  }
+  .boxed span.white { background: #fff; }
+  .hand { font-family: var(--hand); font-weight: 400; color: var(--pen); }
+  .arrow { stroke: var(--pen); stroke-width: 5; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+  .avatar {
+    width: 92px; height: 92px; border-radius: 50%; flex: none;
+    border: 4px solid #fff; box-shadow: 0 4px 12px rgba(70, 45, 20, .18);
+    background: url("../techlab-interview/photo.jpg") no-repeat; background-size: 396px auto; background-position: -165px -50px;
+  }
+
+  /* ---------- chat ---------- */
+  .chat { display: flex; flex-direction: column; gap: 18px; margin-top: 44px; }
+  .row { display: flex; align-items: flex-end; gap: 16px; }
+  .row.a { flex-direction: row-reverse; margin-bottom: 18px; }
+  .who { width: 80px; height: 80px; border-radius: 50%; background: var(--q); display: grid; place-items: center; font-size: 42px; flex: none; }
+  .bubble { font-size: 34px; line-height: 1.6; letter-spacing: .02em; padding: 20px 30px 22px; max-width: 810px; }
+  .row.q .bubble { background: var(--q); border-radius: 36px 36px 36px 8px; }
+  .row.a .bubble { background: #fff; border-radius: 36px 36px 8px 36px; box-shadow: 0 6px 18px rgba(70, 45, 20, .12); font-weight: 500; }
+  .row.a .bubble b { font-weight: 900; background: linear-gradient(transparent 60%, var(--marker) 60%); }
+
+  .q-head { display: flex; align-items: center; justify-content: space-between; }
+  .q-head .boxed { font-size: 58px; }
+  .q-head .hand { font-size: 38px; transform: rotate(-4deg); }
+
+  /* ---------- 01 cover ---------- */
+  .cover-print { transform: rotate(-2deg); margin: 0 -6px; }
+  .cover-print .img { height: 740px; background-image: url("../techlab-interview/photo.jpg"); background-position: 58% 30%; }
+  .label {
+    position: absolute; left: -14px; top: -26px; transform: rotate(-5deg);
+    background: #fff; padding: 12px 26px 14px; border-radius: 999px;
+    font-size: 30px; box-shadow: 0 6px 16px rgba(70, 45, 20, .16);
+  }
+  .hello {
+    position: absolute; right: 40px; bottom: 40px; transform: rotate(4deg);
+    background: #fff; padding: 16px 30px 18px; border-radius: 22px;
+    font-size: 38px; box-shadow: 0 8px 20px rgba(70, 45, 20, .2);
+  }
+  .cover-head { margin-top: 56px; }
+  .cover-sub { font-size: 34px; line-height: 1.75; margin-top: 22px; color: var(--ink-2); font-weight: 700; }
+  .cover-sub em { font-style: normal; color: var(--ink); background: linear-gradient(transparent 60%, var(--marker) 60%); }
+  .cover-hand { align-self: flex-end; font-size: 40px; margin-top: 18px; transform: rotate(-3deg); display: flex; align-items: center; gap: 10px; }
+  .cover-hand svg { width: 70px; height: 40px; }
+
+  /* ---------- 02 / 03 ---------- */
+  .qa-print { margin-top: 34px; transform: rotate(1.8deg); }
+  .qa-print.left { transform: rotate(-1.8deg); }
+  .qa-print .img { height: 360px; }
+
+  /* ---------- 04 CTA ---------- */
+  .collage { position: relative; height: 700px; flex: none; }
+  .collage .one { position: absolute; left: -10px; top: 0; transform: rotate(-2.5deg); }
+  .collage .one .img { width: 860px; height: 488px; background-image: url("team.jpg"); background-position: 50% 60%; }
+  .collage .two { position: absolute; right: -24px; top: 360px; transform: rotate(3.5deg); }
+  .collage .two .img { width: 500px; height: 280px; background-image: url("members.jpg"); background-position: 50% 30%; }
+  .tags { display: flex; flex-wrap: wrap; gap: 14px 16px; margin-top: 30px; }
+  .tags span { font-size: 30px; background: #fff; border: 3px solid var(--ink); border-radius: 999px; padding: 8px 24px 10px; }
+  .tags span:nth-child(odd) { transform: rotate(-2deg); }
+  .tags span:nth-child(even) { transform: rotate(2deg); }
+  .link-hand { align-self: center; font-size: 42px; margin-top: 34px; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+  .link-hand svg { width: 60px; height: 70px; }
+</style>
+</head>
+<body>
+
+<!-- 01 cover -->
+<section class="frame">
+  <div class="print cover-print">
+    <div class="img"></div>
+    <div class="label">Tech Lab｜社員インタビュー</div>
+    <div class="hello">👋 採用担当の篠原です</div>
+  </div>
+  <div class="deco tape" style="right: 30px; top: 290px; transform: rotate(14deg);"></div>
+
+  <h1 class="boxed cover-head"><span>エンジニアのみなさん、</span><br><span class="white">はじめまして！</span></h1>
+  <p class="cover-sub"><em>「女性最年少上場」</em>を目指す Tech Lab で、<br>採用統括をしています。</p>
+  <p class="hand cover-hand">気になること、答えます
+    <svg viewBox="0 0 70 40"><path class="arrow" d="M4 22 C 22 8, 42 34, 62 18 M50 10 L63 18 L53 30"/></svg>
+  </p>
+</section>
+
+<!-- 02 Q&A: overtime / projects -->
+<section class="frame">
+  <div class="q-head">
+    <h2 class="boxed"><span>ぶっちゃけ質問 ①</span></h2>
+    <p class="hand">篠原さんに<br>聞いてみた！</p>
+  </div>
+
+  <div class="print qa-print">
+    <div class="img" style="background-image: url('engineers.jpg'); background-position: 50% 40%;"></div>
+  </div>
+  <div class="deco tape" style="right: 40px; top: 446px; transform: rotate(8deg);"></div>
+
+  <div class="chat">
+    <div class="row q"><div class="who">🧑‍💻</div><div class="bubble">ぶっちゃけ、残業ってある？</div></div>
+    <div class="row a"><div class="avatar"></div><div class="bubble"><b>無理な残業はないです！</b><br>メリハリつけて、プライベートも大切に🙆‍♀️</div></div>
+    <div class="row q"><div class="who">🧑‍💻</div><div class="bubble">案件って選べるの？</div></div>
+    <div class="row a"><div class="avatar"></div><div class="bubble"><b>選べます！</b><br>「AIに挑戦したい」「上流工程に行きたい」<br>そんな希望に合う案件を一緒に探します💻</div></div>
+  </div>
+</section>
+
+<!-- 03 Q&A: who / interview -->
+<section class="frame">
+  <div class="q-head">
+    <h2 class="boxed"><span>ぶっちゃけ質問 ②</span></h2>
+    <p class="hand">もうちょっと<br>聞いてみた！</p>
+  </div>
+
+  <div class="print qa-print left">
+    <div class="img" style="background-image: url('laptop-duo.jpg'); background-position: 56% 28%;"></div>
+  </div>
+  <div class="deco tape" style="left: 50px; top: 450px; transform: rotate(-8deg);"></div>
+
+  <div class="chat">
+    <div class="row q"><div class="who">🧑‍💻</div><div class="bubble">どんな人と働きたい？</div></div>
+    <div class="row a"><div class="avatar"></div><div class="bubble">スキルより、<br><b>「こんなエンジニアになりたい」</b>がある人！<br>その挑戦を全力で応援したいです🔥</div></div>
+    <div class="row q"><div class="who">🧑‍💻</div><div class="bubble">面談ってかたい雰囲気？</div></div>
+    <div class="row a"><div class="avatar"></div><div class="bubble">評価じゃなくて<b>「対話」の場</b>です。<br>なぜエンジニアを選んだのか、<br>ぜひ聞かせてください☺️</div></div>
+  </div>
+</section>
+
+<!-- 04 CTA -->
+<section class="frame">
+  <div class="collage">
+    <div class="print one"><div class="img"></div></div>
+    <div class="print two"><div class="img"></div></div>
+  </div>
+  <div class="deco tape" style="left: 380px; top: 270px; transform: rotate(-3deg);"></div>
+  <div class="deco tape" style="right: 40px; top: 640px; width: 150px; transform: rotate(40deg);"></div>
+
+  <h2 class="boxed" style="margin-top: 20px;"><span>まずはカジュアルに</span><br><span class="white">話しましょう！</span></h2>
+  <div class="tags">
+    <span>#エンジニアファースト</span><span>#案件が選べる</span><span>#ムリな残業なし</span><span>#生成AIにも挑戦</span>
+  </div>
+  <p class="hand link-hand">求人・カジュアル面談はここから
+    <svg viewBox="0 0 60 70"><path class="arrow" d="M30 4 C 22 22, 38 38, 30 62 M18 50 L30 64 L42 50"/></svg>
+  </p>
+</section>
+
+</body>
+</html>

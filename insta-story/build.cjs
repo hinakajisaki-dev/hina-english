@@ -16,16 +16,20 @@ if (!input) {
   await page.goto(pathToFileURL(resolve(input)).href, { waitUntil: "networkidle" });
   await page.evaluate(() => document.fonts.ready);
   // Fonts live in matome/fonts and insta-story/fonts; fail loudly instead of rendering with a fallback font.
+  // Every family the page declares must have loaded at least one face, and no face may have failed.
   const missing = await page.evaluate(() => {
-    const loaded = new Set([...document.fonts].filter((f) => f.status === "loaded").map((f) => f.family.replace(/"/g, "")));
-    return ["Lato", "Noto Sans JP"].filter((f) => !loaded.has(f));
+    const faces = [...document.fonts].map((f) => ({ family: f.family.replace(/"/g, ""), status: f.status }));
+    const loaded = new Set(faces.filter((f) => f.status === "loaded").map((f) => f.family));
+    const failed = faces.filter((f) => f.status === "error").map((f) => f.family);
+    return [...new Set([...faces.map((f) => f.family).filter((f) => !loaded.has(f)), ...failed])];
   });
   if (missing.length) throw new Error(`fonts failed to load: ${missing.join(", ")}`);
-  // Instagram's reply bar covers the bottom of a story: nothing but the "next" hint may sit below 1590px.
+  // Instagram's reply bar covers the bottom of a story: nothing but backgrounds, the "next" hint
+  // and decoration may sit below 1590px.
   const overflow = await page.evaluate(() =>
     [...document.querySelectorAll("section.frame")].flatMap((frame, i) => {
       const top = frame.getBoundingClientRect().top;
-      const bottom = Math.max(...[...frame.children].filter((el) => !el.matches(".bg, .next")).map((el) => el.getBoundingClientRect().bottom - top));
+      const bottom = Math.max(...[...frame.children].filter((el) => !el.matches(".bg, .next, .deco")).map((el) => el.getBoundingClientRect().bottom - top));
       return bottom > 1590 ? [`frame ${i + 1} ends at ${Math.round(bottom)}px`] : [];
     }),
   );
