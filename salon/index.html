@@ -533,8 +533,8 @@
   .teachers { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; margin-top: 44px; }
   .teacher {
     display: grid;
-    grid-template-columns: 88px minmax(0, 1fr);
-    gap: 18px;
+    grid-template-columns: 104px minmax(0, 1fr);
+    gap: 20px;
     align-items: start;
     background: var(--card);
     border-radius: 24px;
@@ -542,18 +542,18 @@
     padding: 24px;
     min-width: 0;
   }
-  .t-photo {
-    width: 88px;
-    height: 88px;
+  /* 仮のキャラクター。写真が届いたら img の src を差し替える */
+  .t-avatar {
+    width: 104px;
+    height: 104px;
     border-radius: 50%;
-    display: grid;
-    place-items: center;
-    background: var(--tbd-bg);
-    border: 2px dashed var(--tbd-line);
-    font-size: 12px;
-    font-weight: 700;
-    color: var(--ink-2);
+    overflow: hidden;
+    border: 4px solid var(--card);
+    box-shadow: 0 0 0 1.5px var(--line);
   }
+  .t-avatar.native { background: #D7EAFB; }
+  .t-avatar.japanese { background: var(--accent-soft); }
+  .t-avatar img { width: 100%; height: 100%; }
   .teacher h4 { font-weight: 900; font-size: 19px; line-height: 1.5; margin-top: 2px; }
   .teacher p:last-child { color: var(--ink-2); font-size: 15px; margin-top: 6px; }
 
@@ -707,6 +707,8 @@
     .levels small { font-size: 10px; }
     .profile { grid-template-columns: minmax(0, 1fr); gap: 20px; justify-items: start; }
     .portrait { width: 140px; height: 140px; }
+    .teacher { grid-template-columns: 80px minmax(0, 1fr); gap: 16px; padding: 20px; }
+    .t-avatar { width: 80px; height: 80px; border-width: 3px; }
     .price-main, .price-inc { padding: 30px 22px 32px; }
     .price-main .btn { width: 100%; }
     .inc > li { grid-template-columns: 76px minmax(0, 1fr); }
@@ -1071,7 +1073,7 @@
       </div>
       <div class="teachers">
         <article class="teacher">
-          <div class="t-photo">写真</div>
+          <div class="t-avatar native"><img src="teacher-native.svg" width="104" height="104" alt="ネイティブ講師のイラスト" loading="lazy"></div>
           <div>
             <p class="label">Native</p>
             <h4>ネイティブ講師</h4>
@@ -1079,7 +1081,7 @@
           </div>
         </article>
         <article class="teacher">
-          <div class="t-photo">写真</div>
+          <div class="t-avatar japanese"><img src="teacher-japanese.svg" width="104" height="104" alt="日本人講師のイラスト" loading="lazy"></div>
           <div>
             <p class="label">TOEIC 900+</p>
             <h4>日本人講師</h4>
