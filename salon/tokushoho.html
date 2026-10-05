@@ -23,8 +23,6 @@
     --accent-2: #D63E10;
     --accent-text: #C23B12;
     --on-accent: #FFFFFF;
-    --tbd-bg: #FFF4CC;
-    --tbd-line: #C9962B;
     --en: "DM Sans", "Helvetica Neue", Arial, "Noto Sans JP", sans-serif;
     --ja: "Noto Sans JP", "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif;
     --shadow: 0 12px 32px rgba(26, 34, 56, .07);
@@ -36,10 +34,6 @@
   a { color: inherit; }
   :focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; border-radius: 8px; }
   .wrap { max-width: 880px; margin-inline: auto; padding-inline: 20px; }
-
-  /* 仮の内容。中身が決まったら class="tbd" を外して差し替える */
-  .tbd { background: var(--tbd-bg); outline: 2px dashed var(--tbd-line); outline-offset: 1px; border-radius: 4px; padding: 0 4px; margin-inline: 2px; }
-  .draft { background: var(--tbd-bg); border-bottom: 1px solid var(--tbd-line); font-size: 13px; line-height: 1.6; color: var(--ink-2); text-align: center; padding-block: 8px; }
 
   .site-head { background: var(--bg); }
   .site-head .wrap { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-block: 16px; }
@@ -80,9 +74,6 @@
 <body>
 <div lang="ja">
 
-<!-- 下書き用のお知らせ。公開前にこのブロックごと消す -->
-<p class="draft">下書き：<span class="tbd">点線の枠</span>は仮の内容です。公開前に、すべて実際の内容に差し替えてください。</p>
-
 <header class="site-head">
   <div class="wrap">
     <a class="logo" href="index.html">
@@ -109,13 +100,11 @@
       </div>
       <div>
         <dt>所在地</dt>
-        <!-- 個人で運営していて住所を載せたくない場合は、「請求があった場合には、遅滞なく開示いたします。」と書く方法もあります -->
-        <dd><span class="tbd">〒000-0000 東京都（DMMバーチャルオフィスの住所）</span></dd>
+        <dd>〒150-0044 東京都渋谷区円山町5-3 MIEUX渋谷ビル8階</dd>
       </div>
       <div>
         <dt>電話番号</dt>
-        <!-- 住所と同じく、「請求があった場合には、遅滞なく開示いたします。」と書く方法もあります -->
-        <dd><p>090-3992-9904</p><p><span class="tbd">受付時間 平日10:00〜18:00</span></p></dd>
+        <dd><p>090-3992-9904</p><p>受付時間 平日10:00〜18:00</p></dd>
       </div>
       <div>
         <dt>メールアドレス</dt>
