@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="400" height="400">
+<defs><linearGradient id="s" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FF8A62"/><stop offset="1" stop-color="#F25A2E"/></linearGradient></defs>
+<ellipse cx="200" cy="356" rx="160" ry="13" fill="#1C2340" opacity=".08"/>
+<path d="M318 120 V310" stroke="#8A5A3C" stroke-width="8" stroke-linecap="round"/>
+<path d="M296 314 H340" stroke="#8A5A3C" stroke-width="10" stroke-linecap="round"/>
+<path d="M286 120 L298 70 H338 L350 120 Z" fill="#FFD24D"/>
+<rect x="56" y="190" width="214" height="80" rx="26" fill="url(#s)"/>
+<rect x="40" y="224" width="52" height="100" rx="22" fill="#E5482A"/>
+<rect x="234" y="224" width="52" height="100" rx="22" fill="#E5482A"/>
+<rect x="76" y="258" width="174" height="56" rx="16" fill="#FF8A62"/>
+<path d="M163 262 V310" stroke="#E5482A" stroke-width="4"/>
+<path d="M72 324 V342 M254 324 V342" stroke="#8A5A3C" stroke-width="10" stroke-linecap="round"/>
+<rect x="104" y="206" width="56" height="44" rx="14" fill="#FFE8DC"/>
+</svg>

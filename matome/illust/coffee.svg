@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="400" height="400">
+<defs><linearGradient id="cup" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFFFFF"/><stop offset="1" stop-color="#E1E8F1"/></linearGradient></defs>
+<ellipse cx="200" cy="340" rx="130" ry="13" fill="#1C2340" opacity=".08"/>
+<path d="M162 138 C150 116 176 104 164 82 M200 138 C188 116 214 104 202 82 M238 138 C226 116 252 104 240 82" stroke="#D6DEE9" stroke-width="10" fill="none" stroke-linecap="round"/>
+<ellipse cx="200" cy="318" rx="132" ry="26" fill="#EAD8C5"/>
+<ellipse cx="200" cy="314" rx="92" ry="15" fill="#F6EDE3"/>
+<path d="M284 194 C342 194 342 268 274 270" stroke="#E3E9F2" stroke-width="20" fill="none" stroke-linecap="round"/>
+<path d="M108 168 H292 L273 290 Q268 316 240 316 H160 Q132 316 127 290 Z" fill="url(#cup)"/>
+<path d="M118 232 H282 L279 254 H121 Z" fill="#FF8A6B"/>
+<ellipse cx="200" cy="168" rx="92" ry="20" fill="#FFFFFF"/>
+<ellipse cx="200" cy="170" rx="79" ry="14" fill="#7A4A2E"/>
+<ellipse cx="138" cy="260" rx="8" ry="26" fill="#fff" opacity=".5" transform="rotate(6 138 260)"/>
+</svg>

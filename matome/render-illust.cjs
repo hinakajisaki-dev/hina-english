@@ -1,6 +1,6 @@
 // Renders every .svg in a folder to a transparent .png (2x) for the slides.
 // The PPTX export can only place raster images, so slides use the PNGs; the SVGs stay editable.
-// Usage: npm run illust -- matome/a-the/illust matome/a-the/img
+// Usage: npm run illust -- matome/illust matome/img
 const { chromium } = require("playwright");
 const { readdirSync, readFileSync, mkdirSync } = require("node:fs");
 const { join, resolve } = require("node:path");
@@ -11,14 +11,14 @@ if (!input || !output) {
   process.exit(1);
 }
 
-// Text inside an illustration (e.g. "CAFE") uses the deck's DM Sans.
+// Text inside an illustration (e.g. "CAFE", "こんにちは") uses the decks' DM Sans and Noto Sans JP.
 const fontsDir = join(__dirname, "fonts");
-const fontFace = [500, 700, 800]
-  .map((w) => {
-    const data = readFileSync(join(fontsDir, `DMSans-${w}.woff2`)).toString("base64");
-    return `@font-face { font-family: "DM Sans"; font-weight: ${w}; src: url(data:font/woff2;base64,${data}) format("woff2"); }`;
-  })
-  .join("\n");
+const face = (family, weight, file) =>
+  `@font-face { font-family: "${family}"; font-weight: ${weight}; src: url(data:font/woff2;base64,${readFileSync(join(fontsDir, file)).toString("base64")}) format("woff2"); }`;
+const fontFace = [
+  ...[500, 700, 800].map((w) => face("DM Sans", w, `DMSans-${w}.woff2`)),
+  face("Noto Sans JP", 700, "NotoSansJP-700.woff2"),
+].join("\n");
 
 (async () => {
   mkdirSync(output, { recursive: true });

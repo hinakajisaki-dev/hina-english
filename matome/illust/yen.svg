@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="400" height="400">
+<defs><radialGradient id="c" cx=".4" cy=".35" r=".75"><stop offset="0" stop-color="#FBFCFE"/><stop offset="1" stop-color="#C3CBD8"/></radialGradient></defs>
+<ellipse cx="200" cy="356" rx="115" ry="13" fill="#1C2340" opacity=".08"/>
+<circle cx="200" cy="196" r="128" fill="url(#c)"/>
+<circle cx="200" cy="196" r="108" fill="none" stroke="#AEB7C6" stroke-width="5"/>
+<text x="200" y="222" text-anchor="middle" font-family="DM Sans" font-weight="800" font-size="72" letter-spacing="0" fill="#6B7390">100</text>
+<g fill="#AEB7C6"><circle cx="200.0" cy="120.0" r="6"/><circle cx="238.0" cy="130.2" r="6"/><circle cx="265.8" cy="158.0" r="6"/><circle cx="265.8" cy="234.0" r="6"/><circle cx="238.0" cy="261.8" r="6"/><circle cx="200.0" cy="272.0" r="6"/><circle cx="162.0" cy="261.8" r="6"/><circle cx="134.2" cy="234.0" r="6"/><circle cx="134.2" cy="158.0" r="6"/><circle cx="162.0" cy="130.2" r="6"/></g>
+<ellipse cx="140" cy="122" rx="16" ry="40" fill="#fff" opacity=".55" transform="rotate(40 140 122)"/>
+</svg>

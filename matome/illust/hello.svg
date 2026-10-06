@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="400" height="400">
+<defs><linearGradient id="b" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7CC7F4"/><stop offset="1" stop-color="#3D86C2"/></linearGradient></defs>
+<path d="M100 90 H300 Q340 90 340 130 V230 Q340 270 300 270 H200 L140 322 L152 270 H100 Q60 270 60 230 V130 Q60 90 100 90 Z" fill="url(#b)"/>
+<text x="200" y="200" text-anchor="middle" font-family="DM Sans" font-weight="800" font-size="64" letter-spacing="0" fill="#fff">Hello!</text>
+<ellipse cx="110" cy="120" rx="22" ry="10" fill="#fff" opacity=".35" transform="rotate(-10 110 120)"/>
+</svg>

@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="400" height="400">
+<defs><linearGradient id="s" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#F6E7CF"/><stop offset="1" stop-color="#E3C9A3"/></linearGradient></defs>
+<ellipse cx="200" cy="356" rx="120" ry="13" fill="#1C2340" opacity=".08"/>
+<path d="M120 120 Q112 98 132 92 L150 86 Q200 100 250 86 L268 92 Q288 98 280 120 L300 318 Q302 346 274 346 H126 Q98 346 100 318 Z" fill="url(#s)"/>
+<path d="M140 118 Q200 136 260 118" stroke="#C99A6A" stroke-width="10" fill="none" stroke-linecap="round"/>
+<rect x="130" y="186" width="140" height="96" rx="14" fill="#FFFFFF"/>
+<text x="200" y="228" text-anchor="middle" font-family="DM Sans" font-weight="800" font-size="26" letter-spacing="2" fill="#C98A5A">FLOUR</text>
+<path d="M168 254 Q200 236 232 254" stroke="#F5B731" stroke-width="8" fill="none" stroke-linecap="round"/>
+<path d="M150 98 Q170 70 186 92 M214 92 Q230 70 250 98" fill="none" stroke="#E8D3B5" stroke-width="10" stroke-linecap="round"/>
+</svg>

@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="400" height="400">
+<defs><linearGradient id="t" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5DBB81"/><stop offset="1" stop-color="#3E9A60"/></linearGradient></defs>
+<ellipse cx="200" cy="356" rx="120" ry="13" fill="#1C2340" opacity=".08"/>
+<rect x="184" y="304" width="32" height="46" rx="6" fill="#A86B45"/>
+<path d="M200 140 L314 304 H86 Z" fill="url(#t)" stroke="#47A86B" stroke-width="16" stroke-linejoin="round"/>
+<path d="M200 84 L292 210 H108 Z" fill="#6BC38B" stroke="#6BC38B" stroke-width="16" stroke-linejoin="round" transform="translate(0 -8)"/>
+<circle cx="160" cy="250" r="12" fill="#F25A2E"/><circle cx="240" cy="270" r="12" fill="#FFD24D"/><circle cx="214" cy="226" r="11" fill="#7CC7F4"/>
+<circle cx="180" cy="176" r="10" fill="#FFD24D"/><circle cx="226" cy="164" r="10" fill="#F25A2E"/><circle cx="132" cy="290" r="10" fill="#FF8FB0"/><circle cx="276" cy="292" r="10" fill="#F25A2E"/>
+<path d="M0 -26 C4 -7 7 -4 26 0 C7 4 4 7 0 26 C-4 7 -7 4 -26 0 C-7 -4 -4 -7 0 -26 Z" fill="#FFC233" transform="translate(200 72) scale(1.2)"/>
+</svg>

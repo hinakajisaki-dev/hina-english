@@ -3,304 +3,7 @@
 <head>
 <meta charset="utf-8">
 <title>冠詞｜a / an と the の違い 文法解説スライド</title>
-<style>
-  @font-face { font-family: "DM Sans"; font-weight: 500; src: url("../fonts/DMSans-500.woff2") format("woff2"); }
-  @font-face { font-family: "DM Sans"; font-weight: 700; src: url("../fonts/DMSans-700.woff2") format("woff2"); }
-  @font-face { font-family: "DM Sans"; font-weight: 800; src: url("../fonts/DMSans-800.woff2") format("woff2"); }
-  @font-face { font-family: "Noto Sans JP"; font-weight: 500; src: url("../fonts/NotoSansJP-500.woff2") format("woff2"); }
-  @font-face { font-family: "Noto Sans JP"; font-weight: 700; src: url("../fonts/NotoSansJP-700.woff2") format("woff2"); }
-  @font-face { font-family: "Noto Sans JP"; font-weight: 900; src: url("../fonts/NotoSansJP-900.woff2") format("woff2"); }
-  @font-face { font-family: "Caveat"; font-weight: 700; src: url("../fonts/Caveat-700.woff2") format("woff2"); }
-
-  @page { size: 1280px 720px; margin: 0; }
-
-  /* Colors follow the Hina English salon: light blue page, orange-red accent, navy text,
-     white rounded cards and soft pastel cards. a / an is orange-red, the is blue. */
-  :root {
-    --bg: #EAF2FB;
-    --card: #FFFFFF;
-    --ink: #1C2340;
-    --ink-2: #4A5270;
-    --muted: #8A90A8;
-    --line: #D6E2F0;
-    --primary: #E8461E;
-    --primary-dark: #C8401A;
-    --primary-soft: #FFE3D8;
-    --blue: #2F86CF;
-    --blue-soft: #DCEFFC;
-    --orange-soft: #FFE8DC;
-    --pink-soft: #FFE4EC;
-    --yellow-soft: #FFF2C9;
-    --sky-soft: #DDEFFC;
-    --marker: #FFD9C9;
-    --en: "DM Sans", "Noto Sans JP", sans-serif;
-    --ja: "Noto Sans JP", sans-serif;
-    --hand: "Caveat", cursive;
-  }
-
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  html, body { background: var(--bg); }
-  body {
-    font-family: var(--ja);
-    font-weight: 500;
-    color: var(--ink);
-    -webkit-print-color-adjust: exact;
-    print-color-adjust: exact;
-  }
-  b { font-weight: 700; }
-  .en { font-family: var(--en); font-weight: 700; }
-  .a { color: var(--primary); }
-  .the { color: var(--blue); }
-  mark {
-    background: linear-gradient(transparent 55%, var(--marker) 55%);
-    color: inherit;
-    padding: 0 2px;
-    margin: 0 -2px;
-  }
-
-  .slide {
-    width: 1280px;
-    height: 720px;
-    position: relative;
-    overflow: hidden;
-    padding: 0 72px 44px;
-    display: flex;
-    flex-direction: column;
-    background: var(--bg);
-    break-after: page;
-  }
-  .slide:last-child { break-after: auto; }
-
-  /* ---------- top bar, like the salon header ---------- */
-  .bar { flex: none; height: 70px; display: flex; align-items: center; justify-content: space-between; }
-  .crumb { font-size: 17px; color: var(--ink-2); }
-  .divider { flex: none; height: 0; border-top: 2px solid var(--line); margin: 0 -72px; }
-
-  .eyebrow { margin-top: 28px; font-family: var(--en); font-weight: 700; font-size: 16px; letter-spacing: .18em; color: var(--primary); }
-  .title { margin-top: 6px; font-weight: 700; font-size: 44px; line-height: 1.3; }
-  .title .en { font-weight: 800; }
-
-  .card { background: var(--card); border-radius: 28px; box-shadow: 0 10px 30px rgba(28, 35, 64, .07); }
-  .c-orange { background: var(--orange-soft); }
-  .c-pink { background: var(--pink-soft); }
-  .c-yellow { background: var(--yellow-soft); }
-  .c-sky { background: var(--sky-soft); }
-
-  .chip {
-    flex: none;
-    font-weight: 700;
-    font-size: 18px;
-    color: var(--primary-dark);
-    background: var(--primary-soft);
-    padding: 6px 18px 7px;
-    border-radius: 999px;
-    white-space: nowrap;
-  }
-  .chip.blue { color: #1F6FB2; background: var(--blue-soft); }
-
-  .band {
-    flex: none;
-    margin-top: 22px;
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    background: var(--card);
-    border-radius: 20px;
-    padding: 18px 26px;
-    font-size: 22px;
-    box-shadow: 0 10px 30px rgba(28, 35, 64, .06);
-  }
-  .band .en { font-weight: 800; }
-
-  .art {
-    flex: none;
-    display: grid;
-    place-items: center;
-    width: 84px;
-    height: 84px;
-    border-radius: 22px;
-    background: var(--primary);
-    color: #fff;
-    font-family: var(--en);
-    font-weight: 800;
-    font-size: 40px;
-  }
-  .art.the { background: var(--blue); }
-
-  .arrow { flex: none; font-size: 40px; color: var(--primary); }
-
-  /* ---------- hero (cover / ending) ---------- */
-  .cover { padding: 44px; }
-  .hero {
-    flex: 1;
-    position: relative;
-    border-radius: 44px;
-    background-color: #FFDCCB;
-    background-image: linear-gradient(120deg, #FFEDE4 0%, #FFDCCB 55%, #FFCDB6 100%);
-    box-shadow: 0 20px 50px rgba(232, 70, 30, .10);
-    padding: 0 80px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    color: var(--ink);
-  }
-  .hero-kicker { font-weight: 700; font-size: 22px; letter-spacing: .2em; color: var(--primary-dark); }
-  .hero-title { margin-top: 10px; font-weight: 900; font-size: 168px; line-height: 1.1; }
-  .hero-title.sm { font-size: 92px; line-height: 1.2; }
-  .hero-sub { margin-top: 10px; font-weight: 700; font-size: 50px; }
-  .hero-sub .en { font-weight: 800; }
-  .hero-sub.sm { font-size: 32px; margin-top: 18px; }
-  .hero-hand { margin-top: 30px; font-family: var(--hand); font-weight: 700; font-size: 48px; color: var(--primary-dark); }
-  .hero > .tile { position: absolute; right: 64px; top: 146px; width: 340px; height: 340px; }
-
-  /* ---------- 冠詞とは ---------- */
-  .def { flex: 1; margin-top: 22px; padding: 30px 40px; display: flex; flex-direction: column; align-items: center; gap: 26px; }
-  .def-text { font-size: 36px; font-weight: 700; }
-  .def-text .en { font-weight: 800; }
-  .combos { flex: 1; width: 100%; display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
-  .combo { border-radius: 22px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; }
-  .combo img { width: 150px; height: 150px; }
-  .combo p { font-size: 38px; font-weight: 800; }
-
-  /* ---------- roadmap ---------- */
-  .road { flex: 1; margin-top: 24px; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 8px; }
-  .stepcard { width: 100%; height: 150px; padding: 0 44px; display: flex; align-items: center; gap: 30px; }
-  .stepcard.off { background: #F3F7FC; box-shadow: none; border: 2px dashed var(--line); }
-  .road .arrow { font-size: 36px; line-height: 1; }
-  .step-no { flex: none; font-family: var(--en); font-weight: 800; font-size: 18px; letter-spacing: .14em; color: #fff; background: var(--primary); padding: 6px 16px 7px; border-radius: 999px; }
-  .off .step-no { background: var(--muted); }
-  .step-h { font-size: 38px; font-weight: 700; }
-  .step-h .en { font-weight: 800; }
-  .off .step-h { color: var(--ink-2); }
-  .step-d { margin-left: auto; font-size: 24px; color: var(--ink-2); }
-
-  /* ---------- mental image ---------- */
-  .mi { flex: 1; margin-top: 22px; display: grid; grid-template-columns: 1fr 1fr; gap: 26px; min-height: 0; }
-  .mi-text { padding: 36px 40px; display: flex; flex-direction: column; justify-content: center; gap: 12px; }
-  .mi-eq { font-size: 34px; font-weight: 700; }
-  .mi-eq .en { font-size: 48px; font-weight: 800; }
-  .mi-big { font-size: 46px; font-weight: 900; line-height: 1.35; }
-  .mi-chips { display: flex; align-items: center; gap: 12px; margin-top: 10px; }
-  .mi-chips .chip { font-size: 22px; background: #fff; }
-  .mi-chips .chip.blue { background: #fff; }
-  .mi-note { font-size: 22px; color: var(--ink-2); }
-  .mi-visual { display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: 1fr 1fr; padding: 22px 30px; align-items: center; justify-items: center; }
-  .mi-visual > img { width: 112px; height: 112px; }
-  .pick { position: relative; width: 150px; height: 150px; border-radius: 50%; display: grid; place-items: center; background: var(--orange-soft); border: 4px solid var(--primary); }
-  .pick.the { background: var(--sky-soft); border-color: var(--blue); }
-  .pick img { width: 112px; height: 112px; }
-  .pick-label {
-    position: absolute; left: 50%; bottom: -14px; margin-left: -38px; width: 76px;
-    text-align: center; font-size: 19px; font-weight: 700; color: #fff; background: var(--primary);
-    padding: 3px 0 4px; border-radius: 999px;
-  }
-  .pick.the .pick-label { background: var(--blue); }
-  .uses { flex: none; margin-top: 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-  .use { display: flex; align-items: center; gap: 14px; padding: 18px 24px; font-size: 22px; }
-  .num {
-    flex: none; width: 38px; height: 38px; border-radius: 50%; display: grid; place-items: center;
-    font-family: var(--en); font-weight: 800; font-size: 19px; color: #fff; background: var(--blue);
-  }
-
-  /* ---------- example cards ---------- */
-  .grid4 { flex: 1; margin-top: 22px; display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 22px; min-height: 0; }
-  .ex { border-radius: 26px; display: flex; align-items: center; gap: 22px; padding: 0 30px 0 22px; }
-  .ex img { flex: none; width: 136px; height: 136px; }
-  .ex-en { font-family: var(--en); font-weight: 700; font-size: 31px; line-height: 1.25; }
-  .ex-ja { margin-top: 8px; font-size: 19px; color: var(--ink-2); }
-
-  .rows { flex: 1; margin-top: 22px; display: flex; flex-direction: column; gap: 16px; min-height: 0; }
-  .row { flex: 1; display: grid; grid-template-columns: 124px 1fr 340px; align-items: center; column-gap: 26px; padding: 0 30px 0 22px; }
-  .row img { width: 124px; height: 124px; }
-  .row-en { font-family: var(--en); font-weight: 700; font-size: 36px; }
-  .row-ja { margin-top: 6px; font-size: 20px; color: var(--ink-2); }
-  .why { border-radius: 16px; background: var(--sky-soft); padding: 14px 20px; font-size: 19px; line-height: 1.55; color: #1F4E79; }
-
-  /* ---------- jobs ---------- */
-  .duo { flex: 1; margin-top: 22px; display: grid; grid-template-columns: 1fr 1fr; gap: 26px; min-height: 0; }
-  .job { position: relative; border-radius: 28px; padding: 40px 44px; }
-  .job img { position: absolute; right: 30px; bottom: 0; width: 260px; height: 260px; }
-  .job-en { font-family: var(--en); font-weight: 700; font-size: 44px; line-height: 1.25; }
-  .job-ja { margin-top: 10px; font-size: 22px; color: var(--ink-2); }
-
-  /* ---------- a / an ---------- */
-  .lead { flex: none; margin-top: 16px; display: flex; align-items: center; gap: 14px; font-size: 26px; font-weight: 700; }
-  .lead .en { font-weight: 800; }
-  .col { border-radius: 28px; padding: 26px 34px; display: flex; flex-direction: column; gap: 14px; }
-  .col-head { display: flex; align-items: center; gap: 18px; }
-  .col-head .art { width: 74px; height: 74px; font-size: 34px; border-radius: 20px; }
-  .col-h { font-size: 26px; font-weight: 700; line-height: 1.35; }
-  .col-h small { display: block; font-size: 17px; font-weight: 500; color: var(--ink-2); }
-  .words { list-style: none; flex: 1; display: flex; flex-direction: column; justify-content: space-around; background: #fff; border-radius: 20px; padding: 6px 24px; }
-  .words li { display: flex; align-items: center; gap: 20px; font-family: var(--en); font-weight: 700; font-size: 32px; }
-  .words li + li { border-top: 2px solid #EEF2F8; }
-  .words img { width: 74px; height: 74px; }
-
-  .snd { padding: 26px 34px; display: flex; flex-direction: column; gap: 14px; }
-  .snd-top { display: flex; align-items: center; gap: 22px; }
-  .snd-top img { flex: none; width: 140px; height: 140px; }
-  .snd-word { font-family: var(--en); font-weight: 800; font-size: 56px; letter-spacing: -.5px; }
-  .snd-word .hl { color: var(--primary); }
-  .snd-word .mute { color: #C3C8D6; }
-  .snd-say { margin-top: 4px; font-size: 24px; color: var(--ink-2); }
-  .snd-say b { color: var(--primary); }
-  .snd-why { border-top: 2px dashed var(--line); padding-top: 16px; font-size: 25px; line-height: 1.6; }
-  .snd-ex { margin-top: auto; background: var(--orange-soft); border-radius: 18px; padding: 16px 24px; }
-  .snd-en { font-family: var(--en); font-weight: 700; font-size: 28px; }
-  .snd-ja { margin-top: 4px; font-size: 19px; color: var(--ink-2); }
-
-  /* ---------- quiz ---------- */
-  .quiz { flex: none; height: 300px; margin-top: 22px; display: flex; align-items: center; gap: 30px; padding: 0 40px 0 30px; }
-  .quiz > img { flex: none; width: 200px; height: 200px; }
-  .qlines { display: flex; flex-direction: column; gap: 22px; }
-  .qline { display: flex; align-items: center; gap: 16px; height: 84px; font-family: var(--en); font-weight: 700; font-size: 46px; white-space: nowrap; }
-  .blank { flex: none; width: 140px; height: 76px; border: 3px dashed #F3A88F; border-radius: 16px; background: #FFF8F5; }
-  .fill { flex: none; display: grid; place-items: center; width: 140px; height: 76px; border-radius: 16px; background: var(--primary); color: #fff; font-weight: 800; font-size: 44px; }
-  .fill.the { background: var(--blue); }
-  .opts { flex: none; height: 150px; margin-top: 22px; display: flex; align-items: center; gap: 18px; }
-  .opts .art { width: 96px; height: 96px; font-size: 42px; }
-  .opts .or { font-family: var(--en); font-size: 24px; color: var(--muted); }
-  .opts .ask { margin-left: 14px; font-size: 28px; font-weight: 700; }
-  .kai { flex: none; height: 150px; margin-top: 22px; display: flex; flex-direction: column; justify-content: center; gap: 10px; padding: 0 32px; }
-  .kai-line { display: flex; align-items: center; gap: 14px; font-size: 24px; }
-  .kai-line .en { font-weight: 800; }
-  .kai .tr { margin-top: 2px; font-size: 19px; color: var(--ink-2); }
-
-  /* ---------- compare ---------- */
-  .cmp { flex: 1; margin-top: 20px; display: grid; grid-template-columns: 130px 1fr 1fr; grid-template-rows: 74px 1fr 1fr; gap: 14px; min-height: 0; }
-  .cmp-head { border-radius: 20px; display: flex; align-items: center; gap: 14px; padding: 0 22px; font-size: 21px; font-weight: 700; }
-  .cmp-head .en { font-size: 32px; font-weight: 800; }
-  .cmp-img { display: grid; place-items: center; }
-  .cmp-img img { width: 120px; height: 120px; }
-  .cmp-cell { border-radius: 22px; padding: 0 26px; display: flex; flex-direction: column; justify-content: center; gap: 6px; }
-  .cmp-cell .en { font-size: 30px; }
-  .cmp-cell .ja { font-size: 19px; color: var(--ink-2); }
-  .cmp-cell .note { margin-top: 4px; font-size: 18px; color: var(--ink-2); }
-
-  /* ---------- next time ---------- */
-  .sub-lead { flex: none; margin-top: 14px; font-size: 22px; color: var(--ink-2); }
-  .nc { border-radius: 28px; padding: 28px 36px; display: flex; flex-direction: column; gap: 6px; }
-  .nc-h { font-size: 38px; font-weight: 900; }
-  .nc-s { font-size: 22px; color: var(--ink-2); }
-  .nc-imgs { margin-top: auto; display: flex; justify-content: space-around; background: #fff; border-radius: 20px; padding: 10px; }
-  .nc-imgs img { width: 140px; height: 140px; }
-
-  .cnt { padding: 0 26px; display: grid; grid-template-columns: 116px 1fr 1fr; align-items: center; column-gap: 12px; }
-  .cnt-w { font-family: var(--en); font-weight: 800; font-size: 30px; }
-  .cnt-g { display: flex; flex-direction: column; align-items: center; gap: 2px; }
-  .cnt-imgs { display: flex; gap: 2px; }
-  .cnt-imgs img { width: 68px; height: 68px; }
-  .cnt-g p { font-family: var(--en); font-weight: 700; font-size: 21px; color: var(--ink-2); }
-
-  .trio { flex: 1; margin-top: 22px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; min-height: 0; }
-  .un { padding: 22px 26px 26px; display: flex; flex-direction: column; align-items: center; gap: 4px; text-align: center; }
-  .un-img { width: 100%; display: grid; place-items: center; border-radius: 20px; padding: 8px 0; }
-  .un-img img { width: 170px; height: 170px; }
-  .un-w { margin-top: 10px; font-family: var(--en); font-weight: 800; font-size: 44px; }
-  .un-ja { font-size: 20px; color: var(--ink-2); }
-  .un-ng { margin-top: auto; font-family: var(--en); font-weight: 700; font-size: 26px; color: var(--muted); background: #F3F5F9; border-radius: 14px; padding: 6px 20px; }
-  .un-ng .x { color: var(--primary); font-weight: 800; }
-</style>
+<link rel="stylesheet" href="../hina.css">
 </head>
 <body>
 
@@ -310,7 +13,7 @@
     <p class="hero-kicker">文法解説動画</p>
     <h1 class="hero-title">冠詞</h1>
     <p class="hero-sub"><span class="en a">a / an</span> と <span class="en the">the</span> の違い</p>
-    <img class="tile" src="img/tile.png" alt="">
+    <img class="tile" src="../img/tile.png" alt="">
   </div>
 </section>
 
@@ -323,9 +26,9 @@
   <div class="def card">
     <p class="def-text"><mark>名詞の前</mark>に置く <span class="en a">a</span> / <span class="en a">an</span> / <span class="en the">the</span> のこと</p>
     <div class="combos">
-      <div class="combo c-orange"><img src="img/book.png" alt="本"><p class="en"><span class="a">a</span> book</p></div>
-      <div class="combo c-yellow"><img src="img/apple.png" alt="りんご"><p class="en"><span class="a">an</span> apple</p></div>
-      <div class="combo c-sky"><img src="img/sun.png" alt="太陽"><p class="en"><span class="the">the</span> sun</p></div>
+      <div class="combo c-orange"><img src="../img/book.png" alt="本"><p class="en"><span class="a">a</span> book</p></div>
+      <div class="combo c-yellow"><img src="../img/apple.png" alt="りんご"><p class="en"><span class="a">an</span> apple</p></div>
+      <div class="combo c-sky"><img src="../img/sun.png" alt="太陽"><p class="en"><span class="the">the</span> sun</p></div>
     </div>
   </div>
   <p class="band"><span class="chip">役割</span><span>名詞を「<b>どんな名詞として話しているか</b>」を、小さく示してくれる</span></p>
@@ -365,12 +68,12 @@
       <div class="mi-chips"><span class="chip">1つの〜</span><span class="chip">ある〜</span><span class="mi-note">という感覚</span></div>
     </div>
     <div class="mi-visual card">
-      <img src="img/apple.png" alt="りんご">
-      <img src="img/apple.png" alt="りんご">
-      <img src="img/apple.png" alt="りんご">
-      <img src="img/apple.png" alt="りんご">
-      <div class="pick"><img src="img/apple.png" alt="りんご"><span class="pick-label">1つ</span></div>
-      <img src="img/apple.png" alt="りんご">
+      <img src="../img/apple.png" alt="りんご">
+      <img src="../img/apple.png" alt="りんご">
+      <img src="../img/apple.png" alt="りんご">
+      <img src="../img/apple.png" alt="りんご">
+      <div class="pick"><img src="../img/apple.png" alt="りんご"><span class="pick-label">1つ</span></div>
+      <img src="../img/apple.png" alt="りんご">
     </div>
   </div>
 </section>
@@ -381,10 +84,10 @@
   <p class="eyebrow">A / AN ・ EXAMPLES</p>
   <h2 class="title"><span class="en a">a / an</span> の例文</h2>
   <div class="grid4">
-    <div class="ex c-orange"><img src="img/bag.png" alt="バッグ"><div><p class="ex-en">I bought <span class="a">a</span> bag.</p><p class="ex-ja">私はバッグを1つ買いました。</p></div></div>
-    <div class="ex c-yellow"><img src="img/dog.png" alt="犬"><div><p class="ex-en">I saw <span class="a">a</span> dog<br>in the park.</p><p class="ex-ja">私は公園で犬を1匹見ました。</p></div></div>
-    <div class="ex c-pink"><img src="img/teacher.png" alt="先生"><div><p class="ex-en">She is <span class="a">a</span> teacher.</p><p class="ex-ja">彼女は先生です。</p></div></div>
-    <div class="ex c-sky"><img src="img/apple.png" alt="りんご"><div><p class="ex-en">I ate <span class="a">an</span> apple.</p><p class="ex-ja">私はリンゴを1個食べました。</p></div></div>
+    <div class="ex c-orange"><img src="../img/bag.png" alt="バッグ"><div><p class="ex-en">I bought <span class="a">a</span> bag.</p><p class="ex-ja">私はバッグを1つ買いました。</p></div></div>
+    <div class="ex c-yellow"><img src="../img/dog.png" alt="犬"><div><p class="ex-en">I saw <span class="a">a</span> dog<br>in the park.</p><p class="ex-ja">私は公園で犬を1匹見ました。</p></div></div>
+    <div class="ex c-pink"><img src="../img/teacher.png" alt="先生"><div><p class="ex-en">She is <span class="a">a</span> teacher.</p><p class="ex-ja">彼女は先生です。</p></div></div>
+    <div class="ex c-sky"><img src="../img/apple.png" alt="りんご"><div><p class="ex-en">I ate <span class="a">an</span> apple.</p><p class="ex-ja">私はリンゴを1個食べました。</p></div></div>
   </div>
   <p class="band"><span class="chip">よく使う場面</span><span>まだ相手が「どれのことか」分かっていないものを、<b>初めて会話に出す</b>とき</span></p>
 </section>
@@ -396,8 +99,8 @@
   <p class="eyebrow">POINT</p>
   <h2 class="title">職業を言うときも、基本的に <span class="en a">a / an</span></h2>
   <div class="duo">
-    <div class="job c-pink"><p class="job-en">She is <span class="a">a</span> nurse.</p><p class="job-ja">彼女は看護師です。</p><img src="img/nurse.png" alt="看護師"></div>
-    <div class="job c-sky"><p class="job-en">He is <span class="a">an</span> engineer.</p><p class="job-ja">彼はエンジニアです。</p><img src="img/engineer.png" alt="エンジニア"></div>
+    <div class="job c-pink"><p class="job-en">She is <span class="a">a</span> nurse.</p><p class="job-ja">彼女は看護師です。</p><img src="../img/nurse.png" alt="看護師"></div>
+    <div class="job c-sky"><p class="job-en">He is <span class="a">an</span> engineer.</p><p class="job-ja">彼はエンジニアです。</p><img src="../img/engineer.png" alt="エンジニア"></div>
   </div>
 </section>
 
@@ -412,17 +115,17 @@
     <div class="col c-orange">
       <div class="col-head"><span class="art">a</span><p class="col-h">子音の音から始まる<small>（母音以外の音）</small></p></div>
       <ul class="words">
-        <li><img src="img/book.png" alt="本"><span><span class="a">a</span> book</span></li>
-        <li><img src="img/dog.png" alt="犬"><span><span class="a">a</span> dog</span></li>
-        <li><img src="img/university.png" alt="大学"><span><span class="a">a</span> university</span></li>
+        <li><img src="../img/book.png" alt="本"><span><span class="a">a</span> book</span></li>
+        <li><img src="../img/dog.png" alt="犬"><span><span class="a">a</span> dog</span></li>
+        <li><img src="../img/university.png" alt="大学"><span><span class="a">a</span> university</span></li>
       </ul>
     </div>
     <div class="col c-yellow">
       <div class="col-head"><span class="art">an</span><p class="col-h">母音の音から始まる<small>（ア・イ・ウ・エ・オ に近い音）</small></p></div>
       <ul class="words">
-        <li><img src="img/apple.png" alt="りんご"><span><span class="a">an</span> apple</span></li>
-        <li><img src="img/egg.png" alt="卵"><span><span class="a">an</span> egg</span></li>
-        <li><img src="img/clock.png" alt="時計"><span><span class="a">an</span> hour</span></li>
+        <li><img src="../img/apple.png" alt="りんご"><span><span class="a">an</span> apple</span></li>
+        <li><img src="../img/egg.png" alt="卵"><span><span class="a">an</span> egg</span></li>
+        <li><img src="../img/clock.png" alt="時計"><span><span class="a">an</span> hour</span></li>
       </ul>
     </div>
   </div>
@@ -435,12 +138,12 @@
   <h2 class="title">スペルではなく<mark>「音」</mark>で判断する</h2>
   <div class="duo">
     <div class="snd card">
-      <div class="snd-top"><img src="img/university.png" alt="大学"><div><p class="snd-word"><span class="hl">u</span>niversity</p><p class="snd-say">「<b>ユ</b>ニバーシティ」</p></div></div>
+      <div class="snd-top"><img src="../img/university.png" alt="大学"><div><p class="snd-word"><span class="hl">u</span>niversity</p><p class="snd-say">「<b>ユ</b>ニバーシティ」</p></div></div>
       <p class="snd-why"><span class="en">u</span> で始まるけど、音は「<b>ユ</b>」<br>→ 子音の音</p>
       <div class="snd-ex"><p class="snd-en">She is <span class="a">a</span> university student.</p><p class="snd-ja">彼女は大学生です。</p></div>
     </div>
     <div class="snd card">
-      <div class="snd-top"><img src="img/clock.png" alt="時計"><div><p class="snd-word"><span class="mute">h</span>our</p><p class="snd-say">「<b>ア</b>ワー」</p></div></div>
+      <div class="snd-top"><img src="../img/clock.png" alt="時計"><div><p class="snd-word"><span class="mute">h</span>our</p><p class="snd-say">「<b>ア</b>ワー」</p></div></div>
       <p class="snd-why"><span class="en">h</span> は発音しないので、音は「<b>ア</b>」<br>→ 母音の音</p>
       <div class="snd-ex"><p class="snd-en">I waited for <span class="a">an</span> hour.</p><p class="snd-ja">私は1時間待ちました。</p></div>
     </div>
@@ -459,12 +162,12 @@
       <p class="mi-big">「<span class="the">それ！</span>」と<br>指させるもの</p>
     </div>
     <div class="mi-visual card">
-      <img src="img/apple.png" alt="りんご">
-      <div class="pick the"><img src="img/apple-green.png" alt="青りんご"><span class="pick-label">それ！</span></div>
-      <img src="img/apple.png" alt="りんご">
-      <img src="img/apple.png" alt="りんご">
-      <img src="img/apple.png" alt="りんご">
-      <img src="img/apple.png" alt="りんご">
+      <img src="../img/apple.png" alt="りんご">
+      <div class="pick the"><img src="../img/apple-green.png" alt="青りんご"><span class="pick-label">それ！</span></div>
+      <img src="../img/apple.png" alt="りんご">
+      <img src="../img/apple.png" alt="りんご">
+      <img src="../img/apple.png" alt="りんご">
+      <img src="../img/apple.png" alt="りんご">
     </div>
   </div>
   <div class="uses">
@@ -479,9 +182,9 @@
   <p class="eyebrow">THE ・ EXAMPLES</p>
   <h2 class="title"><span class="en the">the</span> の例文</h2>
   <div class="rows">
-    <div class="row card"><img src="img/door.png" alt="ドア"><div><p class="row-en">Please close <span class="the">the</span> door.</p><p class="row-ja">そのドアを閉めてください。</p></div><p class="why">その場にいる人たちが<br>どのドアか分かっている</p></div>
-    <div class="row card"><img src="img/restroom.png" alt="トイレ"><div><p class="row-en">Where is <span class="the">the</span> bathroom?</p><p class="row-ja">トイレはどこですか？</p></div><p class="why">その場所にあるトイレを<br>指している</p></div>
-    <div class="row card"><img src="img/sun.png" alt="太陽"><div><p class="row-en"><span class="the">The</span> sun is bright today.</p><p class="row-ja">今日は太陽がまぶしいです。</p></div><p class="why">太陽は、どれのことか<br>特定できる</p></div>
+    <div class="row card"><img src="../img/door.png" alt="ドア"><div><p class="row-en">Please close <span class="the">the</span> door.</p><p class="row-ja">そのドアを閉めてください。</p></div><p class="why">その場にいる人たちが<br>どのドアか分かっている</p></div>
+    <div class="row card"><img src="../img/restroom.png" alt="トイレ"><div><p class="row-en">Where is <span class="the">the</span> bathroom?</p><p class="row-ja">トイレはどこですか？</p></div><p class="why">その場所にあるトイレを<br>指している</p></div>
+    <div class="row card"><img src="../img/sun.png" alt="太陽"><div><p class="row-en"><span class="the">The</span> sun is bright today.</p><p class="row-ja">今日は太陽がまぶしいです。</p></div><p class="why">太陽は、どれのことか<br>特定できる</p></div>
   </div>
 </section>
 
@@ -492,7 +195,7 @@
   <p class="eyebrow">QUIZ ・ 1</p>
   <h2 class="title">（　）に入るのは <span class="en a">a / an</span>？ <span class="en the">the</span>？</h2>
   <div class="quiz card">
-    <img src="img/bag.png" alt="バッグ">
+    <img src="../img/bag.png" alt="バッグ">
     <div class="qlines">
       <div class="qline"><span>I bought</span><span class="blank"></span><span>bag.</span></div>
       <div class="qline"><span class="blank"></span><span>bag was expensive.</span></div>
@@ -507,7 +210,7 @@
   <p class="eyebrow">QUIZ ・ 1　ANSWER</p>
   <h2 class="title">（　）に入るのは <span class="en a">a / an</span>？ <span class="en the">the</span>？</h2>
   <div class="quiz card">
-    <img src="img/bag.png" alt="バッグ">
+    <img src="../img/bag.png" alt="バッグ">
     <div class="qlines">
       <div class="qline"><span>I bought</span><span class="fill">a</span><span>bag.</span></div>
       <div class="qline"><span class="fill the">The</span><span>bag was expensive.</span></div>
@@ -530,10 +233,10 @@
     <div></div>
     <div class="cmp-head c-orange"><span class="en a">a / an</span><span>まだ特定されていない「1つ」</span></div>
     <div class="cmp-head c-sky"><span class="en the">the</span><span>どれのことか特定できる</span></div>
-    <div class="cmp-img"><img src="img/dog.png" alt="犬"></div>
+    <div class="cmp-img"><img src="../img/dog.png" alt="犬"></div>
     <div class="cmp-cell card"><p class="en">I saw <span class="a">a</span> dog.</p><p class="ja">犬を1匹見ました。</p></div>
     <div class="cmp-cell card"><p class="en"><span class="the">The</span> dog was cute.</p><p class="ja">その犬はかわいかったです。</p></div>
-    <div class="cmp-img"><img src="img/book.png" alt="本"></div>
+    <div class="cmp-img"><img src="../img/book.png" alt="本"></div>
     <div class="cmp-cell card"><p class="en">I want to buy <span class="a">a</span> book.</p><p class="ja">本を1冊買いたいです。</p><p class="note">→ どの本かは、まだ決まっていない</p></div>
     <div class="cmp-cell card"><p class="en">I want to buy <span class="the">the</span> book.</p><p class="ja">その本を買いたいです。</p><p class="note">→ 話し手と聞き手が、どの本か分かっている</p></div>
   </div>
@@ -546,7 +249,7 @@
   <p class="eyebrow">QUIZ ・ 2</p>
   <h2 class="title">（　）に入るのは <span class="en a">a / an</span>？ <span class="en the">the</span>？</h2>
   <div class="quiz card">
-    <img src="img/cafe.png" alt="カフェ">
+    <img src="../img/cafe.png" alt="カフェ">
     <div class="qlines">
       <div class="qline"><span>I went to</span><span class="blank"></span><span>cafe yesterday.</span></div>
       <div class="qline"><span class="blank"></span><span>cafe was very quiet.</span></div>
@@ -561,7 +264,7 @@
   <p class="eyebrow">QUIZ ・ 2　ANSWER</p>
   <h2 class="title">（　）に入るのは <span class="en a">a / an</span>？ <span class="en the">the</span>？</h2>
   <div class="quiz card">
-    <img src="img/cafe.png" alt="カフェ">
+    <img src="../img/cafe.png" alt="カフェ">
     <div class="qlines">
       <div class="qline"><span>I went to</span><span class="fill">a</span><span>cafe yesterday.</span></div>
       <div class="qline"><span class="fill the">The</span><span>cafe was very quiet.</span></div>
@@ -582,8 +285,8 @@
   <h2 class="title">すべての名詞に <span class="en a">a / an</span> をつけられるわけではない</h2>
   <p class="sub-lead">そこで大切なのが…</p>
   <div class="duo">
-    <div class="nc c-orange"><p class="nc-h">数えられる名詞</p><p class="nc-s">可算名詞</p><div class="nc-imgs"><img src="img/book.png" alt="本"><img src="img/apple.png" alt="りんご"><img src="img/dog.png" alt="犬"></div></div>
-    <div class="nc c-sky"><p class="nc-h">数えられない名詞</p><p class="nc-s">不可算名詞</p><div class="nc-imgs"><img src="img/water.png" alt="水"><img src="img/heart.png" alt="愛"><img src="img/happy.png" alt="幸せ"></div></div>
+    <div class="nc c-orange"><p class="nc-h">数えられる名詞</p><p class="nc-s">可算名詞</p><div class="nc-imgs"><img src="../img/book.png" alt="本"><img src="../img/apple.png" alt="りんご"><img src="../img/dog.png" alt="犬"></div></div>
+    <div class="nc c-sky"><p class="nc-h">数えられない名詞</p><p class="nc-s">不可算名詞</p><div class="nc-imgs"><img src="../img/water.png" alt="水"><img src="../img/heart.png" alt="愛"><img src="../img/happy.png" alt="幸せ"></div></div>
   </div>
 </section>
 
@@ -594,10 +297,10 @@
   <h2 class="title">数えられる名詞（可算名詞）</h2>
   <p class="sub-lead">1つ、2つ、3つ…と数えられる名詞</p>
   <div class="grid4">
-    <div class="cnt card"><p class="cnt-w">book</p><div class="cnt-g"><div class="cnt-imgs"><img src="img/book.png" alt="本"></div><p>one book</p></div><div class="cnt-g"><div class="cnt-imgs"><img src="img/book.png" alt="本"><img src="img/book.png" alt="本"></div><p>two books</p></div></div>
-    <div class="cnt card"><p class="cnt-w">apple</p><div class="cnt-g"><div class="cnt-imgs"><img src="img/apple.png" alt="りんご"></div><p>one apple</p></div><div class="cnt-g"><div class="cnt-imgs"><img src="img/apple.png" alt="りんご"><img src="img/apple.png" alt="りんご"></div><p>two apples</p></div></div>
-    <div class="cnt card"><p class="cnt-w">dog</p><div class="cnt-g"><div class="cnt-imgs"><img src="img/dog.png" alt="犬"></div><p>one dog</p></div><div class="cnt-g"><div class="cnt-imgs"><img src="img/dog.png" alt="犬"><img src="img/dog.png" alt="犬"></div><p>two dogs</p></div></div>
-    <div class="cnt card"><p class="cnt-w">student</p><div class="cnt-g"><div class="cnt-imgs"><img src="img/student.png" alt="学生"></div><p>one student</p></div><div class="cnt-g"><div class="cnt-imgs"><img src="img/student.png" alt="学生"><img src="img/student.png" alt="学生"></div><p>two students</p></div></div>
+    <div class="cnt card"><p class="cnt-w">book</p><div class="cnt-g"><div class="cnt-imgs"><img src="../img/book.png" alt="本"></div><p>one book</p></div><div class="cnt-g"><div class="cnt-imgs"><img src="../img/book.png" alt="本"><img src="../img/book.png" alt="本"></div><p>two books</p></div></div>
+    <div class="cnt card"><p class="cnt-w">apple</p><div class="cnt-g"><div class="cnt-imgs"><img src="../img/apple.png" alt="りんご"></div><p>one apple</p></div><div class="cnt-g"><div class="cnt-imgs"><img src="../img/apple.png" alt="りんご"><img src="../img/apple.png" alt="りんご"></div><p>two apples</p></div></div>
+    <div class="cnt card"><p class="cnt-w">dog</p><div class="cnt-g"><div class="cnt-imgs"><img src="../img/dog.png" alt="犬"></div><p>one dog</p></div><div class="cnt-g"><div class="cnt-imgs"><img src="../img/dog.png" alt="犬"><img src="../img/dog.png" alt="犬"></div><p>two dogs</p></div></div>
+    <div class="cnt card"><p class="cnt-w">student</p><div class="cnt-g"><div class="cnt-imgs"><img src="../img/student.png" alt="学生"></div><p>one student</p></div><div class="cnt-g"><div class="cnt-imgs"><img src="../img/student.png" alt="学生"><img src="../img/student.png" alt="学生"></div><p>two students</p></div></div>
   </div>
   <p class="band"><span class="chip">1つだけなら</span><span><span class="en a">a / an</span> を使える：　<span class="en"><span class="a">a</span> book ／ <span class="a">an</span> apple ／ <span class="a">a</span> dog</span></span></p>
 </section>
@@ -609,9 +312,9 @@
   <h2 class="title">数えられない名詞（不可算名詞）</h2>
   <p class="lead"><span class="chip blue">ルール</span><span>1つ、2つ…とそのまま数えられない　→　<span class="en a">a / an</span> は使えない</span></p>
   <div class="trio">
-    <div class="un card"><div class="un-img c-sky"><img src="img/water.png" alt="水"></div><p class="un-w">water</p><p class="un-ja">水</p><p class="un-ng"><span class="x">×</span> a water</p></div>
-    <div class="un card"><div class="un-img c-pink"><img src="img/heart.png" alt="愛"></div><p class="un-w">love</p><p class="un-ja">愛</p><p class="un-ng"><span class="x">×</span> a love</p></div>
-    <div class="un card"><div class="un-img c-yellow"><img src="img/happy.png" alt="幸せ"></div><p class="un-w">happiness</p><p class="un-ja">幸せ</p><p class="un-ng"><span class="x">×</span> a happiness</p></div>
+    <div class="un card"><div class="un-img c-sky"><img src="../img/water.png" alt="水"></div><p class="un-w">water</p><p class="un-ja">水</p><p class="un-ng"><span class="x">×</span> a water</p></div>
+    <div class="un card"><div class="un-img c-pink"><img src="../img/heart.png" alt="愛"></div><p class="un-w">love</p><p class="un-ja">愛</p><p class="un-ng"><span class="x">×</span> a love</p></div>
+    <div class="un card"><div class="un-img c-yellow"><img src="../img/happy.png" alt="幸せ"></div><p class="un-w">happiness</p><p class="un-ja">幸せ</p><p class="un-ng"><span class="x">×</span> a happiness</p></div>
   </div>
 </section>
 

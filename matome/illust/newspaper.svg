@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="400" height="400">
+<ellipse cx="200" cy="356" rx="130" ry="13" fill="#1C2340" opacity=".08"/>
+<path d="M76 98 H300 Q316 98 316 114 V318 Q316 340 294 340 H100 Q76 340 76 316 Z" fill="#FFFFFF" stroke="#D6E2F0" stroke-width="5"/>
+<path d="M316 150 H336 V316 Q336 340 314 340" fill="#F1F5FA" stroke="#D6E2F0" stroke-width="5"/>
+<text x="196" y="150" text-anchor="middle" font-family="DM Sans" font-weight="800" font-size="40" letter-spacing="4" fill="#2A2F4F">NEWS</text>
+<rect x="100" y="168" width="196" height="8" rx="4" fill="#2A2F4F"/>
+<rect x="100" y="192" width="88" height="70" rx="8" fill="#BFE3FA"/>
+<path d="M112 250 L136 222 L156 240 L170 228 L180 250 Z" fill="#7CC7F4"/>
+<g fill="#D6E2F0"><rect x="200" y="194" width="96" height="9" rx="4.5"/><rect x="200" y="214" width="96" height="9" rx="4.5"/><rect x="200" y="234" width="96" height="9" rx="4.5"/><rect x="200" y="254" width="64" height="9" rx="4.5"/>
+<rect x="100" y="280" width="196" height="9" rx="4.5"/><rect x="100" y="300" width="196" height="9" rx="4.5"/></g>
+</svg>
