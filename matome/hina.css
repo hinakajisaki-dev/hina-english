@@ -76,7 +76,9 @@ mark {
 .title .en { font-weight: 800; }
 .divider + .title { margin-top: 30px; }  /* slides without the small label above the title */
 
-.card { background: var(--card); border-radius: 28px; box-shadow: 0 10px 30px rgba(28, 35, 64, .07); }
+/* No box-shadows anywhere: Chrome bakes a soft shadow into the PDF as a gray image, and
+   some viewers draw that image as a solid gray block over the cards. */
+.card { background: var(--card); border-radius: 28px; }
 .c-orange { background: var(--orange-soft); }
 .c-pink { background: var(--pink-soft); }
 .c-yellow { background: var(--yellow-soft); }
@@ -104,7 +106,6 @@ mark {
   border-radius: 20px;
   padding: 18px 26px;
   font-size: 22px;
-  box-shadow: 0 10px 30px rgba(28, 35, 64, .06);
 }
 .band .en { font-weight: 800; }
 
@@ -133,7 +134,6 @@ mark {
   border-radius: 44px;
   background-color: #FFDCCB;
   background-image: linear-gradient(120deg, #FFEDE4 0%, #FFDCCB 55%, #FFCDB6 100%);
-  box-shadow: 0 20px 50px rgba(232, 70, 30, .10);
   padding: 0 80px;
   display: flex;
   flex-direction: column;
@@ -161,7 +161,7 @@ mark {
 /* ---------- roadmap ---------- */
 .road { flex: 1; margin-top: 24px; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 8px; }
 .stepcard { width: 100%; height: 150px; padding: 0 44px; display: flex; align-items: center; gap: 30px; }
-.stepcard.off { background: #F3F7FC; box-shadow: none; border: 2px dashed var(--line); }
+.stepcard.off { background: #F3F7FC; border: 2px dashed var(--line); }
 .road .arrow { font-size: 36px; line-height: 1; }
 .step-no { flex: none; font-family: var(--en); font-weight: 800; font-size: 18px; letter-spacing: .14em; color: #fff; background: var(--primary); padding: 6px 16px 7px; border-radius: 999px; }
 .off .step-no { background: var(--muted); }

@@ -1,0 +1,930 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<title>冠詞 練習問題｜文法解説スライド</title>
+<link rel="stylesheet" href="../hina.css">
+<style>
+  .hero-title .part { margin-left: 18px; font-size: 92px; font-weight: 900; color: var(--primary); }
+
+  /* how to */
+  .how { flex: 1; margin-top: 22px; display: grid; grid-template-columns: 1.1fr 1fr; gap: 26px; min-height: 0; }
+  .how-steps { display: flex; flex-direction: column; gap: 14px; }
+  .how-step { flex: 1; display: flex; align-items: center; gap: 18px; padding: 0 28px; font-size: 25px; font-weight: 700; }
+  .how-step .num { width: 46px; height: 46px; font-size: 22px; background: var(--primary); }
+  .how-opts { padding: 26px 30px; display: flex; flex-direction: column; justify-content: center; gap: 22px; }
+  .how-opts h3 { font-size: 25px; font-weight: 700; }
+  .optrow { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+  .optrow div { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+  .optrow .art { width: 100%; height: 100px; font-size: 40px; }
+  .optrow p { font-size: 17px; color: var(--ink-2); text-align: center; }
+
+  /* menu */
+  .menu { flex: 1; margin-top: 22px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; min-height: 0; }
+  .mcard { padding: 24px 18px 26px; display: flex; flex-direction: column; align-items: center; gap: 8px; text-align: center; }
+  .mcard img { width: 150px; height: 150px; margin-top: auto; }
+  .mcard h3 { margin-top: auto; font-size: 26px; font-weight: 700; line-height: 1.35; }
+  .mcard h3 .en { font-weight: 800; }
+  .mcard p { font-size: 20px; color: var(--ink-2); }
+  .snum { align-self: flex-start; font-family: var(--en); font-weight: 800; font-size: 17px; letter-spacing: .14em; color: #fff; background: var(--primary); padding: 6px 16px 7px; border-radius: 999px; }
+  .mcard .snum { align-self: center; }
+
+  /* step cover */
+  .scover { flex: 1; margin-top: 18px; padding: 36px 48px 30px; display: flex; flex-direction: column; gap: 14px; }
+  .stitle { margin-top: 6px; font-size: 62px; font-weight: 900; line-height: 1.2; }
+  .stitle .en { font-weight: 800; }
+  .ssub { font-size: 24px; color: var(--ink-2); }
+  .spoints { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 8px; }
+  .spoints > span { font-size: 21px; font-weight: 500; background: var(--bg); border-radius: 999px; padding: 8px 20px 9px; white-space: nowrap; }
+  .simgs { margin-top: auto; display: flex; gap: 18px; }
+  .simgs img { width: 150px; height: 150px; }
+
+  /* question number in front of the title */
+  .title.qt { display: flex; align-items: center; gap: 16px; }
+  .qno { font-family: var(--en); font-weight: 800; font-size: 28px; color: #fff; background: var(--primary); border-radius: 999px; padding: 4px 20px 6px; }
+  .divider + .scover { margin-top: 30px; }
+
+  /* questions */
+  .quiz .qlines { gap: 10px; }
+  .quiz .qline { height: 76px; font-size: 42px; }
+  .quiz .blank, .quiz .fill { width: 130px; height: 70px; }
+  .quiz .fill { font-size: 40px; }
+  .qja { margin-top: 6px; font-size: 22px; color: var(--ink-2); }
+  .jp-q { font-size: 38px; font-weight: 700; line-height: 1.5; }
+  .en-a { font-family: var(--en); font-weight: 700; font-size: 40px; line-height: 1.35; }
+  .art.none { background: #9AA1B6; font-family: var(--ja); font-size: 28px; }
+  .fill.none { background: #9AA1B6; font-family: var(--ja); font-weight: 700; font-size: 30px; }
+  .opts .art { width: 96px; height: 96px; font-size: 42px; }
+  .opts .art.none { font-size: 28px; }
+  .kai .ans { font-family: var(--en); font-weight: 800; font-size: 28px; }
+</style>
+</head>
+<body>
+
+<!-- ============ 表紙 ============ -->
+<section class="slide cover">
+  <div class="hero">
+    <p class="hero-kicker">文法解説動画</p>
+    <h1 class="hero-title">冠詞<span class="part">練習問題</span></h1>
+    <p class="hero-sub sm">全25問　一緒に声に出して練習しよう！</p>
+    <img class="tile" src="../img/tile.png" alt="">
+  </div>
+</section>
+
+<!-- ============ やり方 ============ -->
+<section class="slide">
+  <header class="bar"><span class="crumb">文法解説 / 冠詞 練習問題</span></header>
+  <div class="divider"></div>
+  <h2 class="title">やり方</h2>
+  <div class="how">
+    <div class="how-steps">
+      <p class="how-step card"><span class="num">1</span><span>問題を見て、（　）に入るものを考える</span></p>
+      <p class="how-step card"><span class="num">2</span><span>声に出して答える</span></p>
+      <p class="how-step card"><span class="num">3</span><span>次のスライドで答え合わせ</span></p>
+    </div>
+    <div class="how-opts card">
+      <h3>答えは、この4つから選ぼう</h3>
+      <div class="optrow">
+        <div><span class="art">a</span><p>1つの〜</p></div>
+        <div><span class="art">an</span><p>母音の音の前</p></div>
+        <div><span class="art the">the</span><p>特定できる</p></div>
+        <div><span class="art none">なし</span><p>冠詞なし</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 今日の流れ ============ -->
+<section class="slide">
+  <header class="bar"><span class="crumb">文法解説 / 冠詞 練習問題</span></header>
+  <div class="divider"></div>
+  <h2 class="title">今日の流れ（全25問）</h2>
+  <div class="menu">
+    <div class="mcard card"><span class="snum">STEP 1</span><img src="../img/bag.png" alt=""><h3><span class="en a">a / an</span> と <span class="en the">the</span></h3><p>6問</p></div>
+    <div class="mcard card"><span class="snum">STEP 2</span><img src="../img/coffee.png" alt=""><h3>数えられない名詞</h3><p>5問</p></div>
+    <div class="mcard card"><span class="snum">STEP 3</span><img src="../img/dog.png" alt=""><h3>無冠詞</h3><p>6問</p></div>
+    <div class="mcard card"><span class="snum">STEP 4</span><img src="../img/nurse.png" alt=""><h3>瞬間英作文</h3><p>8問</p></div>
+  </div>
+</section>
+
+<!-- ============ STEP 1 ============ -->
+<section class="slide">
+  <header class="bar"><span class="crumb">文法解説 / 冠詞 練習問題</span></header>
+  <div class="divider"></div>
+  <div class="scover card">
+    <span class="snum">STEP 1</span>
+    <h2 class="stitle"><span class="en a">a / an</span> と <span class="en the">the</span></h2>
+    <p class="ssub">動画1のおさらい ・ 6問</p>
+    <div class="spoints"><span>初登場は <b class="en a">a / an</b></span><span>2回目以降は <b class="en the">the</b></span><span><b class="en a">a</b> と <b class="en a">an</b> は「音」で決まる</span><span><b class="en the">the</b> ＝ どれのことか特定できる</span></div>
+    <div class="simgs"><img src="../img/bag.png" alt=""><img src="../img/clock.png" alt=""><img src="../img/door.png" alt=""><img src="../img/sun.png" alt=""></div>
+  </div>
+</section>
+
+<!-- Q1 -->
+<section class="slide">
+  <header class="bar"><span class="crumb">文法解説 / 冠詞 練習問題</span></header>
+  <div class="divider"></div>
+  <h2 class="title qt"><span class="qno">Q1</span><span>（　）に入るのは？</span></h2>
+  <div class="quiz card">
+    <img src="../img/bag.png" alt="">
+    <div class="qlines">
+      <div class="qline"><span>I bought</span><span class="blank"></span><span>new bag yesterday.</span></div>
+      <div class="qline"><span class="blank"></span><span>bag is black.</span></div>
+      <p class="qja">昨日、新しいバッグを買いました。そのバッグは黒いです。</p>
+    </div>
+  </div>
+  <div class="opts"><span class="art">a</span><span class="art">an</span><span class="art the">the</span><span class="art none">なし</span><span class="ask">声に出して答えてみよう！</span></div>
+</section>
+<section class="slide">
+  <header class="bar"><span class="crumb">文法解説 / 冠詞 練習問題</span></header>
+  <div class="divider"></div>
+  <h2 class="title qt"><span class="qno">Q1</span><span>（　）に入るのは？</span></h2>
+  <div class="quiz card">
+    <img src="../img/bag.png" alt="">
+    <div class="qlines">
+      <div class="qline"><span>I bought</span><span class="fill">a</span><span>new bag yesterday.</span></div>
+      <div class="qline"><span class="fill the">The</span><span>bag is black.</span></div>
+      <p class="qja">昨日、新しいバッグを買いました。そのバッグは黒いです。</p>
+    </div>
+  </div>
+  <div class="kai card">
+    <p class="kai-line"><span class="chip">答え</span><span class="ans">a / The</span></p>
+    <p class="kai-line"><span class="chip blue">1つめ</span><span>初登場なので → <b class="en a">a</b></span></p>
+    <p class="kai-line"><span class="chip blue">2つめ</span><span>「さっきのバッグ」と分かるので → <b class="en the">the</b></span></p>
+  </div>
+</section>
+
+<!-- Q2 -->
+<section class="slide">
+  <header class="bar"><span class="crumb">文法解説 / 冠詞 練習問題</span></header>
+  <div class="divider"></div>
+  <h2 class="title qt"><span class="qno">Q2</span><span>（　）に入るのは？</span></h2>
+  <div class="quiz card">
+    <img src="../img/teacher.png" alt="">
+    <div class="qlines">
+      <div class="qline"><span>She is</span><span class="blank"></span><span>English teacher.</span></div>
+      <p class="qja">彼女は英語の先生です。</p>
+    </div>
+  </div>
+  <div class="opts"><span class="art">a</span><span class="art">an</span><span class="art the">the</span><span class="art none">なし</span><span class="ask">声に出して答えてみよう！</span></div>
+</section>
+<section class="slide">
+  <header class="bar"><span class="crumb">文法解説 / 冠詞 練習問題</span></header>
+  <div class="divider"></div>
+  <h2 class="title qt"><span class="qno">Q2</span><span>（　）に入るのは？</span></h2>
+  <div class="quiz card">
+    <img src="../img/teacher.png" alt="">
+    <div class="qlines">
+      <div class="qline"><span>She is</span><span class="fill">an</span><span>English teacher.</span></div>
+      <p class="qja">彼女は英語の先生です。</p>
+    </div>
+  </div>
+  <div class="kai card">
+    <p class="kai-line"><span class="chip">答え</span><span class="ans">an</span></p>
+    <p class="kai-line"><span class="chip blue">理由</span><span><span class="en">English</span> は「イ」の音（母音）で始まるので → <b class="en a">an</b></span></p>
+  </div>
+</section>
+
+<!-- Q3 -->
+<section class="slide">
+  <header class="bar"><span class="crumb">文法解説 / 冠詞 練習問題</span></header>
+  <div class="divider"></div>
+  <h2 class="title qt"><span class="qno">Q3</span><span>（　）に入るのは？</span></h2>
+  <div class="quiz card">
+    <img src="../img/university.png" alt="">
+    <div class="qlines">
+      <div class="qline"><span>He is</span><span class="blank"></span><span>university student.</span></div>
+      <p class="qja">彼は大学生です。</p>
+    </div>
+  </div>
+  <div class="opts"><span class="art">a</span><span class="art">an</span><span class="art the">the</span><span class="art none">なし</span><span class="ask">声に出して答えてみよう！</span></div>
+</section>
+<section class="slide">
+  <header class="bar"><span class="crumb">文法解説 / 冠詞 練習問題</span></header>
+  <div class="divider"></div>
+  <h2 class="title qt"><span class="qno">Q3</span><span>（　）に入るのは？</span></h2>
+  <div class="quiz card">
+    <img src="../img/university.png" alt="">
+    <div class="qlines">
+      <div class="qline"><span>He is</span><span class="fill">a</span><span>university student.</span></div>
+      <p class="qja">彼は大学生です。</p>
+    </div>
+  </div>
+  <div class="kai card">
+    <p class="kai-line"><span class="chip">答え</span><span class="ans">a</span></p>
+    <p class="kai-line"><span class="chip blue">理由</span><span><span class="en">university</span> は「ユ」の音（子音）で始まるので → <b class="en a">a</b></span></p>
+  </div>
+</section>
+
+<!-- Q4 -->
+<section class="slide">
+  <header class="bar"><span class="crumb">文法解説 / 冠詞 練習問題</span></header>
+  <div class="divider"></div>
+  <h2 class="title qt"><span class="qno">Q4</span><span>（　）に入るのは？</span></h2>
+  <div class="quiz card">
+    <img src="../img/clock.png" alt="">
+    <div class="qlines">
+      <div class="qline"><span>I waited for</span><span class="blank"></span><span>hour.</span></div>
+      <p class="qja">1時間待ちました。</p>
+    </div>
+  </div>
+  <div class="opts"><span class="art">a</span><span class="art">an</span><span class="art the">the</span><span class="art none">なし</span><span class="ask">声に出して答えてみよう！</span></div>
+</section>
+<section class="slide">
+  <header class="bar"><span class="crumb">文法解説 / 冠詞 練習問題</span></header>
+  <div class="divider"></div>
+  <h2 class="title qt"><span class="qno">Q4</span><span>（　）に入るのは？</span></h2>
+  <div class="quiz card">
+    <img src="../img/clock.png" alt="">
+    <div class="qlines">
+      <div class="qline"><span>I waited for</span><span class="fill">an</span><span>hour.</span></div>
+      <p class="qja">1時間待ちました。</p>
+    </div>
+  </div>
+  <div class="kai card">
+    <p class="kai-line"><span class="chip">答え</span><span class="ans">an</span></p>
+    <p class="kai-line"><span class="chip blue">理由</span><span><span class="en">hour</span> は h を読まず「ア」の音で始まるので → <b class="en a">an</b></span></p>
+  </div>
+</section>
+
+<!-- Q5 -->
+<section class="slide">
+  <header class="bar"><span class="crumb">文法解説 / 冠詞 練習問題</span></header>
+  <div class="divider"></div>
+  <h2 class="title qt"><span class="qno">Q5</span><span>（　）に入るのは？</span></h2>
+  <div class="quiz card">
+    <img src="../img/door.png" alt="">
+    <div class="qlines">
+      <div class="qline"><span>Please close</span><span class="blank"></span><span>door.</span></div>
+      <p class="qja">そのドアを閉めてください。</p>
+    </div>
+  </div>
+  <div class="opts"><span class="art">a</span><span class="art">an</span><span class="art the">the</span><span class="art none">なし</span><span class="ask">声に出して答えてみよう！</span></div>
+</section>
+<section class="slide">
+  <header class="bar"><span class="crumb">文法解説 / 冠詞 練習問題</span></header>
+  <div class="divider"></div>
+  <h2 class="title qt"><span class="qno">Q5</span><span>（　）に入るのは？</span></h2>
+  <div class="quiz card">
+    <img src="../img/door.png" alt="">
+    <div class="qlines">
+      <div class="qline"><span>Please close</span><span class="fill the">the</span><span>door.</span></div>
+      <p class="qja">そのドアを閉めてください。</p>
+    </div>
+  </div>
+  <div class="kai card">
+    <p class="kai-line"><span class="chip">答え</span><span class="ans">the</span></p>
+    <p class="kai-line"><span class="chip blue">理由</span><span>その場にいる人が、どのドアか分かるので → <b class="en the">the</b></span></p>
+  </div>
+</section>
+
+<!-- Q6 -->
+<section class="slide">
+  <header class="bar"><span class="crumb">文法解説 / 冠詞 練習問題</span></header>
+  <div class="divider"></div>
+  <h2 class="title qt"><span class="qno">Q6</span><span>（　）に入るのは？</span></h2>
+  <div class="quiz card">
+    <img src="../img/sun.png" alt="">
+    <div class="qlines">
+      <div class="qline"><span class="blank"></span><span>sun is very bright today.</span></div>
+      <p class="qja">今日は太陽がとてもまぶしいです。</p>
+    </div>
+  </div>
+  <div class="opts"><span class="art">a</span><span class="art">an</span><span class="art the">the</span><span class="art none">なし</span><span class="ask">声に出して答えてみよう！</span></div>
+</section>
+<section class="slide">
+  <header class="bar"><span class="crumb">文法解説 / 冠詞 練習問題</span></header>
+  <div class="divider"></div>
+  <h2 class="title qt"><span class="qno">Q6</span><span>（　）に入るのは？</span></h2>
+  <div class="quiz card">
+    <img src="../img/sun.png" alt="">
+    <div class="qlines">
+      <div class="qline"><span class="fill the">The</span><span>sun is very bright today.</span></div>
+      <p class="qja">今日は太陽がとてもまぶしいです。</p>
+    </div>
+  </div>
+  <div class="kai card">
+    <p class="kai-line"><span class="chip">答え</span><span class="ans">The</span></p>
+    <p class="kai-line"><span class="chip blue">理由</span><span>太陽は1つだけで、どれのことか特定できるので → <b class="en the">the</b></span></p>
+  </div>
+</section>
+
+<!-- ============ STEP 2 ============ -->
+<section class="slide">
+  <header class="bar"><span class="crumb">文法解説 / 冠詞 練習問題</span></header>
+  <div class="divider"></div>
+  <div class="scover card">
+    <span class="snum">STEP 2</span>
+    <h2 class="stitle">数えられない名詞</h2>
+    <p class="ssub">動画2のおさらい ・ 5問</p>
+    <div class="spoints"><span>液体・抽象的なものは数えない</span><span>「1杯」なら <b class="en"><span class="a">a</span> coffee</b></span><span>1羽のニワトリは <b class="en"><span class="a">a</span> chicken</b></span></div>
+    <div class="simgs"><img src="../img/coffee.png" alt=""><img src="../img/information.png" alt=""><img src="../img/money.png" alt=""><img src="../img/chicken.png" alt=""></div>
+  </div>
+</section>
+
+<!-- Q7 -->
+<section class="slide">
+  <header class="bar"><span class="crumb">文法解説 / 冠詞 練習問題</span></header>
+  <div class="divider"></div>
+  <h2 class="title qt"><span class="qno">Q7</span><span>（　）に入るのは？</span></h2>
+  <div class="quiz card">
+    <img src="../img/coffee.png" alt="">
+    <div class="qlines">
+      <div class="qline"><span>I drink</span><span class="blank"></span><span>coffee every morning.</span></div>
+      <p class="qja">毎朝コーヒーを飲みます。</p>
+    </div>
+  </div>
+  <div class="opts"><span class="art">a</span><span class="art">an</span><span class="art the">the</span><span class="art none">なし</span><span class="ask">声に出して答えてみよう！</span></div>
+</section>
+<section class="slide">
+  <header class="bar"><span class="crumb">文法解説 / 冠詞 練習問題</span></header>
+  <div class="divider"></div>
+  <h2 class="title qt"><span class="qno">Q7</span><span>（　）に入るのは？</span></h2>
+  <div class="quiz card">
+    <img src="../img/coffee.png" alt="">
+    <div class="qlines">
+      <div class="qline"><span>I drink</span><span class="fill none">なし</span><span>coffee every morning.</span></div>
+      <p class="qja">毎朝コーヒーを飲みます。</p>
+    </div>
+  </div>
+  <div class="kai card">
+    <p class="kai-line"><span class="chip">答え</span><span class="ans">なし（冠詞をつけない）</span></p>
+    <p class="kai-line"><span class="chip blue">理由</span><span>液体の <span class="en">coffee</span> は数えないので → <b>冠詞なし</b></span></p>
+  </div>
+</section>
+
+<!-- Q8 -->
+<section class="slide">
+  <header class="bar"><span class="crumb">文法解説 / 冠詞 練習問題</span></header>
+  <div class="divider"></div>
+  <h2 class="title qt"><span class="qno">Q8</span><span>（　）に入るのは？</span></h2>
+  <div class="quiz card">
+    <img src="../img/coffee.png" alt="">
+    <div class="qlines">
+      <div class="qline"><span>Can I have</span><span class="blank"></span><span>coffee, please?</span></div>
+      <p class="qja">コーヒーを1杯ください。</p>
+    </div>
+  </div>
+  <div class="opts"><span class="art">a</span><span class="art">an</span><span class="art the">the</span><span class="art none">なし</span><span class="ask">声に出して答えてみよう！</span></div>
+</section>
+<section class="slide">
+  <header class="bar"><span class="crumb">文法解説 / 冠詞 練習問題</span></header>
+  <div class="divider"></div>
+  <h2 class="title qt"><span class="qno">Q8</span><span>（　）に入るのは？</span></h2>
+  <div class="quiz card">
+    <img src="../img/coffee.png" alt="">
+    <div class="qlines">
+      <div class="qline"><span>Can I have</span><span class="fill">a</span><span>coffee, please?</span></div>
+      <p class="qja">コーヒーを1杯ください。</p>
+    </div>
+  </div>
+  <div class="kai card">
+    <p class="kai-line"><span class="chip">答え</span><span class="ans">a</span></p>
+    <p class="kai-line"><span class="chip blue">理由</span><span>「コーヒー1杯」として数えるので → <b class="en a">a</b></span></p>
+  </div>
+</section>
+
+<!-- Q9 -->
+<section class="slide">
+  <header class="bar"><span class="crumb">文法解説 / 冠詞 練習問題</span></header>
+  <div class="divider"></div>
+  <h2 class="title qt"><span class="qno">Q9</span><span>（　）に入るのは？</span></h2>
+  <div class="quiz card">
+    <img src="../img/information.png" alt="">
+    <div class="qlines">
+      <div class="qline"><span>We need</span><span class="blank"></span><span>information</span></div>
+      <div class="qline"><span>about the hotel.</span></div>
+      <p class="qja">そのホテルについて情報が必要です。</p>
+    </div>
+  </div>
+  <div class="opts"><span class="art">a</span><span class="art">an</span><span class="art the">the</span><span class="art none">なし</span><span class="ask">声に出して答えてみよう！</span></div>
+</section>
+<section class="slide">
+  <header class="bar"><span class="crumb">文法解説 / 冠詞 練習問題</span></header>
+  <div class="divider"></div>
+  <h2 class="title qt"><span class="qno">Q9</span><span>（　）に入るのは？</span></h2>
+  <div class="quiz card">
+    <img src="../img/information.png" alt="">
+    <div class="qlines">
+      <div class="qline"><span>We need</span><span class="fill none">なし</span><span>information</span></div>
+      <div class="qline"><span>about the hotel.</span></div>
+      <p class="qja">そのホテルについて情報が必要です。</p>
+    </div>
+  </div>
+  <div class="kai card">
+    <p class="kai-line"><span class="chip">答え</span><span class="ans">なし（冠詞をつけない）</span></p>
+    <p class="kai-line"><span class="chip blue">理由</span><span><span class="en">information</span> は数えられない名詞なので → <b>冠詞なし</b></span></p>
+  </div>
+</section>
+
+<!-- Q10 -->
+<section class="slide">
+  <header class="bar"><span class="crumb">文法解説 / 冠詞 練習問題</span></header>
+  <div class="divider"></div>
+  <h2 class="title qt"><span class="qno">Q10</span><span>（　）に入るのは？</span></h2>
+  <div class="quiz card">
+    <img src="../img/money.png" alt="">
+    <div class="qlines">
+      <div class="qline"><span>I want to save</span><span class="blank"></span><span>money.</span></div>
+      <p class="qja">お金を貯めたいです。</p>
+    </div>
+  </div>
+  <div class="opts"><span class="art">a</span><span class="art">an</span><span class="art the">the</span><span class="art none">なし</span><span class="ask">声に出して答えてみよう！</span></div>
+</section>
+<section class="slide">
+  <header class="bar"><span class="crumb">文法解説 / 冠詞 練習問題</span></header>
+  <div class="divider"></div>
+  <h2 class="title qt"><span class="qno">Q10</span><span>（　）に入るのは？</span></h2>
+  <div class="quiz card">
+    <img src="../img/money.png" alt="">
+    <div class="qlines">
+      <div class="qline"><span>I want to save</span><span class="fill none">なし</span><span>money.</span></div>
+      <p class="qja">お金を貯めたいです。</p>
+    </div>
+  </div>
+  <div class="kai card">
+    <p class="kai-line"><span class="chip">答え</span><span class="ans">なし（冠詞をつけない）</span></p>
+    <p class="kai-line"><span class="chip blue">理由</span><span><span class="en">money</span> は数えられない名詞なので → <b>冠詞なし</b></span></p>
+  </div>
+</section>
+
+<!-- Q11 -->
+<section class="slide">
+  <header class="bar"><span class="crumb">文法解説 / 冠詞 練習問題</span></header>
+  <div class="divider"></div>
+  <h2 class="title qt"><span class="qno">Q11</span><span>（　）に入るのは？</span></h2>
+  <div class="quiz card">
+    <img src="../img/chicken.png" alt="">
+    <div class="qlines">
+      <div class="qline"><span>I saw</span><span class="blank"></span><span>chicken on the farm.</span></div>
+      <p class="qja">農場でニワトリを1羽見ました。</p>
+    </div>
+  </div>
+  <div class="opts"><span class="art">a</span><span class="art">an</span><span class="art the">the</span><span class="art none">なし</span><span class="ask">声に出して答えてみよう！</span></div>
+</section>
+<section class="slide">
+  <header class="bar"><span class="crumb">文法解説 / 冠詞 練習問題</span></header>
+  <div class="divider"></div>
+  <h2 class="title qt"><span class="qno">Q11</span><span>（　）に入るのは？</span></h2>
+  <div class="quiz card">
+    <img src="../img/chicken.png" alt="">
+    <div class="qlines">
+      <div class="qline"><span>I saw</span><span class="fill">a</span><span>chicken on the farm.</span></div>
+      <p class="qja">農場でニワトリを1羽見ました。</p>
+    </div>
+  </div>
+  <div class="kai card">
+    <p class="kai-line"><span class="chip">答え</span><span class="ans">a</span></p>
+    <p class="kai-line"><span class="chip blue">理由</span><span>1羽のニワトリなので → <b class="en a">a</b>（鶏肉の <span class="en">chicken</span> なら数えない）</span></p>
+  </div>
+</section>
+
+<!-- ============ STEP 3 ============ -->
+<section class="slide">
+  <header class="bar"><span class="crumb">文法解説 / 冠詞 練習問題</span></header>
+  <div class="divider"></div>
+  <div class="scover card">
+    <span class="snum">STEP 3</span>
+    <h2 class="stitle">無冠詞</h2>
+    <p class="ssub">動画3のおさらい ・ 6問</p>
+    <div class="spoints"><span>複数名詞</span><span><span class="en">furniture</span></span><span>固有名詞（<b class="en the">the</b> がつく名前もある）</span><span>言語</span><span>食事</span></div>
+    <div class="simgs"><img src="../img/dog.png" alt=""><img src="../img/furniture.png" alt=""><img src="../img/eiffel.png" alt=""><img src="../img/lunch.png" alt=""></div>
+  </div>
+</section>
+
+<!-- Q12 -->
+<section class="slide">
+  <header class="bar"><span class="crumb">文法解説 / 冠詞 練習問題</span></header>
+  <div class="divider"></div>
+  <h2 class="title qt"><span class="qno">Q12</span><span>（　）に入るのは？</span></h2>
+  <div class="quiz card">
+    <img src="../img/dog.png" alt="">
+    <div class="qlines">
+      <div class="qline"><span>I like</span><span class="blank"></span><span>dogs.</span></div>
+      <p class="qja">私は犬が好きです。</p>
+    </div>
+  </div>
+  <div class="opts"><span class="art">a</span><span class="art">an</span><span class="art the">the</span><span class="art none">なし</span><span class="ask">声に出して答えてみよう！</span></div>
+</section>
+<section class="slide">
+  <header class="bar"><span class="crumb">文法解説 / 冠詞 練習問題</span></header>
+  <div class="divider"></div>
+  <h2 class="title qt"><span class="qno">Q12</span><span>（　）に入るのは？</span></h2>
+  <div class="quiz card">
+    <img src="../img/dog.png" alt="">
+    <div class="qlines">
+      <div class="qline"><span>I like</span><span class="fill none">なし</span><span>dogs.</span></div>
+      <p class="qja">私は犬が好きです。</p>
+    </div>
+  </div>
+  <div class="kai card">
+    <p class="kai-line"><span class="chip">答え</span><span class="ans">なし（冠詞をつけない）</span></p>
+    <p class="kai-line"><span class="chip blue">理由</span><span><span class="en">dogs</span> は複数名詞なので → <b>冠詞なし</b></span></p>
+  </div>
+</section>
+
+<!-- Q13 -->
+<section class="slide">
+  <header class="bar"><span class="crumb">文法解説 / 冠詞 練習問題</span></header>
+  <div class="divider"></div>
+  <h2 class="title qt"><span class="qno">Q13</span><span>（　）に入るのは？</span></h2>
+  <div class="quiz card">
+    <img src="../img/furniture.png" alt="">
+    <div class="qlines">
+      <div class="qline"><span>We need</span><span class="blank"></span><span>new furniture.</span></div>
+      <p class="qja">新しい家具が必要です。</p>
+    </div>
+  </div>
+  <div class="opts"><span class="art">a</span><span class="art">an</span><span class="art the">the</span><span class="art none">なし</span><span class="ask">声に出して答えてみよう！</span></div>
+</section>
+<section class="slide">
+  <header class="bar"><span class="crumb">文法解説 / 冠詞 練習問題</span></header>
+  <div class="divider"></div>
+  <h2 class="title qt"><span class="qno">Q13</span><span>（　）に入るのは？</span></h2>
+  <div class="quiz card">
+    <img src="../img/furniture.png" alt="">
+    <div class="qlines">
+      <div class="qline"><span>We need</span><span class="fill none">なし</span><span>new furniture.</span></div>
+      <p class="qja">新しい家具が必要です。</p>
+    </div>
+  </div>
+  <div class="kai card">
+    <p class="kai-line"><span class="chip">答え</span><span class="ans">なし（冠詞をつけない）</span></p>
+    <p class="kai-line"><span class="chip blue">理由</span><span><span class="en">furniture</span> は家具をまとめて指す、数えられない名詞なので → <b>冠詞なし</b></span></p>
+  </div>
+</section>
+
+<!-- Q14 -->
+<section class="slide">
+  <header class="bar"><span class="crumb">文法解説 / 冠詞 練習問題</span></header>
+  <div class="divider"></div>
+  <h2 class="title qt"><span class="qno">Q14</span><span>（　）に入るのは？</span></h2>
+  <div class="quiz card">
+    <img src="../img/torii.png" alt="">
+    <div class="qlines">
+      <div class="qline"><span>He lives in</span><span class="blank"></span><span>Japan.</span></div>
+      <p class="qja">彼は日本に住んでいます。</p>
+    </div>
+  </div>
+  <div class="opts"><span class="art">a</span><span class="art">an</span><span class="art the">the</span><span class="art none">なし</span><span class="ask">声に出して答えてみよう！</span></div>
+</section>
+<section class="slide">
+  <header class="bar"><span class="crumb">文法解説 / 冠詞 練習問題</span></header>
+  <div class="divider"></div>
+  <h2 class="title qt"><span class="qno">Q14</span><span>（　）に入るのは？</span></h2>
+  <div class="quiz card">
+    <img src="../img/torii.png" alt="">
+    <div class="qlines">
+      <div class="qline"><span>He lives in</span><span class="fill none">なし</span><span>Japan.</span></div>
+      <p class="qja">彼は日本に住んでいます。</p>
+    </div>
+  </div>
+  <div class="kai card">
+    <p class="kai-line"><span class="chip">答え</span><span class="ans">なし（冠詞をつけない）</span></p>
+    <p class="kai-line"><span class="chip blue">理由</span><span>国の名前（固有名詞）なので → <b>冠詞なし</b></span></p>
+  </div>
+</section>
+
+<!-- Q15 -->
+<section class="slide">
+  <header class="bar"><span class="crumb">文法解説 / 冠詞 練習問題</span></header>
+  <div class="divider"></div>
+  <h2 class="title qt"><span class="qno">Q15</span><span>（　）に入るのは？</span></h2>
+  <div class="quiz card">
+    <img src="../img/eiffel.png" alt="">
+    <div class="qlines">
+      <div class="qline"><span>I want to see</span><span class="blank"></span><span>Eiffel Tower</span></div>
+      <div class="qline"><span>someday.</span></div>
+      <p class="qja">いつかエッフェル塔を見たいです。</p>
+    </div>
+  </div>
+  <div class="opts"><span class="art">a</span><span class="art">an</span><span class="art the">the</span><span class="art none">なし</span><span class="ask">声に出して答えてみよう！</span></div>
+</section>
+<section class="slide">
+  <header class="bar"><span class="crumb">文法解説 / 冠詞 練習問題</span></header>
+  <div class="divider"></div>
+  <h2 class="title qt"><span class="qno">Q15</span><span>（　）に入るのは？</span></h2>
+  <div class="quiz card">
+    <img src="../img/eiffel.png" alt="">
+    <div class="qlines">
+      <div class="qline"><span>I want to see</span><span class="fill the">the</span><span>Eiffel Tower</span></div>
+      <div class="qline"><span>someday.</span></div>
+      <p class="qja">いつかエッフェル塔を見たいです。</p>
+    </div>
+  </div>
+  <div class="kai card">
+    <p class="kai-line"><span class="chip">答え</span><span class="ans">the</span></p>
+    <p class="kai-line"><span class="chip blue">理由</span><span><b class="en the">the</b> が名前の一部になっているので → <b class="en the">the</b> <span class="en">Eiffel Tower</span></span></p>
+  </div>
+</section>
+
+<!-- Q16 -->
+<section class="slide">
+  <header class="bar"><span class="crumb">文法解説 / 冠詞 練習問題</span></header>
+  <div class="divider"></div>
+  <h2 class="title qt"><span class="qno">Q16</span><span>（　）に入るのは？</span></h2>
+  <div class="quiz card">
+    <img src="../img/hello.png" alt="">
+    <div class="qlines">
+      <div class="qline"><span>She speaks</span><span class="blank"></span><span>English.</span></div>
+      <p class="qja">彼女は英語を話します。</p>
+    </div>
+  </div>
+  <div class="opts"><span class="art">a</span><span class="art">an</span><span class="art the">the</span><span class="art none">なし</span><span class="ask">声に出して答えてみよう！</span></div>
+</section>
+<section class="slide">
+  <header class="bar"><span class="crumb">文法解説 / 冠詞 練習問題</span></header>
+  <div class="divider"></div>
+  <h2 class="title qt"><span class="qno">Q16</span><span>（　）に入るのは？</span></h2>
+  <div class="quiz card">
+    <img src="../img/hello.png" alt="">
+    <div class="qlines">
+      <div class="qline"><span>She speaks</span><span class="fill none">なし</span><span>English.</span></div>
+      <p class="qja">彼女は英語を話します。</p>
+    </div>
+  </div>
+  <div class="kai card">
+    <p class="kai-line"><span class="chip">答え</span><span class="ans">なし（冠詞をつけない）</span></p>
+    <p class="kai-line"><span class="chip blue">理由</span><span>言語の名前なので → <b>冠詞なし</b></span></p>
+  </div>
+</section>
+
+<!-- Q17 -->
+<section class="slide">
+  <header class="bar"><span class="crumb">文法解説 / 冠詞 練習問題</span></header>
+  <div class="divider"></div>
+  <h2 class="title qt"><span class="qno">Q17</span><span>（　）に入るのは？</span></h2>
+  <div class="quiz card">
+    <img src="../img/lunch.png" alt="">
+    <div class="qlines">
+      <div class="qline"><span>We had</span><span class="blank"></span><span>lunch together.</span></div>
+      <p class="qja">私たちは一緒にお昼ごはんを食べました。</p>
+    </div>
+  </div>
+  <div class="opts"><span class="art">a</span><span class="art">an</span><span class="art the">the</span><span class="art none">なし</span><span class="ask">声に出して答えてみよう！</span></div>
+</section>
+<section class="slide">
+  <header class="bar"><span class="crumb">文法解説 / 冠詞 練習問題</span></header>
+  <div class="divider"></div>
+  <h2 class="title qt"><span class="qno">Q17</span><span>（　）に入るのは？</span></h2>
+  <div class="quiz card">
+    <img src="../img/lunch.png" alt="">
+    <div class="qlines">
+      <div class="qline"><span>We had</span><span class="fill none">なし</span><span>lunch together.</span></div>
+      <p class="qja">私たちは一緒にお昼ごはんを食べました。</p>
+    </div>
+  </div>
+  <div class="kai card">
+    <p class="kai-line"><span class="chip">答え</span><span class="ans">なし（冠詞をつけない）</span></p>
+    <p class="kai-line"><span class="chip blue">理由</span><span>食事（<span class="en">breakfast / lunch / dinner</span>）は基本、無冠詞なので → <b>冠詞なし</b></span></p>
+  </div>
+</section>
+
+<!-- ============ STEP 4 ============ -->
+<section class="slide">
+  <header class="bar"><span class="crumb">文法解説 / 冠詞 練習問題</span></header>
+  <div class="divider"></div>
+  <div class="scover card">
+    <span class="snum">STEP 4</span>
+    <h2 class="stitle">瞬間英作文</h2>
+    <p class="ssub">総まとめ ・ 8問</p>
+    <div class="spoints"><span>日本語を見たら、すぐに英語で言ってみよう</span><span>冠詞はいる？いらない？</span></div>
+    <div class="simgs"><img src="../img/nurse.png" alt=""><img src="../img/music.png" alt=""><img src="../img/breakfast.png" alt=""><img src="../img/cafe.png" alt=""></div>
+  </div>
+</section>
+
+<!-- Q18 -->
+<section class="slide">
+  <header class="bar"><span class="crumb">文法解説 / 冠詞 練習問題</span></header>
+  <div class="divider"></div>
+  <h2 class="title qt"><span class="qno">Q18</span><span>英語で言うと？</span></h2>
+  <div class="quiz card">
+    <img src="../img/nurse.png" alt="">
+    <div class="qlines">
+      <p class="jp-q">彼女は看護師です。</p>
+    </div>
+  </div>
+  <div class="opts"><span class="chip">ヒント</span><span class="ask">冠詞はいる？いらない？　声に出して、英語で言ってみよう！</span></div>
+</section>
+<section class="slide">
+  <header class="bar"><span class="crumb">文法解説 / 冠詞 練習問題</span></header>
+  <div class="divider"></div>
+  <h2 class="title qt"><span class="qno">Q18</span><span>英語で言うと？</span></h2>
+  <div class="quiz card">
+    <img src="../img/nurse.png" alt="">
+    <div class="qlines">
+      <p class="en-a">She is <span class="a">a</span> nurse.</p>
+      <p class="qja">彼女は看護師です。</p>
+    </div>
+  </div>
+  <div class="kai card">
+    <p class="kai-line"><span class="chip">ポイント</span><span>職業は <b class="en a">a / an</b> をつける</span></p>
+  </div>
+</section>
+
+<!-- Q19 -->
+<section class="slide">
+  <header class="bar"><span class="crumb">文法解説 / 冠詞 練習問題</span></header>
+  <div class="divider"></div>
+  <h2 class="title qt"><span class="qno">Q19</span><span>英語で言うと？</span></h2>
+  <div class="quiz card">
+    <img src="../img/engineer.png" alt="">
+    <div class="qlines">
+      <p class="jp-q">彼はエンジニアです。</p>
+    </div>
+  </div>
+  <div class="opts"><span class="chip">ヒント</span><span class="ask">冠詞はいる？いらない？　声に出して、英語で言ってみよう！</span></div>
+</section>
+<section class="slide">
+  <header class="bar"><span class="crumb">文法解説 / 冠詞 練習問題</span></header>
+  <div class="divider"></div>
+  <h2 class="title qt"><span class="qno">Q19</span><span>英語で言うと？</span></h2>
+  <div class="quiz card">
+    <img src="../img/engineer.png" alt="">
+    <div class="qlines">
+      <p class="en-a">He is <span class="a">an</span> engineer.</p>
+      <p class="qja">彼はエンジニアです。</p>
+    </div>
+  </div>
+  <div class="kai card">
+    <p class="kai-line"><span class="chip">ポイント</span><span><span class="en">engineer</span> は母音の音で始まるので <b class="en a">an</b></span></p>
+  </div>
+</section>
+
+<!-- Q20 -->
+<section class="slide">
+  <header class="bar"><span class="crumb">文法解説 / 冠詞 練習問題</span></header>
+  <div class="divider"></div>
+  <h2 class="title qt"><span class="qno">Q20</span><span>英語で言うと？</span></h2>
+  <div class="quiz card">
+    <img src="../img/music.png" alt="">
+    <div class="qlines">
+      <p class="jp-q">私は音楽が好きです。</p>
+    </div>
+  </div>
+  <div class="opts"><span class="chip">ヒント</span><span class="ask">冠詞はいる？いらない？　声に出して、英語で言ってみよう！</span></div>
+</section>
+<section class="slide">
+  <header class="bar"><span class="crumb">文法解説 / 冠詞 練習問題</span></header>
+  <div class="divider"></div>
+  <h2 class="title qt"><span class="qno">Q20</span><span>英語で言うと？</span></h2>
+  <div class="quiz card">
+    <img src="../img/music.png" alt="">
+    <div class="qlines">
+      <p class="en-a">I like <mark>music</mark>.</p>
+      <p class="qja">私は音楽が好きです。</p>
+    </div>
+  </div>
+  <div class="kai card">
+    <p class="kai-line"><span class="chip">ポイント</span><span><span class="en">music</span> は数えられない名詞なので、冠詞なし</span></p>
+  </div>
+</section>
+
+<!-- Q21 -->
+<section class="slide">
+  <header class="bar"><span class="crumb">文法解説 / 冠詞 練習問題</span></header>
+  <div class="divider"></div>
+  <h2 class="title qt"><span class="qno">Q21</span><span>英語で言うと？</span></h2>
+  <div class="quiz card">
+    <img src="../img/advice.png" alt="">
+    <div class="qlines">
+      <p class="jp-q">彼は私にアドバイスをくれました。</p>
+    </div>
+  </div>
+  <div class="opts"><span class="chip">ヒント</span><span class="ask">冠詞はいる？いらない？　声に出して、英語で言ってみよう！</span></div>
+</section>
+<section class="slide">
+  <header class="bar"><span class="crumb">文法解説 / 冠詞 練習問題</span></header>
+  <div class="divider"></div>
+  <h2 class="title qt"><span class="qno">Q21</span><span>英語で言うと？</span></h2>
+  <div class="quiz card">
+    <img src="../img/advice.png" alt="">
+    <div class="qlines">
+      <p class="en-a">He gave me <mark>advice</mark>.</p>
+      <p class="qja">彼は私にアドバイスをくれました。</p>
+    </div>
+  </div>
+  <div class="kai card">
+    <p class="kai-line"><span class="chip">ポイント</span><span><span class="en">advice</span> は数えられない名詞なので、冠詞なし（<span class="en">some advice</span> も○）</span></p>
+  </div>
+</section>
+
+<!-- Q22 -->
+<section class="slide">
+  <header class="bar"><span class="crumb">文法解説 / 冠詞 練習問題</span></header>
+  <div class="divider"></div>
+  <h2 class="title qt"><span class="qno">Q22</span><span>英語で言うと？</span></h2>
+  <div class="quiz card">
+    <img src="../img/breakfast.png" alt="">
+    <div class="qlines">
+      <p class="jp-q">私は毎朝、朝ごはんを食べます。</p>
+    </div>
+  </div>
+  <div class="opts"><span class="chip">ヒント</span><span class="ask">冠詞はいる？いらない？　声に出して、英語で言ってみよう！</span></div>
+</section>
+<section class="slide">
+  <header class="bar"><span class="crumb">文法解説 / 冠詞 練習問題</span></header>
+  <div class="divider"></div>
+  <h2 class="title qt"><span class="qno">Q22</span><span>英語で言うと？</span></h2>
+  <div class="quiz card">
+    <img src="../img/breakfast.png" alt="">
+    <div class="qlines">
+      <p class="en-a">I eat <mark>breakfast</mark> every morning.</p>
+      <p class="qja">私は毎朝、朝ごはんを食べます。</p>
+    </div>
+  </div>
+  <div class="kai card">
+    <p class="kai-line"><span class="chip">ポイント</span><span>食事は基本、無冠詞（<span class="en">I have breakfast</span> も○）</span></p>
+  </div>
+</section>
+
+<!-- Q23 -->
+<section class="slide">
+  <header class="bar"><span class="crumb">文法解説 / 冠詞 練習問題</span></header>
+  <div class="divider"></div>
+  <h2 class="title qt"><span class="qno">Q23</span><span>英語で言うと？</span></h2>
+  <div class="quiz card">
+    <img src="../img/xmastree.png" alt="">
+    <div class="qlines">
+      <p class="jp-q">クリスマスは家族と過ごします。</p>
+    </div>
+  </div>
+  <div class="opts"><span class="chip">ヒント</span><span class="ask">冠詞はいる？いらない？　声に出して、英語で言ってみよう！</span></div>
+</section>
+<section class="slide">
+  <header class="bar"><span class="crumb">文法解説 / 冠詞 練習問題</span></header>
+  <div class="divider"></div>
+  <h2 class="title qt"><span class="qno">Q23</span><span>英語で言うと？</span></h2>
+  <div class="quiz card">
+    <img src="../img/xmastree.png" alt="">
+    <div class="qlines">
+      <p class="en-a">I spend <mark>Christmas</mark> with my family.</p>
+      <p class="qja">クリスマスは家族と過ごします。</p>
+    </div>
+  </div>
+  <div class="kai card">
+    <p class="kai-line"><span class="chip">ポイント</span><span>祝日・ホリデーは無冠詞</span></p>
+  </div>
+</section>
+
+<!-- Q24 -->
+<section class="slide">
+  <header class="bar"><span class="crumb">文法解説 / 冠詞 練習問題</span></header>
+  <div class="divider"></div>
+  <h2 class="title qt"><span class="qno">Q24</span><span>英語で言うと？</span></h2>
+  <div class="quiz card">
+    <img src="../img/cafe.png" alt="">
+    <div class="qlines">
+      <p class="jp-q">私は昨日、あるカフェに行きました。<br>そのカフェはとても混んでいました。</p>
+    </div>
+  </div>
+  <div class="opts"><span class="chip">ヒント</span><span class="ask">冠詞はいる？いらない？　声に出して、英語で言ってみよう！</span></div>
+</section>
+<section class="slide">
+  <header class="bar"><span class="crumb">文法解説 / 冠詞 練習問題</span></header>
+  <div class="divider"></div>
+  <h2 class="title qt"><span class="qno">Q24</span><span>英語で言うと？</span></h2>
+  <div class="quiz card">
+    <img src="../img/cafe.png" alt="">
+    <div class="qlines">
+      <p class="en-a">I went to <span class="a">a</span> cafe yesterday.</p>
+      <p class="en-a"><span class="the">The</span> cafe was very crowded.</p>
+      <p class="qja">私は昨日、あるカフェに行きました。そのカフェはとても混んでいました。</p>
+    </div>
+  </div>
+  <div class="kai card">
+    <p class="kai-line"><span class="chip">ポイント</span><span>初登場は <b class="en a">a</b>、2回目は「さっきのカフェ」なので <b class="en the">the</b></span></p>
+  </div>
+</section>
+
+<!-- Q25 -->
+<section class="slide">
+  <header class="bar"><span class="crumb">文法解説 / 冠詞 練習問題</span></header>
+  <div class="divider"></div>
+  <h2 class="title qt"><span class="qno">Q25</span><span>英語で言うと？</span></h2>
+  <div class="quiz card">
+    <img src="../img/coffee.png" alt="">
+    <div class="qlines">
+      <p class="jp-q">私はこのカフェのコーヒーが好きです。</p>
+    </div>
+  </div>
+  <div class="opts"><span class="chip">ヒント</span><span class="ask">冠詞はいる？いらない？　声に出して、英語で言ってみよう！</span></div>
+</section>
+<section class="slide">
+  <header class="bar"><span class="crumb">文法解説 / 冠詞 練習問題</span></header>
+  <div class="divider"></div>
+  <h2 class="title qt"><span class="qno">Q25</span><span>英語で言うと？</span></h2>
+  <div class="quiz card">
+    <img src="../img/coffee.png" alt="">
+    <div class="qlines">
+      <p class="en-a">I like <span class="the">the</span> coffee at this cafe.</p>
+      <p class="qja">私はこのカフェのコーヒーが好きです。</p>
+    </div>
+  </div>
+  <div class="kai card">
+    <p class="kai-line"><span class="chip">ポイント</span><span>「このカフェの」コーヒーと特定できるので <b class="en the">the</b></span></p>
+  </div>
+</section>
+
+</body>
+</html>
