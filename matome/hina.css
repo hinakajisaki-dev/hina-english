@@ -74,6 +74,7 @@ mark {
 .eyebrow { margin-top: 28px; font-family: var(--en); font-weight: 700; font-size: 16px; letter-spacing: .18em; color: var(--primary); }
 .title { margin-top: 6px; font-weight: 700; font-size: 44px; line-height: 1.3; }
 .title .en { font-weight: 800; }
+.divider + .title { margin-top: 30px; }  /* slides without the small label above the title */
 
 .card { background: var(--card); border-radius: 28px; box-shadow: 0 10px 30px rgba(28, 35, 64, .07); }
 .c-orange { background: var(--orange-soft); }
