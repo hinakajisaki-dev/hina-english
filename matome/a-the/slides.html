@@ -4,6 +4,36 @@
 <meta charset="utf-8">
 <title>冠詞｜a / an と the の違い 文法解説スライド</title>
 <link rel="stylesheet" href="../hina.css">
+<style>
+  /* a / an: when to use it */
+  .band.ab { gap: 28px; padding: 14px 26px; }
+  .ab-item { display: flex; align-items: center; gap: 12px; font-size: 22px; font-weight: 700; }
+  .ab-item .num { width: 32px; height: 32px; font-size: 17px; background: var(--primary); }
+  .ab-item small { display: block; font-size: 17px; font-weight: 500; color: var(--ink-2); }
+
+  /* spelling vs sound: the answer */
+  .snd-ans { align-self: flex-start; margin-top: auto; font-family: var(--en); font-weight: 800; font-size: 40px; background: var(--orange-soft); border-radius: 16px; padding: 8px 26px; }
+
+  /* the: an apple vs the apple */
+  .vs2 { flex: none; margin-top: 18px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .vs2 p { display: flex; align-items: center; gap: 16px; padding: 14px 24px; font-size: 21px; }
+  .vs2 .en { flex: none; font-size: 30px; font-weight: 800; }
+
+  /* the examples: when to use it, then three rows */
+  .uses.top { margin-top: 18px; }
+  .uses.top .num { background: var(--blue); }
+  .rows.slim { margin-top: 16px; gap: 12px; }
+  .rows.slim .row img { width: 92px; height: 92px; }
+  .rows.slim .row { grid-template-columns: 92px 1fr 340px; }
+  .rows.slim .row-en { font-size: 32px; }
+
+  /* quiz: Japanese inside the question card */
+  .quiz .qja { margin-top: 2px; font-size: 26px; font-weight: 700; color: var(--ink-2); }
+  .quiz .qlines { gap: 14px; }
+
+  /* compare: two-line header */
+  .cmp-head .two-l { font-size: 18px; line-height: 1.35; }
+</style>
 </head>
 <body>
 
@@ -89,7 +119,7 @@
     <div class="ex c-pink"><img src="../img/teacher.png" alt="先生"><div><p class="ex-en">She is <span class="a">a</span> teacher.</p><p class="ex-ja">彼女は先生です。</p></div></div>
     <div class="ex c-sky"><img src="../img/apple.png" alt="りんご"><div><p class="ex-en">I ate <span class="a">an</span> apple.</p><p class="ex-ja">私はリンゴを1個食べました。</p></div></div>
   </div>
-  <p class="band"><span class="chip">よく使う場面</span><span>まだ相手が「どれのことか」分かっていないものを、<b>初めて会話に出す</b>とき</span></p>
+  <div class="band ab"><span class="chip">よく使う場面</span><p class="ab-item"><span class="num">1</span><span>「1つ」のとき</span></p><p class="ab-item"><span class="num">2</span><span>一般的なものを指しているとき<small>（特定のものを話しているわけではない）</small></span></p></div>
 </section>
 
 <!-- ============ 4 職業 ============ -->
@@ -117,7 +147,7 @@
       <ul class="words">
         <li><img src="../img/book.png" alt="本"><span><span class="a">a</span> book</span></li>
         <li><img src="../img/dog.png" alt="犬"><span><span class="a">a</span> dog</span></li>
-        <li><img src="../img/university.png" alt="大学"><span><span class="a">a</span> university</span></li>
+        <li><img src="../img/pencil.png" alt="えんぴつ"><span><span class="a">a</span> pencil</span></li>
       </ul>
     </div>
     <div class="col c-yellow">
@@ -140,12 +170,12 @@
     <div class="snd card">
       <div class="snd-top"><img src="../img/university.png" alt="大学"><div><p class="snd-word"><span class="hl">u</span>niversity</p><p class="snd-say">「<b>ユ</b>ニバーシティ」</p></div></div>
       <p class="snd-why"><span class="en">u</span> で始まるけど、音は「<b>ユ</b>」<br>→ 子音の音</p>
-      <div class="snd-ex"><p class="snd-en">She is <span class="a">a</span> university student.</p><p class="snd-ja">彼女は大学生です。</p></div>
+      <p class="snd-ans"><span class="a">a</span> university</p>
     </div>
     <div class="snd card">
       <div class="snd-top"><img src="../img/clock.png" alt="時計"><div><p class="snd-word"><span class="mute">h</span>our</p><p class="snd-say">「<b>ア</b>ワー」</p></div></div>
       <p class="snd-why"><span class="en">h</span> は発音しないので、音は「<b>ア</b>」<br>→ 母音の音</p>
-      <div class="snd-ex"><p class="snd-en">I waited for <span class="a">an</span> hour.</p><p class="snd-ja">私は1時間待ちました。</p></div>
+      <p class="snd-ans"><span class="a">an</span> hour</p>
     </div>
   </div>
 </section>
@@ -170,9 +200,9 @@
       <img src="../img/apple.png" alt="りんご">
     </div>
   </div>
-  <div class="uses">
-    <p class="use card"><span class="num">1</span><span>どの人・どの物のことか<b>特定できる</b>とき</span></p>
-    <p class="use card"><span class="num">2</span><span>話し手と聞き手の<b>両方が分かる</b>とき</span></p>
+  <div class="vs2">
+    <p class="card c-orange"><span class="en a">an apple</span><span>どれでもいい<br>りんご1つ</span></p>
+    <p class="card c-sky"><span class="en the">the apple</span><span>「それ！」と指させる<br>その（緑の）りんご</span></p>
   </div>
 </section>
 
@@ -181,7 +211,11 @@
   <div class="divider"></div>
   <p class="eyebrow">THE ・ EXAMPLES</p>
   <h2 class="title"><span class="en the">the</span> の例文</h2>
-  <div class="rows">
+  <div class="uses top">
+    <p class="use card"><span class="num">1</span><span><b>特定のもの</b>を指しているとき</span></p>
+    <p class="use card"><span class="num">2</span><span>話し手と聞き手が<br><b>同じものを認識できている</b>とき</span></p>
+  </div>
+  <div class="rows slim">
     <div class="row card"><img src="../img/door.png" alt="ドア"><div><p class="row-en">Please close <span class="the">the</span> door.</p><p class="row-ja">そのドアを閉めてください。</p></div><p class="why">その場にいる人たちが<br>どのドアか分かっている</p></div>
     <div class="row card"><img src="../img/restroom.png" alt="トイレ"><div><p class="row-en">Where is <span class="the">the</span> bathroom?</p><p class="row-ja">トイレはどこですか？</p></div><p class="why">その場所にあるトイレを<br>指している</p></div>
     <div class="row card"><img src="../img/sun.png" alt="太陽"><div><p class="row-en"><span class="the">The</span> sun is bright today.</p><p class="row-ja">今日は太陽がまぶしいです。</p></div><p class="why">太陽は、どれのことか<br>特定できる</p></div>
@@ -199,6 +233,7 @@
     <div class="qlines">
       <div class="qline"><span>I bought</span><span class="blank"></span><span>bag.</span></div>
       <div class="qline"><span class="blank"></span><span>bag was expensive.</span></div>
+      <p class="qja">私はバッグを買いました。そのバッグは高かったです。</p>
     </div>
   </div>
   <div class="opts"><span class="art">a</span><span class="or">or</span><span class="art the">the</span><span class="ask">どっち？ 声に出して答えてみよう！</span></div>
@@ -214,12 +249,12 @@
     <div class="qlines">
       <div class="qline"><span>I bought</span><span class="fill">a</span><span>bag.</span></div>
       <div class="qline"><span class="fill the">The</span><span>bag was expensive.</span></div>
+      <p class="qja">私はバッグを買いました。そのバッグは高かったです。</p>
     </div>
   </div>
   <div class="kai card">
     <p class="kai-line"><span class="chip">1回目</span><span>初登場なので → <span class="en a">a</span> <span class="en">bag</span></span></p>
     <p class="kai-line"><span class="chip blue">2回目</span><span>「さっきのバッグ」と分かるので → <span class="en the">the</span> <span class="en">bag</span></span></p>
-    <p class="tr">私はバッグを買いました。そのバッグは高かったです。</p>
   </div>
 </section>
 
@@ -231,7 +266,7 @@
   <h2 class="title"><span class="en a">a / an</span> と <span class="en the">the</span> の違い</h2>
   <div class="cmp">
     <div></div>
-    <div class="cmp-head c-orange"><span class="en a">a / an</span><span>まだ特定されていない「1つ」</span></div>
+    <div class="cmp-head c-orange"><span class="en a">a / an</span><span class="two-l">特定のものではない、<br>一般的なもの「1つ」</span></div>
     <div class="cmp-head c-sky"><span class="en the">the</span><span>どれのことか特定できる</span></div>
     <div class="cmp-img"><img src="../img/dog.png" alt="犬"></div>
     <div class="cmp-cell card"><p class="en">I saw <span class="a">a</span> dog.</p><p class="ja">犬を1匹見ました。</p></div>
@@ -253,6 +288,7 @@
     <div class="qlines">
       <div class="qline"><span>I went to</span><span class="blank"></span><span>cafe yesterday.</span></div>
       <div class="qline"><span class="blank"></span><span>cafe was very quiet.</span></div>
+      <p class="qja">昨日、あるカフェに行きました。そのカフェはとても静かでした。</p>
     </div>
   </div>
   <div class="opts"><span class="art">a</span><span class="or">or</span><span class="art the">the</span><span class="ask">どっち？ 声に出して答えてみよう！</span></div>
@@ -268,12 +304,12 @@
     <div class="qlines">
       <div class="qline"><span>I went to</span><span class="fill">a</span><span>cafe yesterday.</span></div>
       <div class="qline"><span class="fill the">The</span><span>cafe was very quiet.</span></div>
+      <p class="qja">昨日、あるカフェに行きました。そのカフェはとても静かでした。</p>
     </div>
   </div>
   <div class="kai card">
     <p class="kai-line"><span class="chip">1回目</span><span>初登場なので → <span class="en a">a</span> <span class="en">cafe</span></span></p>
     <p class="kai-line"><span class="chip blue">2回目</span><span>「さっきのカフェ」と分かるので → <span class="en the">the</span> <span class="en">cafe</span></span></p>
-    <p class="tr">昨日、あるカフェに行きました。そのカフェはとても静かでした。</p>
   </div>
 </section>
 
