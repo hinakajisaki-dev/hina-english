@@ -49,6 +49,22 @@
   .vs-ja { font-size: 19px; color: var(--ink-2); }
   .vs-why { margin-top: auto; align-self: stretch; background: #fff; border-radius: 14px; padding: 10px 18px; font-size: 21px; font-weight: 700; }
 
+  /* 複数名詞の例: two pictures per row */
+  .rows.pl .row { grid-template-columns: 200px 1fr 300px; }
+  .rows.pl .imgs img { width: 96px; height: 96px; }
+  .band .ng { color: var(--muted); }
+
+  /* furniture の仲間 */
+  .kin { flex: 1; margin-top: 18px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; min-height: 0; }
+  .kcard { padding: 14px 14px 18px; display: flex; flex-direction: column; align-items: center; gap: 2px; text-align: center; }
+  .kimg { width: 100%; flex: 1; min-height: 0; display: grid; place-items: center; border-radius: 18px; }
+  .kimg img { width: 150px; height: 150px; }
+  .kword { margin-top: 8px; font-family: var(--en); font-weight: 800; font-size: 34px; }
+  .kja { font-size: 18px; color: var(--ink-2); }
+  .kex { margin-top: 10px; align-self: stretch; background: #F5F8FC; border-radius: 14px; padding: 8px 12px; }
+  .kex .en { font-weight: 700; font-size: 22px; }
+  .kex .ja { font-size: 16px; color: var(--ink-2); }
+
   /* furniture explained */
   .fz { flex: 1; margin-top: 18px; display: grid; grid-template-columns: 1fr 1.1fr; gap: 22px; min-height: 0; }
   .fz-set { padding: 22px 24px; display: flex; flex-direction: column; justify-content: center; gap: 14px; }
@@ -96,7 +112,7 @@
   <header class="bar"><span class="crumb">文法解説 / 冠詞 Part 3</span></header>
   <div class="divider"></div>
   <h2 class="title">冠詞をつけないパターン：無冠詞</h2>
-  <p class="sub-lead">ここまでは <span class="en a">a / an</span> と <span class="en the">the</span>。ここからは「どちらもつけない」パターン</p>
+  <p class="sub-lead">これまでは <span class="en a">a / an</span> と <span class="en the">the</span> をつけるパターン。今回は「どちらもつけない」パターン</p>
   <div class="three">
     <div class="tcard card"><span class="art">a / an</span><p class="t-h">1つの〜</p><div class="t-img"><img src="../img/movie.png" alt="映画"></div><p class="t-en"><span class="a">a</span> movie</p></div>
     <div class="tcard card"><span class="art the">the</span><p class="t-h">それ！</p><div class="t-img"><div class="pick the"><img src="../img/movie.png" alt="映画"><span class="pick-label">それ！</span></div></div><p class="t-en"><span class="the">the</span> movie</p></div>
@@ -142,11 +158,24 @@
   <p class="band"><span class="chip">ポイント</span><span><span class="en a">a / an</span> は「1つ」のときだけ。複数名詞にはつけない</span></p>
 </section>
 
+<section class="slide">
+  <header class="bar"><span class="crumb">文法解説 / 冠詞 Part 3</span></header>
+  <div class="divider"></div>
+  <h2 class="title">複数名詞の例</h2>
+  <p class="sub-lead">特定のものではなく「〜というもの全般」の話をするときは、複数形で冠詞なし</p>
+  <div class="rows pl">
+    <div class="row card"><div class="imgs"><img src="../img/dog.png" alt="犬"><img src="../img/dog.png" alt="犬"></div><div><p class="row-en">I like <mark>dogs</mark>.</p><p class="row-ja">犬が好きです。</p></div><p class="why">犬全般の話<br>（特定の犬ではない）</p></div>
+    <div class="row card"><div class="imgs"><img src="../img/book.png" alt="本"><img src="../img/book.png" alt="本"></div><div><p class="row-en">I read <mark>books</mark> before bed.</p><p class="row-ja">寝る前に本を読みます。</p></div><p class="why">本全般の話<br>（特定の本ではない）</p></div>
+    <div class="row card"><div class="imgs"><img src="../img/apple.png" alt="りんご"><img src="../img/apple.png" alt="りんご"></div><div><p class="row-en"><mark>Apples</mark> are good for you.</p><p class="row-ja">りんごは体にいい。</p></div><p class="why">りんご全般の話<br>（特定のりんごではない）</p></div>
+  </div>
+  <p class="band"><span class="chip">よくある間違い</span><span><span class="en ng">× I like dog.　× I like a dog.</span>　→　<span class="en">○ I like dogs.</span>（「〜が好き」は複数形で）</span></p>
+</section>
+
 <!-- 2. furniture -->
 <section class="slide">
   <header class="bar"><span class="crumb">文法解説 / 冠詞 Part 3</span></header>
   <div class="divider"></div>
-  <h2 class="title">英語で言うと？</h2>
+  <h2 class="title">2. まとめて指す名詞：英語で言うと？</h2>
   <div class="quiz card">
     <img src="../img/furniture.png" alt="家具">
     <div class="qlines">
@@ -160,7 +189,7 @@
 <section class="slide">
   <header class="bar"><span class="crumb">文法解説 / 冠詞 Part 3</span></header>
   <div class="divider"></div>
-  <h2 class="title">英語で言うと？</h2>
+  <h2 class="title">2. まとめて指す名詞：英語で言うと？</h2>
   <div class="quiz card">
     <img src="../img/furniture.png" alt="家具">
     <div class="qlines">
@@ -207,6 +236,19 @@
     <div class="row card"><img src="../img/furniture.png" alt="家具"><div><p class="row-en">I bought <span class="the">the</span> furniture online.</p><p class="row-ja">その家具をオンラインで買った。</p></div><p class="why">話し手と聞き手が分かる<br>特定の家具</p></div>
     <div class="row card"><img src="../img/furniture.png" alt="家具"><div><p class="row-en" style="color:var(--muted)">× I bought <span class="a">a</span> furniture online.</p><p class="row-ja">1点なら <span class="en">a piece of furniture</span>（家具1点）</p></div><p class="why">furniture は数えられない<br>名詞なので a はつけない</p></div>
   </div>
+</section>
+
+<section class="slide">
+  <header class="bar"><span class="crumb">文法解説 / 冠詞 Part 3</span></header>
+  <div class="divider"></div>
+  <h2 class="title"><span class="en">furniture</span> の仲間</h2>
+  <p class="sub-lead">いくつかの物を「まとめて」指す名詞。どれも数えられない名詞なので、<span class="en">a</span> も <span class="en">s</span> もつけない</p>
+  <div class="kin">
+    <div class="kcard card"><div class="kimg c-sky"><img src="../img/luggage.png" alt="荷物"></div><p class="kword">luggage</p><p class="kja">荷物（スーツケース・バッグなど）</p><div class="kex"><p class="en">I have too much <mark>luggage</mark>.</p><p class="ja">荷物が多すぎる。</p></div></div>
+    <div class="kcard card"><div class="kimg c-pink"><img src="../img/jewelry.png" alt="アクセサリー"></div><p class="kword">jewelry</p><p class="kja">アクセサリー（指輪・ネックレスなど）</p><div class="kex"><p class="en">She loves <mark>jewelry</mark>.</p><p class="ja">彼女はアクセサリーが大好きです。</p></div></div>
+    <div class="kcard card"><div class="kimg c-yellow"><img src="../img/mail.png" alt="郵便物"></div><p class="kword">mail</p><p class="kja">郵便物（手紙・小包など）</p><div class="kex"><p class="en">I got <mark>mail</mark> today.</p><p class="ja">今日、郵便物が届きました。</p></div></div>
+  </div>
+  <p class="band"><span class="chip">1つだけなら</span><span class="en">a piece of luggage ／ a piece of jewelry ／ a piece of mail</span></p>
 </section>
 
 <!-- 3. 固有名詞 -->
