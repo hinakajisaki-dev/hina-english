@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="400" height="400">
+<defs><linearGradient id="w" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#DCA16E"/><stop offset="1" stop-color="#B47448"/></linearGradient></defs>
+<ellipse cx="200" cy="356" rx="150" ry="13" fill="#1C2340" opacity=".08"/>
+<rect x="74" y="120" width="252" height="230" rx="10" fill="#FFF6EA"/>
+<rect x="56" y="58" width="288" height="66" rx="16" fill="#8A5A3C"/>
+<text x="200" y="104" text-anchor="middle" font-family="DM Sans" font-weight="800" font-size="36" letter-spacing="8" fill="#FFF6EA">CAFE</text>
+<path d="M60 124 H100 V160 A20 20 0 0 1 60 160 Z" fill="#F25A2E"/><path d="M100 124 H140 V160 A20 20 0 0 1 100 160 Z" fill="#FFFFFF"/><path d="M140 124 H180 V160 A20 20 0 0 1 140 160 Z" fill="#F25A2E"/><path d="M180 124 H220 V160 A20 20 0 0 1 180 160 Z" fill="#FFFFFF"/><path d="M220 124 H260 V160 A20 20 0 0 1 220 160 Z" fill="#F25A2E"/><path d="M260 124 H300 V160 A20 20 0 0 1 260 160 Z" fill="#FFFFFF"/><path d="M300 124 H340 V160 A20 20 0 0 1 300 160 Z" fill="#F25A2E"/>
+<rect x="96" y="204" width="112" height="90" rx="12" fill="#BFE3FA"/>
+<path d="M152 204 V294 M96 249 H208" stroke="#FFF6EA" stroke-width="6"/>
+<rect x="232" y="200" width="74" height="150" rx="10" fill="url(#w)"/>
+<circle cx="292" cy="278" r="6" fill="#FFD24D"/>
+<rect x="88" y="312" width="40" height="38" rx="8" fill="#F25A2E"/>
+<circle cx="98" cy="304" r="16" fill="#5DBB81"/><circle cx="118" cy="300" r="18" fill="#47A86B"/><circle cx="108" cy="290" r="14" fill="#6BC38B"/>
+</svg>

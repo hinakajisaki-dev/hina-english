@@ -2,890 +2,663 @@
 <html lang="ja">
 <head>
 <meta charset="utf-8">
-<title>a と the の違い｜モヤモヤ文法スッキリ解説① 動画スライド</title>
+<title>冠詞｜a / an と the の違い 文法解説スライド</title>
 <style>
-  @font-face { font-family: "Liberation Sans"; font-weight: 700; src: url("../fonts/LiberationSans-Bold.ttf") format("truetype"); }
+  @font-face { font-family: "DM Sans"; font-weight: 500; src: url("../fonts/DMSans-500.woff2") format("woff2"); }
+  @font-face { font-family: "DM Sans"; font-weight: 700; src: url("../fonts/DMSans-700.woff2") format("woff2"); }
+  @font-face { font-family: "DM Sans"; font-weight: 800; src: url("../fonts/DMSans-800.woff2") format("woff2"); }
+  @font-face { font-family: "Noto Sans JP"; font-weight: 500; src: url("../fonts/NotoSansJP-500.woff2") format("woff2"); }
   @font-face { font-family: "Noto Sans JP"; font-weight: 700; src: url("../fonts/NotoSansJP-700.woff2") format("woff2"); }
   @font-face { font-family: "Noto Sans JP"; font-weight: 900; src: url("../fonts/NotoSansJP-900.woff2") format("woff2"); }
+  @font-face { font-family: "Caveat"; font-weight: 700; src: url("../fonts/Caveat-700.woff2") format("woff2"); }
 
   @page { size: 1280px 720px; margin: 0; }
 
+  /* Colors follow the Hina English salon: light blue page, orange-red accent, navy text,
+     white rounded cards and soft pastel cards. a / an is orange-red, the is blue. */
   :root {
-    --bg: #FDF6F8;
-    --blob: #FBE1E9;
-    --pink: #F3A6C8;
-    --pink-soft: #FCE6EF;
-    --accent: #C8417F;
-    --marker: #F9D3E3;
-    --ink: #1E1A1C;
-    --ink-2: #574D52;
-    --muted: #9C9196;
-    --line: #F2D5E1;
+    --bg: #EAF2FB;
     --card: #FFFFFF;
-    --en: "Liberation Sans", Arial, "Noto Sans JP", sans-serif;
+    --ink: #1C2340;
+    --ink-2: #4A5270;
+    --muted: #8A90A8;
+    --line: #D6E2F0;
+    --primary: #E8461E;
+    --primary-dark: #C8401A;
+    --primary-soft: #FFE3D8;
+    --blue: #2F86CF;
+    --blue-soft: #DCEFFC;
+    --orange-soft: #FFE8DC;
+    --pink-soft: #FFE4EC;
+    --yellow-soft: #FFF2C9;
+    --sky-soft: #DDEFFC;
+    --marker: #FFD9C9;
+    --en: "DM Sans", "Noto Sans JP", sans-serif;
     --ja: "Noto Sans JP", sans-serif;
+    --hand: "Caveat", cursive;
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
   html, body { background: var(--bg); }
   body {
-    font-family: var(--en);
-    font-weight: 700;
+    font-family: var(--ja);
+    font-weight: 500;
     color: var(--ink);
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
   }
-  .ja { font-family: var(--ja); }
-  .en { font-family: var(--en); }
-  .v { color: var(--accent); }
+  b { font-weight: 700; }
+  .en { font-family: var(--en); font-weight: 700; }
+  .a { color: var(--primary); }
+  .the { color: var(--blue); }
+  mark {
+    background: linear-gradient(transparent 55%, var(--marker) 55%);
+    color: inherit;
+    padding: 0 2px;
+    margin: 0 -2px;
+  }
 
   .slide {
     width: 1280px;
     height: 720px;
     position: relative;
     overflow: hidden;
-    padding: 36px 80px 40px;
+    padding: 0 72px 44px;
     display: flex;
     flex-direction: column;
     background: var(--bg);
     break-after: page;
   }
   .slide:last-child { break-after: auto; }
-  .slide > * { position: relative; }
-  .slide > .blob { position: absolute; inset: 0; width: 1280px; height: 720px; }
-  .blob path { fill: var(--blob); }
 
-  /* small waving character in the bottom-right corner */
-  .slide > .mini { position: absolute; right: 36px; bottom: 0; height: 180px; }
-  .slide > .mini.lg { right: 60px; height: 300px; }
+  /* ---------- top bar, like the salon header ---------- */
+  .bar { flex: none; height: 70px; display: flex; align-items: center; justify-content: space-between; }
+  .crumb { font-size: 17px; color: var(--ink-2); }
+  .brand { display: flex; align-items: center; gap: 10px; }
+  .brand img { width: 32px; height: 32px; }
+  .brand span { font-family: var(--en); font-weight: 700; font-size: 19px; }
+  .divider { flex: none; height: 0; border-top: 2px solid var(--line); margin: 0 -72px; }
 
-  mark {
-    background: linear-gradient(transparent 58%, var(--marker) 58%);
-    color: inherit;
-    padding: 0 2px;
-    margin: 0 -2px;
-  }
+  .eyebrow { margin-top: 28px; font-family: var(--en); font-weight: 700; font-size: 16px; letter-spacing: .18em; color: var(--primary); }
+  .title { margin-top: 6px; font-weight: 700; font-size: 44px; line-height: 1.3; }
+  .title .en { font-weight: 800; }
 
-  .rule { height: 6px; background: var(--pink); border-radius: 3px; }
-  .tag {
-    font-family: var(--ja);
-    font-size: 15px;
-    color: #fff;
-    background: var(--ink);
-    padding: 4px 11px 5px;
-    border-radius: 6px;
-    white-space: nowrap;
-  }
-  .tag.pink { background: var(--accent); }
+  .card { background: var(--card); border-radius: 28px; box-shadow: 0 10px 30px rgba(28, 35, 64, .07); }
+  .c-orange { background: var(--orange-soft); }
+  .c-pink { background: var(--pink-soft); }
+  .c-yellow { background: var(--yellow-soft); }
+  .c-sky { background: var(--sky-soft); }
 
-  /* ---------- corner label: section pill + what this part is about ---------- */
-  .top { display: flex; align-items: center; gap: 16px; height: 52px; }
-  .top .num { font-size: 52px; line-height: 1; letter-spacing: -1px; }
-  .pill {
-    font-family: var(--ja);
-    font-size: 18px;
-    color: #fff;
-    background: var(--accent);
-    padding: 6px 16px 7px;
-    border-radius: 999px;
-    white-space: nowrap;
-  }
-  .top .what { font-family: var(--ja); font-size: 24px; font-weight: 900; }
-
-  /* ---------- big article tile ---------- */
-  .tile {
+  .chip {
     flex: none;
-    width: 210px;
-    height: 210px;
-    border-radius: 28px;
-    background: var(--accent);
-    color: #fff;
-    font-size: 92px;
-    letter-spacing: -2px;
-    display: grid;
-    place-items: center;
-  }
-  .tile.soft { background: var(--pink-soft); color: var(--accent); }
-
-  /* ---------- cover ---------- */
-  .cover { flex-direction: row; padding: 0; }
-  .cover .left { flex: 1; padding: 0 30px 0 88px; display: flex; flex-direction: column; justify-content: center; }
-  .cover .kicker { font-family: var(--ja); font-size: 22px; color: var(--accent); letter-spacing: .06em; }
-  .cover h1 { font-family: var(--ja); font-weight: 900; font-size: 64px; line-height: 1.25; margin-top: 14px; }
-  .cover h1 .en { font-size: 116px; letter-spacing: -3px; }
-  .cover .rule { width: 360px; margin-top: 30px; }
-  .cover .lead { font-family: var(--ja); font-size: 24px; color: var(--ink-2); margin-top: 26px; line-height: 1.7; }
-  .cover .right { width: 470px; padding: 0 88px 150px 0; display: flex; flex-direction: column; justify-content: center; gap: 16px; }
-  .cover .ex-card { background: var(--card); border: 2px solid var(--line); border-radius: 18px; padding: 18px 26px; font-size: 36px; letter-spacing: -.5px; }
-  .cover .ask { font-family: var(--ja); font-size: 24px; color: var(--accent); text-align: center; margin-top: 4px; }
-
-  /* ---------- section cover ---------- */
-  .sec { justify-content: center; padding-left: 96px; }
-  .sec .kicker { font-size: 18px; letter-spacing: .25em; color: var(--accent); }
-  .sec h1 { font-family: var(--ja); font-weight: 900; font-size: 84px; line-height: 1.2; margin-top: 10px; }
-  .sec h1 .en { letter-spacing: -2px; }
-  .sec .rule { width: 360px; margin-top: 26px; }
-  .sec .lead { font-family: var(--ja); font-size: 25px; margin-top: 26px; }
-  .sec .ep {
-    align-self: flex-start;
-    margin-top: 22px;
-    font-family: var(--ja);
-    font-size: 24px;
-    color: var(--accent);
-    background: var(--pink-soft);
-    padding: 8px 22px 9px;
+    font-weight: 700;
+    font-size: 18px;
+    color: var(--primary-dark);
+    background: var(--primary-soft);
+    padding: 6px 18px 7px;
     border-radius: 999px;
+    white-space: nowrap;
   }
-  .steps { list-style: none; margin-top: 30px; display: flex; flex-direction: column; gap: 14px; }
-  .steps li { display: flex; align-items: center; gap: 16px; font-family: var(--ja); font-size: 22px; color: var(--ink-2); }
-  .steps b {
-    width: 40px; height: 40px; border-radius: 50%;
-    background: var(--pink-soft); color: var(--accent);
-    font-family: var(--en); font-size: 20px;
-    display: grid; place-items: center;
-  }
-
-  /* ---------- centered statement ---------- */
-  .center { justify-content: center; align-items: center; text-align: center; padding: 40px 90px; }
-  .center .kicker { font-family: var(--ja); font-size: 26px; color: var(--accent); }
-  .center .big { font-family: var(--ja); font-weight: 900; font-size: 62px; line-height: 1.4; margin-top: 16px; }
-  .center .big .en { letter-spacing: -1px; }
-  .center .sub { font-family: var(--ja); font-size: 27px; color: var(--ink-2); line-height: 1.6; margin-top: 26px; }
-  .center .rule { width: 360px; margin-top: 30px; }
-  .en-xl { font-size: 80px; letter-spacing: -1.5px; line-height: 1.25; }
-  .center .en-xl + .en-xl { margin-top: 6px; }
-  .center .en-xl.bye { color: var(--accent); margin-top: 22px; }
-
-  /* ---------- goal ---------- */
-  .goal { margin-top: 30px; font-family: var(--ja); font-weight: 900; font-size: 52px; line-height: 1.3; }
-  .goal .en { letter-spacing: -1px; }
-  .goal-steps { list-style: none; display: grid; grid-template-columns: 1fr 1fr; gap: 18px 28px; margin-top: 40px; }
-  .goal-steps li {
-    display: flex; align-items: center; gap: 16px;
-    background: var(--card); border: 2px solid var(--line); border-radius: 16px;
-    padding: 24px 26px; font-family: var(--ja); font-size: 27px;
-  }
-  .goal-steps b {
-    width: 42px; height: 42px; border-radius: 50%;
-    background: var(--accent); color: #fff;
-    font-family: var(--en); font-size: 21px;
-    display: grid; place-items: center; flex: none;
-  }
+  .chip.blue { color: #1F6FB2; background: var(--blue-soft); }
 
   .band {
-    margin-top: auto;
-    background: var(--pink-soft);
-    border-radius: 16px;
-    padding: 16px 24px 17px;
-    text-align: center;
-    font-family: var(--ja);
-    font-size: 25px;
-  }
-
-  /* ---------- example sentence header ---------- */
-  .sent { margin-top: 30px; }
-  .sent .en { font-size: 68px; letter-spacing: -1px; line-height: 1.1; }
-  .sent .ja { font-family: var(--ja); font-size: 28px; color: var(--ink-2); margin-top: 14px; }
-  .sent + .rule { margin-top: 28px; }
-
-  /* ---------- flow: scene → listener → article ---------- */
-  .flow { flex: 1; display: flex; align-items: center; gap: 20px; }
-  .fbox {
-    flex: 1;
-    height: 210px;
-    background: var(--card);
-    border: 2px solid var(--line);
-    border-radius: 20px;
-    padding: 24px 26px;
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-  }
-  .fbox .tag { align-self: flex-start; }
-  .fbox .txt { font-family: var(--ja); font-size: 27px; line-height: 1.5; }
-  .fbox .txt .s { font-size: 20px; color: var(--ink-2); }
-  .fbox.say { background: var(--pink-soft); border-color: var(--pink-soft); }
-  .fbox.say .txt { color: var(--accent); }
-  .arrow { flex: none; font-family: var(--ja); font-size: 44px; color: var(--pink); }
-
-  /* ---------- two cards side by side ---------- */
-  .duo { flex: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin-top: 28px; min-height: 0; }
-  .rcard {
-    background: var(--card);
-    border: 2px solid var(--line);
-    border-radius: 24px;
-    padding: 26px 30px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    gap: 16px;
-  }
-  .rcard .tile { width: 160px; height: 160px; font-size: 76px; border-radius: 26px; }
-  .rcard .h { font-family: var(--ja); font-weight: 900; font-size: 36px; line-height: 1.45; }
-  .rcard .h .q { color: var(--accent); }
-  .rcard .d { font-family: var(--ja); font-size: 24px; color: var(--ink-2); line-height: 1.6; }
-  .rcard .eg { font-size: 46px; letter-spacing: -.5px; }
-  .rcard .step { font-family: var(--ja); font-size: 26px; line-height: 1.5; }
-  .rcard .down { font-family: var(--ja); font-size: 26px; color: var(--pink); line-height: 1; }
-  .duo + .band { margin-top: 22px; }
-
-  /* ---------- rows that appear one by one ---------- */
-  .rows { list-style: none; margin-top: 28px; display: flex; flex-direction: column; gap: 22px; }
-  .rows li {
-    height: 200px;
-    background: var(--card);
-    border: 2px solid var(--line);
-    border-radius: 20px;
-    padding: 0 28px;
-    display: grid;
-    grid-template-columns: 96px 1fr 290px;
-    column-gap: 24px;
-    align-items: center;
-  }
-  .rows.three li { height: 165px; }
-  .rows .lab {
-    justify-self: start;
-    font-family: var(--ja);
-    font-size: 19px;
-    color: var(--accent);
-    background: var(--pink-soft);
-    padding: 6px 14px 7px;
-    border-radius: 999px;
-    white-space: nowrap;
-  }
-  .rows .lab.q { font-size: 30px; padding: 4px 20px 5px; }
-  .rows .en { font-size: 38px; letter-spacing: -.5px; }
-  .rows .en.lg { font-size: 50px; }
-  .rows .ja { font-family: var(--ja); font-size: 24px; color: var(--ink-2); margin-top: 10px; }
-  .rows .why {
-    background: var(--pink-soft);
-    border-radius: 14px;
-    padding: 18px 22px;
-    font-family: var(--ja);
-    font-size: 24px;
-    line-height: 1.5;
-  }
-  .rows .why .en { color: var(--accent); }
-
-  /* café: sentence → meaning */
-  .rows.mean li { height: 210px; grid-template-columns: 1fr 50px 430px; }
-  .rows.mean .en { font-size: 50px; }
-  .rows.mean .arrow { font-size: 40px; }
-  .rows.mean .ja { font-size: 28px; font-weight: 900; color: var(--ink); line-height: 1.5; margin: 0; }
-
-  /* ---------- quiz ---------- */
-  .scene {
-    align-self: flex-start;
-    margin-top: 26px;
-    font-family: var(--ja);
-    font-size: 22px;
-    color: var(--accent);
-    background: var(--pink-soft);
-    padding: 8px 20px 9px;
-    border-radius: 999px;
-  }
-  .qwrap { flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 22px; }
-  .qline { display: flex; align-items: center; gap: 20px; height: 100px; font-size: 58px; letter-spacing: -.5px; white-space: nowrap; }
-  .qline.plain { color: var(--ink-2); }
-  .blank { flex: none; width: 160px; height: 88px; border: 3px dashed var(--pink); border-radius: 16px; background: var(--card); }
-  .fill {
-    flex: none; width: 160px; height: 88px; border-radius: 16px;
-    background: var(--accent); color: #fff; font-size: 54px;
-    display: grid; place-items: center;
-  }
-  .center .qline { justify-content: center; margin-top: 30px; }
-
-  .opts { flex: none; height: 140px; display: flex; align-items: center; gap: 22px; }
-  .opts .tile { width: 110px; height: 110px; font-size: 52px; border-radius: 22px; }
-  .opts .or { font-family: var(--ja); font-size: 26px; color: var(--muted); }
-  .opts .ask { font-family: var(--ja); font-size: 30px; margin-left: 14px; }
-
-  .kai {
     flex: none;
-    height: 140px;
-    background: var(--card);
-    border: 2px solid var(--line);
-    border-radius: 20px;
-    padding: 0 28px;
+    margin-top: 22px;
     display: flex;
-    flex-direction: column;
-    justify-content: center;
-    gap: 14px;
+    align-items: center;
+    gap: 16px;
+    background: var(--card);
+    border-radius: 20px;
+    padding: 18px 26px;
+    font-size: 22px;
+    box-shadow: 0 10px 30px rgba(28, 35, 64, .06);
   }
-  .kai .line { display: flex; align-items: center; gap: 14px; font-family: var(--ja); font-size: 26px; }
-  .kai .tr { font-family: var(--ja); font-size: 22px; color: var(--ink-2); }
+  .band .en { font-weight: 800; }
 
-  /* ---------- wrong / right ---------- */
-  .cards { margin-top: 34px; display: flex; flex-direction: column; gap: 24px; }
-  .ans { border-radius: 20px; padding: 0 34px; height: 200px; display: grid; grid-template-columns: 88px 1fr; column-gap: 28px; align-content: center; align-items: center; }
-  .ans .badge {
-    grid-row: 1 / span 2;
-    height: 88px;
-    border-radius: 50%;
-    color: #fff;
-    font-family: var(--ja);
-    font-size: 44px;
+  .art {
+    flex: none;
     display: grid;
     place-items: center;
+    width: 84px;
+    height: 84px;
+    border-radius: 22px;
+    background: var(--primary);
+    color: #fff;
+    font-family: var(--en);
+    font-weight: 800;
+    font-size: 40px;
   }
-  .ans .en { font-size: 50px; letter-spacing: -.5px; }
-  .ans .ja { font-size: 25px; margin-top: 10px; }
-  .ans.ok { background: var(--pink-soft); }
-  .ans.ok .badge { background: var(--accent); }
-  .ans.ok .ja { color: var(--accent); }
-  .ans.ng { background: #EFEAEC; }
-  .ans.ng .badge { background: var(--ink); }
-  .ans.ng .ja { color: var(--ink-2); }
+  .art.the { background: var(--blue); }
 
-  /* ---------- three scenes ---------- */
-  .trio { flex: 1; display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-top: 28px; min-height: 0; }
-  .scard {
-    background: var(--card);
-    border: 2px solid var(--line);
-    border-radius: 20px;
-    padding: 26px;
+  .arrow { flex: none; font-size: 40px; color: var(--primary); }
+
+  /* ---------- hero (cover / ending) ---------- */
+  .cover { padding: 44px; }
+  .hero {
+    flex: 1;
+    position: relative;
+    border-radius: 44px;
+    background-color: #EC4B20;
+    background-image: linear-gradient(120deg, #FF6233 0%, #F04E23 55%, #DC3F18 100%);
+    box-shadow: 0 20px 50px rgba(220, 63, 24, .22);
+    padding: 0 80px;
     display: flex;
     flex-direction: column;
-    gap: 14px;
+    justify-content: center;
+    color: #fff;
   }
-  .num-b {
-    width: 52px; height: 52px; border-radius: 50%;
-    background: var(--accent); color: #fff;
-    font-size: 26px;
-    display: grid; place-items: center;
-    flex: none;
-  }
-  .scard .h { font-family: var(--ja); font-weight: 900; font-size: 30px; line-height: 1.45; }
-  .scard .eg { margin-top: auto; padding-top: 16px; border-top: 2px dashed var(--line); font-size: 24px; letter-spacing: -.3px; }
-  .scard .egj { font-family: var(--ja); font-size: 19px; color: var(--ink-2); margin-top: 4px; }
-  .trio + .band { margin-top: 22px; }
+  .hero-kicker { font-family: var(--en); font-weight: 700; font-size: 20px; letter-spacing: .22em; color: #FFE3D8; }
+  .hero-title { margin-top: 10px; font-weight: 900; font-size: 168px; line-height: 1.1; }
+  .hero-title.sm { font-size: 92px; line-height: 1.2; }
+  .hero-sub { margin-top: 10px; font-weight: 700; font-size: 50px; }
+  .hero-sub .en { font-weight: 800; }
+  .hero-sub.sm { font-size: 32px; margin-top: 18px; }
+  .hero-hand { margin-top: 30px; font-family: var(--hand); font-weight: 700; font-size: 48px; color: #FFE3D8; }
+  .hero > .tile { position: absolute; right: 64px; top: 146px; width: 340px; height: 340px; }
 
-  /* ---------- まとめ ---------- */
-  .sheet-title { display: flex; align-items: baseline; gap: 18px; margin-top: 10px; }
-  .sheet-title h2 { font-family: var(--ja); font-size: 40px; font-weight: 900; }
-  .sheet-title p { font-family: var(--ja); font-size: 18px; color: var(--muted); }
-  .sheet .rule { width: 360px; margin-top: 16px; }
-  .sum { flex: 1; display: grid; grid-template-columns: repeat(6, 1fr); grid-template-rows: 1fr 1fr; gap: 16px; margin-top: 20px; min-height: 0; }
-  .sum > div { background: var(--card); border: 2px solid var(--line); border-radius: 18px; }
-  .sum .rc { grid-column: span 3; display: flex; align-items: center; gap: 22px; padding: 0 24px; }
-  .sum .rc .tile { width: 96px; height: 96px; font-size: 46px; border-radius: 20px; }
-  .sum .rc .h { font-family: var(--ja); font-weight: 900; font-size: 25px; }
-  .sum .rc .eg { font-size: 23px; color: var(--ink-2); margin-top: 6px; }
-  .sum .sc { grid-column: span 2; padding: 16px 20px; display: flex; flex-direction: column; gap: 6px; }
-  .sum .sc .hd { display: flex; align-items: center; gap: 12px; }
-  .sum .sc .num-b { width: 34px; height: 34px; font-size: 18px; }
-  .sum .sc .h { font-family: var(--ja); font-weight: 900; font-size: 21px; }
-  .sum .sc .eg { margin-top: auto; padding-top: 10px; border-top: 2px dashed var(--line); font-size: 21px; letter-spacing: -.2px; }
-  .sum .sc .egj { font-family: var(--ja); font-size: 16px; color: var(--ink-2); margin-top: 3px; }
-  .sum + .band { margin-top: 16px; font-size: 23px; }
+  /* ---------- 冠詞とは ---------- */
+  .def { flex: 1; margin-top: 22px; padding: 30px 40px; display: flex; flex-direction: column; align-items: center; gap: 26px; }
+  .def-text { font-size: 36px; font-weight: 700; }
+  .def-text .en { font-weight: 800; }
+  .combos { flex: 1; width: 100%; display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+  .combo { border-radius: 22px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; }
+  .combo img { width: 150px; height: 150px; }
+  .combo p { font-size: 38px; font-weight: 800; }
+
+  /* ---------- roadmap ---------- */
+  .road { flex: 1; margin-top: 30px; display: flex; align-items: center; gap: 26px; }
+  .stepcard { flex: 1; height: 330px; padding: 40px 44px; display: flex; flex-direction: column; gap: 16px; }
+  .stepcard.off { background: #F3F7FC; box-shadow: none; border: 2px dashed var(--line); }
+  .step-no { align-self: flex-start; font-family: var(--en); font-weight: 800; font-size: 18px; letter-spacing: .14em; color: #fff; background: var(--primary); padding: 6px 16px 7px; border-radius: 999px; }
+  .off .step-no { background: var(--muted); }
+  .step-h { margin-top: 10px; font-size: 34px; font-weight: 700; }
+  .step-h .en { font-weight: 800; }
+  .off .step-h { color: var(--ink-2); }
+  .step-d { font-size: 24px; color: var(--ink-2); }
+  .stepcard .chip { align-self: flex-start; margin-top: auto; }
+
+  /* ---------- mental image ---------- */
+  .mi { flex: 1; margin-top: 22px; display: grid; grid-template-columns: 1fr 1fr; gap: 26px; min-height: 0; }
+  .mi-text { padding: 36px 40px; display: flex; flex-direction: column; justify-content: center; gap: 12px; }
+  .mi-eq { font-size: 34px; font-weight: 700; }
+  .mi-eq .en { font-size: 48px; font-weight: 800; }
+  .mi-big { font-size: 46px; font-weight: 900; line-height: 1.35; }
+  .mi-chips { display: flex; align-items: center; gap: 12px; margin-top: 10px; }
+  .mi-chips .chip { font-size: 22px; background: #fff; }
+  .mi-chips .chip.blue { background: #fff; }
+  .mi-note { font-size: 22px; color: var(--ink-2); }
+  .mi-visual { display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: 1fr 1fr; padding: 22px 30px; align-items: center; justify-items: center; }
+  .mi-visual > img { width: 112px; height: 112px; }
+  .pick { position: relative; width: 150px; height: 150px; border-radius: 50%; display: grid; place-items: center; background: var(--orange-soft); border: 4px solid var(--primary); }
+  .pick.the { background: var(--sky-soft); border-color: var(--blue); }
+  .pick img { width: 112px; height: 112px; }
+  .pick-label {
+    position: absolute; left: 50%; bottom: -14px; margin-left: -38px; width: 76px;
+    text-align: center; font-size: 19px; font-weight: 700; color: #fff; background: var(--primary);
+    padding: 3px 0 4px; border-radius: 999px;
+  }
+  .pick.the .pick-label { background: var(--blue); }
+  .uses { flex: none; margin-top: 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .use { display: flex; align-items: center; gap: 14px; padding: 18px 24px; font-size: 22px; }
+  .num {
+    flex: none; width: 38px; height: 38px; border-radius: 50%; display: grid; place-items: center;
+    font-family: var(--en); font-weight: 800; font-size: 19px; color: #fff; background: var(--blue);
+  }
+
+  /* ---------- example cards ---------- */
+  .grid4 { flex: 1; margin-top: 22px; display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 22px; min-height: 0; }
+  .ex { border-radius: 26px; display: flex; align-items: center; gap: 22px; padding: 0 30px 0 22px; }
+  .ex img { flex: none; width: 150px; height: 150px; }
+  .ex-en { font-family: var(--en); font-weight: 700; font-size: 31px; line-height: 1.25; }
+  .ex-ja { margin-top: 8px; font-size: 19px; color: var(--ink-2); }
+
+  .rows { flex: 1; margin-top: 22px; display: flex; flex-direction: column; gap: 16px; min-height: 0; }
+  .row { flex: 1; display: grid; grid-template-columns: 124px 1fr 340px; align-items: center; column-gap: 26px; padding: 0 30px 0 22px; }
+  .row img { width: 124px; height: 124px; }
+  .row-en { font-family: var(--en); font-weight: 700; font-size: 36px; }
+  .row-ja { margin-top: 6px; font-size: 20px; color: var(--ink-2); }
+  .why { border-radius: 16px; background: var(--sky-soft); padding: 14px 20px; font-size: 19px; line-height: 1.55; color: #1F4E79; }
+
+  /* ---------- jobs ---------- */
+  .duo { flex: 1; margin-top: 22px; display: grid; grid-template-columns: 1fr 1fr; gap: 26px; min-height: 0; }
+  .job { position: relative; border-radius: 28px; padding: 40px 44px; }
+  .job img { position: absolute; right: 30px; bottom: 0; width: 260px; height: 260px; }
+  .job-en { font-family: var(--en); font-weight: 700; font-size: 44px; line-height: 1.25; }
+  .job-ja { margin-top: 10px; font-size: 22px; color: var(--ink-2); }
+
+  /* ---------- a / an ---------- */
+  .lead { flex: none; margin-top: 16px; display: flex; align-items: center; gap: 14px; font-size: 26px; font-weight: 700; }
+  .lead .en { font-weight: 800; }
+  .col { border-radius: 28px; padding: 26px 34px; display: flex; flex-direction: column; gap: 14px; }
+  .col-head { display: flex; align-items: center; gap: 18px; }
+  .col-head .art { width: 74px; height: 74px; font-size: 34px; border-radius: 20px; }
+  .col-h { font-size: 26px; font-weight: 700; line-height: 1.35; }
+  .col-h small { display: block; font-size: 17px; font-weight: 500; color: var(--ink-2); }
+  .words { list-style: none; flex: 1; display: flex; flex-direction: column; justify-content: space-around; background: #fff; border-radius: 20px; padding: 6px 24px; }
+  .words li { display: flex; align-items: center; gap: 20px; font-family: var(--en); font-weight: 700; font-size: 32px; }
+  .words li + li { border-top: 2px solid #EEF2F8; }
+  .words img { width: 74px; height: 74px; }
+
+  .snd { padding: 26px 34px; display: flex; flex-direction: column; gap: 14px; }
+  .snd-top { display: flex; align-items: center; gap: 22px; }
+  .snd-top img { flex: none; width: 140px; height: 140px; }
+  .snd-word { font-family: var(--en); font-weight: 800; font-size: 56px; letter-spacing: -.5px; }
+  .snd-word .hl { color: var(--primary); }
+  .snd-word .mute { color: #C3C8D6; }
+  .snd-say { margin-top: 4px; font-size: 24px; color: var(--ink-2); }
+  .snd-say b { color: var(--primary); }
+  .snd-why { border-top: 2px dashed var(--line); padding-top: 16px; font-size: 25px; line-height: 1.6; }
+  .snd-ans { align-self: flex-start; margin-top: auto; font-family: var(--en); font-weight: 800; font-size: 36px; background: var(--orange-soft); border-radius: 16px; padding: 8px 22px; }
+
+  /* ---------- quiz ---------- */
+  .quiz { flex: none; height: 300px; margin-top: 22px; display: flex; align-items: center; gap: 30px; padding: 0 40px 0 30px; }
+  .quiz > img { flex: none; width: 200px; height: 200px; }
+  .qlines { display: flex; flex-direction: column; gap: 22px; }
+  .qline { display: flex; align-items: center; gap: 16px; height: 84px; font-family: var(--en); font-weight: 700; font-size: 46px; white-space: nowrap; }
+  .blank { flex: none; width: 140px; height: 76px; border: 3px dashed #F3A88F; border-radius: 16px; background: #FFF8F5; }
+  .fill { flex: none; display: grid; place-items: center; width: 140px; height: 76px; border-radius: 16px; background: var(--primary); color: #fff; font-weight: 800; font-size: 44px; }
+  .fill.the { background: var(--blue); }
+  .opts { flex: none; height: 150px; margin-top: 22px; display: flex; align-items: center; gap: 18px; }
+  .opts .art { width: 96px; height: 96px; font-size: 42px; }
+  .opts .or { font-family: var(--en); font-size: 24px; color: var(--muted); }
+  .opts .ask { margin-left: 14px; font-size: 28px; font-weight: 700; }
+  .kai { flex: none; height: 150px; margin-top: 22px; display: flex; flex-direction: column; justify-content: center; gap: 10px; padding: 0 32px; }
+  .kai-line { display: flex; align-items: center; gap: 14px; font-size: 24px; }
+  .kai-line .en { font-weight: 800; }
+  .kai .tr { margin-top: 2px; font-size: 19px; color: var(--ink-2); }
+
+  /* ---------- compare ---------- */
+  .cmp { flex: 1; margin-top: 20px; display: grid; grid-template-columns: 130px 1fr 1fr; grid-template-rows: 74px 1fr 1fr; gap: 14px; min-height: 0; }
+  .cmp-head { border-radius: 20px; display: flex; align-items: center; gap: 14px; padding: 0 22px; font-size: 21px; font-weight: 700; }
+  .cmp-head .en { font-size: 32px; font-weight: 800; }
+  .cmp-img { display: grid; place-items: center; }
+  .cmp-img img { width: 120px; height: 120px; }
+  .cmp-cell { border-radius: 22px; padding: 0 26px; display: flex; flex-direction: column; justify-content: center; gap: 6px; }
+  .cmp-cell .en { font-size: 30px; }
+  .cmp-cell .ja { font-size: 19px; color: var(--ink-2); }
+  .cmp-cell .note { margin-top: 4px; font-size: 18px; color: var(--ink-2); }
+
+  /* ---------- flow ---------- */
+  .flow { flex: 1; margin-top: 22px; display: flex; align-items: center; gap: 24px; min-height: 0; }
+  .fcard { flex: 1; height: 100%; border-radius: 28px; padding: 30px 36px; display: flex; flex-direction: column; gap: 10px; }
+  .fcard .chip { align-self: flex-start; background: #fff; }
+  .f-sub { margin-top: 6px; font-size: 24px; font-weight: 700; }
+  .f-art { font-family: var(--en); font-weight: 800; font-size: 84px; line-height: 1.1; }
+  .f-ex { margin-top: auto; display: flex; align-items: center; gap: 18px; background: #fff; border-radius: 20px; padding: 10px 22px; }
+  .f-ex img { width: 96px; height: 96px; }
+  .f-ex p { font-family: var(--en); font-weight: 700; font-size: 38px; }
+
+  /* ---------- next time ---------- */
+  .sub-lead { flex: none; margin-top: 14px; font-size: 22px; color: var(--ink-2); }
+  .nc { border-radius: 28px; padding: 28px 36px; display: flex; flex-direction: column; gap: 6px; }
+  .nc-h { font-size: 38px; font-weight: 900; }
+  .nc-s { font-size: 22px; color: var(--ink-2); }
+  .nc-imgs { margin-top: auto; display: flex; justify-content: space-around; background: #fff; border-radius: 20px; padding: 10px; }
+  .nc-imgs img { width: 140px; height: 140px; }
+
+  .cnt { padding: 0 26px; display: grid; grid-template-columns: 116px 1fr 1fr; align-items: center; column-gap: 12px; }
+  .cnt-w { font-family: var(--en); font-weight: 800; font-size: 30px; }
+  .cnt-g { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+  .cnt-imgs { display: flex; gap: 2px; }
+  .cnt-imgs img { width: 68px; height: 68px; }
+  .cnt-g p { font-family: var(--en); font-weight: 700; font-size: 21px; color: var(--ink-2); }
+
+  .trio { flex: 1; margin-top: 22px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; min-height: 0; }
+  .un { padding: 22px 26px 26px; display: flex; flex-direction: column; align-items: center; gap: 4px; text-align: center; }
+  .un-img { width: 100%; display: grid; place-items: center; border-radius: 20px; padding: 8px 0; }
+  .un-img img { width: 170px; height: 170px; }
+  .un-w { margin-top: 10px; font-family: var(--en); font-weight: 800; font-size: 44px; }
+  .un-ja { font-size: 20px; color: var(--ink-2); }
+  .un-ng { margin-top: auto; font-family: var(--en); font-weight: 700; font-size: 26px; color: var(--muted); background: #F3F5F9; border-radius: 14px; padding: 6px 20px; }
+  .un-ng .x { color: var(--primary); font-weight: 800; }
 </style>
 </head>
 <body>
 
 <!-- ============ 1 表紙 ============ -->
 <section class="slide cover">
-  <svg class="blob" viewBox="0 0 1280 720"><path d="M 820 0 C 860 96, 958 150, 1064 160 C 1172 170, 1244 232, 1280 330 L 1280 0 Z"/></svg>
-  <img class="mini" src="character.png" alt="手を振るキャラクター">
-  <div class="left">
-    <p class="kicker">モヤモヤ文法スッキリ解説 ①</p>
-    <h1><span class="en">a</span> と <span class="en v">the</span><br>の違い</h1>
-    <div class="rule"></div>
-    <p class="lead">たった1つのルールで<br>もう迷わない！</p>
-  </div>
-  <div class="right">
-    <p class="ex-card">I saw <span class="v">a</span> cat.</p>
-    <p class="ex-card">I saw <span class="v">the</span> cat.</p>
-    <p class="ask">この違い、説明できる？</p>
+  <div class="hero">
+    <p class="hero-kicker">HINA ENGLISH ・ 文法解説動画</p>
+    <h1 class="hero-title">冠詞</h1>
+    <p class="hero-sub"><span class="en">a / an</span> と <span class="en">the</span> の違い</p>
+    <p class="hero-hand">Small steps, big changes.</p>
+    <img class="tile" src="img/tile.png" alt="">
   </div>
 </section>
 
-<!-- ============ ① 掴み ============ -->
-<section class="slide center">
-  <svg class="blob" viewBox="0 0 1280 720"><path d="M 820 0 C 860 96, 958 150, 1064 160 C 1172 170, 1244 232, 1280 330 L 1280 0 Z"/></svg>
-  <p class="kicker">いきなりですが、問題です</p>
-  <div class="rule"></div>
-  <p class="en-xl" style="margin-top:40px">I saw <span class="v">a</span> cat.</p>
-  <p class="en-xl">I saw <span class="v">the</span> cat.</p>
-  <p class="sub">この2つ、何が違うか説明できますか？</p>
+<!-- ============ 2 冠詞とは？ ============ -->
+<section class="slide">
+  <header class="bar"><span class="crumb">文法解説 / 冠詞</span><div class="brand"><img src="img/mark.png" alt=""><span>Hina English</span></div></header>
+  <div class="divider"></div>
+  <p class="eyebrow">BASICS</p>
+  <h2 class="title">冠詞とは？</h2>
+  <div class="def card">
+    <p class="def-text"><mark>名詞の前</mark>に置く <span class="en a">a</span> / <span class="en a">an</span> / <span class="en the">the</span> のこと</p>
+    <div class="combos">
+      <div class="combo c-orange"><img src="img/book.png" alt="本"><p class="en"><span class="a">a</span> book</p></div>
+      <div class="combo c-yellow"><img src="img/apple.png" alt="りんご"><p class="en"><span class="a">an</span> apple</p></div>
+      <div class="combo c-sky"><img src="img/sun.png" alt="太陽"><p class="en"><span class="the">the</span> sun</p></div>
+    </div>
+  </div>
+  <p class="band"><span class="chip">役割</span><span>名詞を「<b>どんな名詞として話しているか</b>」を、小さく示してくれる</span></p>
 </section>
 
-<section class="slide center">
-  <svg class="blob" viewBox="0 0 1280 720"><path d="M 820 0 C 860 96, 958 150, 1064 160 C 1172 170, 1244 232, 1280 330 L 1280 0 Z"/></svg>
-  <p class="big">どちらも「猫を見た」。<br>でも、伝わる意味が<br><span class="v">ちょっと違う</span>んです</p>
+<!-- ============ 2' まずは a / an と the ============ -->
+<section class="slide">
+  <header class="bar"><span class="crumb">文法解説 / 冠詞</span><div class="brand"><img src="img/mark.png" alt=""><span>Hina English</span></div></header>
+  <div class="divider"></div>
+  <p class="eyebrow">ROADMAP</p>
+  <h2 class="title">まずは <span class="en a">a / an</span> と <span class="en the">the</span> の2つ</h2>
+  <div class="road">
+    <div class="stepcard card">
+      <span class="step-no">STEP 1</span>
+      <p class="step-h"><span class="en a">a / an</span> と <span class="en the">the</span></p>
+      <p class="step-d">まずはこの2つを理解しよう</p>
+      <span class="chip">まずはここから！</span>
+    </div>
+    <span class="arrow">→</span>
+    <div class="stepcard off">
+      <span class="step-no">STEP 2</span>
+      <p class="step-h">冠詞がつかないパターン</p>
+      <p class="step-d">そのあとで説明します</p>
+    </div>
+  </div>
 </section>
 
-<section class="slide center">
-  <svg class="blob" viewBox="0 0 1280 720"><path d="M 820 0 C 860 96, 958 150, 1064 160 C 1172 170, 1244 232, 1280 330 L 1280 0 Z"/></svg>
-  <p class="big">中学1年生で習うのに<br>ずっと<mark>モヤモヤ</mark>したまま…</p>
-  <p class="sub">そんな人、すごく多いんです</p>
-</section>
-
-<section class="slide center">
-  <svg class="blob" viewBox="0 0 1280 720"><path d="M 820 0 C 860 96, 958 150, 1064 160 C 1172 170, 1244 232, 1280 330 L 1280 0 Z"/></svg>
-  <p class="kicker">今日は</p>
-  <p class="big"><span class="v">たった1つのルール</span>で<br>スッキリさせます！</p>
-</section>
-
-<!-- ============ ② 今日のゴール ============ -->
-<section class="slide sec">
-  <svg class="blob" viewBox="0 0 1280 720"><path d="M 820 0 C 860 96, 958 150, 1064 160 C 1172 170, 1244 232, 1280 330 L 1280 0 Z"/></svg>
-  <img class="mini" src="character.png" alt="手を振るキャラクター">
-  <p class="kicker">SERIES</p>
-  <h1>モヤモヤ文法<br>スッキリ解説</h1>
-  <div class="rule"></div>
-  <p class="lead">初心者がモヤモヤしがちな文法を、1つずつスッキリさせるシリーズ</p>
-  <p class="ep">第1回　a と the の違い</p>
+<!-- ============ 3 a / an の使い方 ============ -->
+<section class="slide">
+  <header class="bar"><span class="crumb">文法解説 / 冠詞</span><div class="brand"><img src="img/mark.png" alt=""><span>Hina English</span></div></header>
+  <div class="divider"></div>
+  <p class="eyebrow">A / AN ・ MENTAL IMAGE</p>
+  <h2 class="title"><span class="en a">a / an</span> の使い方</h2>
+  <div class="mi">
+    <div class="mi-text card c-orange">
+      <p class="mi-eq"><span class="en a">a / an</span> ＝</p>
+      <p class="mi-big">たくさんある中の<br><mark>「1つ」</mark></p>
+      <div class="mi-chips"><span class="chip">1つの〜</span><span class="chip">ある〜</span><span class="mi-note">という感覚</span></div>
+    </div>
+    <div class="mi-visual card">
+      <img src="img/apple.png" alt="りんご">
+      <img src="img/apple.png" alt="りんご">
+      <img src="img/apple.png" alt="りんご">
+      <img src="img/apple.png" alt="りんご">
+      <div class="pick"><img src="img/apple.png" alt="りんご"><span class="pick-label">1つ</span></div>
+      <img src="img/apple.png" alt="りんご">
+    </div>
+  </div>
+  <p class="band"><span class="chip">よく使う場面</span><span>まだ相手が「どれのことか」分かっていないものを、<b>初めて会話に出す</b>とき</span></p>
 </section>
 
 <section class="slide">
-  <svg class="blob" viewBox="0 0 1280 720"><path d="M 820 0 C 860 96, 958 150, 1064 160 C 1172 170, 1244 232, 1280 330 L 1280 0 Z"/></svg>
-  <div class="top"><span class="pill">今日のゴール</span></div>
-  <p class="goal"><span class="en">a</span> と <span class="en">the</span> を<br><mark>迷わず選べる</mark>ようになる！</p>
-  <ol class="goal-steps">
-    <li><b>1</b><span>ルールは1つだけ</span></li>
-    <li><b>2</b><span>the になる3つの場面</span></li>
-    <li><b>3</b><span>よくある引っかけ</span></li>
-    <li><b>4</b><span>クイズで練習</span></li>
-  </ol>
-  <p class="band">最後にクイズあり！　<span class="v">一緒に声に出しながら</span>見てね</p>
+  <header class="bar"><span class="crumb">文法解説 / 冠詞</span><div class="brand"><img src="img/mark.png" alt=""><span>Hina English</span></div></header>
+  <div class="divider"></div>
+  <p class="eyebrow">A / AN ・ EXAMPLES</p>
+  <h2 class="title"><span class="en a">a / an</span> の例文</h2>
+  <div class="grid4">
+    <div class="ex c-orange"><img src="img/bag.png" alt="バッグ"><div><p class="ex-en">I bought <span class="a">a</span> bag.</p><p class="ex-ja">私はバッグを1つ買いました。</p></div></div>
+    <div class="ex c-yellow"><img src="img/dog.png" alt="犬"><div><p class="ex-en">I saw <span class="a">a</span> dog<br>in the park.</p><p class="ex-ja">私は公園で犬を1匹見ました。</p></div></div>
+    <div class="ex c-pink"><img src="img/teacher.png" alt="先生"><div><p class="ex-en">She is <span class="a">a</span> teacher.</p><p class="ex-ja">彼女は先生です。</p></div></div>
+    <div class="ex c-sky"><img src="img/apple.png" alt="りんご"><div><p class="ex-en">I ate <span class="a">an</span> apple.</p><p class="ex-ja">私はリンゴを1個食べました。</p></div></div>
+  </div>
 </section>
 
-<!-- ============ ③ ルールは1つだけ ============ -->
-<section class="slide sec">
-  <svg class="blob" viewBox="0 0 1280 720"><path d="M 820 0 C 860 96, 958 150, 1064 160 C 1172 170, 1244 232, 1280 330 L 1280 0 Z"/></svg>
-  <p class="kicker">RULE</p>
-  <h1>ルールは<br>1つだけ</h1>
-  <div class="rule"></div>
-  <p class="lead">覚えるのは、これだけ！</p>
-</section>
-
+<!-- ============ 4 職業 ============ -->
 <section class="slide">
-  <svg class="blob" viewBox="0 0 1280 720"><path d="M 820 0 C 860 96, 958 150, 1064 160 C 1172 170, 1244 232, 1280 330 L 1280 0 Z"/></svg>
-  <div class="top"><span class="pill">ルール</span><span class="what">相手の気持ちで決まる</span></div>
+  <header class="bar"><span class="crumb">文法解説 / 冠詞</span><div class="brand"><img src="img/mark.png" alt=""><span>Hina English</span></div></header>
+  <div class="divider"></div>
+  <p class="eyebrow">POINT</p>
+  <h2 class="title">職業を言うときも、基本的に <span class="en a">a / an</span></h2>
   <div class="duo">
-    <div class="rcard">
-      <span class="tile">a</span>
-      <p class="h">相手が<br><span class="q">「どれのこと？」</span>と思う</p>
-      <p class="d">相手はまだ知らない</p>
-    </div>
-    <div class="rcard">
-      <span class="tile">the</span>
-      <p class="h">相手が<br><span class="q">「あー、あれね」</span>とわかる</p>
-      <p class="d">相手も知っている</p>
-    </div>
+    <div class="job c-pink"><p class="job-en">She is <span class="a">a</span> nurse.</p><p class="job-ja">彼女は看護師です。</p><img src="img/nurse.png" alt="看護師"></div>
+    <div class="job c-sky"><p class="job-en">He is <span class="a">an</span> engineer.</p><p class="job-ja">彼はエンジニアです。</p><img src="img/engineer.png" alt="エンジニア"></div>
   </div>
 </section>
 
-<section class="slide center">
-  <svg class="blob" viewBox="0 0 1280 720"><path d="M 820 0 C 860 96, 958 150, 1064 160 C 1172 170, 1244 232, 1280 330 L 1280 0 Z"/></svg>
-  <p class="kicker">ポイント</p>
-  <p class="big">自分じゃなくて<br><mark>相手目線</mark>で考える</p>
-</section>
-
+<!-- ============ 5 a と an の違い ============ -->
 <section class="slide">
-  <svg class="blob" viewBox="0 0 1280 720"><path d="M 820 0 C 860 96, 958 150, 1064 160 C 1172 170, 1244 232, 1280 330 L 1280 0 Z"/></svg>
-  <div class="top"><span class="pill">ルール</span><span class="what">例で見てみよう</span></div>
-  <div class="sent"><p class="en">I saw <span class="v">a</span> cat.</p><p class="ja">猫を見たんだ</p></div>
-  <div class="rule"></div>
-  <div class="flow">
-    <div class="fbox"><span class="tag">シーン</span><p class="txt">帰り道で<br>たまたま見た猫</p></div>
-    <span class="arrow">→</span>
-    <div class="fbox say"><span class="tag pink">相手の気持ち</span><p class="txt">「どの猫？」<br><span class="s">知らない猫</span></p></div>
-    <span class="arrow">→</span>
-    <span class="tile">a</span>
-  </div>
-</section>
-
-<section class="slide">
-  <svg class="blob" viewBox="0 0 1280 720"><path d="M 820 0 C 860 96, 958 150, 1064 160 C 1172 170, 1244 232, 1280 330 L 1280 0 Z"/></svg>
-  <div class="top"><span class="pill">ルール</span><span class="what">例で見てみよう</span></div>
-  <div class="sent"><p class="en">I saw <span class="v">the</span> cat.</p><p class="ja">あの猫、見たよ！</p></div>
-  <div class="rule"></div>
-  <div class="flow">
-    <div class="fbox"><span class="tag">シーン</span><p class="txt">前に一緒に話した<br>近所の猫</p></div>
-    <span class="arrow">→</span>
-    <div class="fbox say"><span class="tag pink">相手の気持ち</span><p class="txt">「あの猫ね！」<br><span class="s">知っている猫</span></p></div>
-    <span class="arrow">→</span>
-    <span class="tile">the</span>
-  </div>
-</section>
-
-<section class="slide">
-  <svg class="blob" viewBox="0 0 1280 720"><path d="M 820 0 C 860 96, 958 150, 1064 160 C 1172 170, 1244 232, 1280 330 L 1280 0 Z"/></svg>
-  <div class="top"><span class="pill">ルール</span><span class="what">比べてみよう</span></div>
+  <header class="bar"><span class="crumb">文法解説 / 冠詞</span><div class="brand"><img src="img/mark.png" alt=""><span>Hina English</span></div></header>
+  <div class="divider"></div>
+  <p class="eyebrow">A or AN ?</p>
+  <h2 class="title"><span class="en a">a</span> と <span class="en a">an</span> の違い</h2>
+  <p class="lead"><span class="chip">ルール</span><span>次に来る単語の<mark>「音」</mark>で決まる</span></p>
   <div class="duo">
-    <div class="rcard">
-      <p class="eg">I saw <span class="v">a</span> cat.</p>
-      <p class="h">猫を見たんだ</p>
-      <p class="d">相手が知らない猫</p>
+    <div class="col c-orange">
+      <div class="col-head"><span class="art">a</span><p class="col-h">子音の音から始まる<small>（母音以外の音）</small></p></div>
+      <ul class="words">
+        <li><img src="img/book.png" alt="本"><span><span class="a">a</span> book</span></li>
+        <li><img src="img/dog.png" alt="犬"><span><span class="a">a</span> dog</span></li>
+        <li><img src="img/university.png" alt="大学"><span><span class="a">a</span> university</span></li>
+      </ul>
     </div>
-    <div class="rcard">
-      <p class="eg">I saw <span class="v">the</span> cat.</p>
-      <p class="h">あの猫、見たよ！</p>
-      <p class="d">相手も知っている猫</p>
+    <div class="col c-yellow">
+      <div class="col-head"><span class="art">an</span><p class="col-h">母音の音から始まる<small>（ア・イ・ウ・エ・オ に近い音）</small></p></div>
+      <ul class="words">
+        <li><img src="img/apple.png" alt="りんご"><span><span class="a">an</span> apple</span></li>
+        <li><img src="img/egg.png" alt="卵"><span><span class="a">an</span> egg</span></li>
+        <li><img src="img/clock.png" alt="時計"><span><span class="a">an</span> hour</span></li>
+      </ul>
     </div>
   </div>
-  <p class="band"><span class="v">the</span> は、ざっくり言うと「その」「あの」に近いイメージ</p>
-</section>
-
-<!-- ============ ④ the になる3つの場面 ============ -->
-<section class="slide sec">
-  <svg class="blob" viewBox="0 0 1280 720"><path d="M 820 0 C 860 96, 958 150, 1064 160 C 1172 170, 1244 232, 1280 330 L 1280 0 Z"/></svg>
-  <p class="kicker">SCENES</p>
-  <h1><span class="en">the</span> になる<br>3つの場面</h1>
-  <div class="rule"></div>
-  <ol class="steps">
-    <li><b>1</b><span>一度話に出たもの</span></li>
-    <li><b>2</b><span>その場の状況でわかるもの</span></li>
-    <li><b>3</b><span>世界に1つしかないもの</span></li>
-  </ol>
 </section>
 
 <section class="slide">
-  <svg class="blob" viewBox="0 0 1280 720"><path d="M 820 0 C 860 96, 958 150, 1064 160 C 1172 170, 1244 232, 1280 330 L 1280 0 Z"/></svg>
-  <div class="top"><span class="pill">場面 1</span><span class="what">一度話に出たもの</span></div>
-  <ol class="rows">
-    <li><span class="lab">1回目</span><div><p class="en">I saw <span class="v">a</span> cat on my way home.</p><p class="ja">帰り道で猫を見たの</p></div><p class="why">相手はまだ知らない<br>→ <span class="en v">a</span></p></li>
-  </ol>
+  <header class="bar"><span class="crumb">文法解説 / 冠詞</span><div class="brand"><img src="img/mark.png" alt=""><span>Hina English</span></div></header>
+  <div class="divider"></div>
+  <p class="eyebrow">POINT</p>
+  <h2 class="title">スペルではなく<mark>「音」</mark>で判断する</h2>
+  <div class="duo">
+    <div class="snd card">
+      <div class="snd-top"><img src="img/university.png" alt="大学"><div><p class="snd-word"><span class="hl">u</span>niversity</p><p class="snd-say">「<b>ユ</b>ニバーシティ」</p></div></div>
+      <p class="snd-why"><span class="en">u</span> で始まるけど、音は「<b>ユ</b>」<br>→ 子音の音</p>
+      <p class="snd-ans"><span class="a">a</span> university</p>
+    </div>
+    <div class="snd card">
+      <div class="snd-top"><img src="img/clock.png" alt="時計"><div><p class="snd-word"><span class="mute">h</span>our</p><p class="snd-say">「<b>ア</b>ワー」</p></div></div>
+      <p class="snd-why"><span class="en">h</span> は発音しないので、音は「<b>ア</b>」<br>→ 母音の音</p>
+      <p class="snd-ans"><span class="a">an</span> hour</p>
+    </div>
+  </div>
 </section>
 
+<!-- ============ 6 the の使い方 ============ -->
 <section class="slide">
-  <svg class="blob" viewBox="0 0 1280 720"><path d="M 820 0 C 860 96, 958 150, 1064 160 C 1172 170, 1244 232, 1280 330 L 1280 0 Z"/></svg>
-  <div class="top"><span class="pill">場面 1</span><span class="what">一度話に出たもの</span></div>
-  <ol class="rows">
-    <li><span class="lab">1回目</span><div><p class="en">I saw <span class="v">a</span> cat on my way home.</p><p class="ja">帰り道で猫を見たの</p></div><p class="why">相手はまだ知らない<br>→ <span class="en v">a</span></p></li>
-    <li><span class="lab">2回目</span><div><p class="en"><span class="v">The</span> cat was so cute.</p><p class="ja">その猫がすごくかわいくて</p></div><p class="why">「さっき言った猫ね」<br>→ <span class="en v">the</span></p></li>
-  </ol>
-</section>
-
-<section class="slide">
-  <svg class="blob" viewBox="0 0 1280 720"><path d="M 820 0 C 860 96, 958 150, 1064 160 C 1172 170, 1244 232, 1280 330 L 1280 0 Z"/></svg>
-  <div class="top"><span class="pill">場面 2</span><span class="what">その場の状況でわかるもの</span></div>
-  <div class="sent"><p class="en">Can you close <span class="v">the</span> door?</p><p class="ja">ドアを閉めてくれる？</p></div>
-  <div class="rule"></div>
-  <div class="flow">
-    <div class="fbox"><span class="tag">シーン</span><p class="txt">部屋の中で</p></div>
-    <span class="arrow">→</span>
-    <div class="fbox say"><span class="tag pink">相手の気持ち</span><p class="txt">「この部屋の<br>ドアのことね」</p></div>
-    <span class="arrow">→</span>
-    <span class="tile">the</span>
+  <header class="bar"><span class="crumb">文法解説 / 冠詞</span><div class="brand"><img src="img/mark.png" alt=""><span>Hina English</span></div></header>
+  <div class="divider"></div>
+  <p class="eyebrow">THE ・ MENTAL IMAGE</p>
+  <h2 class="title"><span class="en the">the</span> の使い方</h2>
+  <div class="mi">
+    <div class="mi-text card c-sky">
+      <p class="mi-eq"><span class="en the">the</span> ＝</p>
+      <p class="mi-big">「<span class="the">それ！</span>」と<br>指させるもの</p>
+    </div>
+    <div class="mi-visual card">
+      <img src="img/apple.png" alt="りんご">
+      <div class="pick the"><img src="img/apple.png" alt="りんご"><span class="pick-label">それ！</span></div>
+      <img src="img/apple.png" alt="りんご">
+      <img src="img/apple.png" alt="りんご">
+      <img src="img/apple.png" alt="りんご">
+      <img src="img/apple.png" alt="りんご">
+    </div>
+  </div>
+  <div class="uses">
+    <p class="use card"><span class="num">1</span><span>どの人・どの物のことか<b>特定できる</b>とき</span></p>
+    <p class="use card"><span class="num">2</span><span>話し手と聞き手の<b>両方が分かる</b>とき</span></p>
   </div>
 </section>
 
 <section class="slide">
-  <svg class="blob" viewBox="0 0 1280 720"><path d="M 820 0 C 860 96, 958 150, 1064 160 C 1172 170, 1244 232, 1280 330 L 1280 0 Z"/></svg>
-  <div class="top"><span class="pill">場面 2</span><span class="what">その場の状況でわかるもの</span></div>
-  <div class="sent"><p class="en">Where's <span class="v">the</span> restroom?</p><p class="ja">お手洗いはどこですか？</p></div>
-  <div class="rule"></div>
-  <div class="flow">
-    <div class="fbox"><span class="tag">シーン</span><p class="txt">レストランで</p></div>
-    <span class="arrow">→</span>
-    <div class="fbox say"><span class="tag pink">相手の気持ち</span><p class="txt">「このお店の<br>お手洗いね」</p></div>
-    <span class="arrow">→</span>
-    <span class="tile">the</span>
+  <header class="bar"><span class="crumb">文法解説 / 冠詞</span><div class="brand"><img src="img/mark.png" alt=""><span>Hina English</span></div></header>
+  <div class="divider"></div>
+  <p class="eyebrow">THE ・ EXAMPLES</p>
+  <h2 class="title"><span class="en the">the</span> の例文</h2>
+  <div class="rows">
+    <div class="row card"><img src="img/door.png" alt="ドア"><div><p class="row-en">Please close <span class="the">the</span> door.</p><p class="row-ja">そのドアを閉めてください。</p></div><p class="why">その場にいる人たちが<br>どのドアか分かっている</p></div>
+    <div class="row card"><img src="img/restroom.png" alt="トイレ"><div><p class="row-en">Where is <span class="the">the</span> bathroom?</p><p class="row-ja">トイレはどこですか？</p></div><p class="why">その場所にあるトイレを<br>指している</p></div>
+    <div class="row card"><img src="img/sun.png" alt="太陽"><div><p class="row-en"><span class="the">The</span> sun is bright today.</p><p class="row-ja">今日は太陽がまぶしいです。</p></div><p class="why">太陽は、どれのことか<br>特定できる</p></div>
+  </div>
+</section>
+
+<!-- ============ 7 クイズ：バッグ ============ -->
+<section class="slide">
+  <header class="bar"><span class="crumb">文法解説 / 冠詞</span><div class="brand"><img src="img/mark.png" alt=""><span>Hina English</span></div></header>
+  <div class="divider"></div>
+  <p class="eyebrow">QUIZ ・ 1</p>
+  <h2 class="title">（　）に入るのは <span class="en a">a / an</span>？ <span class="en the">the</span>？</h2>
+  <div class="quiz card">
+    <img src="img/bag.png" alt="バッグ">
+    <div class="qlines">
+      <div class="qline"><span>I bought</span><span class="blank"></span><span>bag.</span></div>
+      <div class="qline"><span class="blank"></span><span>bag was expensive.</span></div>
+    </div>
+  </div>
+  <div class="opts"><span class="art">a</span><span class="or">or</span><span class="art the">the</span><span class="ask">どっち？ 声に出して答えてみよう！</span></div>
+</section>
+
+<section class="slide">
+  <header class="bar"><span class="crumb">文法解説 / 冠詞</span><div class="brand"><img src="img/mark.png" alt=""><span>Hina English</span></div></header>
+  <div class="divider"></div>
+  <p class="eyebrow">QUIZ ・ 1　ANSWER</p>
+  <h2 class="title">（　）に入るのは <span class="en a">a / an</span>？ <span class="en the">the</span>？</h2>
+  <div class="quiz card">
+    <img src="img/bag.png" alt="バッグ">
+    <div class="qlines">
+      <div class="qline"><span>I bought</span><span class="fill">a</span><span>bag.</span></div>
+      <div class="qline"><span class="fill the">The</span><span>bag was expensive.</span></div>
+    </div>
+  </div>
+  <div class="kai card">
+    <p class="kai-line"><span class="chip">1回目</span><span>初登場なので → <span class="en a">a</span> <span class="en">bag</span></span></p>
+    <p class="kai-line"><span class="chip blue">2回目</span><span>「さっきのバッグ」と分かるので → <span class="en the">the</span> <span class="en">bag</span></span></p>
+    <p class="tr">私はバッグを買いました。そのバッグは高かったです。</p>
+  </div>
+</section>
+
+<!-- ============ 8 a / an と the の違い ============ -->
+<section class="slide">
+  <header class="bar"><span class="crumb">文法解説 / 冠詞</span><div class="brand"><img src="img/mark.png" alt=""><span>Hina English</span></div></header>
+  <div class="divider"></div>
+  <p class="eyebrow">COMPARE</p>
+  <h2 class="title"><span class="en a">a / an</span> と <span class="en the">the</span> の違い</h2>
+  <div class="cmp">
+    <div></div>
+    <div class="cmp-head c-orange"><span class="en a">a / an</span><span>まだ特定されていない「1つ」</span></div>
+    <div class="cmp-head c-sky"><span class="en the">the</span><span>どれのことか特定できる</span></div>
+    <div class="cmp-img"><img src="img/dog.png" alt="犬"></div>
+    <div class="cmp-cell card"><p class="en">I saw <span class="a">a</span> dog.</p><p class="ja">犬を1匹見ました。</p></div>
+    <div class="cmp-cell card"><p class="en"><span class="the">The</span> dog was cute.</p><p class="ja">その犬はかわいかったです。</p></div>
+    <div class="cmp-img"><img src="img/book.png" alt="本"></div>
+    <div class="cmp-cell card"><p class="en">I want to buy <span class="a">a</span> book.</p><p class="ja">本を1冊買いたいです。</p><p class="note">→ どの本かは、まだ決まっていない</p></div>
+    <div class="cmp-cell card"><p class="en">I want to buy <span class="the">the</span> book.</p><p class="ja">その本を買いたいです。</p><p class="note">→ 話し手と聞き手が、どの本か分かっている</p></div>
+  </div>
+</section>
+
+<!-- ============ 9 クイズ：カフェ ============ -->
+<section class="slide">
+  <header class="bar"><span class="crumb">文法解説 / 冠詞</span><div class="brand"><img src="img/mark.png" alt=""><span>Hina English</span></div></header>
+  <div class="divider"></div>
+  <p class="eyebrow">QUIZ ・ 2</p>
+  <h2 class="title">（　）に入るのは <span class="en a">a / an</span>？ <span class="en the">the</span>？</h2>
+  <div class="quiz card">
+    <img src="img/cafe.png" alt="カフェ">
+    <div class="qlines">
+      <div class="qline"><span>I went to</span><span class="blank"></span><span>cafe yesterday.</span></div>
+      <div class="qline"><span class="blank"></span><span>cafe was very quiet.</span></div>
+    </div>
+  </div>
+  <div class="opts"><span class="art">a</span><span class="or">or</span><span class="art the">the</span><span class="ask">どっち？ 声に出して答えてみよう！</span></div>
+</section>
+
+<section class="slide">
+  <header class="bar"><span class="crumb">文法解説 / 冠詞</span><div class="brand"><img src="img/mark.png" alt=""><span>Hina English</span></div></header>
+  <div class="divider"></div>
+  <p class="eyebrow">QUIZ ・ 2　ANSWER</p>
+  <h2 class="title">（　）に入るのは <span class="en a">a / an</span>？ <span class="en the">the</span>？</h2>
+  <div class="quiz card">
+    <img src="img/cafe.png" alt="カフェ">
+    <div class="qlines">
+      <div class="qline"><span>I went to</span><span class="fill">a</span><span>cafe yesterday.</span></div>
+      <div class="qline"><span class="fill the">The</span><span>cafe was very quiet.</span></div>
+    </div>
+  </div>
+  <div class="kai card">
+    <p class="kai-line"><span class="chip">1回目</span><span>初登場なので → <span class="en a">a</span> <span class="en">cafe</span></span></p>
+    <p class="kai-line"><span class="chip blue">2回目</span><span>「さっきのカフェ」と分かるので → <span class="en the">the</span> <span class="en">cafe</span></span></p>
+    <p class="tr">昨日、あるカフェに行きました。そのカフェはとても静かでした。</p>
   </div>
 </section>
 
 <section class="slide">
-  <svg class="blob" viewBox="0 0 1280 720"><path d="M 820 0 C 860 96, 958 150, 1064 160 C 1172 170, 1244 232, 1280 330 L 1280 0 Z"/></svg>
-  <div class="top"><span class="pill">場面 3</span><span class="what">世界に1つしかないもの</span></div>
-  <div class="sent"><p class="en"><span class="v">the</span> sun　／　<span class="v">the</span> moon</p><p class="ja">太陽　／　月</p></div>
-  <div class="rule"></div>
+  <header class="bar"><span class="crumb">文法解説 / 冠詞</span><div class="brand"><img src="img/mark.png" alt=""><span>Hina English</span></div></header>
+  <div class="divider"></div>
+  <p class="eyebrow">POINT</p>
+  <h2 class="title">会話で、とてもよく出てくる流れ</h2>
   <div class="flow">
-    <div class="fbox"><span class="tag">シーン</span><p class="txt">世界に1つだけ</p></div>
+    <div class="fcard c-orange">
+      <span class="chip">初登場</span>
+      <p class="f-sub">はじめて話に出る</p>
+      <p class="f-art a">a / an</p>
+      <div class="f-ex"><img src="img/cafe.png" alt="カフェ"><p><span class="a">a</span> cafe</p></div>
+    </div>
     <span class="arrow">→</span>
-    <div class="fbox say"><span class="tag pink">相手の気持ち</span><p class="txt">「どの太陽？」<br><span class="s">とはならない</span></p></div>
-    <span class="arrow">→</span>
-    <span class="tile">the</span>
+    <div class="fcard c-sky">
+      <span class="chip blue">2回目以降</span>
+      <p class="f-sub">「さっきのそれ」と分かる</p>
+      <p class="f-art the">the</p>
+      <div class="f-ex"><img src="img/cafe.png" alt="カフェ"><p><span class="the">the</span> cafe</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 予告 ============ -->
+<section class="slide">
+  <header class="bar"><span class="crumb">文法解説 / 冠詞</span><div class="brand"><img src="img/mark.png" alt=""><span>Hina English</span></div></header>
+  <div class="divider"></div>
+  <p class="eyebrow">NEXT ・ 次回予告</p>
+  <h2 class="title">すべての名詞に <span class="en a">a / an</span> をつけられるわけではない</h2>
+  <p class="sub-lead">そこで大切なのが…</p>
+  <div class="duo">
+    <div class="nc c-orange"><p class="nc-h">数えられる名詞</p><p class="nc-s">可算名詞</p><div class="nc-imgs"><img src="img/book.png" alt="本"><img src="img/apple.png" alt="りんご"><img src="img/dog.png" alt="犬"></div></div>
+    <div class="nc c-sky"><p class="nc-h">数えられない名詞</p><p class="nc-s">不可算名詞</p><div class="nc-imgs"><img src="img/water.png" alt="水"><img src="img/heart.png" alt="愛"><img src="img/happy.png" alt="幸せ"></div></div>
   </div>
 </section>
 
 <section class="slide">
-  <svg class="blob" viewBox="0 0 1280 720"><path d="M 820 0 C 860 96, 958 150, 1064 160 C 1172 170, 1244 232, 1280 330 L 1280 0 Z"/></svg>
-  <div class="top"><span class="pill">おさらい</span><span class="what">the になる3つの場面</span></div>
+  <header class="bar"><span class="crumb">文法解説 / 冠詞</span><div class="brand"><img src="img/mark.png" alt=""><span>Hina English</span></div></header>
+  <div class="divider"></div>
+  <p class="eyebrow">NEXT ・ 次回予告</p>
+  <h2 class="title">数えられる名詞（可算名詞）</h2>
+  <p class="sub-lead">1つ、2つ、3つ…と数えられる名詞</p>
+  <div class="grid4">
+    <div class="cnt card"><p class="cnt-w">book</p><div class="cnt-g"><div class="cnt-imgs"><img src="img/book.png" alt="本"></div><p>one book</p></div><div class="cnt-g"><div class="cnt-imgs"><img src="img/book.png" alt="本"><img src="img/book.png" alt="本"></div><p>two books</p></div></div>
+    <div class="cnt card"><p class="cnt-w">apple</p><div class="cnt-g"><div class="cnt-imgs"><img src="img/apple.png" alt="りんご"></div><p>one apple</p></div><div class="cnt-g"><div class="cnt-imgs"><img src="img/apple.png" alt="りんご"><img src="img/apple.png" alt="りんご"></div><p>two apples</p></div></div>
+    <div class="cnt card"><p class="cnt-w">dog</p><div class="cnt-g"><div class="cnt-imgs"><img src="img/dog.png" alt="犬"></div><p>one dog</p></div><div class="cnt-g"><div class="cnt-imgs"><img src="img/dog.png" alt="犬"><img src="img/dog.png" alt="犬"></div><p>two dogs</p></div></div>
+    <div class="cnt card"><p class="cnt-w">student</p><div class="cnt-g"><div class="cnt-imgs"><img src="img/student.png" alt="学生"></div><p>one student</p></div><div class="cnt-g"><div class="cnt-imgs"><img src="img/student.png" alt="学生"><img src="img/student.png" alt="学生"></div><p>two students</p></div></div>
+  </div>
+  <p class="band"><span class="chip">1つだけなら</span><span><span class="en a">a / an</span> を使える：　<span class="en"><span class="a">a</span> book ／ <span class="a">an</span> apple ／ <span class="a">a</span> dog</span></span></p>
+</section>
+
+<section class="slide">
+  <header class="bar"><span class="crumb">文法解説 / 冠詞</span><div class="brand"><img src="img/mark.png" alt=""><span>Hina English</span></div></header>
+  <div class="divider"></div>
+  <p class="eyebrow">NEXT ・ 次回予告</p>
+  <h2 class="title">数えられない名詞（不可算名詞）</h2>
+  <p class="lead"><span class="chip blue">ルール</span><span>1つ、2つ…とそのまま数えられない　→　<span class="en a">a / an</span> は使えない</span></p>
   <div class="trio">
-    <div class="scard"><span class="num-b">1</span><p class="h">一度話に出たもの</p><div class="eg"><p><span class="v">The</span> cat was so cute.</p><p class="egj">その猫がすごくかわいくて</p></div></div>
-    <div class="scard"><span class="num-b">2</span><p class="h">その場の状況で<br>わかるもの</p><div class="eg"><p>Can you close <span class="v">the</span> door?</p><p class="egj">ドアを閉めてくれる？</p></div></div>
-    <div class="scard"><span class="num-b">3</span><p class="h">世界に1つしか<br>ないもの</p><div class="eg"><p><span class="v">the</span> sun ／ <span class="v">the</span> moon</p><p class="egj">太陽 ／ 月</p></div></div>
-  </div>
-  <p class="band">どれも、相手が<span class="v">「あれね」</span>とわかる　→　<span class="en v">the</span></p>
-</section>
-
-<!-- ============ ⑤ 引っかけ ============ -->
-<section class="slide center">
-  <svg class="blob" viewBox="0 0 1280 720"><path d="M 820 0 C 860 96, 958 150, 1064 160 C 1172 170, 1244 232, 1280 330 L 1280 0 Z"/></svg>
-  <p class="kicker">ここで引っかけ問題！</p>
-  <p class="big">お姉ちゃんが1人だけ。<br>「姉がいます」は？</p>
-  <div class="qline"><span>I have</span><span class="blank"></span><span>sister.</span></div>
-</section>
-
-<section class="slide">
-  <svg class="blob" viewBox="0 0 1280 720"><path d="M 820 0 C 860 96, 958 150, 1064 160 C 1172 170, 1244 232, 1280 330 L 1280 0 Z"/></svg>
-  <div class="top"><span class="pill">引っかけ</span><span class="what">「姉がいます」（お姉ちゃんは1人だけ）</span></div>
-  <div class="cards">
-    <div class="ans ng"><span class="badge">×</span><p class="en">I have <span class="v">the</span> sister.</p><p class="ja">1人しかいないから the …？</p></div>
+    <div class="un card"><div class="un-img c-sky"><img src="img/water.png" alt="水"></div><p class="un-w">water</p><p class="un-ja">水</p><p class="un-ng"><span class="x">×</span> a water</p></div>
+    <div class="un card"><div class="un-img c-pink"><img src="img/heart.png" alt="愛"></div><p class="un-w">love</p><p class="un-ja">愛</p><p class="un-ng"><span class="x">×</span> a love</p></div>
+    <div class="un card"><div class="un-img c-yellow"><img src="img/happy.png" alt="幸せ"></div><p class="un-w">happiness</p><p class="un-ja">幸せ</p><p class="un-ng"><span class="x">×</span> a happiness</p></div>
   </div>
 </section>
 
-<section class="slide">
-  <svg class="blob" viewBox="0 0 1280 720"><path d="M 820 0 C 860 96, 958 150, 1064 160 C 1172 170, 1244 232, 1280 330 L 1280 0 Z"/></svg>
-  <div class="top"><span class="pill">引っかけ</span><span class="what">「姉がいます」（お姉ちゃんは1人だけ）</span></div>
-  <div class="cards">
-    <div class="ans ng"><span class="badge">×</span><p class="en">I have <span class="v">the</span> sister.</p><p class="ja">1人しかいないから the …？</p></div>
-    <div class="ans ok"><span class="badge">○</span><p class="en">I have <span class="v">a</span> sister.</p><p class="ja">相手はまだ、私のお姉ちゃんを知らない　→　a</p></div>
+<!-- ============ エンディング ============ -->
+<section class="slide cover">
+  <div class="hero">
+    <p class="hero-kicker">NEXT</p>
+    <h1 class="hero-title sm">続きは<br>次回の動画で！</h1>
+    <p class="hero-sub sm">数えられる名詞 / 数えられない名詞</p>
+    <p class="hero-hand">Small steps, big changes.</p>
+    <img class="tile" src="img/tile.png" alt="">
   </div>
-</section>
-
-<section class="slide">
-  <svg class="blob" viewBox="0 0 1280 720"><path d="M 820 0 C 860 96, 958 150, 1064 160 C 1172 170, 1244 232, 1280 330 L 1280 0 Z"/></svg>
-  <div class="top"><span class="pill">引っかけ</span><span class="what">太陽とお姉ちゃん、何が違う？</span></div>
-  <div class="duo">
-    <div class="rcard">
-      <p class="eg"><span class="v">the</span> sun</p>
-      <p class="step">世界に1つ</p>
-      <p class="down">↓</p>
-      <p class="step">誰が聞いても<br><span class="v">どれのことかわかる</span></p>
-      <p class="down">↓</p>
-      <p class="eg v">the</p>
-    </div>
-    <div class="rcard">
-      <p class="eg"><span class="v">a</span> sister</p>
-      <p class="step">私には1人</p>
-      <p class="down">↓</p>
-      <p class="step">でも相手は<br><span class="v">まだ知らない</span></p>
-      <p class="down">↓</p>
-      <p class="eg v">a</p>
-    </div>
-  </div>
-</section>
-
-<section class="slide center">
-  <svg class="blob" viewBox="0 0 1280 720"><path d="M 820 0 C 860 96, 958 150, 1064 160 C 1172 170, 1244 232, 1280 330 L 1280 0 Z"/></svg>
-  <p class="kicker">今日いちばん大事なポイント</p>
-  <p class="big">「1つしかないか」じゃなくて<br><mark>「相手がわかるか」</mark>で決まる</p>
-</section>
-
-<!-- ============ ⑥ a café / the café ============ -->
-<section class="slide center">
-  <svg class="blob" viewBox="0 0 1280 720"><path d="M 820 0 C 860 96, 958 150, 1064 160 C 1172 170, 1244 232, 1280 330 L 1280 0 Z"/></svg>
-  <p class="kicker">会話でよく使う例</p>
-  <p class="big">友達に<br>「カフェ行こうよ」</p>
-  <div class="qline"><span>Let's go to</span><span class="blank"></span><span>café.</span></div>
-</section>
-
-<section class="slide">
-  <svg class="blob" viewBox="0 0 1280 720"><path d="M 820 0 C 860 96, 958 150, 1064 160 C 1172 170, 1244 232, 1280 330 L 1280 0 Z"/></svg>
-  <div class="top"><span class="pill">意味が変わる</span><span class="what">友達に「カフェ行こうよ」</span></div>
-  <ol class="rows mean">
-    <li><p class="en">Let's go to <span class="v">a</span> café.</p><span class="arrow">→</span><p class="ja">どこでもいいから<br>カフェに行こう</p></li>
-  </ol>
-</section>
-
-<section class="slide">
-  <svg class="blob" viewBox="0 0 1280 720"><path d="M 820 0 C 860 96, 958 150, 1064 160 C 1172 170, 1244 232, 1280 330 L 1280 0 Z"/></svg>
-  <div class="top"><span class="pill">意味が変わる</span><span class="what">友達に「カフェ行こうよ」</span></div>
-  <ol class="rows mean">
-    <li><p class="en">Let's go to <span class="v">a</span> café.</p><span class="arrow">→</span><p class="ja">どこでもいいから<br>カフェに行こう</p></li>
-    <li><p class="en">Let's go to <span class="v">the</span> café.</p><span class="arrow">→</span><p class="ja">2人がわかっている<br><span class="v">いつもの、あのカフェ</span>に行こう</p></li>
-  </ol>
-</section>
-
-<section class="slide center">
-  <svg class="blob" viewBox="0 0 1280 720"><path d="M 820 0 C 860 96, 958 150, 1064 160 C 1172 170, 1244 232, 1280 330 L 1280 0 Z"/></svg>
-  <p class="big"><span class="en">a</span> と <span class="en">the</span> を変えるだけで<br><mark>伝わる意味</mark>が変わる！</p>
-</section>
-
-<!-- ============ ⑦ クイズ ============ -->
-<section class="slide sec">
-  <svg class="blob" viewBox="0 0 1280 720"><path d="M 820 0 C 860 96, 958 150, 1064 160 C 1172 170, 1244 232, 1280 330 L 1280 0 Z"/></svg>
-  <img class="mini" src="character.png" alt="手を振るキャラクター">
-  <p class="kicker">QUIZ</p>
-  <h1><span class="en">a</span> と <span class="en">the</span><br>どっち？</h1>
-  <div class="rule"></div>
-  <p class="lead">カッコに入るのは a か the か。全4問！</p>
-  <ol class="steps">
-    <li><b>1</b><span>問題を見て、a か the か考える</span></li>
-    <li><b>2</b><span>声に出して答えてみる</span></li>
-    <li><b>3</b><span>答え合わせ</span></li>
-  </ol>
-</section>
-
-<!-- Q1 -->
-<section class="slide">
-  <svg class="blob" viewBox="0 0 1280 720"><path d="M 820 0 C 860 96, 958 150, 1064 160 C 1172 170, 1244 232, 1280 330 L 1280 0 Z"/></svg>
-  <div class="top"><span class="num">Q1</span><span class="pill">クイズ</span></div>
-  <div class="qwrap">
-    <div class="qline"><span>I bought</span><span class="blank"></span><span>book yesterday.</span></div>
-    <div class="qline"><span class="blank"></span><span>book is really interesting.</span></div>
-  </div>
-  <div class="opts"><span class="tile soft">a</span><span class="or">or</span><span class="tile soft">the</span><span class="ask">どっち？</span></div>
-</section>
-
-<section class="slide">
-  <svg class="blob" viewBox="0 0 1280 720"><path d="M 820 0 C 860 96, 958 150, 1064 160 C 1172 170, 1244 232, 1280 330 L 1280 0 Z"/></svg>
-  <div class="top"><span class="num">Q1</span><span class="pill">こたえ</span></div>
-  <div class="qwrap">
-    <div class="qline"><span>I bought</span><span class="fill">a</span><span>book yesterday.</span></div>
-    <div class="qline"><span class="fill">The</span><span>book is really interesting.</span></div>
-  </div>
-  <div class="kai">
-    <p class="line"><span class="tag pink">解説</span><span>1回目は初めて話に出る本 → <span class="en v">a</span>　／　2回目は「その本」 → <span class="en v">The</span></span></p>
-    <p class="tr">昨日、本を買ったの。その本がすごくおもしろくて。</p>
-  </div>
-</section>
-
-<!-- Q2 -->
-<section class="slide">
-  <svg class="blob" viewBox="0 0 1280 720"><path d="M 820 0 C 860 96, 958 150, 1064 160 C 1172 170, 1244 232, 1280 330 L 1280 0 Z"/></svg>
-  <div class="top"><span class="num">Q2</span><span class="pill">クイズ</span></div>
-  <p class="scene">窓が1つしかない部屋で</p>
-  <div class="qwrap">
-    <div class="qline"><span>Can you open</span><span class="blank"></span><span>window?</span></div>
-  </div>
-  <div class="opts"><span class="tile soft">a</span><span class="or">or</span><span class="tile soft">the</span><span class="ask">どっち？</span></div>
-</section>
-
-<section class="slide">
-  <svg class="blob" viewBox="0 0 1280 720"><path d="M 820 0 C 860 96, 958 150, 1064 160 C 1172 170, 1244 232, 1280 330 L 1280 0 Z"/></svg>
-  <div class="top"><span class="num">Q2</span><span class="pill">こたえ</span></div>
-  <p class="scene">窓が1つしかない部屋で</p>
-  <div class="qwrap">
-    <div class="qline"><span>Can you open</span><span class="fill">the</span><span>window?</span></div>
-  </div>
-  <div class="kai">
-    <p class="line"><span class="tag pink">解説</span><span>この部屋の窓だとわかる → <span class="en v">the</span></span></p>
-    <p class="tr">窓を開けてくれる？</p>
-  </div>
-</section>
-
-<!-- Q3 -->
-<section class="slide">
-  <svg class="blob" viewBox="0 0 1280 720"><path d="M 820 0 C 860 96, 958 150, 1064 160 C 1172 170, 1244 232, 1280 330 L 1280 0 Z"/></svg>
-  <div class="top"><span class="num">Q3</span><span class="pill">クイズ</span></div>
-  <p class="scene">「いつか犬を飼いたいな」</p>
-  <div class="qwrap">
-    <div class="qline"><span>I want to get</span><span class="blank"></span><span>dog someday.</span></div>
-  </div>
-  <div class="opts"><span class="tile soft">a</span><span class="or">or</span><span class="tile soft">the</span><span class="ask">どっち？</span></div>
-</section>
-
-<section class="slide">
-  <svg class="blob" viewBox="0 0 1280 720"><path d="M 820 0 C 860 96, 958 150, 1064 160 C 1172 170, 1244 232, 1280 330 L 1280 0 Z"/></svg>
-  <div class="top"><span class="num">Q3</span><span class="pill">こたえ</span></div>
-  <p class="scene">「いつか犬を飼いたいな」</p>
-  <div class="qwrap">
-    <div class="qline"><span>I want to get</span><span class="fill">a</span><span>dog someday.</span></div>
-  </div>
-  <div class="kai">
-    <p class="line"><span class="tag pink">解説</span><span>まだどの犬か決まっていない → <span class="en v">a</span></span></p>
-    <p class="tr">いつか犬を飼いたいな。</p>
-  </div>
-</section>
-
-<!-- Q4 -->
-<section class="slide">
-  <svg class="blob" viewBox="0 0 1280 720"><path d="M 820 0 C 860 96, 958 150, 1064 160 C 1172 170, 1244 232, 1280 330 L 1280 0 Z"/></svg>
-  <div class="top"><span class="num">Q4</span><span class="pill">クイズ</span></div>
-  <p class="scene">夜、空を見上げて</p>
-  <div class="qwrap">
-    <div class="qline"><span>Look at</span><span class="blank"></span><span>moon!</span></div>
-    <div class="qline plain"><span>It's so beautiful.</span></div>
-  </div>
-  <div class="opts"><span class="tile soft">a</span><span class="or">or</span><span class="tile soft">the</span><span class="ask">どっち？</span></div>
-</section>
-
-<section class="slide">
-  <svg class="blob" viewBox="0 0 1280 720"><path d="M 820 0 C 860 96, 958 150, 1064 160 C 1172 170, 1244 232, 1280 330 L 1280 0 Z"/></svg>
-  <div class="top"><span class="num">Q4</span><span class="pill">こたえ</span></div>
-  <p class="scene">夜、空を見上げて</p>
-  <div class="qwrap">
-    <div class="qline"><span>Look at</span><span class="fill">the</span><span>moon!</span></div>
-    <div class="qline plain"><span>It's so beautiful.</span></div>
-  </div>
-  <div class="kai">
-    <p class="line"><span class="tag pink">解説</span><span>月は1つしかない → <span class="en v">the</span></span></p>
-    <p class="tr">見て、月！すごくきれい。</p>
-  </div>
-</section>
-
-<section class="slide center">
-  <svg class="blob" viewBox="0 0 1280 720"><path d="M 820 0 C 860 96, 958 150, 1064 160 C 1172 170, 1244 232, 1280 330 L 1280 0 Z"/></svg>
-  <img class="mini lg" src="character.png" alt="手を振るキャラクター">
-  <p class="big">何問できた？</p>
-  <p class="sub">全部できた人は<br><span class="v">a と the の基本はもうバッチリ！</span></p>
-</section>
-
-<!-- ============ ⑧ まとめ ============ -->
-<section class="slide sheet">
-  <svg class="blob" viewBox="0 0 1280 720"><path d="M 820 0 C 860 96, 958 150, 1064 160 C 1172 170, 1244 232, 1280 330 L 1280 0 Z"/></svg>
-  <div class="sheet-title"><h2>今日のまとめ</h2><p>スクショして見返してね！</p></div>
-  <div class="rule"></div>
-  <div class="sum">
-    <div class="rc"><span class="tile">a</span><div><p class="h">相手が「どれ？」と思う</p><p class="eg">I saw <span class="v">a</span> cat.</p></div></div>
-    <div class="rc"><span class="tile">the</span><div><p class="h">相手が「あれね」とわかる</p><p class="eg">I saw <span class="v">the</span> cat.</p></div></div>
-    <div class="sc"><div class="hd"><span class="num-b">1</span><p class="h">一度話に出たもの</p></div><div class="eg"><p><span class="v">The</span> cat was so cute.</p><p class="egj">その猫がすごくかわいくて</p></div></div>
-    <div class="sc"><div class="hd"><span class="num-b">2</span><p class="h">その場の状況でわかるもの</p></div><div class="eg"><p>Can you close <span class="v">the</span> door?</p><p class="egj">ドアを閉めてくれる？</p></div></div>
-    <div class="sc"><div class="hd"><span class="num-b">3</span><p class="h">世界に1つしかないもの</p></div><div class="eg"><p><span class="v">the</span> sun ／ <span class="v">the</span> moon</p><p class="egj">太陽 ／ 月</p></div></div>
-  </div>
-  <p class="band">自分じゃなくて<span class="v">相手目線</span>！　「1つしかないか」ではなく<span class="v">「相手がわかるか」</span></p>
-</section>
-
-<!-- ============ ⑨ 続きの予告とサロン案内 ============ -->
-<section class="slide center">
-  <svg class="blob" viewBox="0 0 1280 720"><path d="M 820 0 C 860 96, 958 150, 1064 160 C 1172 170, 1244 232, 1280 330 L 1280 0 Z"/></svg>
-  <p class="big">……でも、ここまで聞いて<br>こう思わなかった？</p>
-</section>
-
-<section class="slide">
-  <svg class="blob" viewBox="0 0 1280 720"><path d="M 820 0 C 860 96, 958 150, 1064 160 C 1172 170, 1244 232, 1280 330 L 1280 0 Z"/></svg>
-  <div class="top"><span class="pill">まだあるモヤモヤ</span></div>
-  <ol class="rows three">
-    <li><span class="lab q">?</span><p class="en lg">I go to school.</p><p class="why">なんで <span class="en">a</span> も <span class="en">the</span> も<br>つかないの？</p></li>
-  </ol>
-</section>
-
-<section class="slide">
-  <svg class="blob" viewBox="0 0 1280 720"><path d="M 820 0 C 860 96, 958 150, 1064 160 C 1172 170, 1244 232, 1280 330 L 1280 0 Z"/></svg>
-  <div class="top"><span class="pill">まだあるモヤモヤ</span></div>
-  <ol class="rows three">
-    <li><span class="lab q">?</span><p class="en lg">I go to school.</p><p class="why">なんで <span class="en">a</span> も <span class="en">the</span> も<br>つかないの？</p></li>
-    <li><span class="lab q">?</span><p class="en lg">water</p><p class="why">なんで <span class="en">a</span> が<br>つかないの？</p></li>
-  </ol>
-</section>
-
-<section class="slide">
-  <svg class="blob" viewBox="0 0 1280 720"><path d="M 820 0 C 860 96, 958 150, 1064 160 C 1172 170, 1244 232, 1280 330 L 1280 0 Z"/></svg>
-  <div class="top"><span class="pill">まだあるモヤモヤ</span></div>
-  <ol class="rows three">
-    <li><span class="lab q">?</span><p class="en lg">I go to school.</p><p class="why">なんで <span class="en">a</span> も <span class="en">the</span> も<br>つかないの？</p></li>
-    <li><span class="lab q">?</span><p class="en lg">water</p><p class="why">なんで <span class="en">a</span> が<br>つかないの？</p></li>
-    <li><span class="lab q">?</span><p class="en lg">play <span class="v">the</span> piano</p><p class="why">なんで <span class="en">the</span> が<br>つくの？</p></li>
-  </ol>
-</section>
-
-<section class="slide sec">
-  <svg class="blob" viewBox="0 0 1280 720"><path d="M 820 0 C 860 96, 958 150, 1064 160 C 1172 170, 1244 232, 1280 330 L 1280 0 Z"/></svg>
-  <img class="mini" src="character.png" alt="手を振るキャラクター">
-  <p class="kicker">NEXT</p>
-  <h1>続きはサロンで！</h1>
-  <div class="rule"></div>
-  <p class="lead">このモヤモヤは「モヤモヤ文法スッキリ解説」の続きで解説しています</p>
-  <ol class="steps">
-    <li><b>1</b><span>毎月6本、新しい動画を公開</span></li>
-    <li><b>2</b><span>動画のまとめPDFと練習問題をダウンロードできる</span></li>
-    <li><b>3</b><span>初心者がモヤモヤしがちな文法を、1つずつスッキリ</span></li>
-  </ol>
-</section>
-
-<!-- ============ ⑩ エンディング ============ -->
-<section class="slide center">
-  <svg class="blob" viewBox="0 0 1280 720"><path d="M 820 0 C 860 96, 958 150, 1064 160 C 1172 170, 1244 232, 1280 330 L 1280 0 Z"/></svg>
-  <img class="mini lg" src="character.png" alt="手を振るキャラクター">
-  <p class="big">最後まで見てくれて<br>ありがとう！</p>
-  <p class="sub"><span class="en">a</span> と <span class="en">the</span>、今日から意識して使ってみてね</p>
-  <p class="en-xl bye">See you!</p>
 </section>
 
 </body>
