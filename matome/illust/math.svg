@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="400" height="400">
+<ellipse cx="200" cy="352" rx="150" ry="13" fill="#1C2340" opacity=".08"/>
+<rect x="92" y="70" width="216" height="272" rx="14" fill="#7CC7F4"/>
+<rect x="104" y="64" width="210" height="270" rx="12" fill="#fff" stroke="#D6E2F0" stroke-width="3"/>
+<g fill="#9AA6BC"><rect x="96" y="96" width="22" height="8" rx="4"/><rect x="96" y="128" width="22" height="8" rx="4"/><rect x="96" y="160" width="22" height="8" rx="4"/><rect x="96" y="192" width="22" height="8" rx="4"/><rect x="96" y="224" width="22" height="8" rx="4"/><rect x="96" y="256" width="22" height="8" rx="4"/><rect x="96" y="288" width="22" height="8" rx="4"/></g>
+<path d="M136 118 H290 M136 178 H290 M136 238 H290 M136 298 H290" stroke="#DDEFFC" stroke-width="3"/>
+<text x="140" y="164" font-family="DM Sans" font-weight="800" font-size="40" fill="#1C2340">1 + 2 =</text>
+<text x="272" y="164" font-family="DM Sans" font-weight="800" font-size="40" fill="#E8461E">3</text>
+<text x="140" y="226" font-family="DM Sans" font-weight="800" font-size="40" fill="#1C2340">5 × 4</text>
+<path d="M236 344 L236 238 L330 344 Z" fill="#FFD24D" opacity=".95"/>
+<path d="M258 322 L258 292 L284 322 Z" fill="#fff"/>
+</svg>

@@ -53,6 +53,37 @@
   .rows.pl .row { grid-template-columns: 200px 1fr 300px; }
   .rows.pl .imgs img { width: 96px; height: 96px; }
   .band .ng { color: var(--muted); }
+  .rows.pl .imgs { justify-content: center; }
+
+  /* 固有名詞: one row per kind (人・都市・国・施設) */
+  .rows.pn { gap: 12px; }
+  .rows.pn .row { grid-template-columns: 84px 1fr 120px; }
+  .rows.pn .row img { width: 84px; height: 84px; }
+  .rows.pn .row-en { font-size: 30px; }
+  .rows.pn .row-ja { margin-top: 2px; font-size: 18px; }
+  .kind { justify-self: end; min-width: 96px; text-align: center; border-radius: 999px; background: var(--blue-soft); color: #1F6FB2; font-size: 20px; font-weight: 700; padding: 6px 16px; }
+
+  /* the がつく国名 */
+  .lgrid.c3 { grid-template-columns: repeat(3, 1fr); }
+  .c3 .lname { font-size: 30px; }
+
+  /* ほかにもある無冠詞 */
+  .ogrid { flex: 1; margin-top: 20px; display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 18px; min-height: 0; }
+  .ocard { display: flex; align-items: center; gap: 22px; padding: 0 28px; }
+  .ocard img { flex: none; width: 124px; height: 124px; }
+  .o-k { display: inline-block; font-size: 17px; font-weight: 700; color: #1F6FB2; background: var(--blue-soft); border-radius: 999px; padding: 3px 14px; }
+  .o-en { margin-top: 8px; font-family: var(--en); font-weight: 800; font-size: 28px; line-height: 1.3; }
+  .o-ja { margin-top: 4px; font-size: 17px; color: var(--ink-2); }
+
+  /* まとめ */
+  .sum-u { flex: 1; margin-top: 18px; padding: 12px 26px; display: flex; flex-direction: column; min-height: 0; }
+  .sum-head { display: flex; align-items: center; gap: 16px; padding: 4px 0 10px; font-size: 20px; }
+  .sum-row { flex: 1; display: grid; grid-template-columns: 330px 1fr; align-items: center; border-top: 2px solid #EEF2F8; }
+  .sum-row .k { display: flex; align-items: center; gap: 10px; font-size: 19px; font-weight: 700; }
+  .sum-row .k .num { width: 30px; height: 30px; font-size: 15px; background: var(--primary); }
+  .sum-row .w { font-family: var(--en); font-weight: 700; font-size: 21px; color: var(--ink-2); }
+  .sum-n { flex: none; margin-top: 14px; display: flex; align-items: center; gap: 14px; padding: 14px 24px; font-size: 19px; }
+  .sum-n .en { font-size: 20px; font-weight: 700; }
 
   /* furniture の仲間 */
   .kin { flex: 1; margin-top: 18px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; min-height: 0; }
@@ -126,7 +157,7 @@
   <h2 class="title">無冠詞になる、6つのパターン</h2>
   <div class="zgrid">
     <div class="zcard card"><span class="num">1</span><img src="../img/movie.png" alt="映画"><p>複数名詞<small class="en">movies</small></p></div>
-    <div class="zcard card"><span class="num">2</span><img src="../img/furniture.png" alt="家具"><p>まとめて指す名詞<small class="en">furniture</small></p></div>
+    <div class="zcard card"><span class="num">2</span><img src="../img/music.png" alt="音楽"><p>数えられない名詞<small class="en">music / furniture</small></p></div>
     <div class="zcard card"><span class="num">3</span><img src="../img/torii.png" alt="鳥居"><p>固有名詞<small class="en">Kyoto</small></p></div>
     <div class="zcard card"><span class="num">4</span><img src="../img/hello.png" alt="英語"><p>言語<small class="en">English</small></p></div>
     <div class="zcard card"><span class="num">5</span><img src="../img/breakfast.png" alt="朝食"><p>食事<small class="en">breakfast</small></p></div>
@@ -138,7 +169,7 @@
 <section class="slide">
   <header class="bar"><span class="crumb">文法解説 / 冠詞 Part 3</span></header>
   <div class="divider"></div>
-  <h2 class="title">1. 複数名詞のときは、冠詞をつけない</h2>
+  <h2 class="title">1. 複数名詞で「〜全般」を言うとき</h2>
   <div class="duo">
     <div class="vs c-orange">
       <span class="chip">1つ</span>
@@ -152,7 +183,7 @@
       <div class="imgs"><img src="../img/movie.png" alt="映画"><img src="../img/movie.png" alt="映画"></div>
       <p class="vs-en">I like <mark>movies</mark>.</p>
       <p class="vs-ja">私は映画が好きです。</p>
-      <p class="vs-why">複数名詞 <span class="en">movies</span>　→　冠詞なし</p>
+      <p class="vs-why">映画全般の話　→　冠詞なし</p>
     </div>
   </div>
   <p class="band"><span class="chip">ポイント</span><span><span class="en a">a / an</span> は「1つ」のときだけ。複数名詞にはつけない</span></p>
@@ -171,11 +202,37 @@
   <p class="band"><span class="chip">よくある間違い</span><span><span class="en ng">× I like dog.　× I like a dog.</span>　→　<span class="en">○ I like dogs.</span>（「〜が好き」は複数形で）</span></p>
 </section>
 
+<section class="slide">
+  <header class="bar"><span class="crumb">文法解説 / 冠詞 Part 3</span></header>
+  <div class="divider"></div>
+  <p class="eyebrow">POINT</p>
+  <h2 class="title">複数名詞でも、特定のものなら <span class="en the">the</span></h2>
+  <div class="rows pl">
+    <div class="row card"><div class="imgs"><img src="../img/dog.png" alt="犬"><img src="../img/dog.png" alt="犬"></div><div><p class="row-en">I like <mark>dogs</mark>.</p><p class="row-ja">犬が好きです。</p></div><p class="why">犬全般の話<br>→ 冠詞なし</p></div>
+    <div class="row card"><div class="imgs"><img src="../img/house.png" alt="隣の家"><img src="../img/dog.png" alt="犬"></div><div><p class="row-en"><span class="the">The</span> dogs next door are noisy.</p><p class="row-ja">隣の家の犬たちはうるさい。</p></div><p class="why">「隣の家の犬」と特定できる<br>→ <b class="en the">the</b></p></div>
+  </div>
+  <p class="band"><span class="chip">ポイント</span><span>どれのことか分かるときは、複数でも <span class="en the">the</span>（動画1の <span class="en the">the</span> と同じルール）</span></p>
+</section>
+
+<!-- 2. 数えられない名詞 -->
+<section class="slide">
+  <header class="bar"><span class="crumb">文法解説 / 冠詞 Part 3</span></header>
+  <div class="divider"></div>
+  <h2 class="title">2. 数えられない名詞で「〜全般」を言うとき</h2>
+  <p class="sub-lead">動画2で学んだ数えられない名詞も、「〜全般」の話なら冠詞なし</p>
+  <div class="rows pl">
+    <div class="row card"><div class="imgs"><img src="../img/music.png" alt="音楽"></div><div><p class="row-en">I love <mark>music</mark>.</p><p class="row-ja">音楽が大好きです。</p></div><p class="why">音楽全般の話<br>（特定の曲ではない）</p></div>
+    <div class="row card"><div class="imgs"><img src="../img/water.png" alt="水"></div><div><p class="row-en">I drink <mark>water</mark> every day.</p><p class="row-ja">毎日、水を飲みます。</p></div><p class="why">水全般の話<br>（特定の水ではない）</p></div>
+    <div class="row card"><div class="imgs"><img src="../img/clock.png" alt="時間"><img src="../img/money.png" alt="お金"></div><div><p class="row-en"><mark>Time</mark> is <mark>money</mark>.</p><p class="row-ja">時は金なり。</p></div><p class="why">ことわざ。<br>どちらも数えられない名詞</p></div>
+  </div>
+  <p class="band"><span class="chip">ポイント</span><span>特定のものなら <span class="en the">the</span>：<span class="en"><span class="the">the</span> music in this cafe</span>（このカフェの音楽）</span></p>
+</section>
+
 <!-- 2. furniture -->
 <section class="slide">
   <header class="bar"><span class="crumb">文法解説 / 冠詞 Part 3</span></header>
   <div class="divider"></div>
-  <h2 class="title">2. まとめて指す名詞：英語で言うと？</h2>
+  <h2 class="title">英語で言うと？</h2>
   <div class="quiz card">
     <img src="../img/furniture.png" alt="家具">
     <div class="qlines">
@@ -189,7 +246,7 @@
 <section class="slide">
   <header class="bar"><span class="crumb">文法解説 / 冠詞 Part 3</span></header>
   <div class="divider"></div>
-  <h2 class="title">2. まとめて指す名詞：英語で言うと？</h2>
+  <h2 class="title">英語で言うと？</h2>
   <div class="quiz card">
     <img src="../img/furniture.png" alt="家具">
     <div class="qlines">
@@ -199,7 +256,8 @@
   </div>
   <div class="kai card">
     <p class="kai-line"><span class="chip">答え</span><span class="en">I bought furniture online.</span></p>
-    <p class="kai-line"><span class="chip blue">理由</span><span>家具は1つとは限らない（一発では分からない）→ 不特定なので<b>無冠詞</b></span></p>
+    <p class="kai-line"><span class="chip blue">理由①</span><span><span class="en">furniture</span> は数えられない名詞　→　<span class="en a">a</span> はつけない</span></p>
+    <p class="kai-line"><span class="chip blue">理由②</span><span>特定の家具の話ではない　→　<span class="en the">the</span> もつけない</span></p>
   </div>
 </section>
 
@@ -257,10 +315,11 @@
   <div class="divider"></div>
   <h2 class="title">3. 固有名詞（人・都市・国・施設）</h2>
   <div class="chips"><span class="nchip">Japan</span><span class="nchip">Tokyo</span><span class="nchip">France</span><span class="nchip">Kyoto</span><span class="nchip">Disneyland</span><span class="nchip">Universal Studios Japan</span></div>
-  <div class="rows nowhy">
-    <div class="row card"><img src="../img/torii.png" alt="京都"><div><p class="row-en">I live in <mark>Kyoto</mark>.</p><p class="row-ja">私は京都に住んでいます。</p></div></div>
-    <div class="row card"><img src="../img/tokyo.png" alt="東京"><div><p class="row-en">I want to go to <mark>Tokyo</mark>.</p><p class="row-ja">東京に行きたいです。</p></div></div>
-    <div class="row card"><img src="../img/park.png" alt="遊園地"><div><p class="row-en">I went to <mark>Disneyland</mark>.</p><p class="row-ja">ディズニーランドに行きました。</p></div></div>
+  <div class="rows pn">
+    <div class="row card"><img src="../img/student.png" alt="ケン"><div><p class="row-en"><mark>Ken</mark> is my best friend.</p><p class="row-ja">ケンは私の親友です。</p></div><p class="kind">人</p></div>
+    <div class="row card"><img src="../img/torii.png" alt="京都"><div><p class="row-en">I live in <mark>Kyoto</mark>.</p><p class="row-ja">私は京都に住んでいます。</p></div><p class="kind">都市</p></div>
+    <div class="row card"><img src="../img/flag-japan.png" alt="日本"><div><p class="row-en">I'm from <mark>Japan</mark>.</p><p class="row-ja">私は日本出身です。</p></div><p class="kind">国</p></div>
+    <div class="row card"><img src="../img/park.png" alt="遊園地"><div><p class="row-en">I went to <mark>Disneyland</mark>.</p><p class="row-ja">ディズニーランドに行きました。</p></div><p class="kind">施設</p></div>
   </div>
 </section>
 
@@ -276,6 +335,20 @@
     <div class="lcard card"><div class="limg c-yellow"><img src="../img/empire.png" alt="エンパイア・ステート・ビル"></div><p class="lname"><span class="the">the</span> Empire<br>State Building</p><p class="lja">エンパイア・ステート・ビル</p></div>
     <div class="lcard card"><div class="limg c-pink"><img src="../img/monalisa.png" alt="モナ・リザ"></div><p class="lname"><span class="the">the</span> Mona<br>Lisa</p><p class="lja">モナ・リザ</p></div>
   </div>
+</section>
+
+<section class="slide">
+  <header class="bar"><span class="crumb">文法解説 / 冠詞 Part 3</span></header>
+  <div class="divider"></div>
+  <p class="eyebrow">POINT</p>
+  <h2 class="title">国の名前にも、<span class="en the">the</span> がつくものがある</h2>
+  <p class="sub-lead">州・国・島などの「集まり」を表す国名には <span class="en the">the</span> がつく</p>
+  <div class="lgrid c3">
+    <div class="lcard card"><div class="limg c-yellow"><img src="../img/flag-usa.png" alt="アメリカの国旗"></div><p class="lname"><span class="the">the</span> United States</p><p class="lja">アメリカ（State＝州の集まり）</p></div>
+    <div class="lcard card"><div class="limg c-sky"><img src="../img/flag-uk.png" alt="イギリスの国旗"></div><p class="lname"><span class="the">the</span> UK</p><p class="lja">イギリス（United Kingdom＝連合王国）</p></div>
+    <div class="lcard card"><div class="limg c-pink"><img src="../img/flag-ph.png" alt="フィリピンの国旗"></div><p class="lname"><span class="the">the</span> Philippines</p><p class="lja">フィリピン（島の集まり＝複数形）</p></div>
+  </div>
+  <p class="band"><span class="chip">ポイント</span><span><span class="en">Japan ／ France ／ China</span> のような普通の国名には <span class="en the">the</span> はつかない</span></p>
 </section>
 
 <!-- 4. 言語 -->
@@ -300,7 +373,7 @@
     <div class="row card"><img src="../img/lunch.png" alt="昼食"><div><p class="row-en">Let's have <mark>lunch</mark> together.</p><p class="row-ja">一緒にお昼ごはんを食べよう。</p></div></div>
     <div class="row card"><img src="../img/dinner.png" alt="夕食"><div><p class="row-en">What's for <mark>dinner</mark>?</p><p class="row-ja">夕ごはんは何？</p></div></div>
   </div>
-  <p class="band"><span class="chip">覚えておこう</span><span>朝食・昼食・夕食は、基本は無冠詞</span></p>
+  <p class="band"><span class="chip">覚えておこう</span><span>基本は無冠詞。でも形容詞がつくと <span class="en a">a</span>：<span class="en">I had <span class="a">a</span> big breakfast.</span>（朝ごはんをしっかり食べた）</span></p>
 </section>
 
 <!-- 6. 祝日 -->
@@ -312,6 +385,38 @@
     <div class="row card"><img src="../img/pumpkin.png" alt="ハロウィン"><div><p class="row-en">What are you dressing up as for <mark>Halloween</mark>?</p><p class="row-ja">ハロウィンはどんな仮装をする？</p></div></div>
     <div class="row card"><img src="../img/xmastree.png" alt="クリスマス"><div><p class="row-en"><mark>Christmas</mark> is my favorite holiday!</p><p class="row-ja">クリスマスは私の一番好きなホリデーです！</p></div></div>
   </div>
+</section>
+
+<!-- ほかにも -->
+<section class="slide">
+  <header class="bar"><span class="crumb">文法解説 / 冠詞 Part 3</span></header>
+  <div class="divider"></div>
+  <h2 class="title">ほかにもある、よく使う無冠詞</h2>
+  <div class="ogrid">
+    <div class="ocard card"><img src="../img/school.png" alt="学校"><div><p class="o-k">本来の目的で使う場所</p><p class="o-en">go to school<br>go to bed</p><p class="o-ja">学校に行く（勉強しに） ／ 寝る</p></div></div>
+    <div class="ocard card"><img src="../img/bus.png" alt="バス"><div><p class="o-k">交通手段（by 〜）</p><p class="o-en">by bus<br>by train</p><p class="o-ja">バスで ／ 電車で</p></div></div>
+    <div class="ocard card"><img src="../img/tennis.png" alt="テニス"><div><p class="o-k">スポーツ</p><p class="o-en">play tennis<br>play soccer</p><p class="o-ja">テニスをする ／ サッカーをする</p></div></div>
+    <div class="ocard card"><img src="../img/math.png" alt="数学"><div><p class="o-k">教科</p><p class="o-en">study math<br>study science</p><p class="o-ja">数学を勉強する ／ 理科を勉強する</p></div></div>
+  </div>
+  <p class="band"><span class="chip">注意</span><span><span class="en">go to <span class="the">the</span> school</span> だと「（授業以外の用事で）その学校の建物に行く」という意味になる</span></p>
+</section>
+
+<!-- まとめ -->
+<section class="slide">
+  <header class="bar"><span class="crumb">文法解説 / 冠詞 Part 3</span></header>
+  <div class="divider"></div>
+  <h2 class="title">無冠詞 まとめ</h2>
+  <div class="sum-u card">
+    <div class="sum-head"><span class="chip">無冠詞</span><span><span class="en a">a / an</span> も <span class="en the">the</span> もつけないパターン</span></div>
+    <div class="sum-row"><p class="k"><span class="num">1</span>複数名詞（〜全般）</p><p class="w">I like dogs. ／ I like movies.</p></div>
+    <div class="sum-row"><p class="k"><span class="num">2</span>数えられない名詞（〜全般）</p><p class="w">I love music. ／ furniture / luggage / jewelry / mail</p></div>
+    <div class="sum-row"><p class="k"><span class="num">3</span>固有名詞</p><p class="w">Ken / Kyoto / Japan / Disneyland</p></div>
+    <div class="sum-row"><p class="k"><span class="num">4</span>言語</p><p class="w">English / Japanese</p></div>
+    <div class="sum-row"><p class="k"><span class="num">5</span>食事</p><p class="w">breakfast / lunch / dinner</p></div>
+    <div class="sum-row"><p class="k"><span class="num">6</span>祝日・ホリデー</p><p class="w">Halloween / Christmas</p></div>
+    <div class="sum-row"><p class="k"><span class="num">+</span>ほかにも</p><p class="w">go to school / by bus / play tennis / study math</p></div>
+  </div>
+  <p class="sum-n card"><span class="chip blue">the がつくとき</span><span><span class="en"><span class="the">the</span> dogs next door</span>（特定できる）　<span class="en"><span class="the">the</span> United States ／ <span class="the">the</span> Eiffel Tower</span>（名前の一部）</span></p>
 </section>
 
 </body>

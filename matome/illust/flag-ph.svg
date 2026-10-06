@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="400" height="400">
+<defs><clipPath id="f"><rect x="105" y="78" width="216" height="144" rx="8"/></clipPath></defs>
+<ellipse cx="200" cy="352" rx="130" ry="12" fill="#1C2340" opacity=".08"/>
+<rect x="94" y="62" width="11" height="290" rx="5.5" fill="#9AA6BC"/>
+<circle cx="99.5" cy="58" r="11" fill="#F5B731"/>
+<g clip-path="url(#f)">
+<rect x="105" y="78" width="216" height="72" fill="#1F4FB0"/>
+<rect x="105" y="150" width="216" height="72" fill="#D0353A"/>
+<path d="M105 78 L230 150 L105 222 Z" fill="#fff"/>
+<path d="M148 150 L174.0 150.0" stroke="#FFD24D" stroke-width="5" stroke-linecap="round"/><path d="M148 150 L166.4 168.4" stroke="#FFD24D" stroke-width="5" stroke-linecap="round"/><path d="M148 150 L148.0 176.0" stroke="#FFD24D" stroke-width="5" stroke-linecap="round"/><path d="M148 150 L129.6 168.4" stroke="#FFD24D" stroke-width="5" stroke-linecap="round"/><path d="M148 150 L122.0 150.0" stroke="#FFD24D" stroke-width="5" stroke-linecap="round"/><path d="M148 150 L129.6 131.6" stroke="#FFD24D" stroke-width="5" stroke-linecap="round"/><path d="M148 150 L148.0 124.0" stroke="#FFD24D" stroke-width="5" stroke-linecap="round"/><path d="M148 150 L166.4 131.6" stroke="#FFD24D" stroke-width="5" stroke-linecap="round"/>
+<circle cx="148" cy="150" r="15" fill="#FFD24D"/>
+<circle cx="119" cy="94" r="5" fill="#FFD24D"/><circle cx="119" cy="206" r="5" fill="#FFD24D"/><circle cx="210" cy="150" r="5" fill="#FFD24D"/>
+</g>
+</svg>
