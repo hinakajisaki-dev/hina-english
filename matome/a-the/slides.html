@@ -74,9 +74,6 @@
   /* ---------- top bar, like the salon header ---------- */
   .bar { flex: none; height: 70px; display: flex; align-items: center; justify-content: space-between; }
   .crumb { font-size: 17px; color: var(--ink-2); }
-  .brand { display: flex; align-items: center; gap: 10px; }
-  .brand img { width: 32px; height: 32px; }
-  .brand span { font-family: var(--en); font-weight: 700; font-size: 19px; }
   .divider { flex: none; height: 0; border-top: 2px solid var(--line); margin: 0 -72px; }
 
   .eyebrow { margin-top: 28px; font-family: var(--en); font-weight: 700; font-size: 16px; letter-spacing: .18em; color: var(--primary); }
@@ -138,22 +135,22 @@
     flex: 1;
     position: relative;
     border-radius: 44px;
-    background-color: #EC4B20;
-    background-image: linear-gradient(120deg, #FF6233 0%, #F04E23 55%, #DC3F18 100%);
-    box-shadow: 0 20px 50px rgba(220, 63, 24, .22);
+    background-color: #FFDCCB;
+    background-image: linear-gradient(120deg, #FFEDE4 0%, #FFDCCB 55%, #FFCDB6 100%);
+    box-shadow: 0 20px 50px rgba(232, 70, 30, .10);
     padding: 0 80px;
     display: flex;
     flex-direction: column;
     justify-content: center;
-    color: #fff;
+    color: var(--ink);
   }
-  .hero-kicker { font-family: var(--en); font-weight: 700; font-size: 20px; letter-spacing: .22em; color: #FFE3D8; }
+  .hero-kicker { font-weight: 700; font-size: 22px; letter-spacing: .2em; color: var(--primary-dark); }
   .hero-title { margin-top: 10px; font-weight: 900; font-size: 168px; line-height: 1.1; }
   .hero-title.sm { font-size: 92px; line-height: 1.2; }
   .hero-sub { margin-top: 10px; font-weight: 700; font-size: 50px; }
   .hero-sub .en { font-weight: 800; }
   .hero-sub.sm { font-size: 32px; margin-top: 18px; }
-  .hero-hand { margin-top: 30px; font-family: var(--hand); font-weight: 700; font-size: 48px; color: #FFE3D8; }
+  .hero-hand { margin-top: 30px; font-family: var(--hand); font-weight: 700; font-size: 48px; color: var(--primary-dark); }
   .hero > .tile { position: absolute; right: 64px; top: 146px; width: 340px; height: 340px; }
 
   /* ---------- 冠詞とは ---------- */
@@ -166,16 +163,16 @@
   .combo p { font-size: 38px; font-weight: 800; }
 
   /* ---------- roadmap ---------- */
-  .road { flex: 1; margin-top: 30px; display: flex; align-items: center; gap: 26px; }
-  .stepcard { flex: 1; height: 330px; padding: 40px 44px; display: flex; flex-direction: column; gap: 16px; }
+  .road { flex: 1; margin-top: 24px; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 8px; }
+  .stepcard { width: 100%; height: 150px; padding: 0 44px; display: flex; align-items: center; gap: 30px; }
   .stepcard.off { background: #F3F7FC; box-shadow: none; border: 2px dashed var(--line); }
-  .step-no { align-self: flex-start; font-family: var(--en); font-weight: 800; font-size: 18px; letter-spacing: .14em; color: #fff; background: var(--primary); padding: 6px 16px 7px; border-radius: 999px; }
+  .road .arrow { font-size: 36px; line-height: 1; }
+  .step-no { flex: none; font-family: var(--en); font-weight: 800; font-size: 18px; letter-spacing: .14em; color: #fff; background: var(--primary); padding: 6px 16px 7px; border-radius: 999px; }
   .off .step-no { background: var(--muted); }
-  .step-h { margin-top: 10px; font-size: 34px; font-weight: 700; }
+  .step-h { font-size: 38px; font-weight: 700; }
   .step-h .en { font-weight: 800; }
   .off .step-h { color: var(--ink-2); }
-  .step-d { font-size: 24px; color: var(--ink-2); }
-  .stepcard .chip { align-self: flex-start; margin-top: auto; }
+  .step-d { margin-left: auto; font-size: 24px; color: var(--ink-2); }
 
   /* ---------- mental image ---------- */
   .mi { flex: 1; margin-top: 22px; display: grid; grid-template-columns: 1fr 1fr; gap: 26px; min-height: 0; }
@@ -208,7 +205,7 @@
   /* ---------- example cards ---------- */
   .grid4 { flex: 1; margin-top: 22px; display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 22px; min-height: 0; }
   .ex { border-radius: 26px; display: flex; align-items: center; gap: 22px; padding: 0 30px 0 22px; }
-  .ex img { flex: none; width: 150px; height: 150px; }
+  .ex img { flex: none; width: 136px; height: 136px; }
   .ex-en { font-family: var(--en); font-weight: 700; font-size: 31px; line-height: 1.25; }
   .ex-ja { margin-top: 8px; font-size: 19px; color: var(--ink-2); }
 
@@ -248,7 +245,9 @@
   .snd-say { margin-top: 4px; font-size: 24px; color: var(--ink-2); }
   .snd-say b { color: var(--primary); }
   .snd-why { border-top: 2px dashed var(--line); padding-top: 16px; font-size: 25px; line-height: 1.6; }
-  .snd-ans { align-self: flex-start; margin-top: auto; font-family: var(--en); font-weight: 800; font-size: 36px; background: var(--orange-soft); border-radius: 16px; padding: 8px 22px; }
+  .snd-ex { margin-top: auto; background: var(--orange-soft); border-radius: 18px; padding: 16px 24px; }
+  .snd-en { font-family: var(--en); font-weight: 700; font-size: 28px; }
+  .snd-ja { margin-top: 4px; font-size: 19px; color: var(--ink-2); }
 
   /* ---------- quiz ---------- */
   .quiz { flex: none; height: 300px; margin-top: 22px; display: flex; align-items: center; gap: 30px; padding: 0 40px 0 30px; }
@@ -277,16 +276,6 @@
   .cmp-cell .en { font-size: 30px; }
   .cmp-cell .ja { font-size: 19px; color: var(--ink-2); }
   .cmp-cell .note { margin-top: 4px; font-size: 18px; color: var(--ink-2); }
-
-  /* ---------- flow ---------- */
-  .flow { flex: 1; margin-top: 22px; display: flex; align-items: center; gap: 24px; min-height: 0; }
-  .fcard { flex: 1; height: 100%; border-radius: 28px; padding: 30px 36px; display: flex; flex-direction: column; gap: 10px; }
-  .fcard .chip { align-self: flex-start; background: #fff; }
-  .f-sub { margin-top: 6px; font-size: 24px; font-weight: 700; }
-  .f-art { font-family: var(--en); font-weight: 800; font-size: 84px; line-height: 1.1; }
-  .f-ex { margin-top: auto; display: flex; align-items: center; gap: 18px; background: #fff; border-radius: 20px; padding: 10px 22px; }
-  .f-ex img { width: 96px; height: 96px; }
-  .f-ex p { font-family: var(--en); font-weight: 700; font-size: 38px; }
 
   /* ---------- next time ---------- */
   .sub-lead { flex: none; margin-top: 14px; font-size: 22px; color: var(--ink-2); }
@@ -318,17 +307,16 @@
 <!-- ============ 1 表紙 ============ -->
 <section class="slide cover">
   <div class="hero">
-    <p class="hero-kicker">HINA ENGLISH ・ 文法解説動画</p>
+    <p class="hero-kicker">文法解説動画</p>
     <h1 class="hero-title">冠詞</h1>
-    <p class="hero-sub"><span class="en">a / an</span> と <span class="en">the</span> の違い</p>
-    <p class="hero-hand">Small steps, big changes.</p>
+    <p class="hero-sub"><span class="en a">a / an</span> と <span class="en the">the</span> の違い</p>
     <img class="tile" src="img/tile.png" alt="">
   </div>
 </section>
 
 <!-- ============ 2 冠詞とは？ ============ -->
 <section class="slide">
-  <header class="bar"><span class="crumb">文法解説 / 冠詞</span><div class="brand"><img src="img/mark.png" alt=""><span>Hina English</span></div></header>
+  <header class="bar"><span class="crumb">文法解説 / 冠詞</span></header>
   <div class="divider"></div>
   <p class="eyebrow">BASICS</p>
   <h2 class="title">冠詞とは？</h2>
@@ -345,7 +333,7 @@
 
 <!-- ============ 2' まずは a / an と the ============ -->
 <section class="slide">
-  <header class="bar"><span class="crumb">文法解説 / 冠詞</span><div class="brand"><img src="img/mark.png" alt=""><span>Hina English</span></div></header>
+  <header class="bar"><span class="crumb">文法解説 / 冠詞</span></header>
   <div class="divider"></div>
   <p class="eyebrow">ROADMAP</p>
   <h2 class="title">まずは <span class="en a">a / an</span> と <span class="en the">the</span> の2つ</h2>
@@ -354,9 +342,8 @@
       <span class="step-no">STEP 1</span>
       <p class="step-h"><span class="en a">a / an</span> と <span class="en the">the</span></p>
       <p class="step-d">まずはこの2つを理解しよう</p>
-      <span class="chip">まずはここから！</span>
     </div>
-    <span class="arrow">→</span>
+    <span class="arrow">↓</span>
     <div class="stepcard off">
       <span class="step-no">STEP 2</span>
       <p class="step-h">冠詞がつかないパターン</p>
@@ -367,7 +354,7 @@
 
 <!-- ============ 3 a / an の使い方 ============ -->
 <section class="slide">
-  <header class="bar"><span class="crumb">文法解説 / 冠詞</span><div class="brand"><img src="img/mark.png" alt=""><span>Hina English</span></div></header>
+  <header class="bar"><span class="crumb">文法解説 / 冠詞</span></header>
   <div class="divider"></div>
   <p class="eyebrow">A / AN ・ MENTAL IMAGE</p>
   <h2 class="title"><span class="en a">a / an</span> の使い方</h2>
@@ -386,11 +373,10 @@
       <img src="img/apple.png" alt="りんご">
     </div>
   </div>
-  <p class="band"><span class="chip">よく使う場面</span><span>まだ相手が「どれのことか」分かっていないものを、<b>初めて会話に出す</b>とき</span></p>
 </section>
 
 <section class="slide">
-  <header class="bar"><span class="crumb">文法解説 / 冠詞</span><div class="brand"><img src="img/mark.png" alt=""><span>Hina English</span></div></header>
+  <header class="bar"><span class="crumb">文法解説 / 冠詞</span></header>
   <div class="divider"></div>
   <p class="eyebrow">A / AN ・ EXAMPLES</p>
   <h2 class="title"><span class="en a">a / an</span> の例文</h2>
@@ -400,11 +386,12 @@
     <div class="ex c-pink"><img src="img/teacher.png" alt="先生"><div><p class="ex-en">She is <span class="a">a</span> teacher.</p><p class="ex-ja">彼女は先生です。</p></div></div>
     <div class="ex c-sky"><img src="img/apple.png" alt="りんご"><div><p class="ex-en">I ate <span class="a">an</span> apple.</p><p class="ex-ja">私はリンゴを1個食べました。</p></div></div>
   </div>
+  <p class="band"><span class="chip">よく使う場面</span><span>まだ相手が「どれのことか」分かっていないものを、<b>初めて会話に出す</b>とき</span></p>
 </section>
 
 <!-- ============ 4 職業 ============ -->
 <section class="slide">
-  <header class="bar"><span class="crumb">文法解説 / 冠詞</span><div class="brand"><img src="img/mark.png" alt=""><span>Hina English</span></div></header>
+  <header class="bar"><span class="crumb">文法解説 / 冠詞</span></header>
   <div class="divider"></div>
   <p class="eyebrow">POINT</p>
   <h2 class="title">職業を言うときも、基本的に <span class="en a">a / an</span></h2>
@@ -416,7 +403,7 @@
 
 <!-- ============ 5 a と an の違い ============ -->
 <section class="slide">
-  <header class="bar"><span class="crumb">文法解説 / 冠詞</span><div class="brand"><img src="img/mark.png" alt=""><span>Hina English</span></div></header>
+  <header class="bar"><span class="crumb">文法解説 / 冠詞</span></header>
   <div class="divider"></div>
   <p class="eyebrow">A or AN ?</p>
   <h2 class="title"><span class="en a">a</span> と <span class="en a">an</span> の違い</h2>
@@ -442,7 +429,7 @@
 </section>
 
 <section class="slide">
-  <header class="bar"><span class="crumb">文法解説 / 冠詞</span><div class="brand"><img src="img/mark.png" alt=""><span>Hina English</span></div></header>
+  <header class="bar"><span class="crumb">文法解説 / 冠詞</span></header>
   <div class="divider"></div>
   <p class="eyebrow">POINT</p>
   <h2 class="title">スペルではなく<mark>「音」</mark>で判断する</h2>
@@ -450,19 +437,19 @@
     <div class="snd card">
       <div class="snd-top"><img src="img/university.png" alt="大学"><div><p class="snd-word"><span class="hl">u</span>niversity</p><p class="snd-say">「<b>ユ</b>ニバーシティ」</p></div></div>
       <p class="snd-why"><span class="en">u</span> で始まるけど、音は「<b>ユ</b>」<br>→ 子音の音</p>
-      <p class="snd-ans"><span class="a">a</span> university</p>
+      <div class="snd-ex"><p class="snd-en">She is <span class="a">a</span> university student.</p><p class="snd-ja">彼女は大学生です。</p></div>
     </div>
     <div class="snd card">
       <div class="snd-top"><img src="img/clock.png" alt="時計"><div><p class="snd-word"><span class="mute">h</span>our</p><p class="snd-say">「<b>ア</b>ワー」</p></div></div>
       <p class="snd-why"><span class="en">h</span> は発音しないので、音は「<b>ア</b>」<br>→ 母音の音</p>
-      <p class="snd-ans"><span class="a">an</span> hour</p>
+      <div class="snd-ex"><p class="snd-en">I waited for <span class="a">an</span> hour.</p><p class="snd-ja">私は1時間待ちました。</p></div>
     </div>
   </div>
 </section>
 
 <!-- ============ 6 the の使い方 ============ -->
 <section class="slide">
-  <header class="bar"><span class="crumb">文法解説 / 冠詞</span><div class="brand"><img src="img/mark.png" alt=""><span>Hina English</span></div></header>
+  <header class="bar"><span class="crumb">文法解説 / 冠詞</span></header>
   <div class="divider"></div>
   <p class="eyebrow">THE ・ MENTAL IMAGE</p>
   <h2 class="title"><span class="en the">the</span> の使い方</h2>
@@ -473,7 +460,7 @@
     </div>
     <div class="mi-visual card">
       <img src="img/apple.png" alt="りんご">
-      <div class="pick the"><img src="img/apple.png" alt="りんご"><span class="pick-label">それ！</span></div>
+      <div class="pick the"><img src="img/apple-green.png" alt="青りんご"><span class="pick-label">それ！</span></div>
       <img src="img/apple.png" alt="りんご">
       <img src="img/apple.png" alt="りんご">
       <img src="img/apple.png" alt="りんご">
@@ -487,7 +474,7 @@
 </section>
 
 <section class="slide">
-  <header class="bar"><span class="crumb">文法解説 / 冠詞</span><div class="brand"><img src="img/mark.png" alt=""><span>Hina English</span></div></header>
+  <header class="bar"><span class="crumb">文法解説 / 冠詞</span></header>
   <div class="divider"></div>
   <p class="eyebrow">THE ・ EXAMPLES</p>
   <h2 class="title"><span class="en the">the</span> の例文</h2>
@@ -500,7 +487,7 @@
 
 <!-- ============ 7 クイズ：バッグ ============ -->
 <section class="slide">
-  <header class="bar"><span class="crumb">文法解説 / 冠詞</span><div class="brand"><img src="img/mark.png" alt=""><span>Hina English</span></div></header>
+  <header class="bar"><span class="crumb">文法解説 / 冠詞</span></header>
   <div class="divider"></div>
   <p class="eyebrow">QUIZ ・ 1</p>
   <h2 class="title">（　）に入るのは <span class="en a">a / an</span>？ <span class="en the">the</span>？</h2>
@@ -515,7 +502,7 @@
 </section>
 
 <section class="slide">
-  <header class="bar"><span class="crumb">文法解説 / 冠詞</span><div class="brand"><img src="img/mark.png" alt=""><span>Hina English</span></div></header>
+  <header class="bar"><span class="crumb">文法解説 / 冠詞</span></header>
   <div class="divider"></div>
   <p class="eyebrow">QUIZ ・ 1　ANSWER</p>
   <h2 class="title">（　）に入るのは <span class="en a">a / an</span>？ <span class="en the">the</span>？</h2>
@@ -535,7 +522,7 @@
 
 <!-- ============ 8 a / an と the の違い ============ -->
 <section class="slide">
-  <header class="bar"><span class="crumb">文法解説 / 冠詞</span><div class="brand"><img src="img/mark.png" alt=""><span>Hina English</span></div></header>
+  <header class="bar"><span class="crumb">文法解説 / 冠詞</span></header>
   <div class="divider"></div>
   <p class="eyebrow">COMPARE</p>
   <h2 class="title"><span class="en a">a / an</span> と <span class="en the">the</span> の違い</h2>
@@ -554,7 +541,7 @@
 
 <!-- ============ 9 クイズ：カフェ ============ -->
 <section class="slide">
-  <header class="bar"><span class="crumb">文法解説 / 冠詞</span><div class="brand"><img src="img/mark.png" alt=""><span>Hina English</span></div></header>
+  <header class="bar"><span class="crumb">文法解説 / 冠詞</span></header>
   <div class="divider"></div>
   <p class="eyebrow">QUIZ ・ 2</p>
   <h2 class="title">（　）に入るのは <span class="en a">a / an</span>？ <span class="en the">the</span>？</h2>
@@ -569,7 +556,7 @@
 </section>
 
 <section class="slide">
-  <header class="bar"><span class="crumb">文法解説 / 冠詞</span><div class="brand"><img src="img/mark.png" alt=""><span>Hina English</span></div></header>
+  <header class="bar"><span class="crumb">文法解説 / 冠詞</span></header>
   <div class="divider"></div>
   <p class="eyebrow">QUIZ ・ 2　ANSWER</p>
   <h2 class="title">（　）に入るのは <span class="en a">a / an</span>？ <span class="en the">the</span>？</h2>
@@ -587,31 +574,9 @@
   </div>
 </section>
 
-<section class="slide">
-  <header class="bar"><span class="crumb">文法解説 / 冠詞</span><div class="brand"><img src="img/mark.png" alt=""><span>Hina English</span></div></header>
-  <div class="divider"></div>
-  <p class="eyebrow">POINT</p>
-  <h2 class="title">会話で、とてもよく出てくる流れ</h2>
-  <div class="flow">
-    <div class="fcard c-orange">
-      <span class="chip">初登場</span>
-      <p class="f-sub">はじめて話に出る</p>
-      <p class="f-art a">a / an</p>
-      <div class="f-ex"><img src="img/cafe.png" alt="カフェ"><p><span class="a">a</span> cafe</p></div>
-    </div>
-    <span class="arrow">→</span>
-    <div class="fcard c-sky">
-      <span class="chip blue">2回目以降</span>
-      <p class="f-sub">「さっきのそれ」と分かる</p>
-      <p class="f-art the">the</p>
-      <div class="f-ex"><img src="img/cafe.png" alt="カフェ"><p><span class="the">the</span> cafe</p></div>
-    </div>
-  </div>
-</section>
-
 <!-- ============ 予告 ============ -->
 <section class="slide">
-  <header class="bar"><span class="crumb">文法解説 / 冠詞</span><div class="brand"><img src="img/mark.png" alt=""><span>Hina English</span></div></header>
+  <header class="bar"><span class="crumb">文法解説 / 冠詞</span></header>
   <div class="divider"></div>
   <p class="eyebrow">NEXT ・ 次回予告</p>
   <h2 class="title">すべての名詞に <span class="en a">a / an</span> をつけられるわけではない</h2>
@@ -623,7 +588,7 @@
 </section>
 
 <section class="slide">
-  <header class="bar"><span class="crumb">文法解説 / 冠詞</span><div class="brand"><img src="img/mark.png" alt=""><span>Hina English</span></div></header>
+  <header class="bar"><span class="crumb">文法解説 / 冠詞</span></header>
   <div class="divider"></div>
   <p class="eyebrow">NEXT ・ 次回予告</p>
   <h2 class="title">数えられる名詞（可算名詞）</h2>
@@ -638,7 +603,7 @@
 </section>
 
 <section class="slide">
-  <header class="bar"><span class="crumb">文法解説 / 冠詞</span><div class="brand"><img src="img/mark.png" alt=""><span>Hina English</span></div></header>
+  <header class="bar"><span class="crumb">文法解説 / 冠詞</span></header>
   <div class="divider"></div>
   <p class="eyebrow">NEXT ・ 次回予告</p>
   <h2 class="title">数えられない名詞（不可算名詞）</h2>
@@ -653,7 +618,7 @@
 <!-- ============ エンディング ============ -->
 <section class="slide cover">
   <div class="hero">
-    <p class="hero-kicker">NEXT</p>
+    <p class="hero-kicker en">NEXT</p>
     <h1 class="hero-title sm">続きは<br>次回の動画で！</h1>
     <p class="hero-sub sm">数えられる名詞 / 数えられない名詞</p>
     <p class="hero-hand">Small steps, big changes.</p>

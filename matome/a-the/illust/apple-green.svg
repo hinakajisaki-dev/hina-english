@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="400" height="400">
+<defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#B5E37E"/><stop offset="1" stop-color="#5DB346"/></linearGradient><linearGradient id="l" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#4FAE6A"/><stop offset="1" stop-color="#2E8A4E"/></linearGradient></defs>
+<ellipse cx="200" cy="356" rx="105" ry="13" fill="#1C2340" opacity=".08"/>
+<path d="M200 128 C160 98 84 104 78 186 C72 262 128 336 170 336 C186 336 192 328 200 328 C208 328 214 336 230 336 C272 336 328 262 322 186 C316 104 240 98 200 128 Z" fill="url(#g)"/>
+<path d="M200 128 C197 108 192 90 184 74" stroke="#8A5A3C" stroke-width="12" stroke-linecap="round" fill="none"/>
+<path d="M206 104 C222 70 262 62 292 72 C278 104 240 118 206 104 Z" fill="url(#l)"/>
+<ellipse cx="134" cy="192" rx="20" ry="40" fill="#fff" opacity=".35" transform="rotate(20 134 192)"/>
+</svg>
