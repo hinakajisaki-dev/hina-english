@@ -88,9 +88,9 @@
 
   /* ---------- no-article overview ---------- */
   .zgrid { flex: 1; margin-top: 18px; display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: 1fr 1fr; gap: 16px; min-height: 0; }
-  .zcard { display: flex; align-items: center; gap: 18px; padding: 0 24px; }
-  .zcard img { flex: none; width: 124px; height: 124px; }
-  .zcard p { font-size: 28px; font-weight: 700; line-height: 1.4; }
+  .zcard { display: flex; align-items: center; gap: 16px; padding: 0 16px; }
+  .zcard img { flex: none; width: 100px; height: 100px; margin-left: 12px; }
+  .zcard p { font-size: 25px; font-weight: 700; line-height: 1.4; }
   .zcard small { display: block; font-size: 19px; font-weight: 500; color: var(--ink-2); }
 
   /* a coffee / two coffees */
@@ -102,6 +102,45 @@
 
   .rows.tight .row img { width: 100px; height: 100px; }
   .rows.tight .row { grid-template-columns: 100px 1fr; }
+
+  /* 無冠詞とは: a / an, the, none */
+  .three { flex: 1; margin-top: 20px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; min-height: 0; }
+  .tcard { padding: 24px 22px; display: flex; flex-direction: column; align-items: center; gap: 8px; text-align: center; }
+  .tcard .art { width: auto; min-width: 84px; height: 64px; padding: 0 18px; font-size: 30px; border-radius: 18px; }
+  .tcard.on { border: 4px solid var(--primary); }
+  .t-h { font-size: 22px; font-weight: 700; }
+  .t-img { flex: 1; min-height: 0; display: grid; place-items: center; }
+  .t-img img { width: 120px; height: 120px; }
+  .t-img .pick { width: 140px; height: 140px; }
+  .t-img .pick img { width: 104px; height: 104px; }
+  .t-en { font-family: var(--en); font-weight: 800; font-size: 36px; }
+
+  .zcard { position: relative; }
+  .zcard .num { position: absolute; left: 14px; top: 14px; width: 34px; height: 34px; font-size: 17px; background: var(--primary); }
+  .zcard small.en { font-size: 20px; font-weight: 700; }
+
+  /* 1つ vs 複数 */
+  .vs { border-radius: 28px; padding: 22px 30px; display: flex; flex-direction: column; align-items: flex-start; gap: 8px; }
+  .vs .imgs { align-self: center; }
+  .vs .imgs img { width: 130px; height: 130px; }
+  .vs-en { font-family: var(--en); font-weight: 700; font-size: 30px; }
+  .vs-ja { font-size: 19px; color: var(--ink-2); }
+  .vs-why { margin-top: auto; align-self: stretch; background: #fff; border-radius: 14px; padding: 10px 18px; font-size: 21px; font-weight: 700; }
+
+  /* furniture explained */
+  .fz { flex: 1; margin-top: 18px; display: grid; grid-template-columns: 1fr 1.1fr; gap: 22px; min-height: 0; }
+  .fz-set { padding: 22px 24px; display: flex; flex-direction: column; justify-content: center; gap: 14px; }
+  .fz-items { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .fz-items div { display: flex; flex-direction: column; align-items: center; background: var(--orange-soft); border-radius: 18px; padding: 6px 0 8px; }
+  .fz-items img { width: 104px; height: 104px; }
+  .fz-items p { font-size: 22px; }
+  .fz-eq { text-align: center; font-size: 26px; font-weight: 700; }
+  .fz-eq .en { font-weight: 800; font-size: 30px; }
+  .fz-pts { display: flex; flex-direction: column; gap: 12px; }
+  .fz-pt { flex: 1; display: flex; align-items: center; gap: 14px; padding: 0 22px; font-size: 20px; line-height: 1.5; }
+  .fz-pt .num { background: var(--primary); }
+  .fz-pt .en { font-weight: 700; }
+  .fz-pt .ng { color: var(--muted); font-family: var(--en); font-weight: 700; }
 
   .art.none { background: #9AA1B6; font-family: var(--ja); font-size: 28px; }
   .fill.none { background: #9AA1B6; font-family: var(--ja); font-weight: 700; font-size: 30px; }
@@ -381,14 +420,26 @@
   <div class="divider"></div>
   <p class="eyebrow">NO ARTICLE</p>
   <h2 class="title">冠詞をつけないパターン：無冠詞</h2>
-  <p class="sub-lead"><span class="en a">a / an</span> も <span class="en the">the</span> もつけないパターンを見ていこう</p>
+  <p class="sub-lead">ここまでは <span class="en a">a / an</span> と <span class="en the">the</span>。ここからは「どちらもつけない」パターン</p>
+  <div class="three">
+    <div class="tcard card"><span class="art">a / an</span><p class="t-h">1つの〜</p><div class="t-img"><img src="../img/movie.png" alt="映画"></div><p class="t-en"><span class="a">a</span> movie</p></div>
+    <div class="tcard card"><span class="art the">the</span><p class="t-h">それ！</p><div class="t-img"><div class="pick the"><img src="../img/movie.png" alt="映画"><span class="pick-label">それ！</span></div></div><p class="t-en"><span class="the">the</span> movie</p></div>
+    <div class="tcard card on"><span class="art none">なし</span><p class="t-h">どちらもつけない＝<mark>無冠詞</mark></p><div class="t-img"><div class="imgs"><img src="../img/movie.png" alt="映画"><img src="../img/movie.png" alt="映画"></div></div><p class="t-en">movies</p></div>
+  </div>
+</section>
+
+<section class="slide">
+  <header class="bar"><span class="crumb">文法解説 / 冠詞 Part 2</span></header>
+  <div class="divider"></div>
+  <p class="eyebrow">NO ARTICLE</p>
+  <h2 class="title">無冠詞になる、6つのパターン</h2>
   <div class="zgrid">
-    <div class="zcard card"><img src="../img/movie.png" alt="映画"><p><span class="en">movies</span><small>複数名詞</small></p></div>
-    <div class="zcard card"><img src="../img/furniture.png" alt="家具"><p><span class="en">furniture</span><small>不特定の不可算名詞</small></p></div>
-    <div class="zcard card"><img src="../img/torii.png" alt="鳥居"><p><span class="en">Kyoto</span><small>固有名詞</small></p></div>
-    <div class="zcard card"><img src="../img/hello.png" alt="英語"><p><span class="en">English</span><small>言語</small></p></div>
-    <div class="zcard card"><img src="../img/breakfast.png" alt="朝食"><p><span class="en">breakfast</span><small>食事</small></p></div>
-    <div class="zcard card"><img src="../img/pumpkin.png" alt="ハロウィン"><p><span class="en">Halloween</span><small>祝日・ホリデー</small></p></div>
+    <div class="zcard card"><span class="num">1</span><img src="../img/movie.png" alt="映画"><p>複数名詞<small class="en">movies</small></p></div>
+    <div class="zcard card"><span class="num">2</span><img src="../img/furniture.png" alt="家具"><p>まとめて指す名詞<small class="en">furniture</small></p></div>
+    <div class="zcard card"><span class="num">3</span><img src="../img/torii.png" alt="鳥居"><p>固有名詞<small class="en">Kyoto</small></p></div>
+    <div class="zcard card"><span class="num">4</span><img src="../img/hello.png" alt="英語"><p>言語<small class="en">English</small></p></div>
+    <div class="zcard card"><span class="num">5</span><img src="../img/breakfast.png" alt="朝食"><p>食事<small class="en">breakfast</small></p></div>
+    <div class="zcard card"><span class="num">6</span><img src="../img/pumpkin.png" alt="ハロウィン"><p>祝日・ホリデー<small class="en">Halloween</small></p></div>
   </div>
 </section>
 
@@ -396,60 +447,32 @@
 <section class="slide">
   <header class="bar"><span class="crumb">文法解説 / 冠詞 Part 2</span></header>
   <div class="divider"></div>
-  <p class="eyebrow">QUIZ</p>
-  <h2 class="title">（　）に入るのは <span class="en a">a / an</span>？ <span class="en the">the</span>？</h2>
-  <div class="quiz card">
-    <img src="../img/movie.png" alt="映画">
-    <div class="qlines">
-      <div class="qline"><span>I watched</span><span class="blank"></span><span>movie last night.</span></div>
-      <div class="qline"><span>I liked</span><span class="blank"></span><span>movie.</span></div>
-    </div>
-  </div>
-  <div class="opts"><span class="art">a</span><span class="or">or</span><span class="art the">the</span><span class="ask">どっち？ 声に出して答えてみよう！</span></div>
-</section>
-
-<section class="slide">
-  <header class="bar"><span class="crumb">文法解説 / 冠詞 Part 2</span></header>
-  <div class="divider"></div>
-  <p class="eyebrow">QUIZ ・ ANSWER</p>
-  <h2 class="title">（　）に入るのは <span class="en a">a / an</span>？ <span class="en the">the</span>？</h2>
-  <div class="quiz card">
-    <img src="../img/movie.png" alt="映画">
-    <div class="qlines">
-      <div class="qline"><span>I watched</span><span class="fill">a</span><span>movie last night.</span></div>
-      <div class="qline"><span>I liked</span><span class="fill the">the</span><span>movie.</span></div>
-    </div>
-  </div>
-  <div class="kai card">
-    <p class="kai-line"><span class="chip">1回目</span><span>数えられる「1つの映画」と分かるので → <span class="en a">a</span> <span class="en">movie</span></span></p>
-    <p class="kai-line"><span class="chip blue">2回目</span><span>「さっきの映画」と分かるので → <span class="en the">the</span> <span class="en">movie</span></span></p>
-    <p class="tr">昨日の夜、映画を観ました。その映画が気に入りました。</p>
-  </div>
-</section>
-
-<section class="slide">
-  <header class="bar"><span class="crumb">文法解説 / 冠詞 Part 2</span></header>
-  <div class="divider"></div>
   <p class="eyebrow">NO ARTICLE ・ 1</p>
-  <h2 class="title">複数名詞のときは、冠詞をつけない</h2>
+  <h2 class="title">1. 複数名詞のときは、冠詞をつけない</h2>
   <div class="duo">
-    <div class="okng c-orange">
-      <div class="okng-head"><img src="../img/movie.png" alt="映画"><div><p class="okng-h"><span class="en"><span class="a">a</span> movie</span></p><p class="okng-s">1本の映画</p></div></div>
-      <p class="ln"><span class="mk">1</span><span><span class="en">I watched <span class="a">a</span> movie.</span><br><span class="ja"><span class="en a">a / an</span> は「1つ」のときだけ</span></span></p>
+    <div class="vs c-orange">
+      <span class="chip">1つ</span>
+      <div class="imgs"><img src="../img/movie.png" alt="映画"></div>
+      <p class="vs-en">I watched <span class="a">a</span> movie last night.</p>
+      <p class="vs-ja">昨日の夜、映画を観ました。</p>
+      <p class="vs-why">「1つの映画」と分かる　→　<span class="en a">a</span></p>
     </div>
-    <div class="okng c-sky">
-      <div class="okng-head"><div class="imgs"><img src="../img/movie.png" alt="映画"><img src="../img/movie.png" alt="映画"></div><div><p class="okng-h"><span class="en">movies</span></p><p class="okng-s">複数の映画・映画全般</p></div></div>
-      <p class="ln"><span class="mk" style="background:var(--blue)">○</span><span><span class="en">I like <mark>movies</mark>.</span><br><span class="ja">私は映画が好きです。</span></span></p>
+    <div class="vs c-sky">
+      <span class="chip blue">複数</span>
+      <div class="imgs"><img src="../img/movie.png" alt="映画"><img src="../img/movie.png" alt="映画"></div>
+      <p class="vs-en">I like <mark>movies</mark>.</p>
+      <p class="vs-ja">私は映画が好きです。</p>
+      <p class="vs-why">複数名詞 <span class="en">movies</span>　→　冠詞なし</p>
     </div>
   </div>
-  <p class="band"><span class="chip">ポイント</span><span><span class="en">movies</span> は複数名詞なので、<span class="en a">a / an</span> は使わない</span></p>
+  <p class="band"><span class="chip">ポイント</span><span><span class="en a">a / an</span> は「1つ」のときだけ。複数名詞にはつけない</span></p>
 </section>
 
 <!-- 2. furniture -->
 <section class="slide">
   <header class="bar"><span class="crumb">文法解説 / 冠詞 Part 2</span></header>
   <div class="divider"></div>
-  <p class="eyebrow">QUIZ</p>
+  <p class="eyebrow">NO ARTICLE ・ 2 ・ QUIZ</p>
   <h2 class="title">英語で言うと？</h2>
   <div class="quiz card">
     <img src="../img/furniture.png" alt="家具">
@@ -464,7 +487,7 @@
 <section class="slide">
   <header class="bar"><span class="crumb">文法解説 / 冠詞 Part 2</span></header>
   <div class="divider"></div>
-  <p class="eyebrow">QUIZ ・ ANSWER</p>
+  <p class="eyebrow">NO ARTICLE ・ 2 ・ ANSWER</p>
   <h2 class="title">英語で言うと？</h2>
   <div class="quiz card">
     <img src="../img/furniture.png" alt="家具">
@@ -482,7 +505,31 @@
 <section class="slide">
   <header class="bar"><span class="crumb">文法解説 / 冠詞 Part 2</span></header>
   <div class="divider"></div>
-  <p class="eyebrow">POINT</p>
+  <p class="eyebrow">NO ARTICLE ・ 2 ・ POINT</p>
+  <h2 class="title"><span class="en">furniture</span> は s がつかないけど、1つとは限らない</h2>
+  <div class="fz">
+    <div class="fz-set card">
+      <div class="fz-items">
+        <div><img src="../img/chair.png" alt="いす"><p class="en">chair</p></div>
+        <div><img src="../img/table.png" alt="テーブル"><p class="en">table</p></div>
+        <div><img src="../img/bed.png" alt="ベッド"><p class="en">bed</p></div>
+        <div><img src="../img/furniture.png" alt="ソファ"><p class="en">sofa</p></div>
+      </div>
+      <p class="fz-eq">まとめて <mark class="en">furniture</mark>（家具）</p>
+    </div>
+    <div class="fz-pts">
+      <p class="fz-pt card"><span class="num">1</span><span>家具を<b>まとめて指す</b>言葉。<br>s はつかないけど、いくつかの家具のこともある</span></p>
+      <p class="fz-pt card"><span class="num">2</span><span>数えられない名詞なので、<b><span class="en">a</span> も <span class="en">s</span> もつけない</b><br><span class="ng">× a furniture　× furnitures</span></span></p>
+      <p class="fz-pt card"><span class="num">3</span><span>1点だけ言いたいときは<br><span class="en">a piece of furniture</span>（家具1点）</span></p>
+      <p class="fz-pt card"><span class="num">4</span><span>動詞は単数あつかい<br><span class="en">The furniture <mark>is</mark> new.</span>（その家具は新しい）</span></p>
+    </div>
+  </div>
+</section>
+
+<section class="slide">
+  <header class="bar"><span class="crumb">文法解説 / 冠詞 Part 2</span></header>
+  <div class="divider"></div>
+  <p class="eyebrow">NO ARTICLE ・ 2 ・ POINT</p>
   <h2 class="title">冠詞を変えると、意味が変わる</h2>
   <div class="rows">
     <div class="row card"><img src="../img/furniture.png" alt="家具"><div><p class="row-en">I bought <mark>furniture</mark> online.</p><p class="row-ja">オンラインで家具を買った。</p></div><p class="why">不特定の家具<br>（1つとは限らない）</p></div>
@@ -495,8 +542,8 @@
 <section class="slide">
   <header class="bar"><span class="crumb">文法解説 / 冠詞 Part 2</span></header>
   <div class="divider"></div>
-  <p class="eyebrow">NO ARTICLE ・ PROPER NOUNS</p>
-  <h2 class="title">固有名詞（人・都市・国・施設）</h2>
+  <p class="eyebrow">NO ARTICLE ・ 3</p>
+  <h2 class="title">3. 固有名詞（人・都市・国・施設）</h2>
   <div class="chips"><span class="nchip">Japan</span><span class="nchip">Tokyo</span><span class="nchip">France</span><span class="nchip">Kyoto</span><span class="nchip">Disneyland</span><span class="nchip">Universal Studios Japan</span></div>
   <div class="rows nowhy">
     <div class="row card"><img src="../img/torii.png" alt="京都"><div><p class="row-en">I live in <mark>Kyoto</mark>.</p><p class="row-ja">私は京都に住んでいます。</p></div></div>
@@ -508,7 +555,7 @@
 <section class="slide">
   <header class="bar"><span class="crumb">文法解説 / 冠詞 Part 2</span></header>
   <div class="divider"></div>
-  <p class="eyebrow">POINT</p>
+  <p class="eyebrow">NO ARTICLE ・ 3 ・ POINT</p>
   <h2 class="title">ただし、<span class="en the">the</span> が名前の一部になっているものもある</h2>
   <p class="sub-lead">有名な建物・作品など</p>
   <div class="lgrid">
@@ -523,8 +570,8 @@
 <section class="slide">
   <header class="bar"><span class="crumb">文法解説 / 冠詞 Part 2</span></header>
   <div class="divider"></div>
-  <p class="eyebrow">NO ARTICLE ・ LANGUAGES</p>
-  <h2 class="title">言語（<span class="en">English / Japanese</span>）</h2>
+  <p class="eyebrow">NO ARTICLE ・ 4</p>
+  <h2 class="title">4. 言語（<span class="en">English / Japanese</span>）</h2>
   <div class="rows nowhy big">
     <div class="row card"><img src="../img/hello.png" alt="英語"><div><p class="row-en">I'm studying <mark>English</mark>.</p><p class="row-ja">私は英語を勉強しています。</p></div></div>
     <div class="row card"><img src="../img/konnichiwa.png" alt="日本語"><div><p class="row-en">I speak <mark>Japanese</mark>.</p><p class="row-ja">私は日本語を話します。</p></div></div>
@@ -536,22 +583,22 @@
 <section class="slide">
   <header class="bar"><span class="crumb">文法解説 / 冠詞 Part 2</span></header>
   <div class="divider"></div>
-  <p class="eyebrow">NO ARTICLE ・ MEALS</p>
-  <h2 class="title">朝食・昼食・夕食は、基本は無冠詞</h2>
+  <p class="eyebrow">NO ARTICLE ・ 5</p>
+  <h2 class="title">5. 食事（<span class="en">breakfast / lunch / dinner</span>）</h2>
   <div class="rows nowhy tight">
     <div class="row card"><img src="../img/breakfast.png" alt="朝食"><div><p class="row-en">I had <mark>breakfast</mark> at seven.</p><p class="row-ja">7時に朝ごはんを食べました。</p></div></div>
     <div class="row card"><img src="../img/lunch.png" alt="昼食"><div><p class="row-en">Let's have <mark>lunch</mark> together.</p><p class="row-ja">一緒にお昼ごはんを食べよう。</p></div></div>
     <div class="row card"><img src="../img/dinner.png" alt="夕食"><div><p class="row-en">What's for <mark>dinner</mark>?</p><p class="row-ja">夕ごはんは何？</p></div></div>
   </div>
-  <p class="band"><span class="chip">覚えておこう</span><span class="en">breakfast / lunch / dinner</span></p>
+  <p class="band"><span class="chip">覚えておこう</span><span>朝食・昼食・夕食は、基本は無冠詞</span></p>
 </section>
 
 <!-- 6. 祝日 -->
 <section class="slide">
   <header class="bar"><span class="crumb">文法解説 / 冠詞 Part 2</span></header>
   <div class="divider"></div>
-  <p class="eyebrow">NO ARTICLE ・ HOLIDAYS</p>
-  <h2 class="title">祝日・ホリデー</h2>
+  <p class="eyebrow">NO ARTICLE ・ 6</p>
+  <h2 class="title">6. 祝日・ホリデー</h2>
   <div class="rows nowhy big">
     <div class="row card"><img src="../img/pumpkin.png" alt="ハロウィン"><div><p class="row-en">What are you dressing up as for <mark>Halloween</mark>?</p><p class="row-ja">ハロウィンはどんな仮装をする？</p></div></div>
     <div class="row card"><img src="../img/xmastree.png" alt="クリスマス"><div><p class="row-en"><mark>Christmas</mark> is my favorite holiday!</p><p class="row-ja">クリスマスは私の一番好きなホリデーです！</p></div></div>

@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="400" height="400">
+<defs><linearGradient id="w" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#DCA16E"/><stop offset="1" stop-color="#B47448"/></linearGradient></defs>
+<ellipse cx="200" cy="356" rx="100" ry="13" fill="#1C2340" opacity=".08"/>
+<rect x="128" y="60" width="144" height="40" rx="14" fill="url(#w)"/>
+<rect x="138" y="96" width="16" height="120" rx="6" fill="#B47448"/>
+<rect x="246" y="96" width="16" height="120" rx="6" fill="#B47448"/>
+<rect x="180" y="100" width="12" height="110" rx="5" fill="#C98A5A"/>
+<rect x="208" y="100" width="12" height="110" rx="5" fill="#C98A5A"/>
+<rect x="110" y="206" width="180" height="40" rx="14" fill="#FF8A62"/>
+<rect x="110" y="230" width="180" height="22" rx="8" fill="#E5482A"/>
+<rect x="124" y="250" width="18" height="100" rx="7" fill="#B47448"/>
+<rect x="258" y="250" width="18" height="100" rx="7" fill="#B47448"/>
+</svg>
