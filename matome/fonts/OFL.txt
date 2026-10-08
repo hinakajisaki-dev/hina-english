@@ -1,6 +1,15 @@
 NotoSansJP-*.woff2 (Noto Sans JP, downloaded from Google Fonts, converted to WOFF2):
 (c) 2014-2021 Adobe (http://www.adobe.com/), with Reserved Font Name 'Source'.
 
+NotoSansJP-500.woff2 is the weight-500 instance of the Noto Sans JP variable font
+from the google/fonts repository, converted to WOFF2.
+
+DMSans-500/700/800.woff2 (static instances, opsz 14, of the DM Sans variable font from the google/fonts repository, converted to WOFF2):
+Copyright 2014 The DM Sans Project Authors (https://github.com/googlefonts/dm-fonts)
+
+Caveat-700.woff2 (weight-700 instance of the Caveat variable font from the google/fonts repository, converted to WOFF2):
+Copyright 2014 The Caveat Project Authors (https://github.com/googlefonts/caveat)
+
 LiberationSans-Bold.ttf (Liberation Sans 2.1.5, unmodified):
 Digitized data copyright (c) 2010 Google Corporation.
 Copyright (c) 2012 Red Hat, Inc.

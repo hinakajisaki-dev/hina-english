@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<title>毎日25分 英語の勉強メニュー Study Guide</title>
+<style>
+  /* Look: the Hina English salon LP (light-blue ground, warm-white paper,
+     orange asterisk tile, DM Sans + Noto Sans JP + Caveat), laid out as two A4 pages. */
+  @font-face { font-family: "DM Sans"; font-weight: 500; src: url("../fonts/DMSans-500.woff2") format("woff2"); }
+  @font-face { font-family: "DM Sans"; font-weight: 700; src: url("../fonts/DMSans-700.woff2") format("woff2"); }
+  @font-face { font-family: "DM Sans"; font-weight: 800; src: url("../fonts/DMSans-800.woff2") format("woff2"); }
+  @font-face { font-family: "Caveat"; font-weight: 700; src: url("../fonts/Caveat-700.woff2") format("woff2"); }
+  @font-face { font-family: "Noto Sans JP"; font-weight: 500; src: url("../fonts/NotoSansJP-500.woff2") format("woff2"); }
+  @font-face { font-family: "Noto Sans JP"; font-weight: 700; src: url("../fonts/NotoSansJP-700.woff2") format("woff2"); }
+  @font-face { font-family: "Noto Sans JP"; font-weight: 900; src: url("../fonts/NotoSansJP-900.woff2") format("woff2"); }
+
+  @page { size: A4; margin: 0; }
+
+  :root {
+    --bg: #EAF2FB;
+    --paper: #FFFCF8;
+    --card: #FFFFFF;
+    --ink: #1A2238;
+    --ink-2: #4B5569;
+    --muted: #5E6780;
+    --line: #D6E2F0;
+    --line-warm: #EFE3DA;
+    --accent: #F0521E;
+    --accent-2: #D63E10;
+    --accent-text: #C23B12;
+    --accent-soft: #FFE6DC;
+    --c-word: #FF8A57;
+    --c-grammar: #7DBDEB;
+    --c-model: #FF9DB4;
+    --c-rest: #FFC94A;
+    --soft-grammar: #E3F1FB;
+    --soft-model: #FFE9EE;
+    --soft-rest: #FFF4D6;
+    --en: "DM Sans", "Noto Sans JP", sans-serif;
+    --ja: "Noto Sans JP", sans-serif;
+    --hand: "Caveat", cursive;
+    --shadow: 0 6px 18px rgba(26, 34, 56, .06);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { background: var(--paper); }
+  body {
+    font-family: var(--ja);
+    font-weight: 500;
+    font-size: 11.5px;
+    line-height: 1.6;
+    color: var(--ink);
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  h1, h2, h3, h4, p, li, dd { word-break: auto-phrase; font-feature-settings: "palt"; }
+  ul, ol { list-style: none; }
+  .en { font-family: var(--en); }
+  b, strong { font-weight: 900; }
+
+  .page {
+    width: 210mm;
+    height: 297mm;
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    background: var(--paper);
+    break-after: page;
+  }
+  .page:last-child { break-after: auto; }
+  .inner { padding: 0 34px; display: flex; flex-direction: column; gap: 12px; flex: 1; min-height: 0; }
+
+  /* ---------- shared pieces ---------- */
+  .mark {
+    display: grid; place-items: center; flex: none;
+    width: 34px; height: 34px; border-radius: 11px;
+    background: linear-gradient(145deg, #FF6A3D, var(--accent-2));
+    color: #fff;
+  }
+  .mark svg { width: 18px; height: 18px; }
+  .logo { display: flex; align-items: center; gap: 10px; }
+  .logo-name { display: grid; line-height: 1.15; font-family: var(--en); }
+  .logo-name b { font-weight: 700; font-size: 17px; letter-spacing: -.3px; }
+  .logo-name small { font-weight: 500; font-size: 10px; color: var(--ink-2); }
+  .label { font-family: var(--en); font-weight: 700; font-size: 9.5px; letter-spacing: .2em; text-transform: uppercase; color: var(--accent-text); }
+  .chip {
+    display: inline-flex; align-items: center; gap: 4px;
+    font-weight: 700; font-size: 10.5px; line-height: 1.4;
+    color: var(--accent-text); background: var(--accent-soft);
+    padding: 2px 9px 3px; border-radius: 999px; white-space: nowrap;
+  }
+  .timer {
+    display: inline-flex; align-items: center; gap: 3px;
+    font-family: var(--en); font-weight: 800; font-size: 10.5px; line-height: 1;
+    color: var(--ink); background: var(--card);
+    border: 1.5px solid var(--ink); border-radius: 999px;
+    padding: 3px 8px 3px 5px; white-space: nowrap;
+  }
+  .timer svg { width: 12px; height: 12px; flex: none; }
+  .card {
+    background: var(--card);
+    border-radius: 20px;
+    box-shadow: var(--shadow);
+    border: 1px solid #E6EDF6;
+    padding: 14px 18px 15px;
+  }
+  .sec-head { display: flex; align-items: center; gap: 12px; }
+  .num {
+    display: grid; place-items: center; flex: none;
+    width: 38px; height: 38px; border-radius: 12px;
+    font-family: var(--en); font-weight: 800; font-size: 17px; letter-spacing: -.5px;
+    background: var(--c); color: var(--ink);
+  }
+  .sec-head h2 { font-weight: 900; font-size: 19px; line-height: 1.3; display: flex; align-items: center; gap: 10px; }
+  .sec-head h2 .timer { font-size: 12px; padding: 4px 10px 4px 6px; }
+  .sec-head h2 .timer svg { width: 14px; height: 14px; }
+  .sec-head p { font-size: 11.5px; color: var(--ink-2); margin-top: 1px; }
+  .word { --c: var(--c-word); }
+  .grammar { --c: var(--c-grammar); }
+  .model { --c: var(--c-model); }
+  .rest { --c: var(--c-rest); }
+
+  .say { font-family: var(--en); font-weight: 700; letter-spacing: -.1px; }
+  .hl { background: linear-gradient(transparent 58%, var(--accent-soft) 58%); }
+  .hl-g { background: linear-gradient(transparent 58%, #CDE6F7 58%); }
+  .hl-m { background: linear-gradient(transparent 50%, #FFC6D3 50%); }
+
+  /* ---------- page 1 header ---------- */
+  .top { background: var(--bg); padding: 16px 34px 0; position: relative; overflow: hidden; }
+  .top-row { display: flex; align-items: center; justify-content: space-between; }
+  .top-body { display: grid; grid-template-columns: minmax(0, 1fr) 128px; gap: 12px; align-items: end; }
+  .top-text { padding: 6px 0 16px; }
+  .script { font-family: var(--hand); font-weight: 700; font-size: 26px; line-height: 1; color: var(--accent-text); }
+  .top h1 { font-weight: 900; font-size: 28px; line-height: 1.3; margin-top: 4px; letter-spacing: .01em; }
+  .top h1 .n { font-family: var(--en); font-weight: 800; color: var(--accent); font-size: 36px; letter-spacing: -1.5px; margin: 0 2px; }
+  .top .lead { font-size: 12px; color: var(--ink-2); margin-top: 2px; }
+  .figure { position: relative; height: 128px; }
+  .figure .tile {
+    position: absolute; left: 12px; right: 6px; top: 34px; height: 120px;
+    border-radius: 28px; background: linear-gradient(145deg, #FF6A3D, var(--accent-2));
+    transform: rotate(-8deg);
+  }
+  .figure img { position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); height: 132px; width: auto; }
+
+  /* ---------- timeline ---------- */
+  .menu { margin-top: 12px; }
+  .menu-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+  .menu-head h3 { font-weight: 900; font-size: 15px; }
+  .menu-head .total { font-weight: 900; font-size: 12px; }
+  .menu-head .total b { font-family: var(--en); font-weight: 800; font-size: 26px; letter-spacing: -1px; color: var(--accent); margin: 0 2px; }
+  .timeline { display: flex; gap: 6px; margin-top: 8px; }
+  .seg { flex: var(--m) 1 0; min-width: 0; }
+  .seg .fill { display: block; height: 14px; border-radius: 7px; background: var(--c); }
+  .seg .t { display: flex; align-items: baseline; flex-wrap: wrap; gap: 0 6px; margin-top: 5px; line-height: 1.4; }
+  .seg .t b { font-size: 12.5px; }
+  .seg .t span { font-family: var(--en); font-size: 11px; color: var(--muted); font-weight: 700; }
+  .rules { display: flex; align-items: center; gap: 10px; margin-top: 10px; background: var(--bg); border-radius: 12px; padding: 7px 12px; font-size: 11px; line-height: 1.55; }
+  .rules .timer { flex: none; }
+  .rules b { color: var(--accent-text); }
+
+  /* ---------- 01 word ---------- */
+  .word-body { display: grid; grid-template-columns: minmax(0, 1fr) 232px; gap: 14px; margin-top: 10px; }
+  .points { display: grid; gap: 5px; }
+  .points li { background: #FFF3EC; border-radius: 10px; padding: 6px 11px; display: grid; grid-template-columns: 150px minmax(0, 1fr); align-items: baseline; gap: 8px; }
+  .points li b { display: flex; align-items: center; gap: 6px; font-size: 12.5px; }
+  .points li b i { font-style: normal; font-family: var(--en); font-weight: 800; font-size: 11px; color: var(--accent-text); }
+  .points li p { font-size: 11px; color: var(--ink-2); line-height: 1.5; }
+  .flow { margin-top: 8px; display: grid; gap: 4px; }
+  .flow li { display: grid; grid-template-columns: 62px minmax(0, 1fr); align-items: center; gap: 8px; font-size: 11px; }
+  .flow li .timer { justify-self: start; }
+
+  .fc { display: grid; gap: 6px; align-content: start; }
+  .fc-cap { font-size: 10.5px; font-weight: 700; color: var(--muted); }
+  .fc-card {
+    border-radius: 14px; border: 1.5px solid var(--line-warm); background: var(--card);
+    padding: 10px 12px; position: relative;
+  }
+  .fc-card .side { position: absolute; top: 8px; right: 10px; font-size: 9.5px; font-weight: 700; color: var(--muted); }
+  .fc-front { display: grid; place-items: center; height: 46px; background: #FFF8F3; }
+  .fc-front .say { font-size: 24px; letter-spacing: -.5px; }
+  .fc-back { display: grid; grid-template-columns: 52px minmax(0, 1fr); gap: 10px; align-items: center; }
+  .fc-back .pic {
+    width: 52px; height: 52px; border-radius: 12px; background: var(--soft-rest);
+    display: grid; place-items: center;
+  }
+  .fc-back .pic svg { width: 40px; height: 40px; }
+  .fc-back dl { display: grid; gap: 1px; font-size: 10.5px; line-height: 1.45; }
+  .fc-back dt { font-weight: 900; font-size: 13px; }
+  .fc-back dd .say { font-size: 11.5px; }
+  .fc-say { background: var(--accent-soft); border-radius: 10px; padding: 6px 10px; font-size: 10.5px; line-height: 1.5; }
+  .fc-say .say { font-size: 11.5px; }
+
+  /* ---------- 02 grammar ---------- */
+  .ai-note { margin-top: 8px; display: flex; gap: 10px; align-items: center; background: var(--soft-grammar); border-radius: 12px; padding: 8px 12px; font-size: 11px; line-height: 1.55; }
+  .ai-note .ai {
+    flex: none; display: grid; place-items: center; width: 30px; height: 30px; border-radius: 9px;
+    background: var(--card); font-family: var(--en); font-weight: 800; font-size: 11px; color: #2C6E9E;
+  }
+  .steps { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; margin-top: 8px; }
+  .step { border: 1.5px solid var(--line); border-radius: 14px; padding: 8px 9px 9px; display: flex; flex-direction: column; gap: 4px; }
+  .step .s-top { display: flex; align-items: center; justify-content: space-between; gap: 4px; }
+  .step .s-no { font-family: var(--en); font-weight: 800; font-size: 9.5px; letter-spacing: .12em; color: #2C6E9E; }
+  .step h4 { font-weight: 900; font-size: 12.5px; line-height: 1.35; }
+  .step p { font-size: 10.5px; color: var(--ink-2); line-height: 1.5; }
+  .prompts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-top: 6px; }
+  .prompt {
+    background: #F4F7FB; border-radius: 9px; padding: 6px 9px;
+    font-size: 10px; line-height: 1.5; color: var(--ink);
+    border-left: 3px solid var(--c-grammar);
+  }
+  .prompt small { display: block; font-size: 9px; font-weight: 700; color: var(--muted); }
+
+  .examples { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-top: 8px; }
+  .ex { background: var(--soft-grammar); border-radius: 14px; padding: 9px 13px 10px; }
+  .ex-head { display: flex; align-items: center; gap: 8px; }
+  .ex-head b { font-size: 13px; }
+  .ex-head .tag { font-size: 9.5px; font-weight: 700; color: #2C6E9E; background: var(--card); border-radius: 999px; padding: 1px 8px 2px; }
+  .ex .rule { font-size: 10.5px; color: var(--ink-2); margin-top: 3px; }
+  .ex .rule .say { color: var(--ink); }
+  .ex .main { font-family: var(--en); font-weight: 800; font-size: 15px; letter-spacing: -.3px; margin-top: 5px; display: flex; align-items: center; }
+  .ex .main .pat { background: var(--card); color: #2C6E9E; border-radius: 7px; padding: 0 8px 1px; }
+  .ex .main small { font-family: var(--ja); font-weight: 500; font-size: 10px; color: var(--ink-2); margin-left: 6px; letter-spacing: 0; }
+  .ex dl { display: grid; grid-template-columns: 64px minmax(0, 1fr); gap: 4px 8px; margin-top: 6px; font-size: 10.5px; line-height: 1.5; }
+  .ex dt { font-weight: 900; font-size: 10px; color: #2C6E9E; padding-top: 1px; }
+  .ex dd .say { font-size: 11px; display: block; }
+  .ex dd .say + .say { margin-top: 1px; }
+  .caution { font-size: 10px; color: var(--muted); margin-top: 6px; }
+
+  /* ---------- page 2 ---------- */
+  .p2-top { padding: 20px 34px 0; display: flex; align-items: center; justify-content: space-between; }
+  .p2-top .page-no { font-family: var(--en); font-weight: 700; font-size: 10px; color: var(--muted); letter-spacing: .1em; }
+
+  .units-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+  .skeleton { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.75fr); gap: 10px; margin-top: 10px; }
+  .sk { background: var(--soft-grammar); border-radius: 14px; padding: 9px 12px 10px; }
+  .sk > b { font-size: 11.5px; display: block; }
+  .sk-row { display: flex; gap: 4px; margin-top: 6px; }
+  .sk-row span { display: grid; justify-items: center; gap: 1px; background: var(--card); border-radius: 8px; padding: 4px 8px 3px; }
+  .sk-row span .say { font-size: 13px; }
+  .sk-row span small { font-size: 9px; font-weight: 700; color: #2C6E9E; }
+  .sk-row span.s small { color: var(--accent-text); }
+  .sk-row span.m { background: transparent; border: 1.5px dashed var(--line); }
+  .sk-row span.m small { color: var(--muted); }
+
+  .weeks { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin-top: 12px; }
+  .wk h4 { font-weight: 900; font-size: 11.5px; display: flex; align-items: center; gap: 8px; padding-bottom: 4px; border-bottom: 2px solid var(--c-grammar); }
+  .wk h4 .en { font-weight: 800; font-size: 10px; color: #2C6E9E; letter-spacing: .1em; }
+  .wk ol { margin-top: 3px; }
+  .wk h4 { flex-wrap: wrap; row-gap: 0; }
+  .wk li { display: grid; grid-template-columns: 18px minmax(0, 1fr); gap: 5px; padding: 4px 0; border-bottom: 1px solid #EEF2F7; align-items: baseline; }
+  .wk li:last-child { border-bottom: 0; }
+  .wk li .d { font-family: var(--en); font-weight: 800; font-size: 11px; color: #2C6E9E; text-align: right; }
+  .wk li .u { font-size: 10.5px; font-weight: 700; line-height: 1.4; }
+  .wk li .u .say { display: block; font-weight: 500; color: var(--ink-2); font-size: 10px; line-height: 1.35; margin-top: 1px; }
+  .wk li.star .u { color: var(--accent-text); }
+
+  .model-body { display: grid; grid-template-columns: 236px minmax(0, 1fr); gap: 16px; margin-top: 12px; }
+  .model-ex { background: var(--soft-model); border-radius: 14px; padding: 12px 14px; display: flex; flex-direction: column; gap: 6px; }
+  .model-ex .say.big { font-size: 15.5px; line-height: 1.35; letter-spacing: -.2px; }
+  .model-ex .ja { font-size: 10.5px; color: var(--ink-2); }
+  .tips { display: grid; gap: 4px; margin-top: 2px; }
+  .tips li { background: var(--card); border-radius: 8px; padding: 4px 8px; font-size: 10.5px; }
+  .tips li .say { font-size: 11px; }
+  .src { font-size: 10px; color: var(--ink-2); line-height: 1.5; }
+  .msteps { display: grid; gap: 6px; }
+  .msteps li { display: grid; grid-template-columns: 24px minmax(0, 1fr) auto; gap: 10px; align-items: center; border: 1.5px solid #F6DCE3; border-radius: 12px; padding: 7px 10px; }
+  .msteps .no { display: grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; background: var(--c-model); font-family: var(--en); font-weight: 800; font-size: 11px; }
+  .msteps b { font-size: 12px; display: block; line-height: 1.4; }
+  .msteps p { font-size: 10.5px; color: var(--ink-2); line-height: 1.45; }
+
+  .bottom { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+  .mini { border-radius: 18px; padding: 12px 16px 13px; display: flex; gap: 12px; align-items: flex-start; }
+  .mini.rest { background: var(--soft-rest); }
+  .mini.check { background: var(--accent-soft); }
+  .mini .num { width: 34px; height: 34px; font-size: 13px; }
+  .mini.check .num { background: var(--card); color: var(--accent-text); }
+  .mini .num svg { width: 18px; height: 18px; }
+  .mini h3 { font-weight: 900; font-size: 13.5px; display: flex; align-items: center; gap: 8px; }
+  .mini p { font-size: 11px; color: var(--ink-2); margin-top: 2px; line-height: 1.55; }
+
+  .foot {
+    margin-top: auto; background: var(--bg); padding: 12px 34px;
+    display: flex; align-items: center; justify-content: space-between; gap: 16px;
+  }
+  .foot .script { font-size: 22px; }
+  .foot .logo-name b { font-size: 14px; }
+  .foot .mark { width: 28px; height: 28px; border-radius: 9px; }
+  .foot .mark svg { width: 15px; height: 15px; }
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="asterisk" viewBox="0 0 24 24"><path d="M12 3.5v17M3.5 12h17M6 6l12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></symbol>
+    <symbol id="timer" viewBox="0 0 24 24"><circle cx="12" cy="13.5" r="7.5" fill="none" stroke="currentColor" stroke-width="2.2"/><path d="M12 13.5V9.8M9.5 2.8h5M12 2.8v3.2M18.6 6.4l1.4-1.4" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></symbol>
+  </defs>
+</svg>
+
+<!-- ===================== PAGE 1 ===================== -->
+<section class="page">
+  <header class="top">
+    <div class="top-row">
+      <div class="logo">
+        <span class="mark"><svg><use href="#asterisk"/></svg></span>
+        <span class="logo-name"><b>Hina English</b><small>Learn. Write. Grow.</small></span>
+      </div>
+      <span class="chip">Study Guide ｜ 初心者向け</span>
+    </div>
+    <div class="top-body">
+      <div class="top-text">
+        <p class="script">Small steps, big changes.</p>
+        <h1>毎日<span class="n">25</span>分の英語の勉強メニュー</h1>
+        <p class="lead">単語、文法、モデリング。タイマーで区切って、毎日同じ順番でやるだけ。</p>
+      </div>
+      <div class="figure">
+        <div class="tile"></div>
+        <img src="character.png" alt="">
+      </div>
+    </div>
+  </header>
+
+  <div class="inner">
+    <!-- timeline -->
+    <div class="menu">
+      <div class="menu-head">
+        <h3>1日の流れ</h3>
+        <p class="total">集中 <b>25</b>分 ＋ 休憩 5分<span style="font-weight:700;color:var(--muted);font-size:10.5px;margin-left:6px">（ポモドーロ・テクニック）</span></p>
+      </div>
+      <div class="timeline">
+        <div class="seg word" style="--m:10"><span class="fill"></span><p class="t"><b>01 単語</b><span>10分</span></p></div>
+        <div class="seg grammar" style="--m:10"><span class="fill"></span><p class="t"><b>02 文法</b><span>10分</span></p></div>
+        <div class="seg model" style="--m:5"><span class="fill"></span><p class="t"><b>03 モデリング</b><span>5分</span></p></div>
+        <div class="seg rest" style="--m:5"><span class="fill"></span><p class="t"><b>休憩</b><span>5分</span></p></div>
+      </div>
+      <p class="rules"><span class="timer"><svg><use href="#timer"/></svg>セット</span><span><b>どのパートもタイマーで区切る。</b>鳴ったら途中でも次へ進みます。忙しい日は、単語の10分だけでもOK。</span></p>
+    </div>
+
+    <!-- 01 word -->
+    <section class="card word">
+      <div class="sec-head">
+        <span class="num">01</span>
+        <div>
+          <h2>単語 <span class="timer"><svg><use href="#timer"/></svg>10:00</span></h2>
+          <p>新しい単語10語に、昨日と1週間前の単語をまぜて、フラッシュカードで何周もします。</p>
+        </div>
+      </div>
+      <div class="word-body">
+        <div>
+          <ol class="points">
+            <li><b><i>1</i>イメージで覚える</b><p>日本語訳より先に、使う場面を思い浮かべる。</p></li>
+            <li><b><i>2</i>声に出す</b><p>見るだけにしない。単語も例文も、口に出して言う。</p></li>
+            <li><b><i>3</i>質より回数</b><p>1語に2〜3秒。雑でもいいから何周もする。</p></li>
+            <li><b><i>4</i>フラッシュカードを使う</b><p>表に英語、裏にイメージと意味。めくる前に思い出す。</p></li>
+          </ol>
+          <ol class="flow">
+            <li><span class="timer"><svg><use href="#timer"/></svg>0:00〜</span><span>新しい10語を、イメージを決めて声に出しながら1周する</span></li>
+            <li><span class="timer"><svg><use href="#timer"/></svg>3:00〜</span><span>昨日と1週間前のカードもまぜて、タイマーが鳴るまでめくり続ける（目安5周）</span></li>
+          </ol>
+        </div>
+        <div class="fc">
+          <p class="fc-cap">フラッシュカードの例</p>
+          <div class="fc-card fc-front"><span class="side">表</span><span class="say">borrow</span></div>
+          <div class="fc-card fc-back">
+            <span class="side">裏</span>
+            <span class="pic"><svg viewBox="0 0 48 48" aria-hidden="true"><g transform="rotate(-35 24 18)"><rect x="9" y="14" width="24" height="8" rx="1.5" fill="#F0521E"/><rect x="9" y="14" width="5" height="8" rx="1.5" fill="#FFB199"/><path d="M33 14l7 4-7 4z" fill="#F5D7B5"/><path d="M38 16.9 40 18l-2 1.1z" fill="#1A2238"/></g><path d="M38 38c-6 4-17 4-25-1" fill="none" stroke="#1A2238" stroke-width="2.2" stroke-linecap="round"/><path d="M13 37l1-5M13 37l5 1" fill="none" stroke="#1A2238" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+            <dl>
+              <dt>借りる</dt>
+              <dd>友だちからペンを借りる場面</dd>
+              <dd><span class="say">Can I borrow your pen?</span></dd>
+            </dl>
+          </div>
+          
+        </div>
+      </div>
+    </section>
+
+    <!-- 02 grammar -->
+    <section class="card grammar">
+      <div class="sec-head">
+        <span class="num">02</span>
+        <div>
+          <h2>文法 <span class="timer"><svg><use href="#timer"/></svg>10:00</span></h2>
+          <p>中学文法の単元を、1日1つクリアしていきます。単元のリストは2ページ目にあります。</p>
+        </div>
+      </div>
+      <p class="ai-note"><span class="ai">AI</span><span><b>ChatGPTを使い倒そう。</b>Googleで調べてもすぐAIが答えてくれるくらい、AIは身近になりました。<br><small style="color:var(--muted);font-size:10px">※ AIもまちがえることがあります。変だなと思ったら、文法の本でも確かめましょう。</small></span></p>
+      <ol class="steps">
+        <li class="step">
+          <div class="s-top"><span class="s-no">STEP 1</span><span class="timer"><svg><use href="#timer"/></svg>3:00</span></div>
+          <h4>ルールを理解する</h4>
+          <p>今日のルールをAIに聞く。</p>
+        </li>
+        <li class="step">
+          <div class="s-top"><span class="s-no">STEP 2</span><span class="timer"><svg><use href="#timer"/></svg>1:00</span></div>
+          <h4>1分で量産する</h4>
+          <p>まちがいOKで1分書きまくる。</p>
+        </li>
+        <li class="step">
+          <div class="s-top"><span class="s-no">STEP 3</span><span class="timer"><svg><use href="#timer"/></svg>3:00</span></div>
+          <h4>合っているかチェック</h4>
+          <p>AIに貼って直してもらう。</p>
+        </li>
+        <li class="step">
+          <div class="s-top"><span class="s-no">STEP 4</span><span class="timer"><svg><use href="#timer"/></svg>3:00</span></div>
+          <h4>形を変えて例文を作る</h4>
+          <p>単語を変えて例文を作る。</p>
+        </li>
+      </ol>
+      <div class="prompts">
+        <p class="prompt"><small>STEP 1　AIに聞く例</small>中学英語の「比較級」を、初心者向けに例文3つで説明して</p>
+        <p class="prompt"><small>STEP 3　AIに聞く例</small>次の英文が正しいかチェックして。まちがいがあれば、正しい文と理由を日本語で教えて</p>
+        <p class="prompt"><small>STEP 4　おすすめ</small>前回の動画の「例文マシン」を使うと、例文をどんどん作れます</p>
+      </div>
+      <div class="examples">
+        <div class="ex">
+          <div class="ex-head"><b>例1　比較級</b><span class="tag">27日目</span></div>
+          <p class="rule">「AはBより〜」＝ <span class="say">A is ＋ 形容詞er ＋ than B</span></p>
+          <p class="main"><span class="pat">bigger than</span><small>東京は大阪より大きい</small></p>
+          <p class="say" style="font-size:12px;margin-top:1px">Tokyo is bigger than Osaka.</p>
+          <dl>
+            <dt>量産する</dt>
+            <dd><span class="say">My bag is bigger than yours.</span><span class="say">Dogs are bigger than cats.</span></dd>
+            <dt>形を変える</dt>
+            <dd><span class="say">smaller than / taller than / older than</span><span class="say">This bag is more expensive than that one.</span></dd>
+          </dl>
+        </div>
+        <div class="ex">
+          <div class="ex-head"><b>例2　助動詞</b><span class="tag">18・19日目</span></div>
+          <p class="rule"><span class="say">主語 ＋ 助動詞 ＋ 動詞の原形</span>（should＝〜したほうがいい）</p>
+          <p class="main"><span class="pat">I should</span><small>早く寝たほうがいい</small></p>
+          <p class="say" style="font-size:12px;margin-top:1px">I should go to bed early.</p>
+          <dl>
+            <dt>量産する</dt>
+            <dd><span class="say">I should drink more water.</span><span class="say">I should call my mom.</span></dd>
+            <dt>形を変える</dt>
+            <dd><span class="say">I will try again tomorrow.</span><span class="say">I can cook pasta.　I must leave now.</span></dd>
+          </dl>
+        </div>
+      </div>
+    </section>
+  </div>
+</section>
+
+<!-- ===================== PAGE 2 ===================== -->
+<section class="page">
+  <div class="p2-top">
+    <div class="logo">
+      <span class="mark"><svg><use href="#asterisk"/></svg></span>
+      <span class="logo-name"><b>Hina English</b><small>Study Guide</small></span>
+    </div>
+    <span class="page-no">2 / 2</span>
+  </div>
+
+  <div class="inner" style="margin-top:14px">
+    <!-- grammar units -->
+    <section class="card grammar">
+      <div class="units-head">
+        <div class="sec-head">
+          <span class="num">02</span>
+          <div>
+            <h2>中学文法 30日の単元リスト</h2>
+            <p>1日1単元。最初の1週間は、英語の「文の骨組み（語順）」からはじめます。<span style="color:var(--accent-text);font-weight:700">オレンジの単元</span>は、1ページ目の例で使った単元です。</p>
+          </div>
+        </div>
+      </div>
+      <div class="skeleton">
+        <div class="sk">
+          <b>英語は「だれが」「どうする」が先</b>
+          <div class="sk-row">
+            <span class="s"><span class="say">I</span><small>主語</small></span>
+            <span><span class="say">like</span><small>動詞</small></span>
+            <span><span class="say">coffee.</span><small>目的語</small></span>
+          </div>
+        </div>
+        <div class="sk">
+          <b>長い文も、まず主語と動詞をさがす</b>
+          <div class="sk-row">
+            <span class="s"><span class="say">I</span><small>主語</small></span>
+            <span><span class="say">don't know</span><small>動詞</small></span>
+            <span><span class="say">how to say this</span><small>目的語</small></span>
+            <span class="m"><span class="say">in English.</span><small>おまけ</small></span>
+          </div>
+        </div>
+      </div>
+      <div class="weeks">
+        <div class="wk">
+          <h4><span class="en">WEEK 1</span>文の骨組み（語順）</h4>
+          <ol>
+            <li><span class="d">1</span><span class="u">英語の語順<span class="say">I like coffee.</span></span></li>
+            <li><span class="d">2</span><span class="u">主語＋動詞<span class="say">I run. / I live in Tokyo.</span></span></li>
+            <li><span class="d">3</span><span class="u">主語＋be動詞＋説明<span class="say">I'm hungry.</span></span></li>
+            <li><span class="d">4</span><span class="u">主語＋look＋説明<span class="say">You look tired.</span></span></li>
+            <li><span class="d">5</span><span class="u">主語＋動詞＋目的語<span class="say">I need your help.</span></span></li>
+            <li><span class="d">6</span><span class="u">主語＋動詞＋人＋もの<span class="say">I'll send you a message.</span></span></li>
+            <li><span class="d">7</span><span class="u">主語＋動詞＋目的語＋説明<span class="say">Call me Hina.</span></span></li>
+          </ol>
+        </div>
+        <div class="wk">
+          <h4><span class="en">WEEK 2</span>文の形を変える</h4>
+          <ol>
+            <li><span class="d">8</span><span class="u">否定文<span class="say">I don't eat meat.</span></span></li>
+            <li><span class="d">9</span><span class="u">疑問文<span class="say">Do you like sushi?</span></span></li>
+            <li><span class="d">10</span><span class="u">疑問詞<span class="say">Where do you live?</span></span></li>
+            <li><span class="d">11</span><span class="u">3人称単数のs<span class="say">She works in Osaka.</span></span></li>
+            <li><span class="d">12</span><span class="u">冠詞と複数形<span class="say">a cat / the cat / two cats</span></span></li>
+            <li><span class="d">13</span><span class="u">代名詞<span class="say">I / my / me / mine</span></span></li>
+            <li><span class="d">14</span><span class="u">There is / are<span class="say">There is a café near here.</span></span></li>
+          </ol>
+        </div>
+        <div class="wk">
+          <h4><span class="en">WEEK 3</span>時と気持ちを表す</h4>
+          <ol>
+            <li><span class="d">15</span><span class="u">現在進行形<span class="say">I'm cooking now.</span></span></li>
+            <li><span class="d">16</span><span class="u">過去形（一般動詞）<span class="say">I went to Kyoto.</span></span></li>
+            <li><span class="d">17</span><span class="u">過去形（be動詞）<span class="say">I was tired. / I was sleeping.</span></span></li>
+            <li class="star"><span class="d">18</span><span class="u">助動詞① will<span class="say">I'll call you.</span></span></li>
+            <li class="star"><span class="d">19</span><span class="u">助動詞② can / should<span class="say">I should rest.</span></span></li>
+            <li><span class="d">20</span><span class="u">現在完了①経験<span class="say">Have you ever been to ~?</span></span></li>
+            <li><span class="d">21</span><span class="u">現在完了②完了・継続<span class="say">I've lived here for 5 years.</span></span></li>
+          </ol>
+        </div>
+        <div class="wk">
+          <h4><span class="en">WEEK 4</span>文を長くする</h4>
+          <ol>
+            <li><span class="d">22</span><span class="u">前置詞<span class="say">at 7 / on Monday / in April</span></span></li>
+            <li><span class="d">23</span><span class="u">接続詞<span class="say">I was tired, so I slept.</span></span></li>
+            <li><span class="d">24</span><span class="u">不定詞<span class="say">I want to travel.</span></span></li>
+            <li><span class="d">25</span><span class="u">疑問詞＋to<span class="say">how to say this</span></span></li>
+            <li><span class="d">26</span><span class="u">動名詞<span class="say">I enjoy cooking.</span></span></li>
+            <li class="star"><span class="d">27</span><span class="u">比較<span class="say">Tokyo is bigger than Osaka.</span></span></li>
+            <li><span class="d">28</span><span class="u">受け身<span class="say">It was made in Italy.</span></span></li>
+            <li><span class="d">29</span><span class="u">関係代名詞<span class="say">a friend who lives in London</span></span></li>
+            <li><span class="d">30</span><span class="u">ふり返り<span class="say" style="font-family:var(--ja)">わからなかった単元をもう一度</span></span></li>
+          </ol>
+        </div>
+      </div>
+    </section>
+
+    <!-- 03 modeling -->
+    <section class="card model">
+      <div class="sec-head">
+        <span class="num">03</span>
+        <div>
+          <h2>モデリング <span class="timer"><svg><use href="#timer"/></svg>5:00</span></h2>
+          <p>お手本の英語を聞いて、そっくりまねします。1日1つの英文を、4ステップでくり返します。</p>
+        </div>
+      </div>
+      <div class="model-body">
+        <div class="model-ex">
+          <span class="label" style="color:#B23A5B">Example</span>
+          <p class="say big">I don't know <span class="hl-m">how to</span> <span class="hl-m">say this</span> in English.</p>
+          <p class="ja">これを英語でどう言えばいいかわからない。</p>
+          <ul class="tips">
+            <li><span class="say">how to</span> は「ハウトゥ」とつなげる</li>
+            <li><span class="say">say this</span> の th は、舌を軽くはさむ</li>
+          </ul>
+          <p class="src">使う英文：今日の文法の例文や、音声つき教材の短い英文。AIの読み上げ機能を使ってもOK。</p>
+        </div>
+        <ol class="msteps">
+          <li><span class="no">1</span><div><b>英文を見ないで、2回聞く</b><p>まずは耳だけ。どんな音か、そのまま聞く。</p></div><span class="timer"><svg><use href="#timer"/></svg>1:00</span></li>
+          <li><span class="no">2</span><div><b>英文を見ながら聞く</b><p>聞き取れなかったところに印をつける。</p></div><span class="timer"><svg><use href="#timer"/></svg>1:00</span></li>
+          <li><span class="no">3</span><div><b>音声に重ねて読む（オーバーラッピング）×3</b><p>英文を見ながら、お手本と同時に声に出す。</p></div><span class="timer"><svg><use href="#timer"/></svg>1:30</span></li>
+          <li><span class="no">4</span><div><b>すぐ後を追って言う（シャドーイング）×3</b><p>英文を見ないで、お手本の少し後ろをまねして言う。</p></div><span class="timer"><svg><use href="#timer"/></svg>1:30</span></li>
+        </ol>
+      </div>
+    </section>
+
+    <div class="bottom">
+      <div class="mini rest">
+        <span class="num">休</span>
+        <div>
+          <h3>休憩 <span class="timer"><svg><use href="#timer"/></svg>5:00</span></h3>
+          <p>立つ、水を飲む、目を休める。休憩中はスマホを見ないのがコツです。</p>
+        </div>
+      </div>
+      <div class="mini check">
+        <span class="num"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V6a3 3 0 0 0-3-3zM6 11a6 6 0 0 0 12 0M12 17v4" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></span>
+        <div>
+          <h3>30日後に確かめよう</h3>
+          <p>今日「1分自己紹介」をスマホで録音。30日後に同じお題で録音して、聞き比べます。</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="foot">
+    <div class="logo">
+      <span class="mark"><svg><use href="#asterisk"/></svg></span>
+      <span class="logo-name"><b>Hina English</b><small>Learn. Write. Grow.</small></span>
+    </div>
+    <p class="script">Small steps, big changes.</p>
+  </footer>
+</section>
+
+</body>
+</html>
