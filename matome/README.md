@@ -8,7 +8,7 @@
 | `a-the/` | 文法解説動画「冠詞 — a / an と the の違い」（`a-the-slides.pdf` / 編集できる `a-the-slides.pptx`）。動画で映すスライド18枚。サロン（Hina English）の画面に合わせたデザインで、例文にはオリジナルのイラストつき。a / an と the が両方出てくる文は、問題ページと答えページの2枚で視聴者に問いかける |
 | `articles-2/` | 文法解説動画「冠詞 Part 2 — 不可算名詞と可算名詞」（`articles-2-slides.pdf` / 編集できる `articles-2-slides.pptx`）。動画で映すスライド16枚。数えられる名詞・数えられない名詞（5つのパターン）・まとめ。`a-the/` と同じデザイン |
 | `articles-3/` | 文法解説動画「冠詞 Part 3 — 無冠詞」（`articles-3-slides.pdf` / 編集できる `articles-3-slides.pptx`）。動画で映すスライド20枚。冠詞をつけない6つのパターン（「〜全般」を言う複数名詞・数えられない名詞、固有名詞、言語、食事、祝日）と、特定なら the・名前の一部の the（the United States など）・形容詞つきの食事（a big breakfast）、ほかによく使う無冠詞（go to school / by bus / play tennis / study math）、まとめ |
-| `articles-4/` | 文法解説動画「冠詞 練習問題」（動画4。`articles-4-slides.pdf` / 編集できる `articles-4-slides.pptx`）。全25問（STEP 1 a / an と the・STEP 2 数えられない名詞・STEP 3 無冠詞 各4問、STEP 4 瞬間英作文 13問）。1問ずつ問題スライド → 答えスライドの順で、全57枚 |
+| `articles-4/` | 文法解説動画「冠詞 練習問題」（動画4。`articles-4-slides.pdf` / 編集できる `articles-4-slides.pptx`）。全25問（STEP 1 a / an と the・STEP 2 数えられない名詞・STEP 3 無冠詞 各4問、STEP 4 総まとめ 13問。どのSTEPも長めの文の穴埋め → 短い文の瞬間英作文の順）。1問ずつ問題スライド → 答えスライドの順で、全56枚 |
 
 ## PDF の作り直し方
 
