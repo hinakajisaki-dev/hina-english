@@ -16,10 +16,10 @@ if (!input || !output) {
   await page.goto(pathToFileURL(resolve(input)).href, { waitUntil: "networkidle" });
   await page.evaluate(() => document.fonts.ready);
   // Fonts live in matome/fonts; fail loudly instead of silently printing with a fallback font.
-  const missing = await page.evaluate(() => {
-    const loaded = new Set([...document.fonts].filter((f) => f.status === "loaded").map((f) => f.family.replace(/"/g, "")));
-    return ["Liberation Sans", "Noto Sans JP"].filter((f) => !loaded.has(f));
-  });
+  // Every deck declares its own @font-face list, so check whatever it uses rather than a fixed set.
+  const missing = await page.evaluate(() =>
+    [...document.fonts].filter((f) => f.status === "error").map((f) => `${f.family.replace(/"/g, "")} ${f.weight}`)
+  );
   if (missing.length) throw new Error(`fonts failed to load: ${missing.join(", ")}`);
   await page.pdf({
     path: output,

@@ -1,19 +1,8 @@
-NotoSansJP-*.woff2 (Noto Sans JP, downloaded from Google Fonts, converted to WOFF2):
-(c) 2014-2021 Adobe (http://www.adobe.com/), with Reserved Font Name 'Source'.
+Copyright 2014 The Caveat Project Authors (https://github.com/googlefonts/caveat)
 
-LiberationSans-Bold.ttf (Liberation Sans 2.1.5, unmodified):
-Digitized data copyright (c) 2010 Google Corporation.
-Copyright (c) 2012 Red Hat, Inc.
-
-DMSans-*.woff2 (DM Sans, static weights made from the Google Fonts variable font, WOFF2):
-see OFL-DMSans.txt for its copyright notice.
-
-Caveat-700.woff2 (Caveat, a static weight made from the Google Fonts variable font, WOFF2):
-see OFL-Caveat.txt for its copyright notice.
-
-These fonts are licensed under the SIL Open Font License, Version 1.1.
+This Font Software is licensed under the SIL Open Font License, Version 1.1.
 This license is copied below, and is also available with a FAQ at:
-https://openfontlicense.org
+http://scripts.sil.org/OFL
 
 
 -----------------------------------------------------------
@@ -29,7 +18,7 @@ with others.
 
 The OFL allows the licensed fonts to be used, studied, modified and
 redistributed freely as long as they are not sold by themselves. The
-fonts, including any derivative works, can be bundled, embedded,
+fonts, including any derivative works, can be bundled, embedded, 
 redistributed and/or sold with any software provided that any reserved
 names are not used by derivative works. The fonts and derivatives,
 however, cannot be released under any other type of license. The
@@ -76,7 +65,7 @@ Name(s) unless explicit written permission is granted by the corresponding
 Copyright Holder. This restriction only applies to the primary font name as
 presented to the users.
 
-4) The name(s) of the Copyright Holder(s) and the Author(s) of the Font
+4) The name(s) of the Copyright Holder(s) or the Author(s) of the Font
 Software shall not be used to promote, endorse or advertise any
 Modified Version, except to acknowledge the contribution(s) of the
 Copyright Holder(s) and the Author(s) or with their explicit written

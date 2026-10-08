@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<title>L と R の発音 発音解説スライド</title>
+<link rel="stylesheet" href="../hina.css">
+<style>
+  /* L is orange-red, R is blue (same pair of colors as a / an and the in the 冠詞 decks).
+     The Japanese ら is gray: it is the habit we are replacing. */
+  .l { color: var(--primary); }
+  .r { color: var(--blue); }
+  .ra { color: var(--muted); }
+  .art.r { background: var(--blue); color: #fff; }
+  .art.ra { background: #B7BCCB; font-family: var(--ja); font-weight: 900; }
+  .chip.gray { color: var(--ink-2); background: #E9EDF4; }
+  .card.plain { background: #F3F7FC; border: 2px dashed var(--line); }
+
+  /* cover */
+  .hero-title .en { font-weight: 800; }
+
+  /* rice / lice */
+  .duo.hook .job { padding: 36px 40px; }
+  .duo.hook .job img { width: 240px; height: 240px; right: 34px; bottom: 10px; }
+  .job-ja b { color: var(--ink); }
+
+  /* roadmap with three steps */
+  .road.three { gap: 18px; }
+  .road.three .stepcard { height: 124px; }
+
+  /* らりるれろ */
+  .tryit { flex: 1; margin-top: 22px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 34px; }
+  .ra-big { font-size: 128px; font-weight: 900; letter-spacing: .12em; line-height: 1; }
+  .ra-q { display: flex; align-items: center; gap: 16px; font-size: 32px; font-weight: 700; }
+
+  /* one big figure on the right of a mental-image card */
+  .fig { display: grid; place-items: center; padding: 20px; position: relative; }
+  .fig img { width: 380px; height: 380px; }
+  .fig .chip { position: absolute; left: 28px; top: 26px; font-size: 22px; }
+  .mi-text .mi-eq .ja { font-size: 34px; }
+
+  /* L / ら / R side by side */
+  .tri3 { flex: 1; margin-top: 22px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; min-height: 0; }
+  .sc { position: relative; border-radius: 28px; padding: 20px 24px 22px; display: flex; flex-direction: column; align-items: center; gap: 8px; }
+  .sc-head { display: flex; align-items: center; gap: 16px; align-self: flex-start; }
+  .sc-head .art { width: 64px; height: 64px; border-radius: 18px; font-size: 34px; }
+  .sc-key { font-size: 38px; font-weight: 900; }
+  .sc img { width: 210px; height: 210px; }
+  .sc-d { font-size: 20px; color: var(--ink-2); text-align: center; line-height: 1.5; }
+  .sc.sealed img, .sc.sealed .sc-d, .sc.sealed .sc-head { opacity: .35; }
+  .stamp {
+    position: absolute; left: 50%; top: 46%; transform: translate(-50%, -50%) rotate(-12deg);
+    border: 6px solid var(--primary); color: var(--primary); background: rgba(255, 255, 255, .85);
+    border-radius: 18px; padding: 10px 26px 12px; font-size: 40px; font-weight: 900; white-space: nowrap;
+  }
+
+  /* 発音は筋トレ */
+  .flows { flex: 1; margin-top: 18px; display: flex; flex-direction: column; gap: 18px; min-height: 0; }
+  .flow { flex: 1; display: grid; grid-template-columns: 132px 120px 1fr; align-items: center; column-gap: 18px; padding: 0 36px 0 24px; }
+  .flow img { width: 132px; height: 132px; }
+  .flow-h { font-size: 34px; font-weight: 900; }
+  .steps3 { display: flex; align-items: center; gap: 14px; }
+  .steps3 .s { flex: 1; text-align: center; background: #fff; border-radius: 16px; padding: 16px 8px; font-size: 21px; font-weight: 700; white-space: nowrap; }
+  .steps3 .s.goal { background: var(--primary); color: #fff; }
+  .c-sky .steps3 .s.goal { background: var(--blue); }
+  .steps3 .arrow { font-size: 28px; }
+
+  /* 3 rules / summary cards */
+  .trio .un-img img { width: 160px; height: 160px; }
+  .un-img { position: relative; }
+  .un-img .num { position: absolute; left: 14px; top: 14px; width: 42px; height: 42px; font-size: 20px; background: var(--primary); }
+  .un-top { margin-top: 12px; }
+  .un-h { font-size: 30px; font-weight: 900; white-space: nowrap; }
+  .trio.sum .un-img { flex: 1; }
+  .trio.sum .un-img img { width: 200px; height: 200px; }
+  .un .un-ja { margin-top: 6px; font-size: 20px; line-height: 1.55; }
+
+  /* tongue position: three points */
+  .pts { padding: 34px 38px; display: flex; flex-direction: column; justify-content: center; gap: 26px; }
+  .pt { display: grid; grid-template-columns: 44px 1fr; column-gap: 16px; align-items: start; }
+  .pt .num { width: 44px; height: 44px; font-size: 21px; background: var(--primary); }
+  .c-sky .pt .num { background: var(--blue); }
+  .pt-h { font-size: 28px; font-weight: 700; line-height: 1.4; }
+  .pt-s { margin-top: 4px; font-size: 19px; color: var(--ink-2); }
+
+  /* let's say it: stretch → vowel → tip */
+  .drill { flex: 1; margin-top: 22px; display: flex; flex-direction: column; gap: 18px; min-height: 0; }
+  .dr { flex: 1; display: grid; grid-template-columns: 150px 330px 1fr; align-items: center; column-gap: 24px; padding: 0 36px; }
+  .dr .step-no { justify-self: start; }
+  .dr.tip .step-no { background: var(--ink); }
+  .dr-en { font-family: var(--en); font-weight: 800; font-size: 54px; letter-spacing: .5px; }
+  .dr-en .wave { font-family: var(--ja); font-weight: 700; letter-spacing: -.08em; }
+  .hold-s .wave { font-family: var(--ja); font-weight: 700; font-size: 34px; letter-spacing: -.08em; }
+  .dr-en small { font-family: var(--ja); font-weight: 900; font-size: 40px; }
+  .dr-d { font-size: 23px; line-height: 1.55; color: var(--ink-2); }
+  .dr-d b { color: var(--ink); }
+  .r-deck .dr .step-no { background: var(--blue); }
+  .r-deck .dr.tip .step-no { background: var(--ink); }
+
+  /* five words */
+  .five { flex: 1; margin-top: 20px; display: grid; grid-template-columns: repeat(5, 1fr); gap: 18px; min-height: 0; }
+  .w5 { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; padding: 18px 12px; }
+  .w5-img { width: 100%; display: grid; place-items: center; border-radius: 20px; padding: 10px 0; }
+  .w5-img img { width: 140px; height: 140px; }
+  .w5-w { margin-top: 14px; font-family: var(--en); font-weight: 800; font-size: 46px; }
+  .w5-ja { font-size: 20px; color: var(--ink-2); }
+
+  /* checks */
+  .chk { padding: 26px 34px; display: flex; flex-direction: column; gap: 14px; }
+  .chk-h { display: flex; align-items: center; gap: 14px; font-size: 28px; font-weight: 900; }
+  .chk-fig { flex: 1; display: grid; place-items: center; min-height: 0; }
+  .chk-fig img { width: 250px; height: 250px; }
+  .chk-t { font-size: 22px; line-height: 1.55; text-align: center; }
+  .holds { flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 22px; }
+  .hold { display: grid; grid-template-columns: 150px 1fr 150px; align-items: center; column-gap: 16px; }
+  .hold-s { font-family: var(--en); font-weight: 800; font-size: 40px; }
+  .hold-s.ja { font-family: var(--ja); font-weight: 900; }
+  .bar-l { height: 26px; border-radius: 13px; background: var(--primary); }
+  .bar-r { height: 26px; border-radius: 13px; background: var(--blue); }
+  .bar-ra { width: 40px; height: 26px; border-radius: 13px; background: #B7BCCB; }
+  .hold-v { font-size: 20px; font-weight: 700; }
+  .hold-v.ok { color: var(--primary-dark); }
+  .r-deck .hold-v.ok { color: #1F6FB2; }
+  .hold-v.ng { color: var(--muted); }
+  .chk-note { border-top: 2px dashed var(--line); padding-top: 14px; font-size: 21px; line-height: 1.55; }
+
+  /* pairs */
+  .pairs { flex: 1; margin-top: 18px; display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: repeat(3, 1fr); gap: 16px; min-height: 0; }
+  .pair { display: grid; grid-template-columns: 1fr 26px 1fr; align-items: center; padding: 0 18px; }
+  .pw { display: flex; align-items: center; gap: 14px; }
+  .pw img { flex: none; width: 92px; height: 92px; }
+  .pw-w { font-family: var(--en); font-weight: 800; font-size: 36px; line-height: 1.1; }
+  .pw-ja { font-size: 17px; color: var(--ink-2); }
+  .pair .sl { font-family: var(--en); font-size: 30px; color: #C3C8D6; text-align: center; }
+
+  /* clusters */
+  .cl { padding: 26px 34px; display: flex; flex-direction: column; gap: 16px; }
+  .cl-top { display: flex; align-items: center; gap: 22px; }
+  .cl-top img { flex: none; width: 130px; height: 130px; }
+  .cl-w { font-family: var(--en); font-weight: 800; font-size: 64px; letter-spacing: .5px; }
+  .cl-w .k { color: var(--ink); }
+  .cl-w mark { padding: 0 4px; margin: 0 -4px; }
+  .cl-row { display: flex; align-items: center; gap: 14px; border-radius: 16px; padding: 12px 20px; font-size: 24px; font-weight: 700; }
+  .cl-row.ng { background: #F3F5F9; color: var(--muted); }
+  .cl-row.ok { background: var(--orange-soft); }
+  .cl-row .x { color: var(--primary); font-weight: 900; font-size: 28px; }
+  .cl-row .o { color: var(--primary); font-weight: 900; font-size: 28px; }
+
+  /* sentences */
+  .rows .row-en { font-size: 36px; }
+
+  /* 5-minute menu */
+  .menu { flex: 1; margin-top: 18px; display: flex; flex-direction: column; justify-content: space-around; padding: 6px 34px; min-height: 0; }
+  .mrow { display: grid; grid-template-columns: 44px 220px 1fr 110px; align-items: center; column-gap: 18px; padding: 10px 0; }
+  .mrow + .mrow { border-top: 2px solid #EEF2F8; }
+  .mrow .num { width: 44px; height: 44px; font-size: 21px; background: var(--primary); }
+  .m-h { font-size: 27px; font-weight: 900; }
+  .m-d { font-size: 22px; color: var(--ink-2); }
+  .m-d .en { color: var(--ink); }
+  .mrow .chip { justify-self: end; font-size: 20px; }
+  .total { margin-left: auto; }
+  .title-row { display: flex; align-items: center; gap: 18px; }
+  .title-row .chip { font-size: 22px; }
+</style>
+</head>
+<body>
+
+<!-- ============ 1 表紙 ============ -->
+<section class="slide cover">
+  <div class="hero">
+    <p class="hero-kicker">発音解説動画</p>
+    <h1 class="hero-title"><span class="en l">L</span> と <span class="en r">R</span></h1>
+    <p class="hero-sub">舌の位置と、毎日の練習法</p>
+    <img class="tile" src="../img/tile.png" alt="">
+  </div>
+</section>
+
+<!-- ============ 2 つかみ：rice と lice ============ -->
+<section class="slide">
+  <header class="bar"><span class="crumb">発音解説 / L と R</span></header>
+  <div class="divider"></div>
+  <h2 class="title"><span class="en r">R</span> が <span class="en l">L</span> になってしまうと…？</h2>
+  <div class="duo hook">
+    <div class="job c-sky"><p class="job-en">I love <span class="r">r</span>ice.</p><p class="job-ja"><b>お米</b>が大好き！</p><img src="../img/rice.png" alt="ごはん"></div>
+    <div class="job c-pink"><p class="job-en">I love <span class="l">l</span>ice.</p><p class="job-ja"><b>シラミ</b>が大好き！？</p><img src="../img/lice.png" alt="シラミ"></div>
+  </div>
+  <p class="band"><span class="chip">言い分けられると</span><span>話すときに<b>自信</b>がつく！ <b>聞き取り</b>もラクになる！</span></p>
+</section>
+
+<!-- ============ 3 今日やること ============ -->
+<section class="slide">
+  <header class="bar"><span class="crumb">発音解説 / L と R</span></header>
+  <div class="divider"></div>
+  <h2 class="title">今日やること</h2>
+  <div class="road three">
+    <div class="stepcard card"><span class="step-no">STEP 1</span><p class="step-h">なんで難しいの？</p><p class="step-d">日本語の「ら」との違い</p></div>
+    <div class="stepcard card"><span class="step-no">STEP 2</span><p class="step-h"><span class="en l">L</span> と <span class="en r">R</span> の舌の位置</p><p class="step-d">一緒に声に出してみよう</p></div>
+    <div class="stepcard card"><span class="step-no">STEP 3</span><p class="step-h">毎日5分の練習メニュー</p><p class="step-d">スクショして使ってね</p></div>
+  </div>
+</section>
+
+<!-- ============ 4 らりるれろ ============ -->
+<section class="slide">
+  <header class="bar"><span class="crumb">発音解説 / L と R</span></header>
+  <div class="divider"></div>
+  <h2 class="title">「らりるれろ」と言ってみよう</h2>
+  <div class="tryit card">
+    <p class="ra-big">らりるれろ</p>
+    <p class="ra-q"><span class="chip">チェック</span>舌の先は、どう動いている？</p>
+  </div>
+</section>
+
+<!-- ============ 5 日本語の「ら」は、はじく音 ============ -->
+<section class="slide">
+  <header class="bar"><span class="crumb">発音解説 / L と R</span></header>
+  <div class="divider"></div>
+  <h2 class="title">日本語の「ら」は、舌先で一瞬はじく音</h2>
+  <div class="mi">
+    <div class="mi-text card c-yellow">
+      <p class="mi-eq">日本語の「ら」＝</p>
+      <p class="mi-big">舌先で一瞬<br><mark>「はじく」</mark></p>
+      <p class="mi-note">上の歯ぐきに「ペッ」と当たって、<br>すぐ離れる</p>
+    </div>
+    <div class="fig card"><img src="../img/mouth-ra.png" alt="舌先が上の歯ぐきを一瞬はじく様子の断面図"></div>
+  </div>
+</section>
+
+<!-- ============ 6 L でも R でもない ============ -->
+<section class="slide">
+  <header class="bar"><span class="crumb">発音解説 / L と R</span></header>
+  <div class="divider"></div>
+  <h2 class="title">日本語の「ら」は、<span class="en l">L</span> でも <span class="en r">R</span> でもない</h2>
+  <div class="tri3">
+    <div class="sc c-orange"><div class="sc-head"><span class="art">L</span><p class="sc-key">つける</p></div><img src="../img/mouth-l.png" alt="L の舌の位置"><p class="sc-d">舌先を上の歯の裏に<br>しっかりつける</p></div>
+    <div class="sc card plain"><div class="sc-head"><span class="art ra">ら</span><p class="sc-key">はじく</p></div><img src="../img/mouth-ra.png" alt="ら の舌の動き"><p class="sc-d">舌先で一瞬はじいて、<br>すぐ離れる</p></div>
+    <div class="sc c-sky"><div class="sc-head"><span class="art r">R</span><p class="sc-key">つけない</p></div><img src="../img/mouth-r.png" alt="R の舌の位置"><p class="sc-d">舌先はどこにもつけない<br>（奥に引いて丸める）</p></div>
+  </div>
+  <p class="band"><span class="chip">やること</span><span>「はじく」をやめて、<b>「つける」</b>と<b>「つけない」</b>の2つを覚えれば OK！</span></p>
+</section>
+
+<!-- ============ 7 発音は筋トレ ============ -->
+<section class="slide">
+  <header class="bar"><span class="crumb">発音解説 / L と R</span></header>
+  <div class="divider"></div>
+  <p class="eyebrow">POINT</p>
+  <h2 class="title">大事な前提：発音は「筋トレ」</h2>
+  <p class="sub-lead">舌は筋肉のかたまり。日本語の「ら」の動きが、もう体にしみついている</p>
+  <div class="flows">
+    <div class="flow card c-orange"><img src="../img/dumbbell.png" alt="ダンベル"><p class="flow-h">筋トレ</p>
+      <div class="steps3"><span class="s">正しいフォームを知る</span><span class="arrow">→</span><span class="s">何回も動かす</span><span class="arrow">→</span><span class="s goal">筋肉がつく</span></div></div>
+    <div class="flow card c-sky"><img src="../img/mouth-l.png" alt="舌の断面図"><p class="flow-h">発音</p>
+      <div class="steps3"><span class="s">舌の位置を知る</span><span class="arrow">→</span><span class="s">何回も言う</span><span class="arrow">→</span><span class="s goal">言えるようになる</span></div></div>
+  </div>
+  <p class="band"><span class="chip">だから</span><span>「<b>分かる</b>」と「<b>できる</b>」は別もの。知っただけでは、まだ言えない</span></p>
+</section>
+
+<!-- ============ 8 筋トレのポイント3つ ============ -->
+<section class="slide">
+  <header class="bar"><span class="crumb">発音解説 / L と R</span></header>
+  <div class="divider"></div>
+  <h2 class="title">発音の筋トレ、ポイントは3つ</h2>
+  <div class="trio">
+    <div class="un card"><div class="un-img c-yellow"><img src="../img/parrot.png" alt="オウム"><span class="num">1</span></div><div class="un-top"><p class="un-h">まねをする</p></div><p class="un-ja">お手本の音をよく聞いて、<br>そっくりまねする</p></div>
+    <div class="un card"><div class="un-img c-sky"><img src="../img/turtle.png" alt="カメ"><span class="num">2</span></div><div class="un-top"><p class="un-h">おおげさに、ゆっくり</p></div><p class="un-ja">慣れてきたら、<br>だんだん自然なスピードへ</p></div>
+    <div class="un card"><div class="un-img c-orange"><img src="../img/calendar.png" alt="カレンダー"><span class="num">3</span></div><div class="un-top"><p class="un-h">毎日ちょっとずつ</p></div><p class="un-ja">週1回1時間より、<br>毎日5分のほうが効く</p></div>
+  </div>
+  <p class="band"><span class="chip">舌や口が疲れたら</span><span>ふだん使っていない筋肉を使っている証拠。いい感じ！</span></p>
+</section>
+
+<!-- ============ 9 L の発音 ============ -->
+<section class="slide">
+  <header class="bar"><span class="crumb">発音解説 / L と R</span></header>
+  <div class="divider"></div>
+  <h2 class="title"><span class="en l">L</span> の発音</h2>
+  <div class="mi">
+    <div class="pts card c-orange">
+      <div class="pt"><span class="num">1</span><div><p class="pt-h">舌先を、上の前歯の裏につける</p><p class="pt-s">歯の付け根の、歯ぐきのあたり</p></div></div>
+      <div class="pt"><span class="num">2</span><div><p class="pt-h">つけたまま、声を出す</p><p class="pt-s">声は舌の両わきから出る</p></div></div>
+      <div class="pt"><span class="num">3</span><div><p class="pt-h">はじかない</p><p class="pt-s">ペッとすぐ離さず、ちょっと「ためて」から離す</p></div></div>
+    </div>
+    <div class="fig card"><span class="chip">つける</span><img src="../img/mouth-l.png" alt="L：舌先を上の前歯の裏につけた断面図"></div>
+  </div>
+</section>
+
+<!-- ============ 10 L を言ってみよう ============ -->
+<section class="slide">
+  <header class="bar"><span class="crumb">発音解説 / L と R</span></header>
+  <div class="divider"></div>
+  <h2 class="title"><span class="en l">L</span> を言ってみよう</h2>
+  <div class="drill">
+    <div class="dr card"><span class="step-no">STEP 1</span><p class="dr-en l">L<span class="wave">〜〜〜</span></p><p class="dr-d"><b>伸ばす</b>：舌先をつけたまま、こもった声を伸ばす</p></div>
+    <div class="dr card"><span class="step-no">STEP 2</span><p class="dr-en"><span class="l">l</span>a, <span class="l">l</span>a, <span class="l">l</span>a</p><p class="dr-d"><b>つなげる</b>：ちょっと「ためて」から、舌を離して「ア」へ</p></div>
+    <div class="dr card tip"><span class="step-no">コツ</span><p class="dr-en"><small>（ン）</small><span class="l">l</span>ight</p><p class="dr-d">小さい「ン」から入ると、<b>舌先がついた状態</b>から始められる</p></div>
+  </div>
+</section>
+
+<!-- ============ 11 L の単語 ============ -->
+<section class="slide">
+  <header class="bar"><span class="crumb">発音解説 / L と R</span></header>
+  <div class="divider"></div>
+  <h2 class="title"><span class="en l">L</span> の単語</h2>
+  <p class="sub-lead">私のあとに続いて、声に出して言ってみよう</p>
+  <div class="five">
+    <div class="w5 card"><div class="w5-img c-yellow"><img src="../img/bulb.png" alt="電球"></div><p class="w5-w"><span class="l">l</span>ight</p><p class="w5-ja">光・明かり</p></div>
+    <div class="w5 card"><div class="w5-img c-pink"><img src="../img/heart.png" alt="ハート"></div><p class="w5-w"><span class="l">l</span>ove</p><p class="w5-ja">大好き</p></div>
+    <div class="w5 card"><div class="w5-img c-sky"><img src="../img/eyes.png" alt="目"></div><p class="w5-w"><span class="l">l</span>ook</p><p class="w5-ja">見る</p></div>
+    <div class="w5 card"><div class="w5-img c-orange"><img src="../img/ball.png" alt="ボール"></div><p class="w5-w">p<span class="l">l</span>ay</p><p class="w5-ja">遊ぶ</p></div>
+    <div class="w5 card"><div class="w5-img c-pink"><img src="../img/wineglass.png" alt="グラス"></div><p class="w5-w">g<span class="l">l</span>ass</p><p class="w5-ja">グラス</p></div>
+  </div>
+</section>
+
+<!-- ============ 12 L のチェック ============ -->
+<section class="slide">
+  <header class="bar"><span class="crumb">発音解説 / L と R</span></header>
+  <div class="divider"></div>
+  <h2 class="title"><span class="en l">L</span> ができているか、チェックしよう</h2>
+  <div class="duo">
+    <div class="chk card">
+      <p class="chk-h"><span class="chip">1</span>鏡チェック</p>
+      <div class="chk-fig"><img src="../img/front-l.png" alt="L のときの口を正面から見た図。舌先が上の歯の裏についている"></div>
+      <p class="chk-t">舌先が、上の歯の裏に<br><b>ついているのが見える</b></p>
+    </div>
+    <div class="chk card">
+      <p class="chk-h"><span class="chip">2</span>伸ばしチェック</p>
+      <div class="holds">
+        <div class="hold"><span class="hold-s l">L<span class="wave">〜〜〜</span></span><span class="bar-l"></span><span class="hold-v ok">○ 伸ばせる</span></div>
+        <div class="hold"><span class="hold-s ja ra">ら</span><span class="bar-ra"></span><span class="hold-v ng">× 伸ばせない</span></div>
+      </div>
+      <p class="chk-note">伸ばせなかったら、<br>舌が<b>はじいてしまっている</b>合図</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 13 R の発音 ============ -->
+<section class="slide">
+  <header class="bar"><span class="crumb">発音解説 / L と R</span></header>
+  <div class="divider"></div>
+  <h2 class="title"><span class="en r">R</span> の発音</h2>
+  <div class="mi">
+    <div class="pts card c-sky">
+      <div class="pt"><span class="num">1</span><div><p class="pt-h">舌先は、どこにもつけない</p><p class="pt-s">いちばん大事！ 上あごにも、歯にもつけない</p></div></div>
+      <div class="pt"><span class="num">2</span><div><p class="pt-h">舌を奥に引いて、口の中で丸める</p><p class="pt-s">舌の両わきが、上の奥歯に軽くふれるくらい</p></div></div>
+      <div class="pt"><span class="num">3</span><div><p class="pt-h">唇を少しすぼめる</p><p class="pt-s">「ウ」の口</p></div></div>
+    </div>
+    <div class="fig card"><span class="chip blue">つけない</span><img src="../img/mouth-r.png" alt="R：舌を奥に引いて丸め、舌先がどこにもついていない断面図"></div>
+  </div>
+</section>
+
+<!-- ============ 14 R を言ってみよう ============ -->
+<section class="slide r-deck">
+  <header class="bar"><span class="crumb">発音解説 / L と R</span></header>
+  <div class="divider"></div>
+  <h2 class="title"><span class="en r">R</span> を言ってみよう</h2>
+  <div class="drill">
+    <div class="dr card"><span class="step-no">STEP 1</span><p class="dr-en r">R<span class="wave">〜〜〜</span></p><p class="dr-d"><b>伸ばす</b>：唇を「ウ」にして舌を奥に引き、口の奥でうなるように伸ばす</p></div>
+    <div class="dr card"><span class="step-no">STEP 2</span><p class="dr-en"><span class="r">r</span>a, <span class="r">r</span>a, <span class="r">r</span>a</p><p class="dr-d"><b>つなげる</b>：舌先をつけないまま「ア」へ</p></div>
+    <div class="dr card tip"><span class="step-no">コツ</span><p class="dr-en"><small>（ゥ）</small><span class="r">r</span>ight</p><p class="dr-d">唇をすぼめて小さい「ゥ」から入ると、<b>舌が上あごから離れたまま</b>になる</p></div>
+  </div>
+</section>
+
+<!-- ============ 15 R の単語 ============ -->
+<section class="slide">
+  <header class="bar"><span class="crumb">発音解説 / L と R</span></header>
+  <div class="divider"></div>
+  <h2 class="title"><span class="en r">R</span> の単語</h2>
+  <p class="sub-lead">私のあとに続いて、声に出して言ってみよう</p>
+  <div class="five">
+    <div class="w5 card"><div class="w5-img c-sky"><img src="../img/sign-right.png" alt="右向きの矢印の標識"></div><p class="w5-w"><span class="r">r</span>ight</p><p class="w5-ja">右・正しい</p></div>
+    <div class="w5 card"><div class="w5-img c-pink"><img src="../img/paint.png" alt="赤い絵の具"></div><p class="w5-w"><span class="r">r</span>ed</p><p class="w5-ja">赤</p></div>
+    <div class="w5 card"><div class="w5-img c-yellow"><img src="../img/rice.png" alt="ごはん"></div><p class="w5-w"><span class="r">r</span>ice</p><p class="w5-ja">お米・ごはん</p></div>
+    <div class="w5 card"><div class="w5-img c-orange"><img src="../img/pray.png" alt="祈る手"></div><p class="w5-w">p<span class="r">r</span>ay</p><p class="w5-ja">祈る</p></div>
+    <div class="w5 card"><div class="w5-img c-sky"><img src="../img/grass.png" alt="草"></div><p class="w5-w">g<span class="r">r</span>ass</p><p class="w5-ja">草・芝生</p></div>
+  </div>
+</section>
+
+<!-- ============ 16 R のチェック ============ -->
+<section class="slide r-deck">
+  <header class="bar"><span class="crumb">発音解説 / L と R</span></header>
+  <div class="divider"></div>
+  <h2 class="title"><span class="en r">R</span> ができているか、チェックしよう</h2>
+  <div class="duo">
+    <div class="chk card">
+      <p class="chk-h"><span class="chip blue">1</span>鏡チェック</p>
+      <div class="chk-fig"><img src="../img/front-r.png" alt="R のときの口を正面から見た図。唇が丸く、舌先は見えない"></div>
+      <p class="chk-t">舌先が<b>見えない</b>。<br>唇が少し<b>丸く</b>なっている</p>
+    </div>
+    <div class="chk card">
+      <p class="chk-h"><span class="chip blue">2</span>伸ばしチェック</p>
+      <div class="holds">
+        <div class="hold"><span class="hold-s r">R<span class="wave">〜〜〜</span></span><span class="bar-r"></span><span class="hold-v ok">○ 伸ばせる</span></div>
+        <div class="hold"><span class="hold-s ja ra">ら</span><span class="bar-ra"></span><span class="hold-v ng">× 伸ばせない</span></div>
+      </div>
+      <p class="chk-note">途中で「ら」っぽくなったら、<br>舌を<b>奥に引いて</b>やり直し</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 17 おさらい ============ -->
+<section class="slide">
+  <header class="bar"><span class="crumb">発音解説 / L と R</span></header>
+  <div class="divider"></div>
+  <h2 class="title">おさらい：<span class="en l">L</span> は「つける」、<span class="en r">R</span> は「つけない」</h2>
+  <div class="tri3">
+    <div class="sc c-orange"><div class="sc-head"><span class="art">L</span><p class="sc-key">つける</p></div><img src="../img/mouth-l.png" alt="L の舌の位置"><p class="sc-d">舌先を上の前歯の裏に<br>ペタッとつける</p></div>
+    <div class="sc c-sky"><div class="sc-head"><span class="art r">R</span><p class="sc-key">つけない</p></div><img src="../img/mouth-r.png" alt="R の舌の位置"><p class="sc-d">舌を奥に引いて丸める<br>唇は「ウ」</p></div>
+    <div class="sc card plain sealed"><div class="sc-head"><span class="art ra">ら</span><p class="sc-key">はじく</p></div><img src="../img/mouth-ra.png" alt="ら の舌の動き"><p class="sc-d">舌先で一瞬はじいて、<br>すぐ離れる</p><span class="stamp">今日は封印！</span></div>
+  </div>
+</section>
+
+<!-- ============ 18 L と R を比べてみよう ============ -->
+<section class="slide">
+  <header class="bar"><span class="crumb">発音解説 / L と R</span></header>
+  <div class="divider"></div>
+  <h2 class="title"><span class="en l">L</span> と <span class="en r">R</span> を比べてみよう</h2>
+  <p class="lead"><span class="chip">L → R の順に</span><span>最初はゆっくり、おおげさに　→　次はふつうのスピードで</span></p>
+  <div class="pairs">
+    <div class="pair card"><div class="pw"><img src="../img/bulb.png" alt="電球"><div><p class="pw-w"><span class="l">l</span>ight</p><p class="pw-ja">光</p></div></div><span class="sl">/</span><div class="pw"><img src="../img/sign-right.png" alt="右向きの矢印の標識"><div><p class="pw-w"><span class="r">r</span>ight</p><p class="pw-ja">右</p></div></div></div>
+    <div class="pair card"><div class="pw"><img src="../img/lice.png" alt="シラミ"><div><p class="pw-w"><span class="l">l</span>ice</p><p class="pw-ja">シラミ</p></div></div><span class="sl">/</span><div class="pw"><img src="../img/rice.png" alt="ごはん"><div><p class="pw-w"><span class="r">r</span>ice</p><p class="pw-ja">お米</p></div></div></div>
+    <div class="pair card"><div class="pw"><img src="../img/wineglass.png" alt="グラス"><div><p class="pw-w">g<span class="l">l</span>ass</p><p class="pw-ja">グラス</p></div></div><span class="sl">/</span><div class="pw"><img src="../img/grass.png" alt="草"><div><p class="pw-w">g<span class="r">r</span>ass</p><p class="pw-ja">草</p></div></div></div>
+    <div class="pair card"><div class="pw"><img src="../img/ball.png" alt="ボール"><div><p class="pw-w">p<span class="l">l</span>ay</p><p class="pw-ja">遊ぶ</p></div></div><span class="sl">/</span><div class="pw"><img src="../img/pray.png" alt="祈る手"><div><p class="pw-w">p<span class="r">r</span>ay</p><p class="pw-ja">祈る</p></div></div></div>
+    <div class="pair card"><div class="pw"><img src="../img/ruler.png" alt="ものさし"><div><p class="pw-w"><span class="l">l</span>ong</p><p class="pw-ja">長い</p></div></div><span class="sl">/</span><div class="pw"><img src="../img/wrong.png" alt="バツのついた紙"><div><p class="pw-w">w<span class="r">r</span>ong</p><p class="pw-ja">まちがった</p></div></div></div>
+    <div class="pair card"><div class="pw"><img src="../img/bird.png" alt="鳥"><div><p class="pw-w">f<span class="l">l</span>y</p><p class="pw-ja">飛ぶ</p></div></div><span class="sl">/</span><div class="pw"><img src="../img/ebifry.png" alt="エビフライ"><div><p class="pw-w">f<span class="r">r</span>y</p><p class="pw-ja">揚げる</p></div></div></div>
+  </div>
+</section>
+
+<!-- ============ 19 子音のあとの L / R ============ -->
+<section class="slide">
+  <header class="bar"><span class="crumb">発音解説 / L と R</span></header>
+  <div class="divider"></div>
+  <p class="eyebrow">POINT</p>
+  <h2 class="title">前に子音があるときは、間に「ウ」を入れない</h2>
+  <div class="duo">
+    <div class="cl card">
+      <div class="cl-top"><img src="../img/wineglass.png" alt="グラス"><p class="cl-w"><mark><span class="k">g</span><span class="l">l</span></mark>ass</p></div>
+      <p class="cl-row ng"><span class="x">×</span>「グ・ラス」と、間に「ウ」が入る</p>
+      <p class="cl-row ok"><span class="o">○</span><span><span class="en">g</span> の口のまま、すぐ <span class="en l">L</span> につなげる</span></p>
+    </div>
+    <div class="cl card">
+      <div class="cl-top"><img src="../img/ball.png" alt="ボール"><p class="cl-w"><mark><span class="k">p</span><span class="l">l</span></mark>ay</p></div>
+      <p class="cl-row ng"><span class="x">×</span>「プ・レイ」と、間に「ウ」が入る</p>
+      <p class="cl-row ok"><span class="o">○</span><span><span class="en">p</span> の口のまま、すぐ <span class="en l">L</span> につなげる</span></p>
+    </div>
+  </div>
+  <p class="band"><span class="chip blue">R も同じ</span><span><span class="en">g<span class="r">r</span>ass ／ p<span class="r">r</span>ay ／ f<span class="r">r</span>y</span>　も、前の子音とひと息で言う</span></p>
+</section>
+
+<!-- ============ 20 文で練習 ============ -->
+<section class="slide">
+  <header class="bar"><span class="crumb">発音解説 / L と R</span></header>
+  <div class="divider"></div>
+  <h2 class="title">文で練習しよう</h2>
+  <p class="sub-lead">ゆっくり → ふつうのスピードで。文になると、つい「ら」に戻りがちなので注意！</p>
+  <div class="rows">
+    <div class="row card"><img src="../img/rice.png" alt="ごはん"><div><p class="row-en">I <span class="l">l</span>ove <span class="r">r</span>ice.</p><p class="row-ja">お米が大好き。</p></div><p class="why"><b class="l">love</b> は舌を「つける」<br><b class="r">rice</b> は「つけない」</p></div>
+    <div class="row card"><img src="../img/traffic.png" alt="信号機"><div><p class="row-en">Turn <span class="r">r</span>ight at the <span class="l">l</span>ight.</p><p class="row-ja">その信号を右に曲がって。</p></div><p class="why"><b class="r">right</b> と <b class="l">light</b> が<br>1つの文に入っている</p></div>
+    <div class="row card"><img src="../img/heart.png" alt="ハート"><div><p class="row-en">I <span class="r">r</span>ea<span class="l">ll</span>y <span class="l">l</span>ike it.</p><p class="row-ja">ほんとに気に入ってる。</p></div><p class="why"><b>really</b> は <b class="r">R</b> → <b class="l">L</b><br>舌が「奥 → 前」に大きく動く</p></div>
+  </div>
+</section>
+
+<!-- ============ 21 毎日5分の筋トレメニュー ============ -->
+<section class="slide">
+  <header class="bar"><span class="crumb">発音解説 / L と R</span></header>
+  <div class="divider"></div>
+  <div class="title-row"><h2 class="title">毎日5分の筋トレメニュー</h2><span class="chip total">スクショしてね！</span></div>
+  <div class="menu card">
+    <div class="mrow"><span class="num">1</span><p class="m-h">伸ばす</p><p class="m-d"><span class="en l">L</span> を5秒、<span class="en r">R</span> を5秒。交互に3セット</p><span class="chip">1分</span></div>
+    <div class="mrow"><span class="num">2</span><p class="m-h">母音とつなげる</p><p class="m-d"><span class="en"><span class="l">la</span> – <span class="r">ra</span> ／ <span class="l">li</span> – <span class="r">ri</span> ／ <span class="l">lu</span> – <span class="r">ru</span> ／ <span class="l">le</span> – <span class="r">re</span> ／ <span class="l">lo</span> – <span class="r">ro</span></span></p><span class="chip">1分</span></div>
+    <div class="mrow"><span class="num">3</span><p class="m-h">ペア単語</p><p class="m-d">今日の6組を、ゆっくり → ふつうのスピードで</p><span class="chip">1分半</span></div>
+    <div class="mrow"><span class="num">4</span><p class="m-h">文</p><p class="m-d">3つの文を、お手本をまねして3回ずつ</p><span class="chip">1分</span></div>
+    <div class="mrow"><span class="num">5</span><p class="m-h">録音チェック</p><p class="m-d">1文だけスマホで録音して、お手本と聞き比べる</p><span class="chip">30秒</span></div>
+  </div>
+</section>
+
+<!-- ============ 22 まとめ ============ -->
+<section class="slide">
+  <header class="bar"><span class="crumb">発音解説 / L と R</span></header>
+  <div class="divider"></div>
+  <h2 class="title">今日のまとめ</h2>
+  <div class="trio sum">
+    <div class="un card"><div class="un-img c-orange"><img src="../img/mouth-l.png" alt="L の舌の位置"></div><p class="un-w l">L</p><p class="un-h">舌先を「つける」</p><p class="un-ja">上の前歯の裏に、<br>しっかりつけたまま声を出す</p></div>
+    <div class="un card"><div class="un-img c-sky"><img src="../img/mouth-r.png" alt="R の舌の位置"></div><p class="un-w r">R</p><p class="un-h">舌先を「つけない」</p><p class="un-ja">奥に引いて丸めて、<br>唇は「ウ」</p></div>
+    <div class="un card"><div class="un-img c-yellow"><img src="../img/dumbbell.png" alt="ダンベル"></div><p class="un-w">&nbsp;</p><p class="un-h">発音は筋トレ</p><p class="un-ja">まねして、<br>毎日ちょっとずつ</p></div>
+  </div>
+</section>
+
+</body>
+</html>
