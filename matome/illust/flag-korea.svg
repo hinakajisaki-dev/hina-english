@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="400" height="400">
+<defs><clipPath id="f"><rect x="105" y="78" width="216" height="144" rx="8"/></clipPath></defs>
+<ellipse cx="200" cy="352" rx="130" ry="12" fill="#1C2340" opacity=".08"/>
+<rect x="94" y="62" width="11" height="290" rx="5.5" fill="#9AA6BC"/>
+<circle cx="99.5" cy="58" r="11" fill="#F5B731"/>
+<g clip-path="url(#f)">
+<rect x="105" y="78" width="216" height="144" fill="#fff"/>
+<g transform="translate(213 150) rotate(33.69)">
+<circle r="36" fill="#2E4A9E"/>
+<path d="M -36 0 A 36 36 0 0 1 36 0 A 18.0 18.0 0 0 1 0 0 A 18.0 18.0 0 0 0 -36 0 Z" fill="#D0353A"/>
+</g>
+<g fill="#1C2340">
+<g transform="translate(158.1 113.4) rotate(-56.31)"><rect x="-18" y="-12" width="36" height="6"/><rect x="-18" y="-3" width="36" height="6"/><rect x="-18" y="6" width="36" height="6"/></g>
+<g transform="translate(267.9 186.6) rotate(-56.31)"><rect x="-18" y="-12" width="16" height="6"/><rect x="2" y="-12" width="16" height="6"/><rect x="-18" y="-3" width="16" height="6"/><rect x="2" y="-3" width="16" height="6"/><rect x="-18" y="6" width="16" height="6"/><rect x="2" y="6" width="16" height="6"/></g>
+<g transform="translate(267.9 113.4) rotate(56.31)"><rect x="-18" y="-12" width="16" height="6"/><rect x="2" y="-12" width="16" height="6"/><rect x="-18" y="-3" width="36" height="6"/><rect x="-18" y="6" width="16" height="6"/><rect x="2" y="6" width="16" height="6"/></g>
+<g transform="translate(158.1 186.6) rotate(56.31)"><rect x="-18" y="-12" width="36" height="6"/><rect x="-18" y="-3" width="16" height="6"/><rect x="2" y="-3" width="16" height="6"/><rect x="-18" y="6" width="36" height="6"/></g>
+</g>
+</g>
+<rect x="105" y="78" width="216" height="144" rx="8" fill="none" stroke="#D6E2F0" stroke-width="3"/>
+</svg>

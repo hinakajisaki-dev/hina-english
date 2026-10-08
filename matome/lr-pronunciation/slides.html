@@ -91,20 +91,21 @@
   .tail path { fill: #fff; }
   .slide > .hina { position: absolute; right: 48px; bottom: 0; height: 168px; }
 
-  /* language distance */
-  .dist { flex: 1; margin-top: 22px; padding: 22px 40px 20px; display: flex; flex-direction: column; justify-content: space-between; min-height: 0; }
-  .dist-h { font-size: 20px; color: var(--ink-2); }
-  .hrow { display: grid; grid-template-columns: 270px 1fr; align-items: center; column-gap: 20px; }
-  .hl { display: flex; align-items: center; gap: 10px; font-size: 24px; font-weight: 700; }
-  .htrack { display: flex; align-items: center; }
-  .hbar { height: 24px; background: #B7BCCB; border-radius: 0 4px 4px 0; }
-  .hbar.lo { border-radius: 0; }
-  .hbar.ext { margin-left: 2px; background: #DADEE7; }
-  .jp .hbar { background: var(--primary); }
-  .hv { margin-left: 14px; font-family: var(--en); font-weight: 700; font-size: 24px; white-space: nowrap; }
-  .hv .ja { font-family: var(--ja); font-size: 18px; }
-  .jp .hv { font-size: 28px; font-weight: 800; }
-  .src { font-size: 16px; color: var(--muted); }
+  /* language distance: two groups of close languages, far apart */
+  .dmap { flex: 1; margin-top: 22px; padding: 26px 30px; display: grid; grid-template-columns: auto 1fr auto; align-items: center; column-gap: 18px; min-height: 0; }
+  .grp { height: 100%; border-radius: 24px; padding: 0 22px; display: flex; align-items: center; gap: 4px; }
+  .nd { display: flex; flex-direction: column; align-items: center; }
+  .nd-flags { display: flex; }
+  .nd-flags img { width: 150px; height: 150px; margin: -6px -24px -14px; }
+  .nd-l { margin-top: 8px; font-size: 26px; font-weight: 900; }
+  .near { display: flex; flex-direction: column; align-items: center; margin: 0 4px 34px; }
+  .near-a { font-family: var(--en); font-size: 30px; font-weight: 800; color: var(--ink-2); line-height: 1; }
+  .near-t { font-size: 19px; font-weight: 700; color: var(--ink-2); }
+  .farline { display: flex; flex-direction: column; align-items: center; gap: 4px; margin-bottom: 34px; }
+  .fl-t { font-size: 30px; font-weight: 900; color: var(--primary); }
+  .fl-a { width: 100%; display: flex; align-items: center; }
+  .fl-a .ln { flex: 1; height: 6px; background: var(--primary); }
+  .fl-a .hd { font-size: 26px; color: var(--primary); line-height: 1; }
   .far { flex: none; margin-top: 18px; display: grid; grid-template-columns: 1fr auto; align-items: center; column-gap: 30px; padding: 22px 40px; }
   .far-t { font-size: 30px; font-weight: 900; line-height: 1.5; }
   .far-t .hot { color: var(--primary-dark); font-weight: 900; }
@@ -238,7 +239,7 @@
   <div class="road three">
     <div class="stepcard card"><span class="step-no">STEP 1</span><p class="step-h">なんで難しいの？</p><p class="step-d">日本語の「ら」との違い</p></div>
     <div class="stepcard card"><span class="step-no">STEP 2</span><p class="step-h"><span class="en l">L</span> と <span class="en r">R</span> の舌の位置</p><p class="step-d">一緒に声に出してみよう</p></div>
-    <div class="stepcard card"><span class="step-no">STEP 3</span><p class="step-h">毎日5分の練習メニュー</p><p class="step-d">スクショして使ってね</p></div>
+    <div class="stepcard card"><span class="step-no">STEP 3</span><p class="step-h"><span class="en l">L</span> と <span class="en r">R</span> を比べて練習</p><p class="step-d">ペアの単語で言い分けよう</p></div>
   </div>
 </section>
 
@@ -317,12 +318,18 @@
   <header class="bar"><span class="crumb">発音解説 / L と R</span></header>
   <div class="divider"></div>
   <h2 class="title">英語と日本語は、「言語間距離」が遠い</h2>
-  <div class="dist card">
-    <p class="dist-h">英語ネイティブが、仕事で使えるレベルになるまでの学習時間の目安</p>
-    <div class="hrow"><p class="hl">スペイン語・フランス語</p><div class="htrack"><div class="hbar lo" style="width:calc((100% - 190px) * 600 / 2200)"></div><div class="hbar ext" style="width:calc((100% - 190px) * 150 / 2200 - 2px)"></div><p class="hv">600〜750<span class="ja">時間</span></p></div></div>
-    <div class="hrow"><p class="hl">ドイツ語</p><div class="htrack"><div class="hbar" style="width:calc((100% - 190px) * 900 / 2200)"></div><p class="hv">900<span class="ja">時間</span></p></div></div>
-    <div class="hrow jp"><p class="hl">日本語</p><div class="htrack"><div class="hbar" style="width:calc(100% - 190px)"></div><p class="hv">2,200<span class="ja">時間</span></p></div></div>
-    <p class="src">アメリカ国務省の外交官養成機関（FSI）の目安。日本語は、いちばん時間がかかるグループに入っている</p>
+  <div class="dmap card">
+    <div class="grp c-sky">
+      <div class="nd"><div class="nd-flags"><img src="../img/flag-usa.png" alt="アメリカの国旗"><img src="../img/flag-uk.png" alt="イギリスの国旗"></div><p class="nd-l">英語</p></div>
+      <p class="near"><span class="near-a">↔</span><span class="near-t">近い</span></p>
+      <div class="nd"><div class="nd-flags"><img src="../img/flag-spain.png" alt="スペインの国旗"></div><p class="nd-l">スペイン語</p></div>
+    </div>
+    <div class="farline"><p class="fl-t">とても遠い！</p><div class="fl-a"><span class="hd">◀</span><span class="ln"></span><span class="hd">▶</span></div></div>
+    <div class="grp c-orange">
+      <div class="nd"><div class="nd-flags"><img src="../img/flag-japan.png" alt="日本の国旗"></div><p class="nd-l">日本語</p></div>
+      <p class="near"><span class="near-a">↔</span><span class="near-t">近い</span></p>
+      <div class="nd"><div class="nd-flags"><img src="../img/flag-korea.png" alt="韓国の国旗"></div><p class="nd-l">韓国語</p></div>
+    </div>
   </div>
   <div class="far card c-orange">
     <p class="far-t">言葉が遠いと、<b class="hot">使う音や、音の出し方</b>も遠い<small>と言われている</small></p>
@@ -486,18 +493,25 @@
   </div>
 </section>
 
-<!-- ============ 20 毎日5分の筋トレメニュー ============ -->
+<!-- ============ 20 子音のあとの L / R ============ -->
 <section class="slide">
   <header class="bar"><span class="crumb">発音解説 / L と R</span></header>
   <div class="divider"></div>
-  <div class="title-row"><h2 class="title">毎日5分の筋トレメニュー</h2><span class="chip total">スクショしてね！</span></div>
-  <div class="menu card">
-    <div class="mrow"><span class="num">1</span><p class="m-h">伸ばす</p><p class="m-d"><span class="en l">L</span> を5秒、<span class="en r">R</span> を5秒。交互に3セット</p><span class="chip">1分</span></div>
-    <div class="mrow"><span class="num">2</span><p class="m-h">母音とつなげる</p><p class="m-d"><span class="en"><span class="l">la</span> – <span class="r">ra</span> ／ <span class="l">li</span> – <span class="r">ri</span> ／ <span class="l">lu</span> – <span class="r">ru</span> ／ <span class="l">le</span> – <span class="r">re</span> ／ <span class="l">lo</span> – <span class="r">ro</span></span></p><span class="chip">1分</span></div>
-    <div class="mrow"><span class="num">3</span><p class="m-h">ペア単語</p><p class="m-d">今日の6組を、ゆっくり → ふつうのスピードで</p><span class="chip">1分半</span></div>
-    <div class="mrow"><span class="num">4</span><p class="m-h">チャレンジ単語</p><p class="m-d"><span class="en"><span class="r">r</span>ea<span class="l">ll</span>y</span> を、ゆっくり → ふつうのスピードで</p><span class="chip">1分</span></div>
-    <div class="mrow"><span class="num">5</span><p class="m-h">録音チェック</p><p class="m-d">1文だけスマホで録音して、お手本と聞き比べる</p><span class="chip">30秒</span></div>
+  <p class="eyebrow">POINT</p>
+  <h2 class="title">前に子音があるときは、間に「ウ」を入れない</h2>
+  <div class="duo">
+    <div class="cl card">
+      <div class="cl-top"><img src="../img/wineglass.png" alt="グラス"><p class="cl-w"><mark><span class="k">g</span><span class="l">l</span></mark>ass</p></div>
+      <p class="cl-row ng"><span class="x">×</span>「グ・ラス」と、間に「ウ」が入る</p>
+      <p class="cl-row ok"><span class="o">○</span><span><span class="en">g</span> の口のまま、すぐ <span class="en l">L</span> につなげる</span></p>
+    </div>
+    <div class="cl card">
+      <div class="cl-top"><img src="../img/ball.png" alt="ボール"><p class="cl-w"><mark><span class="k">p</span><span class="l">l</span></mark>ay</p></div>
+      <p class="cl-row ng"><span class="x">×</span>「プ・レイ」と、間に「ウ」が入る</p>
+      <p class="cl-row ok"><span class="o">○</span><span><span class="en">p</span> の口のまま、すぐ <span class="en l">L</span> につなげる</span></p>
+    </div>
   </div>
+  <p class="band"><span class="chip blue">R も同じ</span><span><span class="en">g<span class="r">r</span>ass ／ p<span class="r">r</span>ay ／ f<span class="r">r</span>y</span>　も、前の子音とひと息で言う</span></p>
 </section>
 
 <!-- ============ 21 まとめ ============ -->
