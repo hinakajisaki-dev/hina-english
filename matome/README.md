@@ -5,7 +5,7 @@
 | フォルダ | 内容 |
 | --- | --- |
 | `9-phrases/` | 日常英会話フレーズ 9選（`9-phrases-matome.pdf` / 編集できる `9-phrases-matome.pptx`）。スライド11枚＋練習問題45問と解答 |
-| `lr-pronunciation/` | 発音解説動画「L と R の発音」（`lr-pronunciation-slides.pdf` / 編集できる `lr-pronunciation-slides.pptx`）。動画で映すスライド22枚。舌の位置の断面図（L・ら・R）と正面図、ペア単語のイラストつき。台本は `script.md`、スライド1枚ごとのセリフは `slide-script.md` |
+| `lr-pronunciation/` | 発音解説動画「L と R の発音」（`lr-pronunciation-slides.pdf` / 編集できる `lr-pronunciation-slides.pptx`）。動画で映すスライド21枚。舌の位置の断面図（L・ら・R）と正面図、ペア単語のイラストつき。台本は `script.md`、スライド1枚ごとのセリフは `slide-script.md` |
 
 ## PDF の作り直し方
 
