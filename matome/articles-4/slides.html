@@ -6,6 +6,10 @@
 <link rel="stylesheet" href="../hina.css">
 <style>
   .hero-title .part { margin-left: 18px; font-size: 92px; font-weight: 900; color: var(--primary); }
+  /* cover: keep everything in the left two thirds; Hina appears on the right in the video */
+  .cover.left23 .hero { align-self: flex-start; width: 809px; padding: 0 60px; }
+  .left23 .hero-title { font-size: 140px; }
+  .left23 .hero-title .part { margin-left: 16px; font-size: 84px; }
 
   /* menu */
   .menu { flex: 1; margin-top: 22px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; min-height: 0; }
@@ -51,12 +55,11 @@
 <body>
 
 <!-- ============ 表紙 ============ -->
-<section class="slide cover">
+<section class="slide cover left23">
   <div class="hero">
     <p class="hero-kicker">文法解説動画</p>
     <h1 class="hero-title">冠詞<span class="part">練習問題</span></h1>
     <p class="hero-sub sm">全25問　一緒に声に出して練習しよう！</p>
-    <img class="tile" src="../img/tile.png" alt="">
   </div>
 </section>
 
