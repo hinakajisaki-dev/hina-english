@@ -276,31 +276,37 @@
   .wk li .u .say { display: block; font-weight: 500; color: var(--ink-2); font-size: 10px; line-height: 1.35; margin-top: 1px; }
   .wk li.star .u { color: var(--accent-text); }
 
-  .model-body { display: grid; grid-template-columns: 236px minmax(0, 1fr); gap: 16px; margin-top: 12px; }
-  .model-ex { background: var(--soft-model); border-radius: 14px; padding: 12px 14px; display: flex; flex-direction: column; gap: 6px; }
+  .model-body { display: grid; grid-template-columns: minmax(0, 1fr) 286px; gap: 14px; margin-top: 10px; }
+  .mleft { display: flex; flex-direction: column; gap: 8px; }
+  .mquote { font-weight: 900; font-size: 15px; line-height: 1.45; background: var(--soft-model); border-radius: 14px; padding: 9px 14px; }
+  .model-ex { background: var(--soft-model); border-radius: 14px; padding: 10px 14px 12px; display: flex; flex-direction: column; gap: 6px; }
   .mx-head { display: flex; align-items: center; justify-content: space-between; margin: -4px 0 -6px; }
   .mx-head .ill { width: 40px; height: 40px; }
   .mini-ill { width: 40px; height: 40px; flex: none; margin: -3px 0; }
-  .model-ex .say.big { font-size: 15.5px; line-height: 1.35; letter-spacing: -.2px; }
-  .model-ex .ja { font-size: 10.5px; color: var(--ink-2); }
+  .model-ex .say.big { font-size: 15px; line-height: 1.35; letter-spacing: -.2px; }
+  .model-ex .ja + .say.big { margin-top: 2px; }
+  .model-ex .ja { font-size: 10.5px; color: var(--ink-2); margin-top: -4px; }
   .tips { display: grid; gap: 4px; margin-top: 2px; }
   .tips li { background: var(--card); border-radius: 8px; padding: 4px 8px; font-size: 10.5px; }
   .tips li .say { font-size: 11px; }
-  .src { font-size: 10px; color: var(--ink-2); line-height: 1.5; }
+  .mvideo { flex: 1; display: flex; flex-direction: column; justify-content: space-between; gap: 2px; background: #FFFBEF; border: 1.5px dashed #F2D58A; border-radius: 14px; padding: 8px 12px 0; }
+  .mv-title { display: flex; align-items: center; gap: 6px; font-weight: 900; font-size: 13.5px; }
+  .mv-title .star { width: 18px; height: 18px; flex: none; }
+  .mv-hina { display: flex; align-items: flex-end; justify-content: flex-end; gap: 4px; }
+  .mv-hina img { height: 62px; width: auto; display: block; }
+  .bubble { position: relative; align-self: center; background: var(--card); border: 1.5px solid #F2D58A; border-radius: 12px; padding: 6px 11px; font-size: 10.5px; font-weight: 700; line-height: 1.45; flex: 1; margin: 0 6px 8px 0; }
+  .bubble::after { content: ""; position: absolute; right: -7px; top: 50%; width: 10px; height: 10px; background: var(--card); border-right: 1.5px solid #F2D58A; border-top: 1.5px solid #F2D58A; transform: translateY(-50%) rotate(45deg); }
   .msteps { display: grid; gap: 6px; }
-  .msteps li { display: grid; grid-template-columns: 24px minmax(0, 1fr) auto; gap: 10px; align-items: center; border: 1.5px solid #F6DCE3; border-radius: 12px; padding: 7px 10px; }
+  .msteps li { display: grid; grid-template-columns: 24px minmax(0, 1fr); gap: 10px; align-items: center; border: 1.5px solid #F6DCE3; border-radius: 12px; padding: 6px 10px; }
   .msteps .no { display: grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; background: var(--c-model); font-family: var(--en); font-weight: 800; font-size: 11px; }
   .msteps b { font-size: 12px; display: block; line-height: 1.4; }
   .msteps p { font-size: 10.5px; color: var(--ink-2); line-height: 1.45; }
 
-  .bottom { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
-  .mini { border-radius: 18px; padding: 12px 16px 13px; display: flex; gap: 12px; align-items: flex-start; }
+  .bottom { display: grid; gap: 12px; }
+  .mini { border-radius: 18px; padding: 10px 16px; display: flex; gap: 12px; align-items: center; }
   .mini.rest { background: var(--soft-rest); }
-  .mini.check { background: var(--accent-soft); }
-  .mini .num { width: 34px; height: 34px; font-size: 13px; }
-  .mini.check .num { background: var(--card); color: var(--accent-text); }
-  .mini .num svg { width: 18px; height: 18px; }
   .mini h3 { font-weight: 900; font-size: 13.5px; display: flex; align-items: center; gap: 8px; }
+  .mini > div { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
   .mini p { font-size: 11px; color: var(--ink-2); margin-top: 2px; line-height: 1.55; }
 
   .foot {
@@ -603,26 +609,36 @@
         <span class="num">03</span>
         <div>
           <h2>モデリング <span class="timer"><svg><use href="#timer"/></svg>5:00</span></h2>
-          <p>お手本の英語を聞いて、そっくりまねします。1日1つの英文を、4ステップでくり返します。</p>
+          <p>お手本の英語を聞いて、とにかく真似しまくります。</p>
         </div>
       </div>
       <div class="model-body">
+        <div class="mleft">
+          <p class="mquote">自分が<span class="hl-m">「発音できる」</span>音は、<span class="hl-m">「聞こえる」</span></p>
+          <ol class="msteps">
+            <li><span class="no">1</span><div><b>とにかく真似しまくる</b><p>英語が聞こえる耳は、真似して作る。お手本を聞いたら、すぐにそっくり言ってみる。</p></div></li>
+            <li><span class="no">2</span><div><b>リンキングやリズムも体で覚える</b><p>音のつながり（リンキング）やリズム感も、声に出して体に覚えさせる。</p></div></li>
+          </ol>
+          <div class="mvideo">
+            <p class="mv-title"><svg class="star"><use href="#star"/></svg>できるだけ5分間、しゃべり続けよう</p>
+            <div class="mv-hina">
+              <p class="bubble">5分のモデリング動画を作ったので、ぜひ見てください！</p>
+              <img src="character.png" alt="">
+            </div>
+          </div>
+        </div>
         <div class="model-ex">
           <div class="mx-head"><span class="label" style="color:#B23A5B">Example</span><svg class="ill"><use href="#ill-headphones"/></svg></div>
-          <p class="say big">I don't know <span class="hl-m">how to</span> <span class="hl-m">say this</span> in English.</p>
-          <p class="ja">これを英語でどう言えばいいかわからない。</p>
+          <p class="say big">Can you grab me the <span class="hl-m">sugar</span>?</p>
+          <p class="ja">砂糖を取ってくれる？</p>
+          <p class="say big">Can you grab me the <span class="hl-m">salt</span>?</p>
+          <p class="ja">塩を取ってくれる？</p>
           <ul class="tips">
-            <li><span class="say">how to</span> は「ハウトゥ」とつなげる</li>
-            <li><span class="say">say this</span> の th は、舌を軽くはさむ</li>
+            <li><span class="say">Can you</span> は「キャニュ」とつなげる</li>
+            <li><span class="say">grab me</span> の b は軽く、「グラッミー」</li>
+            <li>強く言うのは <span class="say">grab</span> と <span class="say">sugar / salt</span>。ほかは弱く短く</li>
           </ul>
-          <p class="src">使う英文：今日の文法の例文や、音声つき教材の短い英文。AIの読み上げ機能を使ってもOK。</p>
         </div>
-        <ol class="msteps">
-          <li><span class="no">1</span><div><b>英文を見ないで、2回聞く</b><p>まずは耳だけ。どんな音か、そのまま聞く。</p></div><span class="timer"><svg><use href="#timer"/></svg>1:00</span></li>
-          <li><span class="no">2</span><div><b>英文を見ながら聞く</b><p>聞き取れなかったところに印をつける。</p></div><span class="timer"><svg><use href="#timer"/></svg>1:00</span></li>
-          <li><span class="no">3</span><div><b>音声に重ねて読む（オーバーラッピング）×3</b><p>英文を見ながら、お手本と同時に声に出す。</p></div><span class="timer"><svg><use href="#timer"/></svg>1:30</span></li>
-          <li><span class="no">4</span><div><b>すぐ後を追って言う（シャドーイング）×3</b><p>英文を見ないで、お手本の少し後ろをまねして言う。</p></div><span class="timer"><svg><use href="#timer"/></svg>1:30</span></li>
-        </ol>
       </div>
     </section>
 
@@ -632,13 +648,6 @@
         <div>
           <h3>休憩 <span class="timer"><svg><use href="#timer"/></svg>5:00</span></h3>
           <p>立つ、水を飲む、目を休める。休憩中はスマホを見ないのがコツです。</p>
-        </div>
-      </div>
-      <div class="mini check">
-        <span class="num"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V6a3 3 0 0 0-3-3zM6 11a6 6 0 0 0 12 0M12 17v4" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></span>
-        <div>
-          <h3>30日後に確かめよう</h3>
-          <p>今日「1分自己紹介」をスマホで録音。30日後に同じお題で録音して、聞き比べます。</p>
         </div>
       </div>
     </div>
