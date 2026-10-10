@@ -103,7 +103,7 @@
     border-radius: 20px;
     box-shadow: var(--shadow);
     border: 1px solid #E6EDF6;
-    padding: 14px 18px 15px;
+    padding: 12px 18px 13px;
   }
   .sec-head { display: flex; align-items: center; gap: 12px; }
   .num {
@@ -130,7 +130,7 @@
   .top { background: var(--bg); padding: 16px 34px 0; position: relative; overflow: hidden; }
   .top-row { display: flex; align-items: center; gap: 14px; }
   .top-body { display: grid; grid-template-columns: minmax(0, 1fr) 128px; gap: 12px; align-items: end; }
-  .top-text { padding: 6px 0 12px; }
+  .top-text { padding: 4px 0 10px; }
   .script { font-family: var(--hand); font-weight: 700; font-size: 26px; line-height: 1; color: var(--accent-text); }
   .top h1 { font-weight: 900; font-size: 28px; line-height: 1.3; margin-top: 4px; letter-spacing: .01em; }
   .top h1 .n { font-family: var(--en); font-weight: 800; color: var(--accent); font-size: 36px; letter-spacing: -1.5px; margin: 0 2px; }
@@ -151,33 +151,31 @@
   .menu-head .total b { font-family: var(--en); font-weight: 800; font-size: 26px; letter-spacing: -1px; color: var(--accent); margin: 0 2px; }
   .timeline { display: flex; gap: 6px; margin-top: 8px; }
   .seg { flex: var(--m) 1 0; min-width: 0; }
-  .seg .fill { display: block; height: 18px; border-radius: 9px; background: var(--c); }
+  .seg .fill { display: block; height: 22px; border-radius: 11px; background: var(--c); }
   .seg .fill.split { display: flex; gap: 2px; background: none; }
   .seg .sub { font-size: 9.5px; font-weight: 700; color: var(--muted); white-space: nowrap; line-height: 1.3; }
-  .seg .fill.split > span { flex: var(--m) 1 0; min-width: 0; border-radius: 3px; }
-  .seg .fill.split > span:first-child { border-radius: 9px 3px 3px 9px; }
-  .seg .fill.split > span:last-child { border-radius: 3px 9px 9px 3px; }
+  .seg .fill.split > span { flex: var(--m) 1 0; min-width: 0; border-radius: 3px; display: grid; place-items: center; font-size: 9.5px; font-weight: 700; line-height: 1; white-space: nowrap; color: var(--ink); overflow: hidden; }
+  .seg .fill.split > span:first-child { border-radius: 11px 3px 3px 11px; }
+  .seg .fill.split > span:last-child { border-radius: 3px 11px 11px 3px; }
   .seg .t { display: flex; align-items: baseline; flex-wrap: wrap; gap: 0 6px; margin-top: 5px; line-height: 1.4; }
   .seg .t b { font-size: 12.5px; }
   .seg .t span { font-family: var(--en); font-size: 11px; color: var(--muted); font-weight: 700; }
-  .rules { display: flex; align-items: center; gap: 12px; margin-top: 10px; background: var(--bg); border-radius: 14px; padding: 6px 14px 6px 10px; font-size: 11.5px; line-height: 1.5; }
-  .rules .tomato { width: 36px; height: 36px; flex: none; }
+  .rules { display: flex; align-items: center; gap: 12px; margin-top: 8px; background: var(--bg); border-radius: 14px; padding: 5px 14px 5px 10px; font-size: 11.5px; line-height: 1.5; }
+  .rules .tomato { width: 32px; height: 32px; flex: none; }
   .rules b { font-size: 12.5px; color: var(--accent-text); }
 
   /* ---------- 01 word ---------- */
   .word-body { display: grid; grid-template-columns: minmax(0, 1fr) 268px; gap: 14px; margin-top: 10px; }
-  .points { display: grid; gap: 5px; }
-  .points li { background: #FFF3EC; border-radius: 10px; padding: 5px 11px; display: grid; grid-template-columns: 150px minmax(0, 1fr); align-items: baseline; gap: 8px; }
+  .points { display: grid; gap: 4px; margin-top: 8px; }
+  .points li { background: #FFF3EC; border-radius: 10px; padding: 4px 11px; display: grid; grid-template-columns: 160px minmax(0, 1fr); align-items: baseline; gap: 8px; }
   .points li b { display: flex; align-items: center; gap: 6px; font-size: 12px; }
   .points li b i { font-style: normal; font-family: var(--en); font-weight: 800; font-size: 11px; color: var(--accent-text); }
   .points li p { font-size: 11px; color: var(--ink-2); line-height: 1.5; }
-  .flow { margin-top: 8px; display: grid; gap: 4px; }
-  .flow li { display: grid; grid-template-columns: 62px minmax(0, 1fr); align-items: center; gap: 8px; font-size: 11px; }
-  .flow li .timer { justify-self: start; }
 
   .fc { display: grid; gap: 6px; align-content: start; }
   .fc-back dl { gap: 2px; }
-  .fc-cap { font-size: 10.5px; font-weight: 700; color: var(--muted); }
+  .fc-cap { font-size: 10.5px; font-weight: 700; color: var(--muted); display: flex; align-items: center; justify-content: space-between; }
+  .fc-cap .ill-s { width: 28px; height: 28px; margin: -8px 0 -6px; }
   .fc-card {
     border-radius: 14px; border: 1.5px solid var(--line-warm); background: var(--card);
     padding: 10px 12px; position: relative;
@@ -199,36 +197,36 @@
   .fc-say .say { font-size: 11.5px; }
 
   /* ---------- 02 grammar ---------- */
-  .ai-note { margin-top: 8px; display: flex; gap: 10px; align-items: center; background: var(--soft-grammar); border-radius: 12px; padding: 6px 12px; font-size: 11px; line-height: 1.55; }
-  .ai-note .ai {
-    flex: none; display: grid; place-items: center; width: 30px; height: 30px; border-radius: 9px;
-    background: var(--card); font-family: var(--en); font-weight: 800; font-size: 11px; color: #2C6E9E;
-  }
   .steps { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-top: 8px; }
   .step { border: 1.5px solid var(--line); border-radius: 14px; padding: 8px 9px 9px; display: flex; flex-direction: column; gap: 4px; }
   .step .s-top { display: flex; align-items: center; justify-content: space-between; gap: 4px; }
   .step .s-no { font-family: var(--en); font-weight: 800; font-size: 9.5px; letter-spacing: .12em; color: #2C6E9E; }
   .step h4 { font-weight: 900; font-size: 12.5px; line-height: 1.35; }
   .step p { font-size: 10.5px; color: var(--ink-2); line-height: 1.5; }
-  .prompts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin-top: 6px; }
-  .prompt {
-    background: #F4F7FB; border-radius: 9px; padding: 6px 9px;
-    font-size: 10px; line-height: 1.5; color: var(--ink);
-    border-left: 3px solid var(--c-grammar);
-  }
-  .prompt small { display: block; font-size: 9px; font-weight: 700; color: var(--muted); }
-  .prompt.w { background: #FFF6F1; border-left-color: var(--c-word); font-size: 10.5px; }
-  .ask { margin-top: 2px; display: grid; gap: 4px; }
-  .why { font-size: 10.5px; color: var(--ink-2); line-height: 1.55; }
+  .stips { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+  .stips.w { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .tipcol { display: flex; flex-direction: column; align-items: stretch; }
+  .tipcol .down { width: 16px; height: 16px; align-self: center; margin: 2px 0; color: #5FA9DE; }
+  .stips.w .tipcol .down { color: var(--c-word); }
+  .tip { background: #F4F7FB; border: 1.5px solid #D5E7F5; border-radius: 10px; padding: 5px 10px 6px; font-size: 10px; line-height: 1.5; flex: 1; }
+  .stips.w .tip { background: #FFF6F1; border-color: #F6DCCD; }
+  .tip small { display: flex; align-items: center; gap: 4px; font-size: 9px; font-weight: 700; color: var(--muted); }
+  .tip small::before { content: "AI"; font-family: var(--en); font-weight: 800; font-size: 8px; color: #fff; background: #5FA9DE; border-radius: 4px; padding: 1px 4px; }
+  .stips.w .tip small::before { background: var(--c-word); }
+  .tip .red { color: #D21F1F; font-weight: 700; }
+  .tip .ideal { font-weight: 900; }
+  .tipcol.mid { align-items: center; justify-content: center; gap: 2px; padding-top: 6px; }
+  .tipcol.mid .ill-note { width: 64px; height: 48px; }
+  .tipcol.mid p { font-size: 10.5px; font-weight: 900; color: #2C6E9E; }
+  .why { font-size: 10px; color: var(--ink-2); line-height: 1.5; margin-top: 3px; }
   .why b { color: #D21F1F; }
-  .prompt .red { color: #D21F1F; font-weight: 700; }
-  .prompt .ideal { font-weight: 900; }
   .steps.w { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .steps.w .step { border-color: #F6DCCD; }
   .steps.w .s-no { color: var(--accent-text); }
 
-  .examples { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-top: 8px; }
-  .ex { background: var(--soft-grammar); border-radius: 14px; padding: 8px 13px 9px; }
+  .examples { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 10px; margin-top: 8px; align-items: start; }
+  .ex { background: var(--soft-grammar); border-radius: 14px; padding: 8px 13px 9px; position: relative; }
+  .ex .ill { position: absolute; right: 12px; top: 38px; width: 46px; height: 46px; }
   .ex-head { display: flex; align-items: center; gap: 8px; }
   .ex-head b { font-size: 13px; }
   .ex-head .tag { font-size: 9.5px; font-weight: 700; color: #2C6E9E; background: var(--card); border-radius: 999px; padding: 1px 8px 2px; }
@@ -241,7 +239,11 @@
   .ex dt { font-weight: 900; font-size: 10px; color: #2C6E9E; padding-top: 1px; }
   .ex dd .say { font-size: 11px; display: block; }
   .ex dd .say + .say { margin-top: 1px; }
-  .ex.alt { background: var(--soft-rest); }
+  .ex.alt { background: #FFFBEF; border: 1.5px dashed #F2D58A; }
+  .ex.alt .ex-head b { font-size: 12px; }
+  .ex.alt .ex-head .star { width: 16px; height: 16px; flex: none; margin-right: -4px; }
+  .ex.alt .main { font-size: 13.5px; }
+  .ex.alt .ill { width: 40px; height: 40px; top: 52px; }
   .ex.alt .ex-head .tag, .ex.alt dt { color: #8A6200; }
   .ex.alt .main .pat { color: #8A6200; }
   .ex .hint { font-size: 10px; color: var(--ink-2); margin-top: 6px; padding-top: 5px; border-top: 1.5px dashed rgba(138, 98, 0, .25); }
@@ -276,6 +278,9 @@
 
   .model-body { display: grid; grid-template-columns: 236px minmax(0, 1fr); gap: 16px; margin-top: 12px; }
   .model-ex { background: var(--soft-model); border-radius: 14px; padding: 12px 14px; display: flex; flex-direction: column; gap: 6px; }
+  .mx-head { display: flex; align-items: center; justify-content: space-between; margin: -4px 0 -6px; }
+  .mx-head .ill { width: 40px; height: 40px; }
+  .mini-ill { width: 40px; height: 40px; flex: none; margin: -3px 0; }
   .model-ex .say.big { font-size: 15.5px; line-height: 1.35; letter-spacing: -.2px; }
   .model-ex .ja { font-size: 10.5px; color: var(--ink-2); }
   .tips { display: grid; gap: 4px; margin-top: 2px; }
@@ -314,6 +319,14 @@
   <defs>
     <symbol id="asterisk" viewBox="0 0 24 24"><path d="M12 3.5v17M3.5 12h17M6 6l12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></symbol>
     <symbol id="timer" viewBox="0 0 24 24"><circle cx="12" cy="13.5" r="7.5" fill="none" stroke="currentColor" stroke-width="2.2"/><path d="M12 13.5V9.8M9.5 2.8h5M12 2.8v3.2M18.6 6.4l1.4-1.4" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></symbol>
+    <symbol id="arrow-down" viewBox="0 0 16 16"><path d="M8 2.5v10M3.8 8.6 8 12.8l4.2-4.2" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="star" viewBox="0 0 24 24"><path d="M12 2.8l2.7 5.6 6.1.8-4.5 4.2 1.1 6.1L12 16.6l-5.4 2.9 1.1-6.1-4.5-4.2 6.1-.8z" fill="#FFC94A" stroke="#E0A400" stroke-width="1.4" stroke-linejoin="round"/></symbol>
+    <symbol id="ill-pencil" viewBox="0 0 48 48"><g transform="rotate(-32 24 24)"><rect x="9" y="19" width="25" height="10" rx="1.5" fill="#FFC94A" stroke="#1A2238" stroke-width="1.6"/><path d="M9 22.3h25M9 25.7h25" stroke="#E0A400" stroke-width="1"/><rect x="4" y="19" width="6.5" height="10" rx="2" fill="#FF9DB4" stroke="#1A2238" stroke-width="1.6"/><path d="M34 19l9 5-9 5z" fill="#F5D7B5" stroke="#1A2238" stroke-width="1.6" stroke-linejoin="round"/><path d="M40.6 22.7 43 24l-2.4 1.3z" fill="#1A2238"/></g></symbol>
+    <symbol id="ill-note" viewBox="0 0 64 48"><rect x="6" y="6" width="34" height="38" rx="4" fill="#FFFFFF" stroke="#1A2238" stroke-width="1.8"/><path d="M6 6h6v38H6z" fill="#7DBDEB" stroke="#1A2238" stroke-width="1.8" stroke-linejoin="round"/><path d="M17 15h17M17 21h17M17 27h13M17 33h15" stroke="#9FB3CC" stroke-width="1.8" stroke-linecap="round"/><g transform="rotate(-48 47 26)"><rect x="34" y="22" width="22" height="8" rx="1.4" fill="#FF8A57" stroke="#1A2238" stroke-width="1.6"/><path d="M56 22l7 4-7 4z" fill="#F5D7B5" stroke="#1A2238" stroke-width="1.6" stroke-linejoin="round"/><path d="M61 25 63 26l-2 1z" fill="#1A2238"/></g><path d="M50 40c2-1.5 4-1.5 6 0M52 44c1.5-1 3-1 4.5 0" stroke="#FF8A57" stroke-width="1.6" stroke-linecap="round" fill="none"/></symbol>
+    <symbol id="ill-bed" viewBox="0 0 48 48"><path d="M36.5 5.5a7 7 0 1 0 6.5 9.6 5.6 5.6 0 1 1-6.5-9.6z" fill="#FFC94A"/><path d="M25 7h4.4L25 11.4h4.4M19 12h3.2L19 15.2h3.2" fill="none" stroke="#5E6780" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><rect x="5" y="22" width="5" height="20" rx="2" fill="#5FA9DE" stroke="#1A2238" stroke-width="1.6"/><rect x="9" y="27" width="34" height="9" rx="3.5" fill="#B9DDF6" stroke="#1A2238" stroke-width="1.6"/><ellipse cx="15.5" cy="26.5" rx="5" ry="3.2" fill="#FFFFFF" stroke="#1A2238" stroke-width="1.6"/><path d="M8 36h36v3.5a2 2 0 0 1-2 2H8z" fill="#5FA9DE" stroke="#1A2238" stroke-width="1.6" stroke-linejoin="round"/><path d="M41 41.5v3M10 41.5v3" stroke="#1A2238" stroke-width="1.8" stroke-linecap="round"/></symbol>
+    <symbol id="ill-popcorn" viewBox="0 0 48 48"><circle cx="15" cy="16" r="5" fill="#FFF0C4" stroke="#E0A400" stroke-width="1.4"/><circle cx="24" cy="12" r="5.5" fill="#FFF0C4" stroke="#E0A400" stroke-width="1.4"/><circle cx="33" cy="16" r="5" fill="#FFF0C4" stroke="#E0A400" stroke-width="1.4"/><circle cx="20" cy="18" r="4.5" fill="#FFF0C4" stroke="#E0A400" stroke-width="1.4"/><circle cx="28.5" cy="18.5" r="4.5" fill="#FFF0C4" stroke="#E0A400" stroke-width="1.4"/><path d="M11 20h26l-3.4 23H14.4z" fill="#FFFFFF" stroke="#1A2238" stroke-width="1.6" stroke-linejoin="round"/><path d="M16.2 20.6l1.6 21.8h3.6l-.4-21.8zM27 20.6l-.4 21.8h3.6l1.6-21.8z" fill="#F0521E"/><path d="M11 20h26l-3.4 23H14.4z" fill="none" stroke="#1A2238" stroke-width="1.6" stroke-linejoin="round"/></symbol>
+    <symbol id="ill-headphones" viewBox="0 0 48 48"><path d="M9 29v-5a15 15 0 0 1 30 0v5" fill="none" stroke="#1A2238" stroke-width="2.6" stroke-linecap="round"/><rect x="5.5" y="26" width="9" height="15" rx="4.5" fill="#FF9DB4" stroke="#1A2238" stroke-width="1.6"/><rect x="33.5" y="26" width="9" height="15" rx="4.5" fill="#FF9DB4" stroke="#1A2238" stroke-width="1.6"/><path d="M21 31.5c1.6-1.4 1.6-3.6 0-5M25 34c3-3 3-7.6 0-10.5" fill="none" stroke="#F0521E" stroke-width="1.8" stroke-linecap="round"/></symbol>
+    <symbol id="ill-coffee" viewBox="0 0 48 48"><path d="M17 13c-2-2.2 2-3.8 0-6.5M23 13c-2-2.2 2-3.8 0-6.5M29 13c-2-2.2 2-3.8 0-6.5" fill="none" stroke="#C9A27A" stroke-width="1.8" stroke-linecap="round"/><path d="M33 22h2.5a4.5 4.5 0 0 1 0 9H33" fill="none" stroke="#1A2238" stroke-width="2"/><path d="M10 17h24v12a10 10 0 0 1-10 10h-4a10 10 0 0 1-10-10z" fill="#FFFFFF" stroke="#1A2238" stroke-width="1.8" stroke-linejoin="round"/><path d="M11.4 21h21.2" stroke="#C98B5E" stroke-width="3" stroke-linecap="round"/><path d="M6 42.5h32" stroke="#1A2238" stroke-width="2" stroke-linecap="round"/><path d="M15 29c1.5 1.4 3 1.4 4.5 0" fill="none" stroke="#FF9DB4" stroke-width="1.6" stroke-linecap="round"/></symbol>
   </defs>
 </svg>
 
@@ -345,8 +358,8 @@
         <p class="total">集中 <b>25</b>分 ＋ 休憩 5分<span style="font-weight:700;color:var(--muted);font-size:10.5px;margin-left:6px">（ポモドーロ・テクニック）</span></p>
       </div>
       <div class="timeline">
-        <div class="seg word" style="--m:10"><span class="fill split"><span style="--m:8;background:#FF8A57"></span><span style="--m:2;background:#FFC3A6"></span></span><p class="t"><b>01 単語</b><span>10分</span></p><p class="sub">インプット 8分 → 復習 2分</p></div>
-        <div class="seg grammar" style="--m:10"><span class="fill split"><span style="--m:4;background:#5FA9DE"></span><span style="--m:1;background:#8CC6EE"></span><span style="--m:5;background:#B9DDF6"></span></span><p class="t"><b>02 文法</b><span>10分</span></p><p class="sub">ルール 3〜5分 → 書く 1分 → 確認</p></div>
+        <div class="seg word" style="--m:10"><span class="fill split"><span style="--m:8;background:#FF8A57">インプット 8分</span><span style="--m:2;background:#FFC3A6">復習 2分</span></span><p class="t"><b>01 単語</b><span>10分</span></p></div>
+        <div class="seg grammar" style="--m:10"><span class="fill split"><span style="--m:4;background:#7DBDEB">ルール 3〜5分</span><span style="--m:1.75;background:#A9D3F3">書く1分</span><span style="--m:4.25;background:#CDE6F7">確認</span></span><p class="t"><b>02 文法</b><span>10分</span></p></div>
         <div class="seg model" style="--m:5"><span class="fill"></span><p class="t"><b>03 モデリング</b><span>5分</span></p></div>
         <div class="seg rest" style="--m:5"><span class="fill"></span><p class="t"><b>休憩</b><span>5分</span></p></div>
       </div>
@@ -373,45 +386,50 @@
           <p>新しい単語を8分でインプット。残りの2分は、フラッシュカードで復習タイムです。</p>
         </div>
       </div>
-      <div class="word-body">
-        <div>
-          <ol class="points">
-            <li><b><i>1</i>フラッシュカードを作る</b><p>表に英語、裏に日本語訳と例文を書く。</p></li>
-            <li><b><i>2</i>シンプルな例文で覚える</b><p>単語帳の硬い例文よりは、日常英会話に寄せた例文で覚えましょう。AIに出してもらうのもおすすめ。</p></li>
-            <li><b><i>3</i>質より、雑に出会う回数</b><p>雑に何度も出会うことを大事にする。</p></li>
-          </ol>
-          <ol class="steps w">
-            <li class="step">
-              <div class="s-top"><span class="s-no">STEP 1</span><span class="timer"><svg><use href="#timer"/></svg>8分</span></div>
-              <h4>新しい単語をインプット</h4>
-              <p>AIで例文を出して、カードで覚える。</p>
-            </li>
-            <li class="step">
-              <div class="s-top"><span class="s-no">STEP 2</span><span class="timer"><svg><use href="#timer"/></svg>2分</span></div>
-              <h4>フラッシュカードで復習</h4>
-              <p>前の日のカードもまぜてめくる。</p>
-            </li>
-          </ol>
-        </div>
-        <div class="fc">
-          <p class="fc-cap">フラッシュカードの例</p>
-          <div class="fc-pair">
-          <div class="fc-card fc-front"><span class="side">表</span><span class="say">borrow</span></div>
-          <div class="fc-card fc-back">
-            <span class="side">裏</span>
-            <dl>
-              <dt>借りる</dt>
-              <dd><span class="say">Can I borrow your pen?</span></dd>
-              <dd>ペンを借りてもいい？</dd>
-            </dl>
-          </div>
-          </div>
-          <div class="ask">
-            <p class="prompt w"><small>AIを使う時のポイント</small><b class="ideal">理想のプロンプト例：</b>「日常会話で使う borrow の例文を出して。<span class="red">ただし、それ以外の情報はいらない。シンプルな解説だけでOK</span>」</p>
+      <ol class="steps w">
+        <li class="step">
+          <div class="s-top"><span class="s-no">STEP 1</span><span class="timer"><svg><use href="#timer"/></svg>8分</span></div>
+          <h4>新しい単語をインプット</h4>
+          <p>AIで例文を出して、フラッシュカードにして覚える。</p>
+        </li>
+        <li class="step">
+          <div class="s-top"><span class="s-no">STEP 2</span><span class="timer"><svg><use href="#timer"/></svg>2分</span></div>
+          <h4>フラッシュカードで復習</h4>
+          <p>前の日のカードもまぜて、タイマーが鳴るまでめくる。</p>
+        </li>
+      </ol>
+      <div class="stips w">
+        <div class="tipcol">
+          <svg class="down"><use href="#arrow-down"/></svg>
+          <div class="tip">
+            <small>AIを使う時のポイント</small>
+            <p><b class="ideal">理想のプロンプト例：</b>「日常会話で使う borrow の例文を出して。<span class="red">ただし、それ以外の情報はいらない。シンプルな解説だけでOK</span>」</p>
             <p class="why"><b>赤字の部分がコツ。</b>詳しい説明はおいおいでも大丈夫なんです。今必要な情報だけを取り入れましょう。</p>
           </div>
         </div>
+        <div class="tipcol">
+          <svg class="down"><use href="#arrow-down"/></svg>
+          <div class="fc">
+            <p class="fc-cap"><span>フラッシュカードの例</span><svg class="ill-s"><use href="#ill-pencil"/></svg></p>
+            <div class="fc-pair">
+              <div class="fc-card fc-front"><span class="side">表</span><span class="say">borrow</span></div>
+              <div class="fc-card fc-back">
+                <span class="side">裏</span>
+                <dl>
+                  <dt>借りる</dt>
+                  <dd><span class="say">Can I borrow your pen?</span></dd>
+                  <dd>ペンを借りてもいい？</dd>
+                </dl>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
+      <ol class="points">
+        <li><b><i>1</i>フラッシュカードを作る</b><p>表に英語、裏に日本語訳と例文を書く。</p></li>
+        <li><b><i>2</i>シンプルな例文で覚える</b><p>単語帳の硬い例文よりは、日常英会話に寄せた例文で覚えましょう。AIに出してもらうのもおすすめ。</p></li>
+        <li><b><i>3</i>質より、雑に出会う回数</b><p>雑に何度も出会うことを大事にする。</p></li>
+      </ol>
     </section>
 
     <!-- 02 grammar -->
@@ -420,10 +438,9 @@
         <span class="num">02</span>
         <div>
           <h2>文法 <span class="timer"><svg><use href="#timer"/></svg>10:00</span></h2>
-          <p>中学文法の単元を、ちょっとずつクリアしていきます。やってほしい単元のまとめは2ページ目にあります。</p>
+          <p>中学文法の単元をちょっとずつクリアしていきます。やってほしい単元のまとめは2ページ目にあります。</p>
         </div>
       </div>
-      <p class="ai-note"><span class="ai">AI</span><span><b>ChatGPTを使い倒そう。</b>Googleで調べてもすぐAIが答えてくれるくらい、AIは身近になりました。<br><small style="color:var(--muted);font-size:10px">※ AIもまちがえることがあります。変だなと思ったら、文法の本でも確かめましょう。</small></span></p>
       <ol class="steps">
         <li class="step">
           <div class="s-top"><span class="s-no">STEP 1</span><span class="timer"><svg><use href="#timer"/></svg>3〜5分</span></div>
@@ -441,12 +458,23 @@
           <p>書いた文をAIに貼って直してもらう。</p>
         </li>
       </ol>
-      <div class="prompts">
-        <p class="prompt"><small>STEP 1　AIを使う時のポイント</small>助動詞 should の最低限のルールを、例文2つで教えて。それ以外の情報はいらない</p>
-        <p class="prompt"><small>STEP 3　AIを使う時のポイント</small>次の英文が正しいかチェックして。まちがいがあれば、正しい文と理由を日本語で短く教えて</p>
+      <div class="stips">
+        <div class="tipcol">
+          <svg class="down"><use href="#arrow-down"/></svg>
+          <div class="tip"><small>AIを使う時のポイント</small><p>「助動詞 should の最低限のルールを、例文2つで教えて。それ以外の情報はいらない」</p></div>
+        </div>
+        <div class="tipcol mid">
+          <svg class="ill-note"><use href="#ill-note"/></svg>
+          <p>とにかく数！</p>
+        </div>
+        <div class="tipcol">
+          <svg class="down"><use href="#arrow-down"/></svg>
+          <div class="tip"><small>AIを使う時のポイント</small><p>「次の英文が正しいかチェックして。まちがいがあれば、正しい文と理由を日本語で短く教えて」</p></div>
+        </div>
       </div>
       <div class="examples">
         <div class="ex">
+          <svg class="ill"><use href="#ill-bed"/></svg>
           <div class="ex-head"><b>例　助動詞 should</b><span class="tag">19日目</span></div>
           <p class="rule"><span class="say">主語 ＋ should ＋ 動詞の原形</span>（〜したほうがいい）</p>
           <p class="main"><span class="pat">I should</span><small>早く寝たほうがいい</small></p>
@@ -457,13 +485,16 @@
           </dl>
         </div>
         <div class="ex alt">
-          <div class="ex-head"><b>文法がまだハードな人は</b><span class="tag">日常会話のかたまり</span></div>
-          <p class="rule">そのまま使えるかたまりで量産してもOK（〜するつもり）。以前の動画で紹介した「作文マシン」も参考に。</p>
-          <p class="main"><span class="pat">I'm going to</span><small>今週末、映画を見るつもり</small></p>
-          <p class="say" style="font-size:12px;margin-top:1px">I'm going to see a movie this weekend.</p>
+          <svg class="ill"><use href="#ill-popcorn"/></svg>
+          <div class="ex-head"><svg class="star"><use href="#star"/></svg><b>文法がまだハードな人は</b><span class="tag">補足</span></div>
+          <p class="rule">日常英会話のかたまりで量産してもOK。</p>
+          <p class="main"><span class="pat">I'm going to</span><small>〜するつもり</small></p>
+          <p class="say" style="font-size:11px;margin-top:1px">I'm going to see a movie this weekend.</p>
           <dl>
             <dt>1分で量産</dt>
-            <dd><span class="say">I'm going to cook dinner.</span><span class="say">I'm going to go shopping tomorrow.</span></dd>
+            <dd><span class="say">I'm going to cook dinner.</span><span class="say">I'm going to go shopping.</span></dd>
+            <dt>参考に</dt>
+            <dd>以前の動画で紹介した「作文マシン」</dd>
           </dl>
         </div>
       </div>
@@ -489,7 +520,7 @@
           <span class="num">02</span>
           <div>
             <h2>中学文法 30日の単元リスト</h2>
-            <p>1日1単元が目安。最初の1週間は、英語の「文の骨組み（語順）」からはじめます。<span style="color:var(--accent-text);font-weight:700">オレンジの単元</span>は、1ページ目の例で使った単元です。</p>
+            <p>1日1単元が目安。最初の1週間は「文の骨組み（語順）」から。<span style="color:var(--accent-text);font-weight:700">オレンジ</span>は1ページ目の例で使った単元です。</p>
           </div>
         </div>
       </div>
@@ -577,7 +608,7 @@
       </div>
       <div class="model-body">
         <div class="model-ex">
-          <span class="label" style="color:#B23A5B">Example</span>
+          <div class="mx-head"><span class="label" style="color:#B23A5B">Example</span><svg class="ill"><use href="#ill-headphones"/></svg></div>
           <p class="say big">I don't know <span class="hl-m">how to</span> <span class="hl-m">say this</span> in English.</p>
           <p class="ja">これを英語でどう言えばいいかわからない。</p>
           <ul class="tips">
@@ -597,7 +628,7 @@
 
     <div class="bottom">
       <div class="mini rest">
-        <span class="num">休</span>
+        <svg class="mini-ill"><use href="#ill-coffee"/></svg>
         <div>
           <h3>休憩 <span class="timer"><svg><use href="#timer"/></svg>5:00</span></h3>
           <p>立つ、水を飲む、目を休める。休憩中はスマホを見ないのがコツです。</p>
