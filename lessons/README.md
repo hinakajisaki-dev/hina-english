@@ -26,7 +26,7 @@ AI は、日記 1 つにつき 1 回だけ添削します。Anthropic に前払�
 
 ## 公開する手順（最初の 1 回だけ）
 
-Cloudflare は、GitHub の `main` ブランチに入ったものを公開します。先にこの変更を `main` にマージしてください。
+Cloudflare は、GitHub のデフォルトブランチ（いまは `claude/english-phrases-matome-pdf-7pe8cd`）に入ったものを公開します。先にこの変更をそのブランチにマージしてください。
 
 ### 1. Anthropic の API キーを作る
 
@@ -45,6 +45,7 @@ Cloudflare は、GitHub の `main` ブランチに入ったものを公開しま
    - ルートディレクトリ（Root directory / Path）：`lessons`
    - ビルドコマンド：空のまま
    - デプロイコマンド：`npx wrangler deploy`（最初から入っています）
+   - 本番ブランチ（Production branch）：`claude/english-phrases-matome-pdf-7pe8cd`
 5. 「Save and Deploy」。初回のデプロイで、データベース（D1 の `hina-lessons`）も自動で作られます
 
 ### 3. パスワードと API キーを入れる
