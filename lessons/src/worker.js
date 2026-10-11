@@ -4,6 +4,7 @@
 // Students sign in with a personal code (kept in an HttpOnly cookie).
 // The teacher signs in with TEACHER_PASSWORD; the cookie holds an HMAC of it.
 import { AiError, correctJournal } from "./ai.js";
+import { SpeechError, speechFor } from "./speech.js";
 import {
   all, ensureSchema, first, itemRow, journalRow, now, run, studentBundle,
 } from "./db.js";
@@ -61,6 +62,7 @@ async function route(request, env, url) {
     const student = await requireStudent(request, env);
     if (path === "/api/me" && method === "GET") return studentHome(env, student);
     if (path === "/api/progress" && method === "POST") return saveProgress(request, env, student);
+    if (path === "/api/speech" && method === "GET") return speech(env, student, url.searchParams.get("text"));
     if (path === "/api/journals" && method === "POST") return newJournal(request, env, student);
     if (parts[0] === "journals" && parts[2] === "correct" && parts.length === 3 && method === "POST") {
       return retryCorrection(env, student, id(1));
@@ -185,6 +187,33 @@ async function newJournal(request, env, student) {
     return json({ journal: journalRow(await first(env.DB, `SELECT * FROM journals WHERE id = ?`, meta.last_row_id)) });
   }
   return correctOnce(env, student, meta.last_row_id);
+}
+
+// Audio is only made for text in the student's own content, so the endpoint
+// can't be used to voice anything else.
+const SPOKEN_FIELDS = { vocab: ["word", "example"], phrase: ["phrase"], pron: ["text"] };
+
+async function speech(env, student, text) {
+  const rows = await all(
+    env.DB,
+    `SELECT kind, data FROM items WHERE student_id = ? AND kind IN ('vocab', 'phrase', 'pron')`,
+    student.id,
+  );
+  const allowed = rows.some((row) => {
+    const data = JSON.parse(row.data);
+    return SPOKEN_FIELDS[row.kind].some((field) => data[field] === text);
+  });
+  if (!text || !allowed) throw new HttpError(404, "見つかりません。");
+  try {
+    const audio = await speechFor(env, text);
+    return new Response(audio, {
+      headers: { "Content-Type": "audio/mpeg", "Cache-Control": "private, max-age=86400" },
+    });
+  } catch (error) {
+    if (!(error instanceof SpeechError)) throw error;
+    // The page falls back to the phone's own voice.
+    throw new HttpError(503, "音声を作れませんでした。");
+  }
 }
 
 // Only an entry with no correction yet (its first try failed) can be sent again.

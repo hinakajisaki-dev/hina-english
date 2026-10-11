@@ -2,7 +2,7 @@
 // pronunciation, grammar and the journal with AI correction.
 import {
   ApiError, api, canListen, compareSpeech, diffHtml, esc, formatDate, icons, japanDayNumber, listen,
-  normalizeWords, speak, startOfJapanDay, toast,
+  normalizeWords, speak, startOfJapanDay, stopSpeaking, toast,
 } from "./common.js";
 
 const app = document.getElementById("app");
@@ -39,9 +39,12 @@ window.addEventListener("hashchange", () => {
 });
 
 // Any element with data-say reads its text aloud.
-document.addEventListener("click", (event) => {
+document.addEventListener("click", async (event) => {
   const button = event.target.closest("[data-say]");
-  if (button) speak(button.dataset.say, Number(button.dataset.rate) || 0.95);
+  if (!button) return;
+  button.classList.add("loading");
+  await speak(button.dataset.say, { slow: "slow" in button.dataset, device: "device" in button.dataset });
+  button.classList.remove("loading");
 });
 
 (async () => {
@@ -60,8 +63,9 @@ function topbar(title) {
   </div></header>`;
 }
 
-function sayButton(text, label = "聞く", rate) {
-  return `<button type="button" class="speak" data-say="${esc(text)}" ${rate ? `data-rate="${rate}"` : ""}>${icons.speaker}${esc(label)}</button>`;
+function sayButton(text, label = "聞く", { slow = false, device = false } = {}) {
+  const flags = `${slow ? " data-slow" : ""}${device ? " data-device" : ""}`;
+  return `<button type="button" class="speak" data-say="${esc(text)}"${flags}>${icons.speaker}${esc(label)}</button>`;
 }
 
 function emptyState(message) {
@@ -300,7 +304,7 @@ function renderPhrases() {
       </div>
       <p><b>${esc(p.data.meaning)}</b></p>
       ${p.data.note ? `<p class="note">${esc(p.data.note)}</p>` : ""}
-      <div class="btn-row" style="flex-wrap:nowrap">${sayButton(p.data.phrase)} ${sayButton(p.data.phrase, "ゆっくり", 0.65)}</div>
+      <div class="btn-row" style="flex-wrap:nowrap">${sayButton(p.data.phrase)} ${sayButton(p.data.phrase, "ゆっくり", { slow: true })}</div>
     </article>`;
   app.innerHTML = `${topbar("フレーズ")}
     <main class="wrap stack">
@@ -330,7 +334,7 @@ function renderPron() {
       <section class="card stack">
         <p class="sentence" lang="en">${esc(item.data.text)}</p>
         ${item.data.tip ? `<p class="muted">💡 ${esc(item.data.tip)}</p>` : ""}
-        <div class="btn-row" style="flex-wrap:nowrap">${sayButton(item.data.text, "お手本")} ${sayButton(item.data.text, "ゆっくり", 0.65)}</div>
+        <div class="btn-row" style="flex-wrap:nowrap">${sayButton(item.data.text, "お手本")} ${sayButton(item.data.text, "ゆっくり", { slow: true })}</div>
       </section>
       ${canListen
         ? `<section class="stack" style="text-align:center">
@@ -354,7 +358,7 @@ function renderPron() {
     if (mic.classList.contains("listening")) return;
     const label = document.getElementById("mic-label");
     const result = document.getElementById("pron-result");
-    window.speechSynthesis?.cancel();
+    stopSpeaking();
     mic.classList.add("listening");
     label.textContent = "聞いています… 読み終わったら少し待ってね";
     try {
@@ -609,7 +613,7 @@ function renderJournalEntry(id) {
           ${j.topic ? `<p class="muted small">テーマ：${esc(j.topic)}</p>` : ""}
           <h3>添削した日記</h3>
           <p class="journal-text diff" lang="en">${diffHtml(j.body, c.corrected)}</p>
-          <div>${sayButton(c.corrected, "読み上げる")}</div>
+          <div>${sayButton(c.corrected, "読み上げる", { device: true })}</div>
         </section>
         ${c.corrections.length ? `
           <section class="card stack">

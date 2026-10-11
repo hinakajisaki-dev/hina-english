@@ -111,6 +111,7 @@ button, input, textarea, select { font: inherit; color: inherit; }
   cursor: pointer; font-weight: 700; font-size: 14px;
 }
 .speak svg { width: 18px; height: 18px; }
+.speak.loading { opacity: .6; cursor: progress; }
 
 input[type="text"], input[type="password"], textarea, select {
   width: 100%; border: 2px solid var(--line); border-radius: 14px; background: var(--card);

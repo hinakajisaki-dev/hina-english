@@ -79,7 +79,33 @@ function pickVoice() {
 }
 if ("speechSynthesis" in window) speechSynthesis.addEventListener?.("voiceschanged", () => (englishVoice = undefined));
 
-export function speak(text, rate = 0.95) {
+// Natural audio made by the server for the student's own words and
+// sentences; the phone's built-in voice is the fallback.
+const player = typeof Audio === "function" ? new Audio() : null;
+
+// Reads text aloud. `slow` plays it more slowly; `device` skips the server
+// audio (for text that has none, like a corrected journal). Resolves once
+// playback has started, or the fallback has.
+export function speak(text, { slow = false, device = false } = {}) {
+  stopSpeaking();
+  if (device || !player) {
+    speakWithDevice(text, slow);
+    return Promise.resolve();
+  }
+  player.src = `/api/speech?text=${encodeURIComponent(text)}`;
+  player.defaultPlaybackRate = player.playbackRate = slow ? 0.75 : 1;
+  return player.play().catch((error) => {
+    // AbortError means another button was tapped before this one started.
+    if (error?.name !== "AbortError") speakWithDevice(text, slow);
+  });
+}
+
+export function stopSpeaking() {
+  player?.pause();
+  window.speechSynthesis?.cancel();
+}
+
+function speakWithDevice(text, slow) {
   if (!("speechSynthesis" in window)) {
     toast("このブラウザでは音声が出せません。");
     return;
@@ -87,7 +113,7 @@ export function speak(text, rate = 0.95) {
   speechSynthesis.cancel();
   const utterance = new SpeechSynthesisUtterance(text);
   utterance.lang = "en-US";
-  utterance.rate = rate;
+  utterance.rate = slow ? 0.65 : 0.95;
   const voice = pickVoice();
   if (voice) utterance.voice = voice;
   speechSynthesis.speak(utterance);

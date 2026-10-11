@@ -12,8 +12,17 @@
   "d1_databases": [
     { "binding": "DB", "database_name": "hina-lessons" }
   ],
+  // Text-to-speech for words and sentences (Workers AI), and a place to keep
+  // the audio so each text is only made once. The KV namespace is created
+  // on the first deploy, like the database.
+  "ai": { "binding": "AI" },
+  "kv_namespaces": [
+    { "binding": "AUDIO" }
+  ],
   "vars": {
-    "AI_MODEL": "claude-opus-5-5"
+    "AI_MODEL": "claude-opus-5-5",
+    // Voice for the audio (one of Deepgram Aura 2's English voices).
+    "VOICE": "thalia"
   },
   // Keeps Workers Logs on, so errors (like a rejected AI request) show in the dashboard.
   "observability": {
