@@ -270,8 +270,6 @@ function renderJournals(panel) {
               <p class="change" lang="en"><del>${esc(fix.before)}</del><span class="arrow">→</span><ins>${esc(fix.after)}</ins></p>
               <p>${esc(fix.why)}</p>
             </div>`).join("")}</div>` : ""}
-          ${c.good ? `<div class="feedback good"><h3>よかったところ</h3><p>${esc(c.good)}</p></div>` : ""}
-          ${c.tip ? `<div class="feedback tip"><h3>次はこれをためそう</h3><p>${esc(c.tip)}</p></div>` : ""}
         ` : ""}
         <form class="comment stack">
           <label class="field"><span>先生からのコメント（生徒に表示されます）</span>

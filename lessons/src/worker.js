@@ -5,7 +5,7 @@
 // The teacher signs in with TEACHER_PASSWORD; the cookie holds an HMAC of it.
 import { AiError, correctJournal } from "./ai.js";
 import {
-  all, ensureSchema, first, itemRow, journalRow, now, run, startOfJapanDay, studentBundle,
+  all, ensureSchema, first, itemRow, journalRow, now, run, studentBundle,
 } from "./db.js";
 
 const STUDENT_COOKIE = "hl_student";
@@ -140,11 +140,7 @@ async function requireStudent(request, env) {
 
 async function studentHome(env, student) {
   const bundle = await studentBundle(env.DB, student.id);
-  return json({
-    student: { name: student.name },
-    ...bundle,
-    ai: await aiAllowance(env, student.id),
-  });
+  return json({ student: { name: student.name }, ...bundle });
 }
 
 async function saveProgress(request, env, student) {
@@ -184,49 +180,35 @@ async function newJournal(request, env, student) {
     `INSERT INTO journals (student_id, topic, body, created_at) VALUES (?, ?, ?, ?)`,
     student.id, topic, body, now(),
   );
-  return correctAndRespond(env, student, meta.last_row_id);
+  return correctOnce(env, student, meta.last_row_id);
 }
 
+// Only an entry with no correction yet (its first try failed) can be sent again.
 async function retryCorrection(env, student, journalId) {
   const row = await first(env.DB, `SELECT * FROM journals WHERE id = ? AND student_id = ?`, journalId, student.id);
   if (!row) throw new HttpError(404, "見つかりません。");
-  if (row.correction) return json({ journal: journalRow(row), ai: await aiAllowance(env, student.id) });
-  return correctAndRespond(env, student, journalId);
+  if (row.correction) return json({ journal: journalRow(row) });
+  return correctOnce(env, student, journalId);
 }
 
-// The entry is already saved; correction failures come back as ai_error so the
-// student keeps their text and can try again.
-async function correctAndRespond(env, student, journalId) {
-  const allowance = await aiAllowance(env, student.id);
+// Each entry is corrected once. It is saved before the AI runs, so if the AI
+// fails the student keeps their text and the message comes back as ai_error.
+async function correctOnce(env, student, journalId) {
+  const entry = await first(env.DB, `SELECT * FROM journals WHERE id = ?`, journalId);
   let aiError = null;
-  if (allowance.left <= 0) {
-    aiError = `今日の添削は ${allowance.limit} 回までです。日記は保存したので、先生が読めます。`;
-  } else {
-    const row = await first(env.DB, `SELECT * FROM journals WHERE id = ?`, journalId);
-    try {
-      const correction = await correctJournal(env, { body: row.body, topic: row.topic, note: student.note });
-      await run(
-        env.DB,
-        `UPDATE journals SET correction = ?, corrected_at = ? WHERE id = ?`,
-        JSON.stringify(correction), now(), journalId,
-      );
-    } catch (error) {
-      if (!(error instanceof AiError)) throw error;
-      aiError = error.message;
-    }
+  try {
+    const correction = await correctJournal(env, { body: entry.body, topic: entry.topic, note: student.note });
+    await run(
+      env.DB,
+      `UPDATE journals SET correction = ?, corrected_at = ? WHERE id = ? AND correction IS NULL`,
+      JSON.stringify(correction), now(), journalId,
+    );
+  } catch (error) {
+    if (!(error instanceof AiError)) throw error;
+    aiError = error.message;
   }
   const row = await first(env.DB, `SELECT * FROM journals WHERE id = ?`, journalId);
-  return json({ journal: journalRow(row), ai: await aiAllowance(env, student.id), ai_error: aiError });
-}
-
-async function aiAllowance(env, studentId) {
-  const limit = Number(env.DAILY_AI_LIMIT) || 3;
-  const row = await first(
-    env.DB,
-    `SELECT COUNT(*) AS n FROM journals WHERE student_id = ? AND corrected_at >= ?`,
-    studentId, startOfJapanDay(),
-  );
-  return { limit, left: Math.max(0, limit - row.n) };
+  return json({ journal: journalRow(row), ai_error: aiError });
 }
 
 // ---------- teacher handlers ----------

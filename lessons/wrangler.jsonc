@@ -12,9 +12,7 @@
     { "binding": "DB", "database_name": "hina-lessons" }
   ],
   "vars": {
-    "AI_MODEL": "claude-opus-5-5",
-    // Corrections per student per day; caps the AI bill.
-    "DAILY_AI_LIMIT": "3"
+    "AI_MODEL": "claude-opus-5-5"
   }
   // ANTHROPIC_API_KEY and TEACHER_PASSWORD are secrets set in the dashboard (see README.md).
 }

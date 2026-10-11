@@ -510,7 +510,6 @@ function renderJournal(id) {
   const todayTopic = topics.length ? topics[japanDayNumber() % topics.length] : null;
   const draft = readDraft();
   const chosen = draft.topic ?? todayTopic?.data.prompt ?? "";
-  const { left, limit } = state.me.ai;
 
   app.innerHTML = `${topbar("日記")}
     <main class="wrap stack">
@@ -528,11 +527,9 @@ function renderJournal(id) {
           <textarea name="body" lang="en" rows="9" spellcheck="false" placeholder="Today I ...">${esc(draft.body || "")}</textarea>
         </label>
         <p class="wordcount" id="wordcount" aria-live="polite">${countWords(draft.body || "")} words</p>
-        <p class="notice ${left ? "" : "bad"}">${left
-          ? `今日の AI 添削は、あと <b>${left}</b> 回（1日 ${limit} 回まで）`
-          : `今日の AI 添削は終わりです。送ると日記は保存され、先生が読めます。`}</p>
+        <p class="muted small">送ると、AI が 1 回添削します。書き終わってから送ってね。</p>
         <p class="notice bad" id="journal-error" role="alert" hidden></p>
-        <button class="btn block" type="submit">${left ? "AI に添削してもらう" : "日記を保存する"}</button>
+        <button class="btn block" type="submit">送って添削してもらう</button>
       </form>
       ${historyHtml()}
     </main>`;
@@ -555,9 +552,7 @@ function renderJournal(id) {
     }
     const button = form.querySelector('button[type="submit"]');
     button.disabled = true;
-    button.innerHTML = left
-      ? `<span class="spinner" aria-hidden="true"></span>添削中…（30秒〜1分ほど）`
-      : `<span class="spinner" aria-hidden="true"></span>保存中…`;
+    button.innerHTML = `<span class="spinner" aria-hidden="true"></span>添削中…（30秒〜1分ほど）`;
     error.hidden = true;
     try {
       const result = await api("/api/journals", {
@@ -566,14 +561,13 @@ function renderJournal(id) {
       });
       clearDraft();
       state.me.journals.unshift(result.journal);
-      state.me.ai = result.ai;
       if (result.ai_error) state.aiError[result.journal.id] = result.ai_error;
       location.hash = `#/journal/${result.journal.id}`;
     } catch (err) {
       error.textContent = err.message;
       error.hidden = false;
       button.disabled = false;
-      button.textContent = left ? "AI に添削してもらう" : "日記を保存する";
+      button.textContent = "送って添削してもらう";
     }
   });
 }
@@ -603,7 +597,6 @@ function renderJournalEntry(id) {
     return;
   }
   const c = j.correction;
-  const { left } = state.me.ai;
   const aiError = state.aiError[j.id];
 
   app.innerHTML = `${topbar(formatDate(j.created_at))}
@@ -625,16 +618,14 @@ function renderJournalEntry(id) {
                 <p>${esc(fix.why)}</p>
               </div>`).join("")}
           </section>` : `<p class="notice good">まちがいはありませんでした！すばらしい！</p>`}
-        ${c.good ? `<section class="feedback good"><h3>よかったところ</h3><p>${esc(c.good)}</p></section>` : ""}
-        ${c.tip ? `<section class="feedback tip"><h3>次はこれをためそう</h3><p>${esc(c.tip)}</p></section>` : ""}
         <details class="card"><summary>はじめに書いた文を見る</summary><p class="journal-text" lang="en" style="margin-top:10px">${esc(j.body)}</p></details>
       ` : `
-        ${aiError ? `<p class="notice bad">${esc(aiError)}</p>` : `<p class="notice">この日記は、まだ AI の添削がありません。</p>`}
+        <p class="notice bad">${esc(aiError || "この日記は、まだ添削できていません。")}</p>
         <section class="card stack">
           ${j.topic ? `<p class="muted small">テーマ：${esc(j.topic)}</p>` : ""}
           <p class="journal-text" lang="en">${esc(j.body)}</p>
         </section>
-        ${left ? `<button class="btn block" id="retry">AI に添削してもらう（あと ${left} 回）</button>` : ""}
+        <button class="btn block" id="retry">もう一度ためす</button>
       `}
       <a class="btn secondary block" href="#/journal">日記のページにもどる</a>
     </main>`;
@@ -646,7 +637,6 @@ function renderJournalEntry(id) {
     try {
       const result = await api(`/api/journals/${j.id}/correct`, { method: "POST", body: {} });
       Object.assign(j, result.journal);
-      state.me.ai = result.ai;
       state.aiError[j.id] = result.ai_error;
     } catch (error) {
       state.aiError[j.id] = error.message;

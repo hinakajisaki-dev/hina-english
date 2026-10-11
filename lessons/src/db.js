@@ -53,13 +53,6 @@ export async function ensureSchema(db) {
 
 export const now = () => new Date().toISOString();
 
-// Start of today in Japan time, as a UTC ISO string, for "per day" limits.
-export function startOfJapanDay(date = new Date()) {
-  const jst = new Date(date.getTime() + 9 * 3600e3);
-  const midnight = Date.UTC(jst.getUTCFullYear(), jst.getUTCMonth(), jst.getUTCDate());
-  return new Date(midnight - 9 * 3600e3).toISOString();
-}
-
 export async function all(db, sql, ...params) {
   const { results } = await db.prepare(sql).bind(...params).all();
   return results;
