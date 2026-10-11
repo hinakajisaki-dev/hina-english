@@ -1,0 +1,154 @@
+/* Shared look for the student app and the teacher page: the Hina English
+   palette (light-blue ground, warm-white cards, orange accent). */
+:root {
+  --bg: #EAF2FB;
+  --paper: #FFFCF8;
+  --card: #FFFFFF;
+  --ink: #1A2238;
+  --ink-2: #4B5569;
+  --muted: #5E6780;
+  --line: #D6E2F0;
+  --line-warm: #EFE3DA;
+
+  --accent: #F0521E;
+  --accent-2: #D63E10;
+  --accent-text: #C23B12;
+  --accent-soft: #FFE6DC;
+  --on-accent: #FFFFFF;
+
+  --sky: #A9D3F3;
+  --sky-soft: #DCEEFB;
+  --yellow: #FFD966;
+  --cream: #FFF0C4;
+  --pink: #FFD3DD;
+
+  --good: #1D7A45;
+  --good-soft: #DDF3E4;
+  --bad: #B8332B;
+  --bad-soft: #FDE2E0;
+
+  --en: "DM Sans", "Helvetica Neue", Arial, "Noto Sans JP", sans-serif;
+  --ja: "Noto Sans JP", "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif;
+
+  --radius: 18px;
+  --shadow: 0 8px 24px rgba(26, 34, 56, .07);
+  color-scheme: light;
+}
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--ja);
+  font-size: 16px;
+  line-height: 1.7;
+  word-break: auto-phrase;
+}
+h1, h2, h3, p { margin: 0; }
+button, input, textarea, select { font: inherit; color: inherit; }
+[lang="en"], .en { font-family: var(--en); }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; border-radius: 10px; }
+[hidden] { display: none !important; }
+
+.wrap { max-width: 640px; margin: 0 auto; padding: 0 16px 48px; }
+
+/* ---------- top bar ---------- */
+.topbar {
+  position: sticky; top: 0; z-index: 5;
+  background: color-mix(in srgb, var(--bg) 92%, transparent);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+.topbar-in {
+  max-width: 640px; margin: 0 auto; padding: 10px 16px;
+  display: flex; align-items: center; gap: 10px; min-height: 60px;
+}
+.topbar h1 { font-size: 18px; font-weight: 900; flex: 1; min-width: 0; }
+.brand { display: flex; align-items: center; gap: 8px; font-family: var(--en); font-weight: 800; font-size: 17px; flex: 1; }
+.brand-mark {
+  width: 30px; height: 30px; border-radius: 9px; background: var(--accent); color: var(--on-accent);
+  display: grid; place-items: center; font-size: 20px; line-height: 1;
+}
+.icon-btn {
+  width: 42px; height: 42px; border-radius: 50%; border: 0; background: var(--card);
+  display: grid; place-items: center; cursor: pointer; box-shadow: var(--shadow); flex: none;
+  font-size: 18px; color: var(--ink);
+}
+.icon-btn svg { width: 20px; height: 20px; }
+
+/* ---------- cards and buttons ---------- */
+.card {
+  background: var(--card); border-radius: var(--radius); padding: 20px;
+  box-shadow: var(--shadow); border: 1px solid var(--line);
+}
+.stack > * + * { margin-top: 14px; }
+.label { font-family: var(--en); font-weight: 700; font-size: 12px; letter-spacing: .16em; text-transform: uppercase; color: var(--accent-text); }
+.muted { color: var(--muted); font-size: 14px; }
+.small { font-size: 13px; }
+
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  min-height: 48px; padding: 10px 20px; border-radius: 999px; border: 2px solid transparent;
+  background: var(--accent); color: var(--on-accent); font-weight: 700; cursor: pointer;
+  text-decoration: none; font-size: 16px; line-height: 1.3; text-align: center;
+}
+.btn:hover { background: var(--accent-2); }
+.btn:disabled { opacity: .55; cursor: default; }
+.btn.secondary { background: var(--card); color: var(--ink); border-color: var(--line); }
+.btn.secondary:hover { border-color: var(--sky); background: var(--card); }
+.btn.ghost { background: transparent; color: var(--accent-text); border-color: transparent; padding-inline: 10px; }
+.btn.small-btn { min-height: 38px; padding: 6px 14px; font-size: 14px; }
+.btn.block { width: 100%; }
+.btn-row { display: flex; gap: 10px; flex-wrap: wrap; }
+.btn-row > .btn { flex: 1 1 0; min-width: 0; }
+
+.speak {
+  border: 0; background: var(--sky-soft); color: var(--ink); border-radius: 999px;
+  min-height: 40px; padding: 6px 14px; display: inline-flex; align-items: center; gap: 6px;
+  cursor: pointer; font-weight: 700; font-size: 14px;
+}
+.speak svg { width: 18px; height: 18px; }
+
+input[type="text"], input[type="password"], textarea, select {
+  width: 100%; border: 2px solid var(--line); border-radius: 14px; background: var(--card);
+  padding: 12px 14px; font-size: 16px; line-height: 1.6;
+}
+input:focus, textarea:focus, select:focus { border-color: var(--sky); outline: none; }
+textarea { resize: vertical; min-height: 120px; }
+label.field { display: block; font-weight: 700; font-size: 14px; }
+label.field > span { display: block; margin-bottom: 6px; }
+
+.notice { border-radius: 14px; padding: 12px 14px; background: var(--cream); font-size: 14px; }
+.notice.bad { background: var(--bad-soft); color: var(--bad); }
+.notice.good { background: var(--good-soft); color: var(--good); }
+.empty { text-align: center; padding: 32px 16px; color: var(--muted); }
+
+.spinner {
+  width: 18px; height: 18px; border-radius: 50%; border: 3px solid currentColor; border-right-color: transparent;
+  animation: spin .8s linear infinite; flex: none;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .spinner { animation-duration: 2.4s; } }
+
+.toast {
+  position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); z-index: 20;
+  background: var(--ink); color: #fff; padding: 10px 18px; border-radius: 999px; font-size: 14px;
+  max-width: calc(100% - 32px); box-shadow: var(--shadow);
+}
+
+/* ---------- login ---------- */
+.login { min-height: 100vh; display: grid; place-items: center; padding: 24px 16px; }
+.login .card { width: 100%; max-width: 400px; text-align: center; }
+.login img { width: 120px; margin: 0 auto 8px; display: block; }
+.login h1 { font-size: 22px; font-weight: 900; margin-bottom: 4px; }
+.login form { margin-top: 18px; text-align: left; }
+.code-input { text-align: center; font-family: var(--en); font-size: 22px !important; letter-spacing: .12em; text-transform: uppercase; }
+
+/* ---------- word-level diff and pronunciation marks ---------- */
+ins { background: var(--good-soft); color: var(--good); text-decoration: none; border-radius: 4px; padding: 0 2px; font-weight: 700; }
+del { color: var(--bad); text-decoration: line-through; text-decoration-thickness: 2px; opacity: .8; }
+.w-ok { color: var(--good); font-weight: 700; }
+.w-miss { color: var(--bad); text-decoration: underline wavy; text-decoration-thickness: 1.5px; text-underline-offset: 4px; }

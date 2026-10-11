@@ -1,0 +1,64 @@
+/* Teacher page: a wider layout for managing students and their content. */
+
+.teacher .wrap, .teacher .topbar-in { max-width: 920px; }
+
+.student-list { display: grid; gap: 12px; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); }
+.student-card {
+  display: flex; flex-direction: column; gap: 4px; text-decoration: none; color: var(--ink);
+  background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px 18px;
+  box-shadow: var(--shadow);
+}
+.student-card:hover { border-color: var(--sky); }
+.student-card b { font-size: 18px; }
+.code {
+  font-family: var(--en); font-weight: 800; letter-spacing: .08em; background: var(--sky-soft);
+  border-radius: 8px; padding: 2px 8px; display: inline-block; font-size: 15px;
+}
+.unread { background: var(--accent); color: #fff; border-radius: 99px; padding: 0 9px; font-size: 13px; font-weight: 700; }
+
+.inline-form { display: flex; gap: 10px; flex-wrap: wrap; }
+.inline-form input { flex: 1 1 200px; min-width: 0; }
+.inline-form .btn { flex: none; }
+
+.head-row { display: flex; gap: 12px; align-items: center; justify-content: space-between; flex-wrap: wrap; }
+.head-row h2 { font-size: 24px; font-weight: 900; }
+
+.stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.stat { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 10px 14px; }
+.stat b { display: block; font-family: var(--en); font-size: 22px; line-height: 1.3; }
+.stat span { font-size: 13px; color: var(--muted); }
+
+.tabs { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: thin; }
+.tabs a {
+  flex: none; text-decoration: none; color: var(--ink-2); font-weight: 700; font-size: 14px;
+  padding: 8px 14px; border-radius: 999px; background: var(--card); border: 1px solid var(--line);
+}
+.tabs a[aria-current="page"] { background: var(--ink); color: #fff; border-color: var(--ink); }
+
+.format { font-size: 13px; background: var(--paper); border: 1px dashed var(--line-warm); border-radius: 12px; padding: 10px 12px; }
+.format code { font-family: var(--en); font-weight: 700; }
+textarea.bulk { font-family: var(--en); min-height: 140px; }
+
+.rows { list-style: none; margin: 0; padding: 0; }
+.rows > li { display: flex; gap: 10px; align-items: flex-start; padding: 12px 0; border-top: 1px solid var(--line); }
+.rows > li:first-child { border-top: 0; }
+.rows .main { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.rows .en-main { font-family: var(--en); font-weight: 700; }
+.rows .sub { font-size: 14px; color: var(--ink-2); }
+.rows .tools { display: flex; gap: 4px; flex: none; }
+.rows .edit-line { width: 100%; font-family: var(--en); }
+.pill { font-size: 12px; font-weight: 700; padding: 1px 8px; border-radius: 99px; background: var(--sky-soft); white-space: nowrap; }
+.pill.good { background: var(--good-soft); color: var(--good); }
+
+.journal-entry { padding: 0; overflow: hidden; }
+.journal-entry > summary {
+  list-style: none; cursor: pointer; padding: 14px 18px; display: flex; flex-direction: column; gap: 2px;
+}
+.journal-entry > summary::-webkit-details-marker { display: none; }
+.journal-entry[open] > summary { border-bottom: 1px solid var(--line); }
+.journal-entry .first-line { font-family: var(--en); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.journal-body { padding: 16px 18px 18px; }
+
+.danger { border-color: var(--bad-soft); }
+.btn.bad { background: var(--bad); }
+.btn.bad:hover { background: #962821; }

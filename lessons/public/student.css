@@ -1,0 +1,120 @@
+/* Student app screens. */
+
+.hello { padding: 8px 2px 4px; }
+.hello h2 { font-size: 22px; font-weight: 900; }
+
+/* today's phrase on the home screen */
+.today {
+  background: var(--accent-soft); border-color: var(--line-warm);
+  display: flex; flex-direction: column; gap: 8px;
+}
+.today .phrase { font-family: var(--en); font-weight: 800; font-size: 24px; line-height: 1.35; }
+.today .meaning { font-weight: 700; }
+
+.tiles { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.tile {
+  display: flex; flex-direction: column; gap: 4px; padding: 16px; border-radius: var(--radius);
+  background: var(--card); border: 1px solid var(--line); box-shadow: var(--shadow);
+  text-decoration: none; color: var(--ink); min-height: 112px;
+}
+.tile:hover { border-color: var(--sky); }
+.tile .emoji { font-size: 26px; line-height: 1.2; }
+.tile b { font-size: 17px; }
+.tile .muted { font-size: 13px; line-height: 1.5; }
+.tile.wide { grid-column: 1 / -1; flex-direction: row; align-items: center; gap: 14px; min-height: 0; }
+.tile.wide > div { flex: 1; min-width: 0; }
+.tile.done { background: var(--good-soft); border-color: transparent; }
+
+.bar { height: 8px; border-radius: 99px; background: var(--sky-soft); overflow: hidden; margin-top: 6px; }
+.bar > i { display: block; height: 100%; background: var(--accent); border-radius: 99px; }
+
+.footer-links { text-align: center; margin-top: 28px; }
+
+/* segmented filter */
+.segment { display: flex; background: var(--card); border: 1px solid var(--line); border-radius: 999px; padding: 4px; }
+.segment button {
+  flex: 1; border: 0; background: transparent; border-radius: 999px; min-height: 38px; font-weight: 700;
+  font-size: 14px; cursor: pointer; color: var(--ink-2);
+}
+.segment button[aria-pressed="true"] { background: var(--ink); color: #fff; }
+
+/* flashcards */
+.counter { text-align: center; font-family: var(--en); font-weight: 700; color: var(--muted); font-size: 14px; }
+.flash {
+  width: 100%; min-height: 260px; border: 0; cursor: pointer; text-align: center;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px;
+  background: var(--card); border-radius: 24px; box-shadow: var(--shadow); padding: 28px 20px;
+  border: 1px solid var(--line);
+}
+.flash .word { font-family: var(--en); font-weight: 800; font-size: clamp(28px, 9vw, 40px); line-height: 1.2; overflow-wrap: anywhere; }
+.flash .meaning { font-size: 22px; font-weight: 900; }
+.flash .example { font-family: var(--en); color: var(--ink-2); font-size: 16px; }
+.flash .hint { color: var(--muted); font-size: 13px; }
+.flash.back { background: var(--paper); border-color: var(--line-warm); }
+.card-actions { display: flex; gap: 10px; }
+.card-actions .btn { flex: 1; }
+.speak-row { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; }
+
+/* phrase list */
+.phrase-card .phrase { font-family: var(--en); font-weight: 800; font-size: 20px; line-height: 1.4; }
+.phrase-card .note { font-size: 14px; color: var(--ink-2); }
+.phrase-card.is-today { border: 2px solid var(--accent); }
+.phrase-head { display: flex; gap: 10px; align-items: flex-start; justify-content: space-between; }
+
+/* pronunciation */
+.sentence { font-family: var(--en); font-weight: 700; font-size: clamp(22px, 6.5vw, 28px); line-height: 1.45; }
+.mic {
+  width: 96px; height: 96px; border-radius: 50%; border: 0; cursor: pointer; margin: 4px auto 0;
+  background: var(--accent); color: #fff; display: grid; place-items: center; box-shadow: 0 10px 24px rgba(240, 82, 30, .3);
+}
+.mic svg { width: 40px; height: 40px; }
+.mic.listening { background: var(--ink); animation: pulse 1.2s ease-in-out infinite; }
+@keyframes pulse { 50% { box-shadow: 0 0 0 14px rgba(26, 34, 56, .12); } }
+@media (prefers-reduced-motion: reduce) { .mic.listening { animation: none; } }
+.mic-label { text-align: center; font-weight: 700; font-size: 14px; color: var(--ink-2); }
+.score { font-family: var(--en); font-weight: 800; font-size: 40px; line-height: 1; }
+.score small { font-size: 16px; font-family: var(--ja); }
+.result-text { font-family: var(--en); font-size: 20px; line-height: 1.6; }
+.pager { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+
+/* grammar */
+.question { font-family: var(--en); font-weight: 700; font-size: 21px; line-height: 1.6; }
+.blank { display: inline-block; min-width: 64px; border-bottom: 3px solid var(--accent); margin: 0 4px; }
+.choices { display: grid; gap: 10px; }
+.choice {
+  min-height: 52px; border-radius: 14px; border: 2px solid var(--line); background: var(--card);
+  font-family: var(--en); font-weight: 700; font-size: 18px; cursor: pointer; padding: 8px 14px; text-align: left;
+}
+.choice:hover:not(:disabled) { border-color: var(--sky); }
+.choice.right { border-color: var(--good); background: var(--good-soft); color: var(--good); }
+.choice.wrong { border-color: var(--bad); background: var(--bad-soft); color: var(--bad); }
+.choice:disabled { cursor: default; }
+.verdict { font-size: 20px; font-weight: 900; }
+.verdict.right { color: var(--good); }
+.verdict.wrong { color: var(--bad); }
+
+/* journal */
+.topic-box { background: var(--cream); border-radius: 14px; padding: 12px 14px; }
+.topic-box .label { color: var(--ink-2); }
+.topic-box p { font-weight: 700; }
+.wordcount { text-align: right; font-family: var(--en); font-size: 13px; color: var(--muted); margin-top: 4px; }
+.journal-text { font-family: var(--en); font-size: 17px; line-height: 1.8; white-space: pre-wrap; overflow-wrap: anywhere; }
+.journal-text.diff { white-space: normal; }
+.fix { border-top: 1px solid var(--line); padding-top: 12px; }
+.fix:first-child { border-top: 0; padding-top: 0; }
+.fix .change { font-family: var(--en); font-size: 16px; display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 8px; }
+.fix .arrow { color: var(--muted); }
+.fix p { font-size: 15px; color: var(--ink-2); margin-top: 2px; }
+.feedback { border-radius: 14px; padding: 12px 14px; }
+.feedback.teacher { background: var(--accent-soft); }
+.feedback h3, .card h3 { font-size: 15px; font-weight: 900; margin-bottom: 2px; }
+
+.history { list-style: none; margin: 0; padding: 0; }
+.history li + li { border-top: 1px solid var(--line); }
+.history a { display: block; padding: 12px 2px; text-decoration: none; color: var(--ink); }
+.history .first-line { font-family: var(--en); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.badges { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 2px; align-items: center; }
+.badge { font-size: 12px; font-weight: 700; padding: 1px 8px; border-radius: 99px; background: var(--sky-soft); }
+.badge.teacher { background: var(--accent-soft); color: var(--accent-text); }
+.badge.waiting { background: var(--cream); }
+details.card summary { cursor: pointer; font-weight: 700; font-size: 15px; }

@@ -1,0 +1,18 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  // Must match the Worker's name in the Cloudflare dashboard.
+  "name": "hina-lessons",
+  "main": "src/worker.js",
+  "compatibility_date": "2026-09-15",
+  "assets": {
+    "directory": "public"
+  },
+  // No database_id: the first deploy creates the D1 database and links it.
+  "d1_databases": [
+    { "binding": "DB", "database_name": "hina-lessons" }
+  ],
+  "vars": {
+    "AI_MODEL": "claude-opus-5-5"
+  }
+  // ANTHROPIC_API_KEY and TEACHER_PASSWORD are secrets set in the dashboard (see README.md).
+}
