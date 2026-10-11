@@ -14,6 +14,10 @@
   ],
   "vars": {
     "AI_MODEL": "claude-opus-5-5"
+  },
+  // Keeps Workers Logs on, so errors (like a rejected AI request) show in the dashboard.
+  "observability": {
+    "logs": { "enabled": true }
   }
   // ANTHROPIC_API_KEY and TEACHER_PASSWORD are secrets set in the dashboard (see README.md).
 }
