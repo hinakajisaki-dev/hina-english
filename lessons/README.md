@@ -34,7 +34,7 @@ Cloudflare は、GitHub のデフォルトブランチ（いまは `claude/engli
 2. 「Workers & Pages」→「Create application」→「Import a repository」
 3. GitHub をつないで、`hinakajisaki-dev/hina-english` を選ぶ
 4. 設定をこうする
-   - プロジェクト名：`hina-lessons`（`wrangler.jsonc` の `name` と同じにする）
+   - プロジェクト名：`hina-coaching`（`wrangler.jsonc` の `name` と同じにする。変えるときは両方変える）
    - ルートディレクトリ（Root directory / Path）：`lessons`
    - ビルドコマンド：空のまま
    - デプロイコマンド：`npx wrangler deploy`（最初から入っています）
@@ -43,13 +43,13 @@ Cloudflare は、GitHub のデフォルトブランチ（いまは `claude/engli
 
 ### 2. 先生ページのパスワードを入れる
 
-1. できた Worker（`hina-lessons`）を開いて「Settings」→「Variables and Secrets」→「Add」
+1. できた Worker（`hina-coaching`）を開いて「Settings」→「Variables and Secrets」→「Add」
 2. 種類は「Secret」、名前は `TEACHER_PASSWORD`、値は先生ページのパスワード（長めに。生徒には教えない）
 3. 保存（Deploy）
 
 ### 3. 開いてみる
 
-`https://hina-lessons.（あなたのアカウント名）.workers.dev/teacher` を開いて、パスワードでログインします。URL は Worker のページに表示されています。
+`https://hina-coaching.（あなたのアカウント名）.workers.dev/teacher` を開いて、パスワードでログインします。URL は Worker のページに表示されています。
 
 Cloudflare の画面のボタン名は、変わることがあります。見つからないときは Claude に聞いてください。
 
@@ -87,7 +87,7 @@ API キーを入れると、そのあとに送られた日記から、AI が 1 �
 2. 「Billing」でクレジットを購入（まずは $10 ほどで十分です）
 3. 「Limits」で、月の使用上限を設定（例：$15）
 4. 「API Keys」→「Create Key」でキーを作り、コピーする（一度しか表示されません）
-5. Cloudflare の Worker（`hina-lessons`）で「Settings」→「Variables and Secrets」→「Add」。種類は「Secret」、名前は `ANTHROPIC_API_KEY`、値はコピーしたキー。保存（Deploy）
+5. Cloudflare の Worker（`hina-coaching`）で「Settings」→「Variables and Secrets」→「Add」。種類は「Secret」、名前は `ANTHROPIC_API_KEY`、値はコピーしたキー。保存（Deploy）
 
 やめたいときは、`ANTHROPIC_API_KEY` を削除すれば、また日記が先生にだけ届く形にもどります。
 
