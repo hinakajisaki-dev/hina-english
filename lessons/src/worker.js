@@ -82,7 +82,7 @@ async function route(request, env, url) {
   }
   if (parts[1] === "students" && parts.length === 3) {
     const student = await findStudent(db, id(2));
-    if (method === "GET") return json({ student, ...(await studentBundle(db, student.id)) });
+    if (method === "GET") return json({ student, ...(await studentBundle(db, student.id)), ai: aiEnabled(env) });
     if (method === "PATCH") return updateStudent(request, db, student);
     if (method === "DELETE") {
       await run(db, `DELETE FROM students WHERE id = ?`, student.id);
@@ -140,7 +140,7 @@ async function requireStudent(request, env) {
 
 async function studentHome(env, student) {
   const bundle = await studentBundle(env.DB, student.id);
-  return json({ student: { name: student.name }, ...bundle });
+  return json({ student: { name: student.name }, ...bundle, ai: aiEnabled(env) });
 }
 
 async function saveProgress(request, env, student) {
@@ -180,6 +180,10 @@ async function newJournal(request, env, student) {
     `INSERT INTO journals (student_id, topic, body, created_at) VALUES (?, ?, ?, ?)`,
     student.id, topic, body, now(),
   );
+  // Without an API key the journal simply goes to the teacher.
+  if (!aiEnabled(env)) {
+    return json({ journal: journalRow(await first(env.DB, `SELECT * FROM journals WHERE id = ?`, meta.last_row_id)) });
+  }
   return correctOnce(env, student, meta.last_row_id);
 }
 
@@ -210,6 +214,9 @@ async function correctOnce(env, student, journalId) {
   const row = await first(env.DB, `SELECT * FROM journals WHERE id = ?`, journalId);
   return json({ journal: journalRow(row), ai_error: aiError });
 }
+
+// AI correction is optional: it switches on once ANTHROPIC_API_KEY is set.
+const aiEnabled = (env) => !!env.ANTHROPIC_API_KEY;
 
 // ---------- teacher handlers ----------
 
