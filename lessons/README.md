@@ -8,7 +8,7 @@
 | 今日のフレーズ | 毎日 1 つ、ホームに表示。音声つき |
 | 発音 | お手本を聞いて、マイクに向かって読む。聞き取れなかった単語が赤くなり、点数が出る |
 | 文法 | 選択肢か、答えを入力する問題。解説つき |
-| 日記 | 英語で書いて送ると、AI が 1 回添削（直したところの説明は日本語）。先生のコメントも表示 |
+| 日記 | 英語で書いて送ると、先生に届く。AI 添削をオンにすると、送ったときに AI が 1 回添削（説明は日本語）。先生のコメントも表示 |
 
 先生ページでは、生徒の追加、教材の追加・編集、日記と AI 添削の確認、コメントの記入ができます。画面はスマホにもパソコンにも合わせてあります。
 
@@ -20,45 +20,36 @@
 | 項目 | 月額 |
 | --- | --- |
 | Cloudflare（アプリの置き場所とデータベース） | ¥0（無料プラン） |
-| AI 添削（Claude Opus 5.5） | 1 回 ¥7 くらい。生徒 6 人が毎日 1 つ書いて、月 ¥1,200 くらい |
+| AI 添削（使うときだけ。Claude Opus 5.5） | 1 回 ¥7 くらい。生徒 6 人が毎日 1 つ書いて、月 ¥1,200 くらい |
 
-AI は、日記 1 つにつき 1 回だけ添削します。Anthropic に前払いでチャージして使い、月の上限も決められるので、使いすぎの心配はありません。
+AI 添削は、あとからオンにできます（下の「AI 添削を使う」）。オンにするまでは ¥0 で、日記は先生にだけ届きます。
 
 ## 公開する手順（最初の 1 回だけ）
 
 Cloudflare は、GitHub のデフォルトブランチ（いまは `claude/english-phrases-matome-pdf-7pe8cd`）に入ったものを公開します。先にこの変更をそのブランチにマージしてください。
 
-### 1. Anthropic の API キーを作る
-
-1. [console.anthropic.com](https://console.anthropic.com) にログイン
-2. 「Billing」でクレジットを購入（まずは $10 ほどで十分です）
-3. 「Limits」で、月の使用上限を設定（例：$15）
-4. 「API Keys」→「Create Key」でキーを作り、コピーしておく（一度しか表示されません）
-
-### 2. Cloudflare でアプリを作る
+### 1. Cloudflare でアプリを作る
 
 1. [dash.cloudflare.com](https://dash.cloudflare.com) で無料アカウントを作る
 2. 「Workers & Pages」→「Create application」→「Import a repository」
 3. GitHub をつないで、`hinakajisaki-dev/hina-english` を選ぶ
 4. 設定をこうする
-   - プロジェクト名：`hina-lessons`（`wrangler.jsonc` の `name` と同じにする）
+   - プロジェクト名：`hina-coaching`（`wrangler.jsonc` の `name` と同じにする。変えるときは両方変える）
    - ルートディレクトリ（Root directory / Path）：`lessons`
    - ビルドコマンド：空のまま
    - デプロイコマンド：`npx wrangler deploy`（最初から入っています）
    - 本番ブランチ（Production branch）：`claude/english-phrases-matome-pdf-7pe8cd`
 5. 「Save and Deploy」。初回のデプロイで、データベース（D1 の `hina-lessons`）も自動で作られます
 
-### 3. パスワードと API キーを入れる
+### 2. 先生ページのパスワードを入れる
 
-1. できた Worker（`hina-lessons`）を開いて「Settings」→「Variables and Secrets」→「Add」
-2. 種類は「Secret」にして、次の 2 つを追加
-   - `TEACHER_PASSWORD`：先生ページのパスワード（長めに。生徒には教えない）
-   - `ANTHROPIC_API_KEY`：手順 1 でコピーしたキー
+1. できた Worker（`hina-coaching`）を開いて「Settings」→「Variables and Secrets」→「Add」
+2. 種類は「Secret」、名前は `TEACHER_PASSWORD`、値は先生ページのパスワード（長めに。生徒には教えない）
 3. 保存（Deploy）
 
-### 4. 開いてみる
+### 3. 開いてみる
 
-`https://hina-lessons.（あなたのアカウント名）.workers.dev/teacher` を開いて、パスワードでログインします。URL は Worker のページに表示されています。
+`https://hina-coaching.（あなたのアカウント名）.workers.dev/teacher` を開いて、パスワードでログインします。URL は Worker のページに表示されています。
 
 Cloudflare の画面のボタン名は、変わることがあります。見つからないときは Claude に聞いてください。
 
@@ -87,6 +78,18 @@ iPhone は Safari の共有ボタン →「ホーム画面に追加」で、ア�
 - 例文・メモ・コツ・選択肢・解説は、なくても大丈夫です
 - 文法の問題の空欄は `___`（アンダーバー 2 つ以上）。選択肢は `/` で区切ります。選択肢がないと、生徒が答えを入力する問題になります
 - 「今日のフレーズ」と「今日のテーマ」は、毎日リストの中から順番に変わります
+
+## AI 添削を使う（あとからでOK）
+
+API キーを入れると、そのあとに送られた日記から、AI が 1 回ずつ添削します。キーを入れる前に送られた日記は、生徒の画面の「AI に添削してもらう」ボタンで 1 回だけ添削できます。
+
+1. [console.anthropic.com](https://console.anthropic.com) にログイン
+2. 「Billing」でクレジットを購入（まずは $10 ほどで十分です）
+3. 「Limits」で、月の使用上限を設定（例：$15）
+4. 「API Keys」→「Create Key」でキーを作り、コピーする（一度しか表示されません）
+5. Cloudflare の Worker（`hina-coaching`）で「Settings」→「Variables and Secrets」→「Add」。種類は「Secret」、名前は `ANTHROPIC_API_KEY`、値はコピーしたキー。保存（Deploy）
+
+やめたいときは、`ANTHROPIC_API_KEY` を削除すれば、また日記が先生にだけ届く形にもどります。
 
 ## AI 添削について
 
@@ -125,7 +128,7 @@ iPhone は Safari の共有ボタン →「ホーム画面に追加」で、ア�
 ```sh
 cd lessons
 npm install
-printf 'TEACHER_PASSWORD=test\nANTHROPIC_API_KEY=sk-ant-...\n' > .dev.vars
+printf 'TEACHER_PASSWORD=test\n' > .dev.vars   # AI も試すときは ANTHROPIC_API_KEY=... の行を足す
 npm run dev   # http://localhost:8787
 ```
 

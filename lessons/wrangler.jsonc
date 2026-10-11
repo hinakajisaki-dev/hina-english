@@ -1,13 +1,14 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   // Must match the Worker's name in the Cloudflare dashboard.
-  "name": "hina-lessons",
+  "name": "hina-coaching",
   "main": "src/worker.js",
   "compatibility_date": "2026-09-15",
   "assets": {
     "directory": "public"
   },
   // No database_id: the first deploy creates the D1 database and links it.
+  // The database keeps its first name even though the Worker was renamed.
   "d1_databases": [
     { "binding": "DB", "database_name": "hina-lessons" }
   ],

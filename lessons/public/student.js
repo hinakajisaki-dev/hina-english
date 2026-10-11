@@ -168,7 +168,7 @@ function renderHome() {
       <nav class="tiles" aria-label="メニュー">
         <a class="tile wide ${done ? "done" : ""}" href="#/journal">
           <span class="emoji" aria-hidden="true">${done ? "✅" : "✍️"}</span>
-          <div><b>日記を書く</b><p class="muted">${done ? "今日の日記は書けました！" : "英語で日記を書いて、AI に添削してもらおう"}</p></div>
+          <div><b>日記を書く</b><p class="muted">${done ? "今日の日記は書けました！" : state.me.ai ? "英語で日記を書いて、AI に添削してもらおう" : "英語で日記を書いて、先生に送ろう"}</p></div>
         </a>
         <a class="tile" href="#/vocab">
           <span class="emoji" aria-hidden="true">🃏</span><b>単語カード</b>
@@ -527,9 +527,9 @@ function renderJournal(id) {
           <textarea name="body" lang="en" rows="9" spellcheck="false" placeholder="Today I ...">${esc(draft.body || "")}</textarea>
         </label>
         <p class="wordcount" id="wordcount" aria-live="polite">${countWords(draft.body || "")} words</p>
-        <p class="muted small">送ると、AI が 1 回添削します。書き終わってから送ってね。</p>
+        <p class="muted small">${state.me.ai ? "送ると、AI が 1 回添削します。書き終わってから送ってね。" : "送ると、先生に届きます。"}</p>
         <p class="notice bad" id="journal-error" role="alert" hidden></p>
-        <button class="btn block" type="submit">送って添削してもらう</button>
+        <button class="btn block" type="submit">${submitLabel()}</button>
       </form>
       ${historyHtml()}
     </main>`;
@@ -552,7 +552,7 @@ function renderJournal(id) {
     }
     const button = form.querySelector('button[type="submit"]');
     button.disabled = true;
-    button.innerHTML = `<span class="spinner" aria-hidden="true"></span>添削中…（30秒〜1分ほど）`;
+    button.innerHTML = `<span class="spinner" aria-hidden="true"></span>${state.me.ai ? "添削中…（30秒〜1分ほど）" : "送信中…"}`;
     error.hidden = true;
     try {
       const result = await api("/api/journals", {
@@ -567,10 +567,12 @@ function renderJournal(id) {
       error.textContent = err.message;
       error.hidden = false;
       button.disabled = false;
-      button.textContent = "送って添削してもらう";
+      button.textContent = submitLabel();
     }
   });
 }
+
+const submitLabel = () => (state.me.ai ? "送って添削してもらう" : "日記を送る");
 
 function historyHtml() {
   const journals = state.me.journals;
@@ -581,7 +583,7 @@ function historyHtml() {
       ${journals.map((j) => `<li><a href="#/journal/${j.id}">
         <div class="badges">
           <span class="muted small">${esc(formatDate(j.created_at))}</span>
-          ${j.correction ? `<span class="badge">添削ずみ</span>` : `<span class="badge waiting">添削なし</span>`}
+          ${j.correction ? `<span class="badge">添削ずみ</span>` : state.me.ai ? `<span class="badge waiting">添削なし</span>` : ""}
           ${j.teacher_comment ? `<span class="badge teacher">先生のコメント</span>` : ""}
         </div>
         <p class="first-line" lang="en">${esc(j.body.split("\n")[0])}</p>
@@ -620,12 +622,14 @@ function renderJournalEntry(id) {
           </section>` : `<p class="notice good">まちがいはありませんでした！すばらしい！</p>`}
         <details class="card"><summary>はじめに書いた文を見る</summary><p class="journal-text" lang="en" style="margin-top:10px">${esc(j.body)}</p></details>
       ` : `
-        <p class="notice bad">${esc(aiError || "この日記は、まだ添削できていません。")}</p>
+        ${state.me.ai ? `<p class="notice ${aiError ? "bad" : ""}">${esc(aiError || "この日記は、まだ AI の添削がありません。")}</p>` : ""}
         <section class="card stack">
           ${j.topic ? `<p class="muted small">テーマ：${esc(j.topic)}</p>` : ""}
           <p class="journal-text" lang="en">${esc(j.body)}</p>
         </section>
-        <button class="btn block" id="retry">もう一度ためす</button>
+        ${state.me.ai
+          ? `<button class="btn block" id="retry">${aiError ? "もう一度ためす" : "AI に添削してもらう"}</button>`
+          : j.teacher_comment ? "" : `<p class="muted" style="text-align:center">先生が読んで、コメントをくれます。</p>`}
       `}
       <a class="btn secondary block" href="#/journal">日記のページにもどる</a>
     </main>`;

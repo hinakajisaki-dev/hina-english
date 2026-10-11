@@ -255,7 +255,7 @@ function renderJournals(panel) {
         <div class="badges">
           <span class="muted small">${esc(formatDateTime(j.created_at))}</span>
           ${j.teacher_read ? "" : `<span class="unread">未読</span>`}
-          ${c ? "" : `<span class="badge waiting">AI 添削なし</span>`}
+          ${c || !state.current.ai ? "" : `<span class="badge waiting">AI 添削なし</span>`}
           ${j.teacher_comment ? `<span class="badge teacher">コメントずみ</span>` : ""}
         </div>
         ${j.topic ? `<span class="muted small">テーマ：${esc(j.topic)}</span>` : ""}
@@ -478,6 +478,7 @@ function renderSettings(panel) {
       <label class="field"><span>名前（アプリで「〇〇さん」と表示）</span>
         <input type="text" name="name" value="${esc(student.name)}" maxlength="60" required>
       </label>
+      ${state.current.ai ? "" : `<p class="notice small">いまは AI 添削をオフにしています。日記は先生にだけ届きます。使うときは README の「AI 添削を使う」の手順で、API キーを入れてください。下のメモは、オンにしたときに使われます。</p>`}
       <label class="field"><span>AI へのメモ（日記の添削に使われます。生徒には見えません）</span>
         <textarea name="note" rows="3" maxlength="1000" placeholder="例：英検3級くらい。いまは過去形と現在完了を練習中。説明はやさしい言葉で。">${esc(student.note)}</textarea>
       </label>
