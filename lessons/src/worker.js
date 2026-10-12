@@ -5,6 +5,7 @@
 // The teacher signs in with TEACHER_PASSWORD; the cookie holds an HMAC of it.
 import { AiError, correctJournal } from "./ai.js";
 import { SpeechError, speechFor } from "./speech.js";
+import { findLesson, lessonExampleSentences, questionCount } from "../public/grammar/lessons.js";
 import {
   all, ensureSchema, first, itemRow, journalRow, now, run, studentBundle,
 } from "./db.js";
@@ -21,6 +22,7 @@ const KINDS = {
   grammar: { fields: ["question", "answer", "choices", "explanation"], required: 2 },
   topic: { fields: ["prompt"], required: 1 },
 };
+const WEEKS = 24;
 const FIELD_NAMES = {
   word: "単語", meaning: "意味", phrase: "フレーズ", text: "文", question: "問題", answer: "答え", prompt: "テーマ",
 };
@@ -63,6 +65,9 @@ async function route(request, env, url) {
     if (path === "/api/me" && method === "GET") return studentHome(env, student);
     if (path === "/api/progress" && method === "POST") return saveProgress(request, env, student);
     if (path === "/api/speech" && method === "GET") return speech(env, student, url.searchParams.get("text"));
+    if (parts[0] === "lessons" && parts.length === 2 && method === "POST") {
+      return saveLessonResult(request, env, student, parts[1]);
+    }
     if (path === "/api/journals" && method === "POST") return newJournal(request, env, student);
     if (parts[0] === "journals" && parts[2] === "correct" && parts.length === 3 && method === "POST") {
       return retryCorrection(env, student, id(1));
@@ -105,7 +110,8 @@ async function route(request, env, url) {
     if (!row) throw new HttpError(404, "見つかりません。");
     if (method === "PUT") {
       const { data } = await readJson(request);
-      const clean = cleanItem(row.kind, data);
+      // Fields the edit doesn't send (like a word's week) keep their old value.
+      const clean = cleanItem(row.kind, { ...JSON.parse(row.data), ...data });
       await run(db, `UPDATE items SET data = ? WHERE id = ?`, JSON.stringify(clean), row.id);
       return json({ item: itemRow({ ...row, data: JSON.stringify(clean) }) });
     }
@@ -189,20 +195,24 @@ async function newJournal(request, env, student) {
   return correctOnce(env, student, meta.last_row_id);
 }
 
-// Audio is only made for text in the student's own content, so the endpoint
-// can't be used to voice anything else.
+// Audio is only made for text in the student's own content or in the grammar
+// lessons' examples, so the endpoint can't be used to voice anything else.
 const SPOKEN_FIELDS = { vocab: ["word", "example"], phrase: ["phrase"], pron: ["text"] };
+const LESSON_SENTENCES = lessonExampleSentences();
 
 async function speech(env, student, text) {
-  const rows = await all(
-    env.DB,
-    `SELECT kind, data FROM items WHERE student_id = ? AND kind IN ('vocab', 'phrase', 'pron')`,
-    student.id,
-  );
-  const allowed = rows.some((row) => {
-    const data = JSON.parse(row.data);
-    return SPOKEN_FIELDS[row.kind].some((field) => data[field] === text);
-  });
+  let allowed = LESSON_SENTENCES.has(text);
+  if (!allowed) {
+    const rows = await all(
+      env.DB,
+      `SELECT kind, data FROM items WHERE student_id = ? AND kind IN ('vocab', 'phrase', 'pron')`,
+      student.id,
+    );
+    allowed = rows.some((row) => {
+      const data = JSON.parse(row.data);
+      return SPOKEN_FIELDS[row.kind].some((field) => data[field] === text);
+    });
+  }
   if (!text || !allowed) throw new HttpError(404, "見つかりません。");
   try {
     const audio = await speechFor(env, text);
@@ -214,6 +224,23 @@ async function speech(env, student, text) {
     // The page falls back to the phone's own voice.
     throw new HttpError(503, "音声を作れませんでした。");
   }
+}
+
+async function saveLessonResult(request, env, student, lessonId) {
+  const found = findLesson(lessonId);
+  if (!found?.lesson.steps) throw new HttpError(404, "見つかりません。");
+  const total = questionCount(found.lesson);
+  const { score } = await readJson(request);
+  const clean = Math.max(0, Math.min(total, Math.round(Number(score)) || 0));
+  await run(
+    env.DB,
+    `INSERT INTO lesson_results (student_id, lesson_id, best_score, last_score, total, times, updated_at)
+     VALUES (?1, ?2, ?3, ?3, ?4, 1, ?5)
+     ON CONFLICT (student_id, lesson_id) DO UPDATE SET
+       best_score = MAX(best_score, ?3), last_score = ?3, total = ?4, times = times + 1, updated_at = ?5`,
+    student.id, lessonId, clean, total, now(),
+  );
+  return json({ ok: true });
 }
 
 // Only an entry with no correction yet (its first try failed) can be sent again.
@@ -339,6 +366,11 @@ function cleanItem(kind, data) {
   }
   if (kind === "grammar" && clean.choices.length && !clean.choices.includes(clean.answer)) {
     clean.choices.push(clean.answer);
+  }
+  // Words are grouped into Week 1–24; words without a week show as そのほか.
+  if (kind === "vocab") {
+    const week = Number(data.week);
+    clean.week = Number.isInteger(week) && week >= 1 && week <= WEEKS ? week : null;
   }
   return clean;
 }

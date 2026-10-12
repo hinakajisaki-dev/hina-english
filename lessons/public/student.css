@@ -129,3 +129,61 @@
 .badge.teacher { background: var(--accent-soft); color: var(--accent-text); }
 .badge.waiting { background: var(--cream); }
 details.card summary { cursor: pointer; font-weight: 700; font-size: 15px; }
+
+/* vocab weeks */
+.weeks { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.week {
+  display: flex; flex-direction: column; gap: 2px; padding: 12px; border-radius: 14px; min-width: 0;
+  background: var(--card); border: 1px solid var(--line); box-shadow: var(--shadow); text-decoration: none; color: var(--ink);
+}
+.week b { font-family: var(--en); font-size: 15px; }
+.week span { font-size: 12px; color: var(--muted); }
+a.week:hover { border-color: var(--sky); }
+.week.done { background: var(--good-soft); border-color: transparent; }
+.week.done span { color: var(--good); font-weight: 700; }
+.week.empty-week { background: transparent; box-shadow: none; border-style: dashed; color: var(--muted); }
+.week .bar { margin-top: 4px; height: 6px; }
+
+/* grammar units and lessons */
+.unit-card, .lesson-card {
+  display: flex; text-decoration: none; color: var(--ink); background: var(--card);
+  border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); padding: 16px 18px;
+}
+.unit-card { flex-direction: column; gap: 2px; }
+.unit-card b { font-size: 20px; font-weight: 900; }
+.unit-card:hover, a.lesson-card:hover { border-color: var(--sky); }
+.teacher-unit { background: var(--accent-soft); border-color: var(--line-warm); }
+.lesson-card { align-items: center; justify-content: space-between; gap: 12px; }
+.lesson-card > div { display: flex; flex-direction: column; min-width: 0; }
+.lesson-card b { font-size: 17px; }
+.lesson-card.soon { opacity: .6; box-shadow: none; }
+.badge.start { background: var(--accent); color: #fff; }
+
+/* lesson player */
+.lesson-progress { display: flex; align-items: center; gap: 10px; }
+.lesson-progress .bar { flex: 1; margin: 0; }
+.lesson-progress .counter { flex: none; }
+.lesson-nav { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+.lesson-nav .btn:not(.ghost) { min-width: 140px; }
+.explain h2 { font-size: 19px; font-weight: 900; line-height: 1.5; }
+.table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 12px; }
+.table-wrap table { width: 100%; border-collapse: collapse; font-size: 14px; }
+.table-wrap th { background: var(--sky-soft); text-align: left; padding: 8px 10px; font-size: 13px; white-space: nowrap; }
+.table-wrap td { padding: 8px 10px; border-top: 1px solid var(--line); vertical-align: top; }
+.examples { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.examples li { display: flex; gap: 10px; align-items: flex-start; }
+.examples .en { font-family: var(--en); font-weight: 700; font-size: 17px; line-height: 1.5; }
+.examples .ja { font-size: 14px; color: var(--ink-2); }
+.speak.icon-only { padding: 0; width: 40px; justify-content: center; flex: none; }
+.question-ja { font-size: 18px; font-weight: 700; }
+.answer-line {
+  min-height: 56px; border-radius: 14px; border: 2px dashed var(--line); padding: 8px;
+  display: flex; flex-wrap: wrap; gap: 8px; align-items: center;
+}
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip {
+  border: 2px solid var(--line); background: var(--card); border-radius: 12px; min-height: 44px; padding: 6px 14px;
+  font-family: var(--en); font-weight: 700; font-size: 17px; cursor: pointer;
+}
+.answer-line .chip { border-color: var(--sky); background: var(--sky-soft); }
+.chip:disabled { visibility: hidden; }
