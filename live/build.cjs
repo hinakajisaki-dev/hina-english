@@ -18,6 +18,7 @@ if (!dir) {
 
 const FIELDS = {
   タイトル: { name: "title", top: true },
+  サブタイトル: { name: "subtitle", top: true },
   後ろの形: { name: "form" },
   意味: { name: "meaning" },
   例文: { name: "example", split: "|" }, // English | 日本語
@@ -103,11 +104,51 @@ const header = (right = "") => `
     ${right}
   </header>`;
 
-// Just the title, in the middle of the slide.
+// Decorations for the title slide, as filled SVG paths in slide pixels. Circles and rounded
+// squares are drawn with Bézier curves because the .pptx builder only reads M/L/C/Z paths.
+const f = (n) => +n.toFixed(1);
+function circle(cx, cy, r) {
+  const k = r * 0.5523;
+  return `M ${f(cx + r)} ${cy} C ${f(cx + r)} ${f(cy + k)} ${f(cx + k)} ${f(cy + r)} ${cx} ${f(cy + r)} C ${f(cx - k)} ${f(cy + r)} ${f(cx - r)} ${f(cy + k)} ${f(cx - r)} ${cy} C ${f(cx - r)} ${f(cy - k)} ${f(cx - k)} ${f(cy - r)} ${cx} ${f(cy - r)} C ${f(cx + k)} ${f(cy - r)} ${f(cx + r)} ${f(cy - k)} ${f(cx + r)} ${cy} Z`;
+}
+function roundSquare(x, y, s, r) {
+  const k = r * 0.5523;
+  return `M ${x + r} ${y} L ${x + s - r} ${y} C ${f(x + s - r + k)} ${y} ${x + s} ${f(y + r - k)} ${x + s} ${y + r} L ${x + s} ${y + s - r} C ${x + s} ${f(y + s - r + k)} ${f(x + s - r + k)} ${y + s} ${x + s - r} ${y + s} L ${x + r} ${y + s} C ${f(x + r - k)} ${y + s} ${x} ${f(y + s - r + k)} ${x} ${y + s - r} L ${x} ${y + r} C ${x} ${f(y + r - k)} ${f(x + r - k)} ${y} ${x + r} ${y} Z`;
+}
+function sparkle(cx, cy, s) {
+  const a = f(s * 0.14);
+  return `M ${cx} ${cy - s} C ${cx + a} ${cy - a} ${cx + a} ${cy - a} ${cx + s} ${cy} C ${cx + a} ${cy + a} ${cx + a} ${cy + a} ${cx} ${cy + s} C ${cx - a} ${cy + a} ${cx - a} ${cy + a} ${cx - s} ${cy} C ${cx - a} ${cy - a} ${cx - a} ${cy - a} ${cx} ${cy - s} Z`;
+}
+const shapes = (list) => `<svg class="deco" viewBox="0 0 1280 720" aria-hidden="true">${list.map(([d, c]) => `<path d="${d}" style="fill: ${c}"/>`).join("")}</svg>`;
+
+// The title in a white card, with salon-coloured shapes peeking out from behind it.
 function cover(deck) {
+  const behind = shapes([
+    [circle(250, 190, 120), "#A9D3F3"],
+    [roundSquare(960, 440, 190, 48), "#FFD3DD"],
+    [circle(1110, 150, 56), "#FFD966"],
+    [circle(175, 545, 44), "#FF9C6E"],
+    [circle(95, 360, 14), "#FF9DB4"],
+    [circle(1195, 380, 12), "#7DBDEB"],
+    [circle(600, 95, 10), "#FFC94A"],
+    [circle(1000, 90, 8), "#FF8A57"],
+    [circle(760, 640, 12), "#FF9DB4"],
+    [circle(420, 652, 9), "#7DBDEB"],
+  ]);
+  const front = shapes([
+    [sparkle(1052, 176, 34), "#F0521E"],
+    [sparkle(236, 560, 26), "#FFC94A"],
+    [sparkle(1186, 566, 16), "#7DBDEB"],
+    [sparkle(122, 236, 16), "#FF9DB4"],
+  ]);
   return `
 <section class="slide cover">
-  <h1>${latin(deck.title)}</h1>
+  ${behind}
+  <div class="cover-card">
+    <div class="ttl"><div class="mk"></div><h1>${latin(deck.title)}</h1></div>
+    ${deck.subtitle ? `<p class="sub">${esc(deck.subtitle)}</p>` : ""}
+  </div>
+  ${front}
 </section>`;
 }
 

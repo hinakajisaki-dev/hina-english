@@ -130,7 +130,22 @@ ol, ul { list-style: none; }
 
 /* ---------- cover ---------- */
 .cover { justify-content: center; align-items: center; }
-.cover h1 { font-size: 84px; font-weight: 900; line-height: 1.25; letter-spacing: .02em; text-align: center; }
+.cover-card {
+  position: relative;
+  width: 860px;
+  height: 400px;
+  background: var(--card);
+  border-radius: 44px;
+  box-shadow: 0 24px 60px rgba(26, 34, 56, .10);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+.ttl { position: relative; padding: 0 14px; }
+.ttl .mk { position: absolute; left: 0; right: 0; bottom: 8px; height: 40px; border-radius: 12px; background: #FFD966; } /* marker under the title */
+.ttl h1 { position: relative; font-size: 120px; font-weight: 900; line-height: 1.2; letter-spacing: .04em; }
+.sub { margin-top: 22px; background: var(--accent); color: #FFFFFF; font-size: 40px; font-weight: 900; letter-spacing: .08em; padding: 12px 44px 14px; border-radius: 999px; }
 h1 .en { font-family: var(--en); font-weight: 700; color: var(--accent); letter-spacing: -1px; }
 
 /* ---------- ending ---------- */

@@ -4,11 +4,11 @@ YouTube の英語ライブで使う「瞬間英作文」のスライド。デザ
 
 | フォルダ | 内容 |
 | --- | --- |
-| `daily-phrases-part2/` | 塊で覚える日常英会話（フレーズ20個・40問）。`daily-phrases-part2.pptx`（Google スライド用）と `daily-phrases-part2.pdf`（確認用）、全46枚 |
+| `daily-phrases-part2/` | 塊で覚える 日常英会話フレーズ（フレーズ20個・40問）。`daily-phrases-part2.pptx`（Google スライド用）と `daily-phrases-part2.pdf`（確認用）、全46枚 |
 
 ## スライドの流れ
 
-1. タイトル（真ん中にタイトルだけ）
+1. タイトル（白いカードにタイトルとサブタイトル、まわりにサロンの色の飾り）
 2. ラウンドごとに、表紙 → フレーズごとに「問題」→「こたえ」の2枚
 3. おわりのあいさつ
 
@@ -28,6 +28,9 @@ npm run live -- live/daily-phrases-part2
 `phrases.md` の書き方：
 
 ```md
+タイトル: 塊で覚える
+サブタイトル: 日常英会話フレーズ
+
 ## ROUND 1 気持ち・予定を話す
 
 ### I'm thinking of 〇〇ing
