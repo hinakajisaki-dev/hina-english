@@ -677,7 +677,7 @@ const sameWord = (a, b) => a.trim().toLowerCase().replace(/[’]/g, "'").replace
 
 function level1Html(word, example, answer, R) {
   return `<section class="card stack word-card">
-      <p class="muted">この単語の意味は？　思いうかべてから「意味を見る」を押そう</p>
+      <p class="muted">単語の意味と例文を頭の中で言えるか確かめてみましょう！</p>
       <div class="word-row">
         <p class="word" lang="en">${esc(word.word)}</p>
         ${sayIcon(speakable(word.word))}
@@ -717,8 +717,7 @@ function level2Html(word, example, answer, R) {
       ${answer
         ? `<div class="word-examples one">${sayIcon(example.en)}<p class="question" lang="en">${exampleHtml(example)}</p></div>`
         : `<p class="question" lang="en">${exampleHtml(example, { blank: true })}</p>`}
-      ${answer ? "" : `<p class="muted small">ヒント：<span lang="en" class="letters">${esc(letters)}</span>（${form.length}文字）</p>
-        ${R.hint ? `<p class="hint-box">元の単語は <b lang="en">${esc(speakable(word.word))}</b>（${esc(word.meaning)}）。形が変わることもあります。</p>` : ""}
+      ${answer ? "" : `${R.hint ? `<p class="muted small" id="hint-line">ヒント：<span lang="en" class="letters">${esc(letters)}</span>（${form.length}文字）</p>` : ""}
         <form id="fill" class="stack">
           <input type="text" name="answer" lang="en" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="単語を入力">
           <button class="btn block" type="submit">答え合わせ</button>
@@ -745,9 +744,14 @@ function renderReviewResult(level, rerender) {
         <h3>${level === 1 ? "わからなかった単語" : "まちがえた単語"}</h3>
         <ul class="plain-list">${missed.map((w) => `<li><b lang="en">${esc(w.word)}</b>　${esc(w.meaning)}</li>`).join("")}</ul>
       </section>` : ""}
-      ${known.length ? `<section class="card stack">
-        <p>${level === 1 ? "わかった" : "正解した"}単語（${known.length} 語）を、復習カードから外しますか？</p>
-        <button type="button" class="btn secondary block" id="remove-known">外す</button>
+      ${known.length ? `<section class="card stack" id="known-box">
+        <h3>${level === 1 ? "わかった" : "正解した"}単語（${known.length} 語）</h3>
+        <p class="muted small">復習カードから外す単語にチェックを入れてください。チェックを外した単語は、復習カードに残ります。</p>
+        <ul class="pick-list">${known.map((w) => `<li><label>
+          <input type="checkbox" data-key="${esc(w.key)}" checked>
+          <span><b lang="en">${esc(w.word)}</b><span class="muted small">${esc(w.meaning)}</span></span>
+        </label></li>`).join("")}</ul>
+        <button type="button" class="btn secondary block" id="remove-known">チェックした単語を外す</button>
       </section>` : ""}
       <button type="button" class="btn block" id="again">もう一度</button>
       <a class="btn ghost block" href="#/review">復習にもどる</a>
@@ -755,9 +759,11 @@ function renderReviewResult(level, rerender) {
 
   document.getElementById("remove-known")?.addEventListener("click", async (event) => {
     event.target.disabled = true;
-    for (const w of known) await setReview(w.key, false);
-    toast(`${known.length} 語を復習カードから外しました`);
-    event.target.closest("section").remove();
+    const box = document.getElementById("known-box");
+    const picked = [...box.querySelectorAll("input[data-key]:checked")].map((input) => input.dataset.key);
+    for (const key of picked) await setReview(key, false);
+    const kept = known.length - picked.length;
+    box.innerHTML = `<p>${picked.length ? `${picked.length} 語を復習カードから外しました。` : "外した単語はありません。"}${kept ? `${kept} 語は復習カードに残しました。` : ""}</p>`;
   });
   document.getElementById("again").addEventListener("click", () => {
     state.review = null;
