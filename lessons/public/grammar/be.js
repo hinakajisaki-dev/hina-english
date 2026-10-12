@@ -1,0 +1,320 @@
+// Unit: be動詞. Follows the be動詞 chapter of the teacher's 中学文法 document.
+// Step format is described in lessons.js.
+
+export const BE = {
+  id: "be",
+  title: "be動詞",
+  subtitle: "am / is / are と was / were",
+  lessons: [
+    {
+      id: "be-present",
+      title: "am / is / are",
+      subtitle: "「〜です」「〜にいます」",
+      steps: [
+        {
+          type: "explain",
+          title: "be動詞とは？",
+          text: [
+            "am / is / are は「**〜は**」を表す言葉です。",
+            "**主語**と**内容**のあいだに入って、「**＝（イコール）**」でつなぎます。",
+          ],
+          table: {
+            head: ["主語", "＝", "内容"],
+            rows: [
+              ["I（私）", "[[am]]", "tired（疲れている）"],
+              ["She（彼女）", "[[is]]", "a teacher（先生）"],
+              ["They（彼ら）", "[[are]]", "at home（家に）"],
+            ],
+          },
+          key: ["主語 ＝ 内容", "この「＝」が [[am]] / [[is]] / [[are]]"],
+          examples: [
+            { en: "I [[am]] tired.", ja: "私は疲れています。（I ＝ tired）" },
+            { en: "She [[is]] a teacher.", ja: "彼女は先生です。（She ＝ a teacher）" },
+            { en: "They [[are]] at home.", ja: "彼らは家にいます。（They ＝ at home）" },
+          ],
+        },
+        {
+          type: "explain",
+          title: "[[am]] / [[is]] / [[are]] の選び方",
+          text: ["どれを使うかは、**主語**で決まります。"],
+          table: {
+            head: ["主語", "be動詞"],
+            rows: [
+              ["I", "[[am]]"],
+              ["He / She / It / Tom（1人・1つ）", "[[is]]"],
+              ["You / We / They（あなた・2人以上）", "[[are]]"],
+            ],
+          },
+          examples: [
+            { en: "I [[am]] from Japan.", ja: "私は日本出身です。" },
+            { en: "He [[is]] my brother.", ja: "彼は私の兄です。" },
+            { en: "We [[are]] friends.", ja: "私たちは友達です。" },
+          ],
+        },
+        {
+          type: "choice",
+          q: "I ___ hungry.",
+          ja: "私はお腹が空いています。",
+          choices: ["am", "is", "are"],
+          answer: "am",
+          why: "I のときは [[am]] です。",
+        },
+        {
+          type: "choice",
+          q: "We ___ students.",
+          ja: "私たちは学生です。",
+          choices: ["am", "is", "are"],
+          answer: "are",
+          why: "We は2人以上なので [[are]] です。",
+        },
+        {
+          type: "choice",
+          q: "He ___ a doctor.",
+          ja: "彼は医者です。",
+          choices: ["am", "is", "are"],
+          answer: "is",
+          why: "He は1人なので [[is]] です。",
+        },
+        {
+          type: "choice",
+          q: "You ___ kind.",
+          ja: "あなたは親切です。",
+          choices: ["am", "is", "are"],
+          answer: "are",
+          why: "You は1人のときも [[are]] です。",
+        },
+        {
+          type: "choice",
+          q: "My sister ___ at school.",
+          ja: "姉は学校にいます。",
+          choices: ["am", "is", "are"],
+          answer: "is",
+          why: "My sister は1人なので、She と同じ [[is]] です。",
+        },
+        {
+          type: "explain",
+          title: "否定文：[[not]] をつける",
+          text: ["「〜ではありません」は **not** を使います。"],
+          compare: {
+            labels: ["ふつうの文", "否定文"],
+            rows: [
+              [
+                { en: "He [[is]] sleepy.", ja: "彼は眠いです。" },
+                { en: "He [[is]] [[not]] sleepy.", ja: "彼は眠くありません。" },
+              ],
+              [
+                { en: "I [[am]] hungry.", ja: "私はお腹が空いています。" },
+                { en: "I [[am]] [[not]] hungry.", ja: "私はお腹が空いていません。" },
+              ],
+            ],
+          },
+          key: "am / is / are のうしろに [[not]]",
+        },
+        {
+          type: "order",
+          ja: "彼女は忙しくありません。",
+          words: ["She", "is", "not", "busy"],
+          end: ".",
+          why: "is のうしろに [[not]] です。",
+        },
+        {
+          type: "choice",
+          q: "My father ___ at home.",
+          ja: "父は家にいません。",
+          choices: ["is not", "not is"],
+          answer: "is not",
+          why: "not は is の**うしろ**なので [[is not]] です。",
+        },
+        {
+          type: "order",
+          ja: "彼らは学生ではありません。",
+          words: ["They", "are", "not", "students"],
+          end: ".",
+          why: "are のうしろに [[not]] です。",
+        },
+        {
+          type: "explain",
+          title: "疑問文：前に出す",
+          text: ["「〜ですか？」は、am / is / are を**前に**出します。"],
+          compare: {
+            labels: ["ふつうの文", "疑問文"],
+            rows: [
+              [
+                { en: "You [[are]] hungry.", ja: "あなたはお腹が空いています。" },
+                { en: "[[Are]] you hungry?", ja: "あなたはお腹が空いていますか？" },
+              ],
+              [
+                { en: "It [[is]] cold today.", ja: "今日は寒いです。" },
+                { en: "[[Is]] it cold today?", ja: "今日は寒いですか？" },
+              ],
+            ],
+          },
+          key: "am / is / are を主語の**前**へ",
+        },
+        {
+          type: "order",
+          ja: "彼は先生ですか？",
+          words: ["Is", "he", "a", "teacher"],
+          end: "?",
+          why: "[[Is]] を he の前に出します。",
+        },
+        {
+          type: "choice",
+          q: "___ she a nurse?",
+          ja: "彼女は看護師ですか？",
+          choices: ["Am", "Is", "Are"],
+          answer: "Is",
+          why: "She なので [[Is]] を前に出します。",
+        },
+        {
+          type: "order",
+          ja: "あなたは学生ですか？",
+          words: ["Are", "you", "a", "student"],
+          end: "?",
+          why: "You なので [[Are]] を前に出します。",
+        },
+        {
+          type: "order",
+          ja: "彼らは忙しいですか？",
+          words: ["Are", "they", "busy"],
+          end: "?",
+          why: "They なので [[Are]] を前に出します。",
+        },
+        {
+          type: "write",
+          ja: "私は幸せです。",
+          answers: ["I am happy."],
+          hint: "happy（幸せ）",
+          why: "I のときは [[am]] です。",
+        },
+        {
+          type: "write",
+          ja: "あなたは疲れていますか？",
+          answers: ["Are you tired?"],
+          hint: "tired（疲れている）",
+          why: "疑問文なので [[Are]] を前に出します。",
+        },
+        {
+          type: "write",
+          ja: "私たちは今、学校にいます。",
+          answers: ["We are at school now.", "Now we are at school."],
+          hint: "at school（学校に）",
+          why: "We は2人以上なので [[are]] です。",
+        },
+      ],
+    },
+    {
+      id: "be-past",
+      title: "was / were",
+      subtitle: "「〜でした」「〜にいました」",
+      steps: [
+        {
+          type: "explain",
+          title: "be動詞の過去形",
+          text: ["「〜でした」「〜にいました」は **was / were** を使います。"],
+          compare: {
+            labels: ["いま", "過去"],
+            rows: [
+              [
+                { en: "I [[am]] tired.", ja: "私は疲れています。" },
+                { en: "I [[was]] tired.", ja: "私は疲れていました。" },
+              ],
+              [
+                { en: "They [[are]] at home.", ja: "彼らは家にいます。" },
+                { en: "They [[were]] at home.", ja: "彼らは家にいました。" },
+              ],
+            ],
+          },
+          key: ["am・is → [[was]]", "are → [[were]]"],
+        },
+        {
+          type: "choice",
+          q: "She ___ a student last year.",
+          ja: "彼女は去年、学生でした。",
+          choices: ["was", "were"],
+          answer: "was",
+          why: "She は is のなかまなので [[was]] です。",
+        },
+        {
+          type: "choice",
+          q: "We ___ at school yesterday.",
+          ja: "私たちは昨日、学校にいました。",
+          choices: ["was", "were"],
+          answer: "were",
+          why: "We は are のなかまなので [[were]] です。",
+        },
+        {
+          type: "choice",
+          q: "I ___ happy yesterday.",
+          ja: "私は昨日うれしかったです。",
+          choices: ["was", "were"],
+          answer: "was",
+          why: "I は am のなかまなので [[was]] です。",
+        },
+        {
+          type: "explain",
+          title: "否定文・疑問文",
+          text: ["作り方は、**am / is / are のときと同じ**です。"],
+          compare: {
+            labels: ["ふつうの文", "否定文・疑問文"],
+            rows: [
+              [
+                { en: "It [[was]] cold.", ja: "寒かったです。" },
+                { en: "It [[was]] [[not]] cold.", ja: "寒くありませんでした。" },
+              ],
+              [
+                { en: "You [[were]] tired.", ja: "あなたは疲れていました。" },
+                { en: "[[Were]] you tired?", ja: "あなたは疲れていましたか？" },
+              ],
+            ],
+          },
+          key: ["否定文 → [[not]] をつける", "疑問文 → was / were を**前**へ"],
+          note: ["※短くすると wasn’t ／ weren’t"],
+        },
+        {
+          type: "choice",
+          q: "___ you busy yesterday?",
+          ja: "あなたは昨日、忙しかったですか？",
+          choices: ["Was", "Were"],
+          answer: "Were",
+          why: "You は are のなかまなので [[Were]]。疑問文なので前に出します。",
+        },
+        {
+          type: "order",
+          ja: "彼らは家にいませんでした。",
+          words: ["They", "were", "not", "at", "home"],
+          end: ".",
+          why: "were のうしろに [[not]] です。",
+        },
+        {
+          type: "write",
+          ja: "彼は昨日、家にいました。",
+          answers: ["He was at home yesterday.", "Yesterday he was at home."],
+          hint: "at home（家に）",
+          why: "He は is のなかまなので [[was]] です。",
+        },
+        {
+          type: "write",
+          ja: "彼女は昨日、病気でした。",
+          answers: ["She was sick yesterday.", "She was ill yesterday.", "Yesterday she was sick."],
+          hint: "sick（病気の）",
+          why: "She は is のなかまなので [[was]] です。",
+        },
+        {
+          type: "write",
+          ja: "彼らは昨日、忙しくありませんでした。",
+          answers: ["They were not busy yesterday.", "Yesterday they were not busy."],
+          hint: "busy（忙しい）",
+          why: "They なので were、否定文なので [[were not]] です。",
+        },
+        {
+          type: "write",
+          ja: "あなたたちは昨日、家にいましたか？",
+          answers: ["Were you at home yesterday?", "Were you home yesterday?"],
+          hint: "you（あなたたち）",
+          why: "疑問文なので [[Were]] を前に出します。",
+        },
+      ],
+    },
+  ],
+};

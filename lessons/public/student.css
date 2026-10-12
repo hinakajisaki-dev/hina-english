@@ -166,11 +166,34 @@ a.week:hover { border-color: var(--sky); }
 .lesson-nav { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
 .lesson-nav .btn:not(.ghost) { min-width: 140px; }
 .explain h2 { font-size: 19px; font-weight: 900; line-height: 1.5; }
+/* lesson colors: red = what changes, blue = where it goes */
+.hl { color: var(--bad); font-weight: 800; }
+.hl2 { color: #1D5FC2; font-weight: 800; }
+/* compare: each pair stacked, the plain sentence above the changed one */
+.compare { display: grid; gap: 10px; }
+.cmp-row { display: grid; gap: 2px; padding: 8px; border-radius: 18px; background: color-mix(in srgb, var(--sky-soft) 55%, transparent); }
+.cmp { display: flex; align-items: center; gap: 10px; border-radius: 14px; padding: 8px 10px 8px 14px; border: 2px solid var(--line); background: var(--card); }
+.cmp > div { flex: 1; min-width: 0; }
+.cmp-label { font-size: 12px; font-weight: 700; color: var(--muted); }
+.cmp .en { font-weight: 700; font-size: 17px; line-height: 1.4; overflow-wrap: anywhere; }
+.cmp .ja { font-size: 13px; line-height: 1.5; color: var(--ink-2); }
+.cmp.after { border-color: var(--bad-soft); background: color-mix(in srgb, var(--bad-soft) 45%, var(--card)); }
+.cmp .speak.icon-only { width: 36px; min-height: 36px; flex: none; }
+.cmp .speak svg { width: 18px; height: 18px; }
+.cmp-arrow { text-align: center; font-weight: 900; color: var(--bad); line-height: 1.2; }
+.chip-group { display: grid; gap: 6px; }
+.chip-label { font-size: 13px; font-weight: 700; color: var(--ink-2); }
+.chip-group ul { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px; }
+.chip-group li { font-family: var(--en); font-weight: 800; font-size: 16px; padding: 4px 12px; border-radius: 999px; border: 2px solid var(--line); background: var(--card); color: var(--ink-2); }
+.chip-group.red li { border-color: var(--bad); background: var(--bad-soft); color: var(--bad); }
+.explain .key { font-size: 17px; font-weight: 900; line-height: 1.6; background: var(--accent-soft); border-radius: 14px; padding: 12px 14px; }
+.explain .note { font-size: 14px; color: var(--ink-2); background: var(--cream); border-radius: 12px; padding: 10px 12px; }
 .table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 12px; }
 .table-wrap table { width: 100%; border-collapse: collapse; font-size: 14px; }
 .table-wrap th { background: var(--sky-soft); text-align: left; padding: 8px 10px; font-size: 13px; white-space: nowrap; }
 .table-wrap td { padding: 8px 10px; border-top: 1px solid var(--line); vertical-align: top; }
 .examples { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.stack > * + .examples { margin-top: 14px; }
 .examples li { display: flex; gap: 10px; align-items: flex-start; }
 .examples .en { font-family: var(--en); font-weight: 700; font-size: 17px; line-height: 1.5; }
 .examples .ja { font-size: 14px; color: var(--ink-2); }

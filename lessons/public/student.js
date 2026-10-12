@@ -4,7 +4,7 @@ import {
   ApiError, api, canListen, compareSpeech, diffHtml, esc, formatDate, icons, japanDayNumber, listen,
   normalizeWords, SPEEDS, getSpeed, setSpeed, speak, startOfJapanDay, stopSpeaking, toast,
 } from "./common.js";
-import { UNITS, findLesson, questionCount } from "./grammar/lessons.js";
+import { UNITS, findLesson, plain, questionCount } from "./grammar/lessons.js";
 
 const app = document.getElementById("app");
 const state = { me: null, vocab: null, pron: { index: 0 }, grammar: null, lesson: null, aiError: {} };
@@ -452,7 +452,10 @@ function normalizeAnswer(text) {
 }
 
 // Bold text in lesson explanations is written **like this**.
-const fmt = (text) => esc(text).replace(/\*\*(.+?)\*\*/g, "<b>$1</b>");
+// [[red]] and {{blue}} color what a beginner should look at.
+const paint = (html) =>
+  html.replace(/\[\[(.+?)\]\]/g, '<span class="hl">$1</span>').replace(/\{\{(.+?)\}\}/g, '<span class="hl2">$1</span>');
+const fmt = (text) => paint(esc(text).replace(/\*\*(.+?)\*\*/g, "<b>$1</b>"));
 
 function renderGrammar(unitId, lessonId) {
   if (unitId === "teacher") return renderTeacherProblems();
@@ -605,20 +608,57 @@ function renderLesson(unit, lessonId) {
   }
 }
 
+// Words listed in a step's `highlight` (like am / is / are) are shown in red.
+function highlighter(step) {
+  if (!step.highlight?.length) return (html) => html;
+  const words = new RegExp(`\\b(${step.highlight.join("|")})\\b`, "gi");
+  return (html) => html.replace(words, '<span class="hl">$1</span>');
+}
+
+function sayIcon(text) {
+  const words = plain(text);
+  return `<button type="button" class="speak icon-only" data-say="${esc(words)}" aria-label="${esc(words)} を聞く">${icons.speaker}</button>`;
+}
+
+// One side of a compare row: an English sentence, its Japanese and its audio.
+// Only the first row carries the labels (ふつうの文 / 否定文 …).
+function cmpCard(cell, side, label, line) {
+  const { en, ja } = typeof cell === "string" ? { en: cell } : cell;
+  return `<div class="cmp ${side}"><div>
+    ${label ? `<p class="cmp-label">${line(label)}</p>` : ""}
+    <p class="en" lang="en">${line(en)}</p>${ja ? `<p class="ja">${line(ja)}</p>` : ""}
+  </div>${sayIcon(en)}</div>`;
+}
+
 function explainHtml(step) {
+  const hl = highlighter(step);
+  const line = (text) => hl(fmt(text));
   return `<section class="card stack explain">
-    <h2>${fmt(step.title)}</h2>
-    ${(step.text || []).map((p) => `<p>${fmt(p)}</p>`).join("")}
+    <h2>${line(step.title)}</h2>
+    ${(step.text || []).map((p) => `<p>${line(p)}</p>`).join("")}
+    ${step.compare ? `<div class="compare">
+      ${step.compare.rows.map(([before, after], i) => `<div class="cmp-row">
+        ${cmpCard(before, "before", i ? "" : step.compare.labels[0], line)}
+        <span class="cmp-arrow" aria-hidden="true">↓</span>
+        ${cmpCard(after, "after", i ? "" : step.compare.labels[1], line)}
+      </div>`).join("")}
+    </div>` : ""}
+    ${(step.chips || []).map((group) => `<div class="chip-group ${group.tone || "plain"}">
+      ${group.label ? `<p class="chip-label">${line(group.label)}</p>` : ""}
+      <ul>${group.items.map((item) => `<li lang="en">${line(item)}</li>`).join("")}</ul>
+    </div>`).join("")}
     ${step.table ? `<div class="table-wrap"><table>
-      <thead><tr>${step.table.head.map((h) => `<th>${esc(h)}</th>`).join("")}</tr></thead>
-      <tbody>${step.table.rows.map((row) => `<tr>${row.map((cell) => `<td>${fmt(cell)}</td>`).join("")}</tr>`).join("")}</tbody>
+      <thead><tr>${step.table.head.map((h) => `<th>${line(h)}</th>`).join("")}</tr></thead>
+      <tbody>${step.table.rows.map((row) => `<tr>${row.map((cell) => `<td>${line(cell)}</td>`).join("")}</tr>`).join("")}</tbody>
     </table></div>` : ""}
+    ${step.key ? `<p class="key">${[].concat(step.key).map(line).join("<br>")}</p>` : ""}
+    ${(step.note || []).map((p) => `<p class="note">${line(p)}</p>`).join("")}
     ${step.examples?.length ? `<ul class="examples">${step.examples.map((ex) => `
       <li>
-        <button type="button" class="speak icon-only" data-say="${esc(ex.en)}" aria-label="${esc(ex.en)} を聞く">${icons.speaker}</button>
-        <div><p class="en" lang="en">${esc(ex.en)}</p><p class="ja">${esc(ex.ja)}</p></div>
-      </li>`).join("")}</ul>
-      <div>${speedControl()}</div>` : ""}
+        ${sayIcon(ex.en)}
+        <div><p class="en" lang="en">${line(ex.en)}</p><p class="ja">${line(ex.ja)}</p></div>
+      </li>`).join("")}</ul>` : ""}
+    ${step.examples?.length || step.compare ? `<div>${speedControl()}</div>` : ""}
   </section>`;
 }
 
