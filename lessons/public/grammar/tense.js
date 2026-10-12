@@ -43,25 +43,24 @@ export const TENSE = {
         },
         {
           type: "explain",
-          title: "三単現：動詞の形が変わるとき",
-          text: [
-            "今までは I play / I eat など、動詞は**そのままの形**でした。",
-            "でも、主語が**三単現**のときは、動詞の形が **plays / eats** に変わります。",
-            "**三単現とは？**　**三人称**で**単数**のとき。つまり、自分（I）と相手（you）以外の**1人・1つ**です（he / she / it、Tom、my mother など）。",
-            "**三単現のときに、動詞に s / es をつけます。**",
-          ],
-          table: {
-            head: ["主語", "動詞の形"],
+          title: "動詞に [[s]] がつくとき",
+          text: ["主語が [[He]] / [[She]] / [[It]] / [[Tom]] のときは、動詞の形が変わります。"],
+          compare: {
+            labels: ["いままで", "[[He]] / [[She]] のとき"],
             rows: [
-              ["I / You / We / They", "play / eat（そのまま）"],
-              ["He / She / It、Tom、my mother", "**plays / eats**（s をつける）"],
+              ["I play tennis.", "[[He]] play[[s]] tennis."],
+              ["I eat lunch.", "[[She]] eat[[s]] lunch."],
             ],
           },
-          examples: [
-            { en: "I play tennis.", ja: "私はテニスをします。" },
-            { en: "He plays tennis.", ja: "彼はテニスをします。" },
-            { en: "I eat lunch at noon.", ja: "私は正午に昼食を食べます。" },
-            { en: "She eats lunch at noon.", ja: "彼女は正午に昼食を食べます。" },
+          key: "[[He]] / [[She]] / [[It]] / [[Tom]] → 動詞に [[s]]",
+        },
+        {
+          type: "explain",
+          title: "この形を「三単現」といいます",
+          text: ["自分（I）と相手（you）**以外**の、**1人・1つ**のことです。"],
+          chips: [
+            { label: "三単現 → 動詞に [[s]]", tone: "red", items: ["He", "She", "It", "Tom", "my mother"] },
+            { label: "三単現ではない → そのまま", tone: "plain", items: ["I", "You", "We", "They", "Tom and Ken"] },
           ],
         },
         {
@@ -70,7 +69,7 @@ export const TENSE = {
           ja: "彼女はテニスをします。",
           choices: ["play", "plays"],
           answer: "plays",
-          why: "She は三単現なので、**s** をつけて plays です。",
+          why: "[[She]] は三単現なので、play[[s]] です。",
         },
         {
           type: "choice",
@@ -78,7 +77,7 @@ export const TENSE = {
           ja: "トムとケンはサッカーをします。",
           choices: ["play", "plays"],
           answer: "play",
-          why: "Tom and Ken は2人なので三単現ではありません。**そのままの形**の play です。",
+          why: "Tom and Ken は2人なので三単現ではありません。**そのまま**の play です。",
         },
         {
           type: "choice",
@@ -86,18 +85,18 @@ export const TENSE = {
           ja: "母は毎朝コーヒーを飲みます。",
           choices: ["drink", "drinks"],
           answer: "drinks",
-          why: "My mother は自分と相手以外の1人なので三単現。**drinks** です。",
+          why: "[[My mother]] は1人なので三単現。drink[[s]] です。",
         },
         {
           type: "explain",
-          title: "s / es のつけ方",
+          title: "[[s]] と [[es]] のつけ方",
           table: {
-            head: ["ルール", "原形", "三単現"],
+            head: ["動詞", "三単現"],
             rows: [
-              ["多くの動詞：s をつける", "play / like / read", "plays / likes / reads"],
-              ["s, sh, ch, x, o で終わる：es", "watch / wash / go", "watches / washes / goes"],
-              ["子音字 + y：y を i に変えて es", "study / try", "studies / tries"],
-              ["特別な形", "have", "has"],
+              ["play / like / read", "play[[s]] / like[[s]] / read[[s]]"],
+              ["watch / wash / go", "watch[[es]] / wash[[es]] / go[[es]]"],
+              ["study / try", "stud[[ies]] / tr[[ies]]"],
+              ["have", "[[has]]"],
             ],
           },
           note: [
@@ -110,7 +109,7 @@ export const TENSE = {
           ja: "watch の三単現の形は？",
           choices: ["watchs", "watches", "watchies"],
           answer: "watches",
-          why: "ch で終わる動詞は **es** をつけます。",
+          why: "watch は watch[[es]] です。",
         },
         {
           type: "choice",
@@ -118,7 +117,7 @@ export const TENSE = {
           ja: "study の三単現の形は？",
           choices: ["studys", "studies", "studyes"],
           answer: "studies",
-          why: "子音字 + y で終わるので、**y を i に変えて es** です。",
+          why: "study は stud[[ies]] です。",
         },
         {
           type: "choice",
@@ -126,50 +125,41 @@ export const TENSE = {
           ja: "have の三単現の形は？",
           choices: ["haves", "has", "havs"],
           answer: "has",
-          why: "have は特別な形で **has** になります。",
+          why: "have は特別で [[has]] になります。",
         },
         {
           type: "order",
           ja: "父は銀行で働いています。",
           words: ["My", "father", "works", "at", "a", "bank"],
           end: ".",
-          why: "ふだんの事実なので現在形。My father は三単現なので **works** です。",
+          why: "[[My father]] は三単現なので work[[s]] です。",
         },
         {
           type: "order",
           ja: "太陽は東から昇ります。",
           words: ["The", "sun", "rises", "in", "the", "east"],
           end: ".",
-          why: "変わらない事実なので現在形。The sun は三単現なので **rises** です。",
+          why: "[[The sun]] は三単現なので rise[[s]] です。",
         },
         {
           type: "order",
           ja: "この電車は9時に出発します。",
           words: ["This", "train", "leaves", "at", "nine"],
           end: ".",
-          why: "時刻表の予定も現在形で表します。This train は三単現なので **leaves** です。",
+          why: "[[This train]] は三単現なので leave[[s]] です。",
         },
         {
           type: "explain",
           title: "頻度を表す言葉",
-          text: [
-            "さらに文章に厚みを入れるために、**頻度を表す言葉**を覚えましょう！",
-            "これらは**動詞の前**に置きます。",
+          text: ["さらに文章に厚みを入れるために、**頻度を表す言葉**を覚えましょう！"],
+          chips: [
+            { tone: "plain", items: ["{{always}} いつも", "{{usually}} たいてい", "{{often}} よく", "{{sometimes}} ときどき", "{{never}} 決して〜ない"] },
           ],
-          table: {
-            head: ["言葉", "意味", "例文"],
-            rows: [
-              ["always", "いつも", "I always drink water in the morning."],
-              ["usually", "たいてい", "She usually walks to school."],
-              ["often", "よく", "We often eat lunch together."],
-              ["sometimes", "ときどき", "He sometimes cooks dinner."],
-              ["never", "決して〜ない", "I never drink coffee at night."],
-            ],
-          },
+          key: "これらは**動詞の前**に置きます。",
           examples: [
-            { en: "I always drink water in the morning.", ja: "私はいつも朝に水を飲みます。" },
-            { en: "She usually walks to school.", ja: "彼女はたいてい歩いて学校に行きます。" },
-            { en: "We often eat lunch together.", ja: "私たちはよく一緒に昼食を食べます。" },
+            { en: "I {{always}} drink water in the morning.", ja: "私はいつも朝に水を飲みます。" },
+            { en: "She {{usually}} walks to school.", ja: "彼女はたいてい歩いて学校に行きます。" },
+            { en: "We {{often}} eat lunch together.", ja: "私たちはよく一緒に昼食を食べます。" },
           ],
         },
         {
@@ -177,14 +167,14 @@ export const TENSE = {
           ja: "彼女はたいてい歩いて学校に行きます。",
           words: ["She", "usually", "walks", "to", "school"],
           end: ".",
-          why: "usually は**動詞（walks）の前**です。",
+          why: "{{usually}} は**動詞（walks）の前**です。",
         },
         {
           type: "order",
           ja: "彼はときどき夕食を作ります。",
           words: ["He", "sometimes", "cooks", "dinner"],
           end: ".",
-          why: "sometimes は**動詞（cooks）の前**です。",
+          why: "{{sometimes}} は**動詞（cooks）の前**です。",
         },
         {
           type: "write",
@@ -198,7 +188,7 @@ export const TENSE = {
           ja: "彼女は英語が好きです。",
           answers: ["She likes English."],
           hint: "like（好き）",
-          why: "She は三単現なので **likes** です。",
+          why: "[[She]] は三単現なので like[[s]] です。",
         },
       ],
     },
