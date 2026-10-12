@@ -54,10 +54,17 @@ button, input, textarea, select { font: inherit; color: inherit; }
 [hidden] { display: none !important; }
 
 .wrap { max-width: 640px; margin: 0 auto; padding: 0 16px 48px; }
+/* On the home screen app, keep clear of the notch and the home bar. */
+.wrap {
+  padding-left: max(16px, env(safe-area-inset-left));
+  padding-right: max(16px, env(safe-area-inset-right));
+  padding-bottom: calc(48px + env(safe-area-inset-bottom));
+}
 
 /* ---------- top bar ---------- */
 .topbar {
   position: sticky; top: 0; z-index: 5;
+  padding-top: env(safe-area-inset-top);
   background: color-mix(in srgb, var(--bg) 92%, transparent);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
