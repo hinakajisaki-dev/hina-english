@@ -18,7 +18,6 @@ if (!dir) {
 
 const FIELDS = {
   タイトル: { name: "title", top: true },
-  サブタイトル: { name: "subtitle", top: true },
   後ろの形: { name: "form" },
   意味: { name: "meaning" },
   例文: { name: "example", split: "|" }, // English | 日本語
@@ -104,68 +103,11 @@ const header = (right = "") => `
     ${right}
   </header>`;
 
-function cover(deck, total) {
-  const ex = deck.rounds[0].phrases[0];
+// Just the title, in the middle of the slide.
+function cover(deck) {
   return `
-<section class="slide cover">${header()}
-  <div class="cbody">
-    <div class="eyebrow"><span class="lab">YOUTUBE LIVE</span><span class="chip">瞬間英作文</span></div>
-    <p class="script">Ready, set, speak!</p>
-    <h1>${latin(deck.title)}</h1>
-    ${deck.subtitle ? `<p class="lead">${esc(deck.subtitle)}</p>` : ""}
-    <dl class="stats">
-      <div><dt>今日のフレーズ</dt><dd><span class="n">${total}</span>個</dd></div>
-      <div class="sep"></div>
-      <div><dt>瞬間英作文</dt><dd><span class="n">${total * 2}</span>問</dd></div>
-      <div class="sep"></div>
-      <div><dt>かんたん → 中級</dt><dd><span class="n">2</span>レベル</dd></div>
-    </dl>
-  </div>
-  <div class="tile"></div>
-  ${deco(LOGO, asterisk(1112, 198, 36, 12))}
-  <div class="sample">
-    <span class="chip">5秒で言える？</span>
-    <p class="sj">${esc(ex.example[1])}</p>
-    <div class="sline"></div>
-    <p class="se">${hi(ex.example[0])}</p>
-  </div>
-</section>`;
-}
-
-function flow(deck) {
-  let n = 0;
-  return `
-<section class="slide flow">${header()}
-  <p class="lab">TODAY'S MENU</p>
-  <h2 class="h">今日の流れ</h2>
-  <div class="menu">
-    ${deck.rounds
-      .map((r, i) => {
-        const from = n + 1;
-        n += r.phrases.length;
-        return `<div class="mcard r${i + 1}">
-      <div class="mhead"><span class="dot"></span><span class="mr">ROUND ${i + 1}</span><span class="mt">${esc(r.title)}</span><span class="mn">No.${two(from)}–${two(n)}</span></div>
-      <ul class="ml">${r.phrases.map((p) => `<li>${slot(p.pattern)}</li>`).join("")}</ul>
-    </div>`;
-      })
-      .join("\n    ")}
-  </div>
-  ${deco(LOGO)}
-</section>`;
-}
-
-function howto() {
-  return `
-<section class="slide howto">${header()}
-  <p class="lab">HOW TO PLAY</p>
-  <h2 class="h">瞬間英作文のやり方</h2>
-  <ol class="steps">
-    <li><span class="sn">1</span><p class="st">日本語を見る</p><p class="sd">「かんたん」→「中級」の<br>順番で出題します</p></li>
-    <li><span class="sn">2</span><p class="st">5秒で英語にする</p><p class="sd">完璧じゃなくてOK！<br>すぐ声に出してみよう</p></li>
-    <li><span class="sn">3</span><p class="st">こたえ合わせ</p><p class="sd">こたえを見たら、<br>一緒にリピートしよう</p></li>
-  </ol>
-  <p class="tip"><span class="chip">チャットで参加</span>思いついた英語を、チャットに書き込んでもOK！</p>
-  ${deco(LOGO)}
+<section class="slide cover">
+  <h1>${latin(deck.title)}</h1>
 </section>`;
 }
 
@@ -206,7 +148,7 @@ function phrase(p, n, total, r, i, answer) {
     <div class="row"><span class="lab">POINT</span><p class="pt">${esc(p.point)}</p></div>
   </div>
   <div class="qcard${answer ? " answer" : ""}">
-    <div class="qhead"><span class="script">${answer ? "Answer" : "Let's try!"}</span><span class="qt">${answer ? "こたえ" : "英語で言ってみよう"}</span></div>
+    <div class="qhead"><span class="script">${answer ? "Answer" : "Questions"}</span><span class="qt">${answer ? "こたえ" : "英語で言ってみよう"}</span></div>
     <ol class="qs">${rows.map(q).join("")}</ol>
   </div>
   ${deco(LOGO)}
@@ -235,7 +177,7 @@ function ending() {
 
 function render(deck) {
   const total = deck.rounds.reduce((n, r) => n + r.phrases.length, 0);
-  const slides = [cover(deck, total), flow(deck), howto()];
+  const slides = [cover(deck)];
   let n = 0;
   deck.rounds.forEach((r, k) => {
     slides.push(roundCover(r, k + 1, n + 1));
