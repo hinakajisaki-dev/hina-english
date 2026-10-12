@@ -187,6 +187,8 @@ const CONTRACTIONS = {
 export function normalizeWords(text) {
   return String(text)
     .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "") // café → cafe
     .replace(/[’‘]/g, "'")
     .split(/\s+/)
     .map((w) => w.replace(/^[^a-z0-9']+|[^a-z0-9']+$/g, ""))
