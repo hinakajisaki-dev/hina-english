@@ -1,13 +1,16 @@
-// Student app: sign in with a lesson code, then vocab cards, today's phrase,
-// pronunciation, grammar and the journal with AI correction.
+// Student app: sign in with a lesson code, then vocab cards and their 復習,
+// today's phrase, pronunciation, grammar and the journal with AI correction.
 import {
   ApiError, api, canListen, compareSpeech, diffHtml, esc, formatDate, icons, japanDayNumber, listen,
   normalizeWords, SPEEDS, getSpeed, setSpeed, speak, startOfJapanDay, stopSpeaking, toast,
 } from "./common.js";
 import { UNITS, findLesson, plain, questionCount } from "./grammar/lessons.js";
+import { bookWeeks, setKey, speakable, splitOnForm, weekWords, wordSets } from "./vocab/words.js";
 
 const app = document.getElementById("app");
-const state = { me: null, vocab: null, pron: { index: 0 }, grammar: null, lesson: null, aiError: {} };
+const state = {
+  me: null, vocab: null, vocabTest: null, review: null, pron: { index: 0 }, grammar: null, lesson: null, aiError: {},
+};
 
 const asterisk = `<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><g stroke="currentColor" stroke-width="3.2" stroke-linecap="round"><path d="M12 3v18"/><path d="M4.2 7.5l15.6 9"/><path d="M4.2 16.5l15.6-9"/></g></svg>`;
 
@@ -30,7 +33,9 @@ async function load() {
 function render() {
   if (!state.me) return renderLogin();
   const [, screen, ...rest] = location.hash.split("/");
-  const screens = { vocab: renderVocab, phrases: renderPhrases, pron: renderPron, grammar: renderGrammar, journal: renderJournal };
+  const screens = {
+    vocab: renderVocab, review: renderReview, phrases: renderPhrases, pron: renderPron, grammar: renderGrammar, journal: renderJournal,
+  };
   (screens[screen] || renderHome)(...rest.map(decodeURIComponent));
 }
 
@@ -162,8 +167,10 @@ function renderLogin() {
 // ---------- home ----------
 
 function renderHome() {
-  const vocab = items("vocab");
-  const known = vocab.filter((v) => progress(v.id).known).length;
+  const weeks = [...new Set([...bookWeeks(), ...items("vocab").map((v) => v.data.week || "other")])];
+  const sets = weeks.flatMap((week) => wordSets(studentWeekWords(week)).map((s) => setKey(week, s.number)));
+  const tested = sets.filter((key) => state.me.vocabTests[key]).length;
+  const review = reviewWords().length;
   const phrase = todaysPhrase();
   const pron = items("pron");
   const grammar = items("grammar");
@@ -192,8 +199,12 @@ function renderHome() {
         </a>
         <a class="tile" href="#/vocab">
           <span class="emoji" aria-hidden="true">🃏</span><b>単語カード</b>
-          <span class="muted">${vocab.length ? `覚えた ${known} / ${vocab.length}` : "まだありません"}</span>
-          ${vocab.length ? `<div class="bar"><i style="width:${Math.round((known / vocab.length) * 100)}%"></i></div>` : ""}
+          <span class="muted">${sets.length ? `テスト ${tested} / ${sets.length}` : "まだありません"}</span>
+          ${sets.length ? `<div class="bar"><i style="width:${Math.round((tested / sets.length) * 100)}%"></i></div>` : ""}
+        </a>
+        <a class="tile" href="#/review">
+          <span class="emoji" aria-hidden="true">🔁</span><b>復習</b>
+          <span class="muted">${review ? `復習カード ${review} 語` : "まだありません"}</span>
         </a>
         <a class="tile" href="#/phrases">
           <span class="emoji" aria-hidden="true">💬</span><b>フレーズ</b>
@@ -203,9 +214,9 @@ function renderHome() {
           <span class="emoji" aria-hidden="true">🎤</span><b>発音</b>
           <span class="muted">${pron.length ? `${pron.length} 文` : "まだありません"}</span>
         </a>
-        <a class="tile" href="#/grammar">
-          <span class="emoji" aria-hidden="true">✏️</span><b>文法</b>
-          <span class="muted">${UNITS.map((u) => u.title).join("・")}${grammar.length ? ` ＋ 先生からの問題 ${grammar.length} 問` : ""}</span>
+        <a class="tile wide" href="#/grammar">
+          <span class="emoji" aria-hidden="true">✏️</span>
+          <div><b>文法</b><p class="muted">${UNITS.map((u) => u.title).join("・")}${grammar.length ? ` ＋ 先生からの問題 ${grammar.length} 問` : ""}</p></div>
         </a>
       </nav>
       <p class="footer-links"><button type="button" class="btn ghost small-btn" id="logout">ログアウト</button></p>
@@ -221,126 +232,510 @@ function renderHome() {
 }
 
 // ---------- vocab cards ----------
+// A week is the shared 単語帳 plus the teacher's words for this student, in
+// sets of ten. Each set: one card per word (with a 復習 checkbox), then a test.
+// Missed words and ticked words make the 復習 list.
 
 const WEEKS = 24;
-// Words added before weeks existed have no week; they show as そのほか.
-const weekOf = (item) => item.data.week || "other";
 const weekLabel = (week) => (week === "other" ? "そのほか" : `Week ${week}`);
+const studentWeekWords = (week) => weekWords(week, state.me.items);
+const inReview = (key) => state.me.review.some((r) => r.key === key);
+const testResult = (week, number) => state.me.vocabTests[setKey(week, number)];
 
-function renderVocab(week) {
-  if (week) return renderVocabCards(week === "other" ? "other" : Number(week));
-  const vocab = items("vocab");
+// Every word this student has, by key, so the 復習 list can find its words.
+function wordsByKey() {
+  const weeks = new Set([...bookWeeks(), ...items("vocab").map((v) => v.data.week || "other")]);
+  const map = new Map();
+  for (const week of weeks) for (const w of studentWeekWords(week)) map.set(w.key, { ...w, week });
+  return map;
+}
+
+async function setReview(key, on, source = "check") {
+  if (on && !inReview(key)) state.me.review.push({ key, source, added_at: new Date().toISOString() });
+  if (!on) state.me.review = state.me.review.filter((r) => r.key !== key);
+  try {
+    await api("/api/vocab/review", { method: "POST", body: { key, on, source } });
+  } catch (error) {
+    toast(error.message);
+  }
+}
+
+// An example sentence with its word in red (or a blank in its place).
+function exampleHtml(ex, { blank = false } = {}) {
+  return splitOnForm(ex.en, ex.form)
+    .map((part, i) => (i % 2 ? (blank ? '<span class="blank" aria-label="空欄"></span>' : `<span class="hl">${esc(part)}</span>`) : esc(part)))
+    .join("");
+}
+
+const noteHtml = (note) => esc(note).replace(/\n/g, "<br>");
+// 名詞 / 動詞 above an example, when a word's examples use it in different ways.
+const exTag = (ex) => (ex.tag ? `<span class="ex-tag">${esc(ex.tag)}</span>` : "");
+
+function renderVocab(week, setNumber, mode) {
+  const w = week === "other" ? "other" : Number(week);
+  if (week && setNumber && mode === "test") return renderVocabTest(w, Number(setNumber));
+  if (week && setNumber) return renderVocabSet(w, Number(setNumber));
+  if (week) return renderWeek(w);
+
   const weeks = Array.from({ length: WEEKS }, (_, i) => i + 1);
-  if (vocab.some((v) => !v.data.week)) weeks.push("other");
-
+  if (items("vocab").some((v) => !v.data.week)) weeks.push("other");
   const tiles = weeks.map((week) => {
-    const words = vocab.filter((v) => weekOf(v) === week);
-    if (!words.length) {
-      return `<div class="week empty-week"><b>${weekLabel(week)}</b><span>まだありません</span></div>`;
-    }
-    const known = words.filter((v) => progress(v.id).known).length;
-    return `<a class="week ${known === words.length ? "done" : ""}" href="#/vocab/${week}">
+    const words = studentWeekWords(week);
+    if (!words.length) return `<div class="week empty-week"><b>${weekLabel(week)}</b><span>まだありません</span></div>`;
+    const sets = wordSets(words);
+    const tested = sets.filter((s) => testResult(week, s.number)).length;
+    return `<a class="week ${tested === sets.length ? "done" : ""}" href="#/vocab/${week}">
       <b>${weekLabel(week)}</b>
-      <span>${known === words.length ? "✓ " : ""}${known} / ${words.length} 語</span>
-      <div class="bar"><i style="width:${Math.round((known / words.length) * 100)}%"></i></div>
+      <span>${words.length} 語 ・ テスト ${tested} / ${sets.length}</span>
+      <div class="bar"><i style="width:${Math.round((tested / sets.length) * 100)}%"></i></div>
     </a>`;
   });
 
   app.innerHTML = `${topbar("単語カード")}
     <main class="wrap stack">
-      ${vocab.length ? "" : emptyState("まだ単語がありません。<br>先生が追加すると、ここに出てきます。")}
       <div class="weeks">${tiles.join("")}</div>
     </main>`;
 }
 
-function startVocab(week, filter) {
-  const words = items("vocab").filter((v) => weekOf(v) === week);
-  const pool = filter === "todo" ? words.filter((v) => !progress(v.id).known) : words;
-  state.vocab = { week, filter, queue: shuffle(pool.map((v) => v.id)), flipped: false, total: pool.length };
-}
-
-function renderVocabCards(week) {
-  const words = items("vocab").filter((v) => weekOf(v) === week);
-  if (state.vocab?.week !== week) startVocab(week, "todo");
-  const { filter, queue, flipped, total } = state.vocab;
-  const card = words.find((v) => v.id === queue[0]);
-  const again = () => renderVocabCards(week);
-
-  let body;
-  if (!words.length) {
-    body = emptyState("この週の単語は、まだありません。");
-  } else if (!card) {
-    const next = typeof week === "number" && items("vocab").some((v) => v.data.week === week + 1) ? week + 1 : null;
-    body = `<div class="card empty stack">
-      <p style="font-size:40px">🎉</p>
-      <p><b>${filter === "todo" ? `${weekLabel(week)} の単語を全部覚えました！` : "全部見ました！"}</b></p>
-      <button class="btn block" data-restart="all">${weekLabel(week)} をもう一度</button>
-      ${next ? `<a class="btn secondary block" href="#/vocab/${next}">Week ${next} へ</a>` : ""}
-      <a class="btn ghost block" href="#/vocab">Week 一覧にもどる</a>
-    </div>`;
-  } else {
-    const d = card.data;
-    body = `
-      <p class="counter">のこり ${queue.length} / ${total}</p>
-      <div class="flash ${flipped ? "back" : ""}" role="button" tabindex="0" id="flash" aria-label="カードをめくる">
-        ${flipped
-          ? `<p class="word" lang="en">${esc(d.word)}</p>
-             <p class="meaning">${esc(d.meaning)}</p>
-             ${d.example ? `<p class="example" lang="en">${esc(d.example)}</p>` : ""}`
-          : `<p class="word" lang="en">${esc(d.word)}</p><p class="hint">タップして意味を見る</p>`}
-      </div>
-      <div class="speak-row">
-        ${sayButton(d.word)}
-        ${flipped && d.example ? sayButton(d.example, "例文を聞く") : ""}
-      </div>
-      <div class="speak-row">${speedControl()}</div>
-      <div class="card-actions">
-        <button class="btn secondary" data-answer="again">もう一回</button>
-        <button class="btn" data-answer="known">覚えた！</button>
-      </div>`;
-  }
-
+function renderWeek(week) {
+  state.vocabTest = null;
+  const sets = wordSets(studentWeekWords(week));
   app.innerHTML = `${topbar(`単語カード ・ ${weekLabel(week)}`, "#/vocab")}
     <main class="wrap stack">
-      ${words.length ? `<div class="segment" role="group" aria-label="表示するカード">
-        <button data-filter="todo" aria-pressed="${filter === "todo"}">まだのカード</button>
-        <button data-filter="all" aria-pressed="${filter === "all"}">全部</button>
-      </div>` : ""}
+      <p class="muted">10語ずつ覚えて、最後にテストをします。まちがえた単語は「復習」に入ります。</p>
+      ${sets.length ? "" : emptyState("この週の単語は、まだありません。")}
+      ${sets.map((set) => {
+        const result = testResult(week, set.number);
+        return `<a class="lesson-card" href="#/vocab/${week}/${set.number}">
+          <div><b>${set.number}. ${esc(set.title)}</b><span class="muted small" lang="en">${set.words.map((w) => esc(w.word)).join(" ・ ")}</span></div>
+          ${result ? `<span class="badge">✓ ${result.best} / ${result.total}</span>` : `<span class="badge start">はじめる</span>`}
+        </a>`;
+      }).join("")}
+    </main>`;
+}
+
+function findSet(week, number) {
+  return wordSets(studentWeekWords(week)).find((s) => s.number === number);
+}
+
+function renderVocabSet(week, number) {
+  const set = findSet(week, number);
+  if (!set) return renderWeek(week);
+  const id = setKey(week, number);
+  if (state.vocab?.id !== id) state.vocab = { id, index: 0 };
+  const V = state.vocab;
+  const word = set.words[V.index];
+  const last = V.index === set.words.length - 1;
+  const rerender = () => {
+    renderVocabSet(week, number);
+    window.scrollTo(0, 0);
+  };
+
+  app.innerHTML = `${topbar(`${weekLabel(week)} ・ ${set.number}. ${set.title}`, `#/vocab/${week}`)}
+    <main class="wrap stack">
+      <div class="lesson-progress" role="progressbar" aria-valuemin="1" aria-valuemax="${set.words.length}" aria-valuenow="${V.index + 1}">
+        <div class="bar"><i style="width:${Math.round(((V.index + 1) / set.words.length) * 100)}%"></i></div>
+        <span class="counter">${V.index + 1} / ${set.words.length}</span>
+      </div>
+      <section class="card stack word-card">
+        ${word.pos ? `<p class="pos">${esc(word.pos)}</p>` : ""}
+        <div class="word-row">
+          <p class="word" lang="en">${esc(word.word)}</p>
+          ${sayIcon(speakable(word.word))}
+        </div>
+        <p class="meaning">${noteHtml(word.meaning)}</p>
+        ${word.examples.length ? `<ul class="word-examples">${word.examples.map((ex) => `<li>
+          ${sayIcon(ex.en)}
+          <div>
+            ${exTag(ex)}<p class="en" lang="en">${exampleHtml(ex)}</p>
+            ${ex.ja ? `<p class="ja">${esc(ex.ja)}</p>` : ""}
+            ${ex.note ? `<p class="word-note">${noteHtml(ex.note)}</p>` : ""}
+          </div>
+        </li>`).join("")}</ul>` : ""}
+        <div>${speedControl()}</div>
+        <label class="review-check">
+          <input type="checkbox" id="review-check" ${inReview(word.key) ? "checked" : ""}>
+          <span>復習カードに入れる</span>
+        </label>
+      </section>
+      <div class="lesson-nav">
+        ${V.index > 0 ? `<button type="button" class="btn ghost" id="prev">← もどる</button>` : "<span></span>"}
+        <button type="button" class="btn" id="next">${last ? "テストへ" : "次へ"}</button>
+      </div>
+    </main>`;
+
+  document.getElementById("review-check").addEventListener("change", (event) => {
+    setReview(word.key, event.target.checked);
+    toast(event.target.checked ? "復習カードに入れました" : "復習カードから外しました");
+  });
+  document.getElementById("prev")?.addEventListener("click", () => {
+    V.index -= 1;
+    rerender();
+  });
+  document.getElementById("next").addEventListener("click", () => {
+    if (last) {
+      state.vocab = null;
+      state.vocabTest = null;
+      location.hash = `#/vocab/${week}/${number}/test`;
+      return;
+    }
+    V.index += 1;
+    rerender();
+  });
+}
+
+// ---------- ten-word test ----------
+// Pick the meaning of each word from four. A miss goes into the 復習 list.
+
+function meaningChoices(word, pool) {
+  const others = shuffle(pool.filter((w) => w.word !== word.word && w.meaning !== word.meaning));
+  const samePos = others.filter((w) => w.pos === word.pos);
+  const picked = [];
+  for (const w of [...samePos, ...others]) {
+    if (picked.length === 3) break;
+    if (!picked.includes(w.meaning)) picked.push(w.meaning);
+  }
+  return shuffle([word.meaning, ...picked]);
+}
+
+function renderVocabTest(week, number) {
+  const set = findSet(week, number);
+  if (!set) return renderWeek(week);
+  const id = setKey(week, number);
+  if (state.vocabTest?.id !== id) {
+    const pool = studentWeekWords(week);
+    state.vocabTest = {
+      id,
+      questions: shuffle(set.words).map((word) => ({ word, choices: meaningChoices(word, pool) })),
+      index: 0,
+      answers: [],
+      saved: false,
+    };
+  }
+  const T = state.vocabTest;
+  const rerender = () => {
+    renderVocabTest(week, number);
+    window.scrollTo(0, 0);
+  };
+  const back = `#/vocab/${week}`;
+
+  if (T.index >= T.questions.length) return renderVocabTestResult(week, set, rerender);
+
+  const { word, choices } = T.questions[T.index];
+  const answer = T.answers[T.index];
+  app.innerHTML = `${topbar(`テスト ・ ${set.number}. ${set.title}`, back)}
+    <main class="wrap stack">
+      <div class="lesson-progress" role="progressbar" aria-valuemin="1" aria-valuemax="${T.questions.length}" aria-valuenow="${T.index + 1}">
+        <div class="bar"><i style="width:${Math.round((T.index / T.questions.length) * 100)}%"></i></div>
+        <span class="counter">${T.index + 1} / ${T.questions.length}</span>
+      </div>
+      <section class="card stack">
+        <p class="muted">この単語の意味は？</p>
+        <div class="word-row">
+          <p class="word" lang="en">${esc(word.word)}</p>
+          ${sayIcon(speakable(word.word))}
+        </div>
+        <div class="choices">${choices.map((c, i) => {
+          let cls = "";
+          if (answer && c === word.meaning) cls = "right";
+          else if (answer && c === answer.given) cls = "wrong";
+          return `<button type="button" class="choice ${cls}" data-choice="${i}" ${answer ? "disabled" : ""}>${esc(c)}</button>`;
+        }).join("")}</div>
+      </section>
+      ${answer ? `<section class="card stack" id="verdict" aria-live="polite">
+        <p class="verdict ${answer.right ? "right" : "wrong"}">${answer.right ? "⭕ 正解！" : "❌ ざんねん"}</p>
+        ${answer.right ? "" : `<p><b lang="en">${esc(word.word)}</b> は「${esc(word.meaning)}」。復習カードに入れました。</p>`}
+      </section>
+      <div class="lesson-nav"><span></span><button type="button" class="btn" id="next">${T.index === T.questions.length - 1 ? "結果を見る" : "次へ"}</button></div>` : ""}
+    </main>`;
+
+  if (answer) {
+    document.getElementById("next").addEventListener("click", () => {
+      T.index += 1;
+      rerender();
+    });
+    document.getElementById("next").focus();
+    return;
+  }
+  app.querySelectorAll("[data-choice]").forEach((button) =>
+    button.addEventListener("click", () => {
+      const given = choices[Number(button.dataset.choice)];
+      const right = given === word.meaning;
+      T.answers[T.index] = { given, right };
+      if (!right) setReview(word.key, true, "test");
+      rerender();
+    }),
+  );
+}
+
+function renderVocabTestResult(week, set, rerender) {
+  const T = state.vocabTest;
+  const score = T.answers.filter((a) => a.right).length;
+  const missed = T.questions.filter((_, i) => !T.answers[i].right).map((q) => q.word);
+  if (!T.saved) {
+    T.saved = true;
+    const key = setKey(week, set.number);
+    const old = state.me.vocabTests[key];
+    state.me.vocabTests[key] = {
+      best: Math.max(old?.best ?? 0, score), last: score, total: T.questions.length, times: (old?.times ?? 0) + 1,
+    };
+    api(`/api/vocab/tests/${week}/${set.number}`, { method: "POST", body: { score } }).catch((error) => toast(error.message));
+  }
+  const next = findSet(week, set.number + 1);
+  const perfect = score === T.questions.length;
+
+  app.innerHTML = `${topbar(`テスト ・ ${set.number}. ${set.title}`, `#/vocab/${week}`)}
+    <main class="wrap stack">
+      <section class="card stack" style="text-align:center">
+        <p style="font-size:40px">${perfect ? "🎉" : "👏"}</p>
+        <p class="score">${score} / ${T.questions.length}<small> 問正解</small></p>
+        <p>${perfect ? "全問正解！" : "まちがえた単語は、復習カードに入れました。"}</p>
+      </section>
+      ${missed.length ? `<section class="card stack">
+        <h3>復習カードに入れた単語</h3>
+        <ul class="plain-list">${missed.map((w) => `<li><b lang="en">${esc(w.word)}</b>　${esc(w.meaning)}</li>`).join("")}</ul>
+      </section>` : ""}
+      ${next ? `<a class="btn block" href="#/vocab/${week}/${next.number}">次の10語へ（${next.number}. ${esc(next.title)}）</a>` : ""}
+      <button type="button" class="btn secondary block" id="again">もう一度テスト</button>
+      <a class="btn ghost block" href="#/vocab/${week}">${weekLabel(week)} にもどる</a>
+    </main>`;
+  document.getElementById("again").addEventListener("click", () => {
+    state.vocabTest = null;
+    rerender();
+  });
+}
+
+// ---------- review ----------
+// The 復習 list: words ticked on their card or missed in a test.
+// Level 1: see the word, think of the meaning, check yourself.
+// Level 2: type the word into the gap in its example sentence.
+
+const REVIEW_SESSION = 20;
+
+function reviewWords() {
+  const byKey = wordsByKey();
+  return state.me.review.map((r) => byKey.get(r.key) && { ...byKey.get(r.key), source: r.source }).filter(Boolean);
+}
+
+// Level 2 needs an example sentence the word can be blanked out of.
+const blankable = (word) => word.examples.filter((ex) => ex.form);
+
+function renderReview(level) {
+  if (level === "1" || level === "2") return renderReviewSession(Number(level));
+  state.review = null;
+  const words = reviewWords();
+  const level2 = words.filter((w) => blankable(w).length).length;
+
+  app.innerHTML = `${topbar("復習")}
+    <main class="wrap stack">
+      ${words.length ? `
+        <p class="muted">復習する単語：<b>${words.length} 語</b>（1回 ${REVIEW_SESSION} 語まで、順番はばらばらに出ます）</p>
+        <a class="unit-card" href="#/review/1">
+          <span class="label">Level 1</span><b>単語の復習</b>
+          <span class="muted small">単語を見て、日本語の意味が分かるか自分でチェック</span>
+        </a>
+        ${level2 ? `<a class="unit-card" href="#/review/2">
+          <span class="label">Level 2</span><b>例文に単語を入れる</b>
+          <span class="muted small">例文の空いているところに、合う単語を入れよう</span>
+        </a>` : ""}
+        <section class="card stack">
+          <h3>復習カード</h3>
+          <ul class="review-list">${words.map((w) => `<li>
+            <div><b lang="en">${esc(w.word)}</b><span class="muted small">${esc(w.meaning)}</span></div>
+            <span class="badge ${w.source === "test" ? "teacher" : ""}">${w.source === "test" ? "テスト" : "チェック"}</span>
+            <button type="button" class="btn ghost small-btn" data-remove="${esc(w.key)}">外す</button>
+          </li>`).join("")}</ul>
+        </section>`
+      : emptyState("まだ復習カードがありません。<br>単語カードで「復習カードに入れる」にチェックするか、<br>テストでまちがえた単語がここに入ります。")}
+    </main>`;
+
+  app.querySelectorAll("[data-remove]").forEach((button) =>
+    button.addEventListener("click", async () => {
+      await setReview(button.dataset.remove, false);
+      renderReview();
+    }),
+  );
+}
+
+function startReview(level) {
+  const pool = reviewWords().filter((w) => level === 1 || blankable(w).length);
+  const words = shuffle(pool).slice(0, REVIEW_SESSION);
+  state.review = {
+    level,
+    questions: words.map((word) => {
+      const examples = level === 1 ? word.examples : blankable(word);
+      return { word, example: examples[Math.floor(Math.random() * examples.length)] || null };
+    }),
+    index: 0,
+    answers: [],
+  };
+}
+
+function renderReviewSession(level) {
+  if (state.review?.level !== level) startReview(level);
+  const R = state.review;
+  const rerender = () => {
+    renderReviewSession(level);
+    window.scrollTo(0, 0);
+  };
+  if (!R.questions.length) {
+    state.review = null;
+    location.hash = "#/review";
+    return;
+  }
+  if (R.index >= R.questions.length) return renderReviewResult(level, rerender);
+
+  const { word, example } = R.questions[R.index];
+  const answer = R.answers[R.index];
+  const body = level === 1 ? level1Html(word, example, answer, R) : level2Html(word, example, answer, R);
+  app.innerHTML = `${topbar(level === 1 ? "Level 1 ・ 単語の復習" : "Level 2 ・ 例文に入れる", "#/review")}
+    <main class="wrap stack">
+      <div class="lesson-progress" role="progressbar" aria-valuemin="1" aria-valuemax="${R.questions.length}" aria-valuenow="${R.index + 1}">
+        <div class="bar"><i style="width:${Math.round((R.index / R.questions.length) * 100)}%"></i></div>
+        <span class="counter">${R.index + 1} / ${R.questions.length}</span>
+      </div>
       ${body}
     </main>`;
 
-  const flash = document.getElementById("flash");
-  const flip = () => {
-    state.vocab.flipped = !state.vocab.flipped;
-    again();
-    document.getElementById("flash")?.focus();
+  const next = () => {
+    R.index += 1;
+    R.revealed = false;
+    R.hint = false;
+    rerender();
   };
-  flash?.addEventListener("click", flip);
-  flash?.addEventListener("keydown", (event) => {
-    if (event.key === "Enter" || event.key === " ") {
-      event.preventDefault();
-      flip();
+  document.getElementById("next")?.addEventListener("click", next);
+  if (answer) {
+    document.getElementById("next")?.focus();
+    return;
+  }
+
+  if (level === 1) {
+    document.getElementById("reveal")?.addEventListener("click", () => {
+      R.revealed = true;
+      rerender();
+    });
+    app.querySelectorAll("[data-self]").forEach((button) =>
+      button.addEventListener("click", () => {
+        R.answers[R.index] = { right: button.dataset.self === "yes" };
+        next();
+      }),
+    );
+    return;
+  }
+
+  const form = document.getElementById("fill");
+  form.answer.focus();
+  form.addEventListener("submit", (event) => {
+    event.preventDefault();
+    const given = form.answer.value.trim();
+    if (!given) return;
+    R.answers[R.index] = { given, right: sameWord(given, example.form) };
+    rerender();
+  });
+  document.getElementById("hint")?.addEventListener("click", () => {
+    R.hint = true;
+    rerender();
+  });
+  document.getElementById("give-up").addEventListener("click", () => {
+    R.answers[R.index] = { given: "", right: false };
+    rerender();
+  });
+}
+
+const sameWord = (a, b) => a.trim().toLowerCase().replace(/[’]/g, "'").replace(/[.,!?]+$/, "") === b.toLowerCase();
+
+function level1Html(word, example, answer, R) {
+  return `<section class="card stack word-card">
+      <p class="muted">この単語の意味は？　思いうかべてから「意味を見る」を押そう</p>
+      <div class="word-row">
+        <p class="word" lang="en">${esc(word.word)}</p>
+        ${sayIcon(speakable(word.word))}
+      </div>
+      ${example ? `<div class="word-examples one">${sayIcon(example.en)}<div>
+        ${exTag(example)}<p class="en" lang="en">${exampleHtml(example)}</p>
+        ${R.revealed && example.ja ? `<p class="ja">${esc(example.ja)}</p>` : ""}
+      </div></div>` : ""}
+      ${R.revealed ? `<p class="meaning reveal">${noteHtml(word.meaning)}</p>` : ""}
+    </section>
+    ${R.revealed
+      ? `<p class="muted center">分かりましたか？</p>
+        <div class="card-actions">
+          <button type="button" class="btn secondary" data-self="no">わからなかった</button>
+          <button type="button" class="btn" data-self="yes">わかった！</button>
+        </div>`
+      : `<button type="button" class="btn block" id="reveal">意味を見る</button>`}`;
+}
+
+function level2Html(word, example, answer, R) {
+  const form = example.form;
+  const letters = `${form[0]} ${"_ ".repeat(form.length - 1).trim()}`;
+  let verdict = "";
+  if (answer) {
+    const close = !answer.right && sameWord(answer.given, speakable(word.word));
+    verdict = `<section class="card stack" id="verdict" aria-live="polite">
+      <p class="verdict ${answer.right ? "right" : "wrong"}">${answer.right ? "⭕ 正解！" : close ? "🔺 おしい！" : "❌ ざんねん"}</p>
+      ${close ? `<p>この文では <b lang="en">${esc(form)}</b> になります（<span lang="en">${esc(speakable(word.word))}</span> の形が変わっています）。</p>` : ""}
+      ${answer.right || close ? "" : `<p>正解は <b lang="en">${esc(form)}</b></p>`}
+      <p><b lang="en">${esc(word.word)}</b>　${esc(word.meaning)}</p>
+    </section>
+    <div class="lesson-nav"><span></span><button type="button" class="btn" id="next">${R.index === R.questions.length - 1 ? "結果を見る" : "次へ"}</button></div>`;
+  }
+  return `<section class="card stack">
+      <p class="muted">日本語に合うように、空いているところに入る単語を書こう</p>
+      ${exTag(example)}${example.ja ? `<p class="question-ja">${esc(example.ja)}</p>` : ""}
+      ${answer
+        ? `<div class="word-examples one">${sayIcon(example.en)}<p class="question" lang="en">${exampleHtml(example)}</p></div>`
+        : `<p class="question" lang="en">${exampleHtml(example, { blank: true })}</p>`}
+      ${answer ? "" : `<p class="muted small">ヒント：<span lang="en" class="letters">${esc(letters)}</span>（${form.length}文字）</p>
+        ${R.hint ? `<p class="hint-box">元の単語は <b lang="en">${esc(speakable(word.word))}</b>（${esc(word.meaning)}）。形が変わることもあります。</p>` : ""}
+        <form id="fill" class="stack">
+          <input type="text" name="answer" lang="en" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="単語を入力">
+          <button class="btn block" type="submit">答え合わせ</button>
+          <div class="card-actions">
+            ${R.hint ? "" : `<button type="button" class="btn ghost" id="hint">ヒントを見る</button>`}
+            <button type="button" class="btn ghost" id="give-up">答えを見る</button>
+          </div>
+        </form>`}
+      ${answer && !answer.right && answer.given ? `<p class="muted small">あなたの答え：<span lang="en">${esc(answer.given)}</span></p>` : ""}
+    </section>${verdict}`;
+}
+
+function renderReviewResult(level, rerender) {
+  const R = state.review;
+  const known = R.questions.filter((_, i) => R.answers[i]?.right).map((q) => q.word);
+  const missed = R.questions.filter((_, i) => !R.answers[i]?.right).map((q) => q.word);
+  app.innerHTML = `${topbar(level === 1 ? "Level 1 ・ 単語の復習" : "Level 2 ・ 例文に入れる", "#/review")}
+    <main class="wrap stack">
+      <section class="card stack" style="text-align:center">
+        <p style="font-size:40px">${missed.length ? "👏" : "🎉"}</p>
+        <p class="score">${known.length} / ${R.questions.length}<small> ${level === 1 ? "語わかった" : "問正解"}</small></p>
+      </section>
+      ${missed.length ? `<section class="card stack">
+        <h3>${level === 1 ? "わからなかった単語" : "まちがえた単語"}</h3>
+        <ul class="plain-list">${missed.map((w) => `<li><b lang="en">${esc(w.word)}</b>　${esc(w.meaning)}</li>`).join("")}</ul>
+      </section>` : ""}
+      ${known.length ? `<section class="card stack">
+        <p>${level === 1 ? "わかった" : "正解した"}単語（${known.length} 語）を、復習カードから外しますか？</p>
+        <button type="button" class="btn secondary block" id="remove-known">外す</button>
+      </section>` : ""}
+      <button type="button" class="btn block" id="again">もう一度</button>
+      <a class="btn ghost block" href="#/review">復習にもどる</a>
+    </main>`;
+
+  document.getElementById("remove-known")?.addEventListener("click", async (event) => {
+    event.target.disabled = true;
+    for (const w of known) await setReview(w.key, false);
+    toast(`${known.length} 語を復習カードから外しました`);
+    event.target.closest("section").remove();
+  });
+  document.getElementById("again").addEventListener("click", () => {
+    state.review = null;
+    if (!reviewWords().length) {
+      location.hash = "#/review";
+      return;
     }
+    rerender();
   });
-  app.querySelectorAll("[data-filter]").forEach((button) =>
-    button.addEventListener("click", () => {
-      startVocab(week, button.dataset.filter);
-      again();
-    }),
-  );
-  app.querySelector("[data-restart]")?.addEventListener("click", () => {
-    startVocab(week, "all");
-    again();
-  });
-  app.querySelectorAll("[data-answer]").forEach((button) =>
-    button.addEventListener("click", () => {
-      const id = state.vocab.queue.shift();
-      if (button.dataset.answer === "again") state.vocab.queue.push(id);
-      state.vocab.flipped = false;
-      saveProgress(id, { result: button.dataset.answer });
-      again();
-    }),
-  );
 }
 
 // ---------- phrases ----------

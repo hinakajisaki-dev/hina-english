@@ -52,6 +52,26 @@ const SCHEMA = [
     updated_at TEXT NOT NULL,
     PRIMARY KEY (student_id, lesson_id)
   )`,
+  // Words in the student's 復習 list. word_key is "w1/go" (単語帳) or "item/12" (teacher's word);
+  // source is "check" (the student ticked it) or "test" (missed in a set test).
+  `CREATE TABLE IF NOT EXISTS vocab_review (
+    student_id INTEGER NOT NULL REFERENCES students(id) ON DELETE CASCADE,
+    word_key TEXT NOT NULL,
+    source TEXT NOT NULL,
+    added_at TEXT NOT NULL,
+    PRIMARY KEY (student_id, word_key)
+  )`,
+  // Best and latest score of each ten-word set test; set_key is "w1/s3".
+  `CREATE TABLE IF NOT EXISTS vocab_tests (
+    student_id INTEGER NOT NULL REFERENCES students(id) ON DELETE CASCADE,
+    set_key TEXT NOT NULL,
+    best_score INTEGER NOT NULL,
+    last_score INTEGER NOT NULL,
+    total INTEGER NOT NULL,
+    times INTEGER NOT NULL DEFAULT 1,
+    updated_at TEXT NOT NULL,
+    PRIMARY KEY (student_id, set_key)
+  )`,
 ];
 
 let ready = false;
@@ -94,12 +114,15 @@ export function journalRow(row) {
   };
 }
 
-// Everything one student's screen needs: items, progress, lesson results and recent journals.
+// Everything one student's screen needs: items, progress, lesson results, the 復習 list,
+// set test results and recent journals.
 export async function studentBundle(db, studentId) {
-  const [items, progress, lessonRows, journals] = await Promise.all([
+  const [items, progress, lessonRows, reviewRows, testRows, journals] = await Promise.all([
     all(db, `SELECT * FROM items WHERE student_id = ? ORDER BY id`, studentId),
     all(db, `SELECT * FROM progress WHERE student_id = ?`, studentId),
     all(db, `SELECT * FROM lesson_results WHERE student_id = ?`, studentId),
+    all(db, `SELECT * FROM vocab_review WHERE student_id = ? ORDER BY added_at`, studentId),
+    all(db, `SELECT * FROM vocab_tests WHERE student_id = ?`, studentId),
     all(db, `SELECT * FROM journals WHERE student_id = ? ORDER BY id DESC LIMIT 60`, studentId),
   ]);
   const progressById = {};
@@ -115,5 +138,10 @@ export async function studentBundle(db, studentId) {
   for (const r of lessonRows) {
     lessons[r.lesson_id] = { best: r.best_score, last: r.last_score, total: r.total, times: r.times, updated_at: r.updated_at };
   }
-  return { items: items.map(itemRow), progress: progressById, lessons, journals: journals.map(journalRow) };
+  const review = reviewRows.map((r) => ({ key: r.word_key, source: r.source, added_at: r.added_at }));
+  const vocabTests = {};
+  for (const r of testRows) {
+    vocabTests[r.set_key] = { best: r.best_score, last: r.last_score, total: r.total, times: r.times, updated_at: r.updated_at };
+  }
+  return { items: items.map(itemRow), progress: progressById, lessons, review, vocabTests, journals: journals.map(journalRow) };
 }
