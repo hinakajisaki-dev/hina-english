@@ -18,17 +18,16 @@
     --memo: #EEF4FB;
     --ink: #1A2238;
     --ink-2: #4B5569;
-    --muted: #8A93A8;
     --accent: #F0521E;
     --accent-text: #C23B12;
     --accent-soft: #FFE6DC;
 
-    /* one color per part of the sentence */
-    --s: #D6E9FA;  --s-ink: #1F5F96;  --s-line: #9CC6EC;  /* 主語 */
-    --a: #F0521E;  --a-ink: #FFFFFF;  --a-line: #F5A285;  /* 助動詞 */
-    --v: #FFD9E2;  --v-ink: #B3304F;  --v-line: #F2A3B6;  /* 動詞 */
-    --o: #FFEDB8;  --o-ink: #8A5A00;  --o-line: #EBC864;  /* 目的語 */
-    --w: #D3F0E2;  --w-ink: #1F7A52;  --w-line: #8FD3B2;  /* W */
+    /* one fruit and one color per part of the sentence (pictures in fruits/, made by make-fruits.cjs) */
+    --s: #FFDDE0;  --s-ink: #C42B3B;  --s-line: #F2A0A8;  /* 主語 = りんご */
+    --a: #FFE98A;  --a-ink: #7A5A00;  --a-line: #EDCB45;  /* 助動詞 = 黄色いバナナ */
+    --v: #DDF1C6;  --v-ink: #3D7A1A;  --v-line: #A9D77F;  /* 動詞 = 緑のバナナ */
+    --o: #FFE0C0;  --o-ink: #B65300;  --o-line: #F5B57A;  /* 目的語 = オレンジ */
+    --w: #D6E9FA;  --w-ink: #1F5F96;  --w-line: #9CC6EC;  /* W */
     --n: #1A2238;  --n-ink: #FFFFFF;  --n-line: #8A93A8;  /* NOT */
 
     --en: "Liberation Sans", Arial, "Noto Sans JP", sans-serif;
@@ -44,7 +43,6 @@
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
   }
-  .en { font-family: var(--en); }
 
   .slide {
     width: 1280px;
@@ -73,6 +71,7 @@
 
   /* ---------- parts of the sentence ---------- */
   .row { display: flex; align-items: center; gap: 12px; }
+  .f { display: block; flex: none; }
   .c {
     display: flex;
     align-items: center;
@@ -91,7 +90,8 @@
   .c.w { background: var(--w); color: var(--w-ink); }
   .c.n { background: var(--n); color: var(--n-ink); }
   .c.w, .c.n { font-family: var(--en); letter-spacing: .04em; }
-  .qm { font-family: var(--en); font-size: 44px; color: var(--accent); width: 32px; text-align: center; }
+  .qm { font-family: var(--en); font-size: 44px; color: var(--ink); width: 32px; text-align: center; }
+  .word { font-family: var(--en); font-size: 46px; text-align: center; }
 
   /* ---------- 1: title ---------- */
   .cover { background: var(--bg); justify-content: center; padding-left: 120px; }
@@ -116,52 +116,61 @@
   .tile.s { background: var(--s); color: var(--s-ink); }
   .tile.v { background: var(--v); color: var(--v-ink); }
   .tile.o { background: var(--o); color: var(--o-ink); }
-  .word { font-family: var(--en); font-size: 46px; text-align: center; }
   .basic .ja { font-size: 26px; color: var(--ink-2); margin-top: 34px; text-align: center; }
 
-  /* ---------- 3: 4つの形 ---------- */
-  .forms { display: flex; flex-direction: column; gap: 14px; margin-top: 30px; }
+  /* ---------- 3: 4つの形 (fruits only) + which fruit is which ---------- */
+  .forms { display: flex; flex-direction: column; gap: 12px; margin-top: 26px; }
+  .forms .row { gap: 22px; }
   .forms .type { width: 190px; font-size: 21px; color: var(--ink-2); }
-  .emoji {
+  .forms .f { width: 70px; height: 70px; }
+  .forms .c { width: 110px; height: 50px; font-size: 22px; }
+  .key {
     flex: 1;
-    margin-top: 28px;
+    margin-top: 24px;
     background: var(--bg);
     border-radius: 28px;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 44px;
+    gap: 56px;
   }
-  .emoji .col { display: flex; flex-direction: column; align-items: center; gap: 6px; }
-  .emoji .e { font-family: "Noto Color Emoji", var(--ja); font-size: 64px; line-height: 1.15; }
-  .emoji .c { width: 128px; height: 40px; font-size: 18px; }
-  .emoji .word { font-size: 30px; }
+  .key .col { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+  .key .f { width: 66px; height: 66px; }
+  .key .word { font-size: 28px; }
+  .key .c { width: 120px; height: 36px; font-size: 17px; }
 
   /* ---------- 4-7: one form + space to write ---------- */
-  .big { margin-top: 30px; gap: 14px; }
-  .big .c { width: 180px; height: 80px; font-size: 32px; }
-  .big .qm { font-size: 64px; width: 44px; }
-  .memo { flex: 1; margin-top: 32px; background: var(--memo); border-radius: 28px; }
+  .parts { display: flex; align-items: flex-start; gap: 18px; margin-top: 24px; }
+  .p { width: 150px; display: flex; flex-direction: column; align-items: center; gap: 10px; }
+  .p .f { width: 104px; height: 104px; }
+  .p .c { width: 124px; height: 38px; font-size: 19px; }
+  .p .c.w, .p .c.n { width: 140px; height: 64px; font-size: 30px; margin: 20px 0; }
+  .p.q { width: 48px; }
+  .p .qm { height: 104px; line-height: 104px; font-size: 64px; width: 48px; }
+  .memo { flex: 1; margin-top: 24px; background: var(--memo); border-radius: 28px; }
 
   /* ---------- 8-11: practice slots ---------- */
   .sheet {
     flex: 1;
     display: grid;
-    grid-template-rows: 60px repeat(4, 1fr);
-    row-gap: 14px;
+    grid-template-rows: 100px repeat(4, 1fr);
+    row-gap: 12px;
     column-gap: 12px;
-    margin-top: 30px;
+    margin-top: 26px;
   }
   .sheet.k4 { grid-template-columns: 44px repeat(4, 1fr) 32px; }
   .sheet.k5 { grid-template-columns: 44px repeat(5, 1fr) 32px; }
-  .sheet .c { width: auto; height: auto; font-size: 24px; }
+  .hd { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+  .hd .f { width: 62px; height: 62px; }
+  .hd .c { width: 100%; height: 32px; font-size: 17px; }
+  .hd .c.w, .hd .c.n { height: 52px; font-size: 22px; margin-top: 5px; }
   .no {
     align-self: center;
     width: 40px;
     height: 40px;
     border-radius: 50%;
-    background: var(--accent-soft);
-    color: var(--accent-text);
+    background: var(--bg);
+    color: var(--ink-2);
     font-family: var(--en);
     font-size: 20px;
     display: flex;
@@ -212,60 +221,64 @@
 <section class="slide">
   <div class="h"><div class="bar"></div><h2>4つの形</h2></div>
   <div class="forms">
-    <div class="row">
-      <p class="type">肯定文</p>
-      <div class="c s">主語</div><div class="c a">助動詞</div><div class="c v">動詞</div><div class="c o">目的語</div>
-    </div>
-    <div class="row">
-      <p class="type">疑問文</p>
-      <div class="c a">助動詞</div><div class="c s">主語</div><div class="c v">動詞</div><div class="c o">目的語</div><p class="qm">?</p>
-    </div>
-    <div class="row">
-      <p class="type">疑問詞の疑問文</p>
-      <div class="c w">W</div><div class="c a">助動詞</div><div class="c s">主語</div><div class="c v">動詞</div><div class="c o">目的語</div><p class="qm">?</p>
-    </div>
-    <div class="row">
-      <p class="type">否定文</p>
-      <div class="c s">主語</div><div class="c a">助動詞</div><div class="c n">NOT</div><div class="c v">動詞</div><div class="c o">目的語</div>
-    </div>
+    <div class="row"><p class="type">肯定文</p><img class="f" src="fruits/apple.png" alt="りんご"><img class="f" src="fruits/banana.png" alt="黄色いバナナ"><img class="f" src="fruits/banana-green.png" alt="緑のバナナ"><img class="f" src="fruits/orange.png" alt="オレンジ"></div>
+    <div class="row"><p class="type">疑問文</p><img class="f" src="fruits/banana.png" alt="黄色いバナナ"><img class="f" src="fruits/apple.png" alt="りんご"><img class="f" src="fruits/banana-green.png" alt="緑のバナナ"><img class="f" src="fruits/orange.png" alt="オレンジ"><p class="qm">?</p></div>
+    <div class="row"><p class="type">疑問詞の疑問文</p><div class="c w">W</div><img class="f" src="fruits/banana.png" alt="黄色いバナナ"><img class="f" src="fruits/apple.png" alt="りんご"><img class="f" src="fruits/banana-green.png" alt="緑のバナナ"><img class="f" src="fruits/orange.png" alt="オレンジ"><p class="qm">?</p></div>
+    <div class="row"><p class="type">否定文</p><img class="f" src="fruits/apple.png" alt="りんご"><img class="f" src="fruits/banana.png" alt="黄色いバナナ"><div class="c n">NOT</div><img class="f" src="fruits/banana-green.png" alt="緑のバナナ"><img class="f" src="fruits/orange.png" alt="オレンジ"></div>
   </div>
-  <div class="emoji">
-    <div class="col"><p class="e">🙋</p><p class="word">I</p><div class="c s">主語</div></div>
-    <div class="col"><p class="e">💪</p><p class="word">can</p><div class="c a">助動詞</div></div>
-    <div class="col"><p class="e">😋</p><p class="word">eat</p><div class="c v">動詞</div></div>
-    <div class="col"><p class="e">🍣</p><p class="word">sushi.</p><div class="c o">目的語</div></div>
+  <div class="key">
+    <div class="col"><img class="f" src="fruits/apple.png" alt="りんご"><p class="word">I</p><div class="c s">主語</div></div>
+    <div class="col"><img class="f" src="fruits/banana.png" alt="黄色いバナナ"><p class="word">can</p><div class="c a">助動詞</div></div>
+    <div class="col"><img class="f" src="fruits/banana-green.png" alt="緑のバナナ"><p class="word">eat</p><div class="c v">動詞</div></div>
+    <div class="col"><img class="f" src="fruits/orange.png" alt="オレンジ"><p class="word">sushi.</p><div class="c o">目的語</div></div>
   </div>
 </section>
 
 <!-- ============ 4-7 それぞれの形 + 記入スペース ============ -->
 <section class="slide">
   <div class="h"><div class="bar"></div><h2>肯定文</h2></div>
-  <div class="row big">
-    <div class="c s">主語</div><div class="c a">助動詞</div><div class="c v">動詞</div><div class="c o">目的語</div>
+  <div class="parts">
+    <div class="p"><img class="f" src="fruits/apple.png" alt="りんご"><div class="c s">主語</div></div>
+    <div class="p"><img class="f" src="fruits/banana.png" alt="黄色いバナナ"><div class="c a">助動詞</div></div>
+    <div class="p"><img class="f" src="fruits/banana-green.png" alt="緑のバナナ"><div class="c v">動詞</div></div>
+    <div class="p"><img class="f" src="fruits/orange.png" alt="オレンジ"><div class="c o">目的語</div></div>
   </div>
   <div class="memo" data-write="memo"></div>
 </section>
 
 <section class="slide">
   <div class="h"><div class="bar"></div><h2>疑問文</h2></div>
-  <div class="row big">
-    <div class="c a">助動詞</div><div class="c s">主語</div><div class="c v">動詞</div><div class="c o">目的語</div><p class="qm">?</p>
+  <div class="parts">
+    <div class="p"><img class="f" src="fruits/banana.png" alt="黄色いバナナ"><div class="c a">助動詞</div></div>
+    <div class="p"><img class="f" src="fruits/apple.png" alt="りんご"><div class="c s">主語</div></div>
+    <div class="p"><img class="f" src="fruits/banana-green.png" alt="緑のバナナ"><div class="c v">動詞</div></div>
+    <div class="p"><img class="f" src="fruits/orange.png" alt="オレンジ"><div class="c o">目的語</div></div>
+    <div class="p q"><p class="qm">?</p></div>
   </div>
   <div class="memo" data-write="memo"></div>
 </section>
 
 <section class="slide">
   <div class="h"><div class="bar"></div><h2>疑問詞の疑問文</h2></div>
-  <div class="row big">
-    <div class="c w">W</div><div class="c a">助動詞</div><div class="c s">主語</div><div class="c v">動詞</div><div class="c o">目的語</div><p class="qm">?</p>
+  <div class="parts">
+    <div class="p"><div class="c w">W</div></div>
+    <div class="p"><img class="f" src="fruits/banana.png" alt="黄色いバナナ"><div class="c a">助動詞</div></div>
+    <div class="p"><img class="f" src="fruits/apple.png" alt="りんご"><div class="c s">主語</div></div>
+    <div class="p"><img class="f" src="fruits/banana-green.png" alt="緑のバナナ"><div class="c v">動詞</div></div>
+    <div class="p"><img class="f" src="fruits/orange.png" alt="オレンジ"><div class="c o">目的語</div></div>
+    <div class="p q"><p class="qm">?</p></div>
   </div>
   <div class="memo" data-write="memo"></div>
 </section>
 
 <section class="slide">
   <div class="h"><div class="bar"></div><h2>否定文</h2></div>
-  <div class="row big">
-    <div class="c s">主語</div><div class="c a">助動詞</div><div class="c n">NOT</div><div class="c v">動詞</div><div class="c o">目的語</div>
+  <div class="parts">
+    <div class="p"><img class="f" src="fruits/apple.png" alt="りんご"><div class="c s">主語</div></div>
+    <div class="p"><img class="f" src="fruits/banana.png" alt="黄色いバナナ"><div class="c a">助動詞</div></div>
+    <div class="p"><div class="c n">NOT</div></div>
+    <div class="p"><img class="f" src="fruits/banana-green.png" alt="緑のバナナ"><div class="c v">動詞</div></div>
+    <div class="p"><img class="f" src="fruits/orange.png" alt="オレンジ"><div class="c o">目的語</div></div>
   </div>
   <div class="memo" data-write="memo"></div>
 </section>
@@ -274,7 +287,12 @@
 <section class="slide">
   <div class="h"><div class="bar"></div><h2>肯定文</h2><span class="tag">練習</span></div>
   <div class="sheet k4">
-    <div></div><div class="c s">主語</div><div class="c a">助動詞</div><div class="c v">動詞</div><div class="c o">目的語</div><div></div>
+    <div></div>
+    <div class="hd"><img class="f" src="fruits/apple.png" alt="りんご"><div class="c s">主語</div></div>
+    <div class="hd"><img class="f" src="fruits/banana.png" alt="黄色いバナナ"><div class="c a">助動詞</div></div>
+    <div class="hd"><img class="f" src="fruits/banana-green.png" alt="緑のバナナ"><div class="c v">動詞</div></div>
+    <div class="hd"><img class="f" src="fruits/orange.png" alt="オレンジ"><div class="c o">目的語</div></div>
+    <div></div>
     <div class="no">1</div><div class="slot s" data-write="slot"></div><div class="slot a" data-write="slot"></div><div class="slot v" data-write="slot"></div><div class="slot o" data-write="slot"></div><div></div>
     <div class="no">2</div><div class="slot s" data-write="slot"></div><div class="slot a" data-write="slot"></div><div class="slot v" data-write="slot"></div><div class="slot o" data-write="slot"></div><div></div>
     <div class="no">3</div><div class="slot s" data-write="slot"></div><div class="slot a" data-write="slot"></div><div class="slot v" data-write="slot"></div><div class="slot o" data-write="slot"></div><div></div>
@@ -285,7 +303,12 @@
 <section class="slide">
   <div class="h"><div class="bar"></div><h2>疑問文</h2><span class="tag">練習</span></div>
   <div class="sheet k4">
-    <div></div><div class="c a">助動詞</div><div class="c s">主語</div><div class="c v">動詞</div><div class="c o">目的語</div><div></div>
+    <div></div>
+    <div class="hd"><img class="f" src="fruits/banana.png" alt="黄色いバナナ"><div class="c a">助動詞</div></div>
+    <div class="hd"><img class="f" src="fruits/apple.png" alt="りんご"><div class="c s">主語</div></div>
+    <div class="hd"><img class="f" src="fruits/banana-green.png" alt="緑のバナナ"><div class="c v">動詞</div></div>
+    <div class="hd"><img class="f" src="fruits/orange.png" alt="オレンジ"><div class="c o">目的語</div></div>
+    <div></div>
     <div class="no">1</div><div class="slot a" data-write="slot"></div><div class="slot s" data-write="slot"></div><div class="slot v" data-write="slot"></div><div class="slot o" data-write="slot"></div><p class="qm">?</p>
     <div class="no">2</div><div class="slot a" data-write="slot"></div><div class="slot s" data-write="slot"></div><div class="slot v" data-write="slot"></div><div class="slot o" data-write="slot"></div><p class="qm">?</p>
     <div class="no">3</div><div class="slot a" data-write="slot"></div><div class="slot s" data-write="slot"></div><div class="slot v" data-write="slot"></div><div class="slot o" data-write="slot"></div><p class="qm">?</p>
@@ -296,7 +319,13 @@
 <section class="slide">
   <div class="h"><div class="bar"></div><h2>疑問詞の疑問文</h2><span class="tag">練習</span></div>
   <div class="sheet k5">
-    <div></div><div class="c w">W</div><div class="c a">助動詞</div><div class="c s">主語</div><div class="c v">動詞</div><div class="c o">目的語</div><div></div>
+    <div></div>
+    <div class="hd"><div class="c w">W</div></div>
+    <div class="hd"><img class="f" src="fruits/banana.png" alt="黄色いバナナ"><div class="c a">助動詞</div></div>
+    <div class="hd"><img class="f" src="fruits/apple.png" alt="りんご"><div class="c s">主語</div></div>
+    <div class="hd"><img class="f" src="fruits/banana-green.png" alt="緑のバナナ"><div class="c v">動詞</div></div>
+    <div class="hd"><img class="f" src="fruits/orange.png" alt="オレンジ"><div class="c o">目的語</div></div>
+    <div></div>
     <div class="no">1</div><div class="slot w" data-write="slot"></div><div class="slot a" data-write="slot"></div><div class="slot s" data-write="slot"></div><div class="slot v" data-write="slot"></div><div class="slot o" data-write="slot"></div><p class="qm">?</p>
     <div class="no">2</div><div class="slot w" data-write="slot"></div><div class="slot a" data-write="slot"></div><div class="slot s" data-write="slot"></div><div class="slot v" data-write="slot"></div><div class="slot o" data-write="slot"></div><p class="qm">?</p>
     <div class="no">3</div><div class="slot w" data-write="slot"></div><div class="slot a" data-write="slot"></div><div class="slot s" data-write="slot"></div><div class="slot v" data-write="slot"></div><div class="slot o" data-write="slot"></div><p class="qm">?</p>
@@ -307,7 +336,13 @@
 <section class="slide">
   <div class="h"><div class="bar"></div><h2>否定文</h2><span class="tag">練習</span></div>
   <div class="sheet k5">
-    <div></div><div class="c s">主語</div><div class="c a">助動詞</div><div class="c n">NOT</div><div class="c v">動詞</div><div class="c o">目的語</div><div></div>
+    <div></div>
+    <div class="hd"><img class="f" src="fruits/apple.png" alt="りんご"><div class="c s">主語</div></div>
+    <div class="hd"><img class="f" src="fruits/banana.png" alt="黄色いバナナ"><div class="c a">助動詞</div></div>
+    <div class="hd"><div class="c n">NOT</div></div>
+    <div class="hd"><img class="f" src="fruits/banana-green.png" alt="緑のバナナ"><div class="c v">動詞</div></div>
+    <div class="hd"><img class="f" src="fruits/orange.png" alt="オレンジ"><div class="c o">目的語</div></div>
+    <div></div>
     <div class="no">1</div><div class="slot s" data-write="slot"></div><div class="slot a" data-write="slot"></div><div class="slot n" data-write="slot"></div><div class="slot v" data-write="slot"></div><div class="slot o" data-write="slot"></div><div></div>
     <div class="no">2</div><div class="slot s" data-write="slot"></div><div class="slot a" data-write="slot"></div><div class="slot n" data-write="slot"></div><div class="slot v" data-write="slot"></div><div class="slot o" data-write="slot"></div><div></div>
     <div class="no">3</div><div class="slot s" data-write="slot"></div><div class="slot a" data-write="slot"></div><div class="slot n" data-write="slot"></div><div class="slot v" data-write="slot"></div><div class="slot o" data-write="slot"></div><div></div>

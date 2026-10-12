@@ -5,7 +5,7 @@
 | フォルダ | 内容 |
 | --- | --- |
 | `9-phrases/` | 日常英会話フレーズ 9選（`9-phrases-matome.pdf` / 編集できる `9-phrases-matome.pptx`）。スライド11枚＋練習問題45問と解答 |
-| `sentence-structure/` | 授業資料「文章の構成」（`sentence-structure.pdf` / 編集できる `sentence-structure.pptx`）。基本の形、助動詞を使った4つの形、形ごとの記入スペース、練習用の記入枠。スライド11枚 |
+| `sentence-structure/` | 授業資料「文章の構成」（`sentence-structure.pdf` / 編集できる `sentence-structure.pptx`）。基本の形、助動詞を使った4つの形、形ごとの記入スペース、練習用の記入枠。スライド11枚。3枚目からは文の部品を果物で表す（主語＝りんご、助動詞＝黄色いバナナ、動詞＝緑のバナナ、目的語＝オレンジ）。果物の絵は `fruits/` にあり、`node matome/sentence-structure/make-fruits.cjs` で作り直せる |
 
 ## PDF の作り直し方
 
