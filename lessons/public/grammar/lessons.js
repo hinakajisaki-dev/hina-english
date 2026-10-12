@@ -5,7 +5,7 @@
 // A lesson is a list of steps, one screen each:
 //   explain: title, text (paragraphs), compare { labels, rows: [[before, after]] }, chips
 //            [{ label (optional), items, tone: "red" | "plain" }], table { head, rows }, note (paragraphs
-//            under the table), key (the one sentence to remember, shown big), examples
+//            under the key), key (what to remember, shown big; a list shows one per line), examples
 //            [{ en, ja }], highlight (whole words shown in red)
 //
 // Inside any text: **bold**, [[red]] and {{blue}}. Red marks what changes (a 三単現

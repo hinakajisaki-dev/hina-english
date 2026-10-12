@@ -642,8 +642,8 @@ function explainHtml(step) {
       <thead><tr>${step.table.head.map((h) => `<th>${line(h)}</th>`).join("")}</tr></thead>
       <tbody>${step.table.rows.map((row) => `<tr>${row.map((cell) => `<td>${line(cell)}</td>`).join("")}</tr>`).join("")}</tbody>
     </table></div>` : ""}
+    ${step.key ? `<p class="key">${[].concat(step.key).map(line).join("<br>")}</p>` : ""}
     ${(step.note || []).map((p) => `<p class="note">${line(p)}</p>`).join("")}
-    ${step.key ? `<p class="key">${line(step.key)}</p>` : ""}
     ${step.examples?.length ? `<ul class="examples">${step.examples.map((ex) => `
       <li>
         ${sayIcon(ex.en)}

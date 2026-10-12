@@ -5,6 +5,12 @@
 const NONE = "×（なし）";
 const ARTICLE_CHOICES = ["a", "an", "the", NONE];
 
+const PRACTICE = {
+  type: "explain",
+  title: "練習：a / an / the / ×",
+  text: ["空欄に入る言葉を選びます。何もつけないときは **×（なし）** を選びます。"],
+};
+
 export const ARTICLES = {
   id: "articles",
   title: "冠詞",
@@ -18,41 +24,34 @@ export const ARTICLES = {
         {
           type: "explain",
           title: "冠詞とは？",
-          text: [
-            "冠詞は、名詞の前に置く **a / an / the** のことです。",
-            "名詞を話すときに、「**どんな名詞として話しているか**」を小さく示してくれます。",
-            "まずは **a / an** と **the** の2つを理解しましょう。",
+          text: ["名詞の前につける **a / an / the** のことです。"],
+          examples: [
+            { en: "I have [[a]] dog.", ja: "私は犬を1匹飼っています。" },
+            { en: "I ate [[an]] apple.", ja: "私はリンゴを1個食べました。" },
+            { en: "[[The]] sun is bright.", ja: "太陽がまぶしいです。" },
+          ],
+          key: ["[[a]] / [[an]] ＝「1つの」", "[[the]] ＝「その」"],
+        },
+        {
+          type: "explain",
+          title: "[[a]] / [[an]]：はじめて話に出る「1つ」",
+          text: ["相手がまだ**どれか分からない**「1つの〜」に使います。"],
+          examples: [
+            { en: "I bought [[a]] bag.", ja: "私はバッグを1つ買いました。" },
+            { en: "I saw [[a]] dog in the park.", ja: "私は公園で犬を1匹見ました。" },
+            { en: "She is [[a]] nurse.", ja: "彼女は看護師です。（職業も a / an）" },
           ],
         },
         {
           type: "explain",
-          title: "a / an：たくさんある中の「1つ」",
-          text: [
-            "**a / an** は「**1つの〜**」「**ある〜**」という感覚です。",
-            "まだ相手が「どれのことか」分かっていないものを、**会話に初めて登場させる**ときによく使います。",
-            "**POINT**：職業を言うときも、基本的に a / an を使います。",
+          title: "[[a]] と [[an]] のちがい",
+          text: ["次の単語の**最初の音**で決まります。"],
+          chips: [
+            { label: "ア・イ・ウ・エ・オ の音 → [[an]]", tone: "plain", items: ["[[an]] apple", "[[an]] egg", "[[an]] hour"] },
+            { label: "それ以外の音 → [[a]]", tone: "plain", items: ["[[a]] book", "[[a]] dog", "[[a]] university"] },
           ],
-          examples: [
-            { en: "I bought a bag.", ja: "私はバッグを1つ買いました。" },
-            { en: "I saw a dog in the park.", ja: "私は公園で犬を1匹見ました。" },
-            { en: "I ate an apple.", ja: "私はリンゴを1個食べました。" },
-            { en: "She is a nurse.", ja: "彼女は看護師です。" },
-            { en: "He is an engineer.", ja: "彼はエンジニアです。" },
-          ],
-        },
-        {
-          type: "explain",
-          title: "a と an の違い",
-          text: [
-            "a と an は、次に来る単語の「**音**」で決まります。",
-            "**a** → 子音の音から始まる（a book / a dog / a university）",
-            "**an** → 母音の音（ア・イ・ウ・エ・オ）から始まる（an apple / an egg / an hour）",
-            "**POINT**：スペルではなく**音**で判断します。university は「ユ」の音なので a university。hour は h を発音せず「アワー」と始まるので an hour です。",
-          ],
-          examples: [
-            { en: "a university", ja: "大学（「ユ」の音で始まる）" },
-            { en: "an hour", ja: "1時間（「ア」の音で始まる）" },
-          ],
+          key: "ア・イ・ウ・エ・オの音 → [[an]]",
+          note: ["※スペルではなく**音**で決まります。hour は「アワー」、university は「ユ」の音で始まります。"],
         },
         {
           type: "choice",
@@ -60,7 +59,7 @@ export const ARTICLES = {
           ja: "私はリンゴを1個食べました。",
           choices: ["a", "an"],
           answer: "an",
-          why: "apple は母音の音（ア）で始まるので **an** です。",
+          why: "apple は「ア」の音で始まるので [[an]] です。",
         },
         {
           type: "choice",
@@ -68,7 +67,7 @@ export const ARTICLES = {
           ja: "彼女は大学生です。",
           choices: ["a", "an"],
           answer: "a",
-          why: "university は「ユ」の音で始まるので **a** です。u のスペルでも、音で判断します。",
+          why: "university は「ユ」の音で始まるので [[a]] です。",
         },
         {
           type: "choice",
@@ -76,49 +75,39 @@ export const ARTICLES = {
           ja: "私は1時間待ちました。",
           choices: ["a", "an"],
           answer: "an",
-          why: "hour は h を発音せず「アワー」と始まるので **an** です。",
+          why: "hour は「アワー」と「ア」の音で始まるので [[an]] です。",
         },
         {
           type: "explain",
-          title: "the：「それ！」と指させるもの",
-          text: [
-            "**the** は、**どの人・どの物のことか特定できる**ときに使います。",
-            "話し手と聞き手の両方が「**どれのことか分かる**」ときによく使います。",
-          ],
+          title: "[[the]]：どれか分かる「その」",
+          text: ["話している2人が、**どれのことか分かる**ときに使います。"],
+          compare: {
+            labels: ["1回目", "2回目（さっきの）"],
+            rows: [
+              ["I bought a bag.", "[[The]] bag was expensive."],
+              ["I have a dog.", "[[The]] dog is cute."],
+            ],
+          },
+          key: "1回目 → [[a]] / [[an]]　／　2回目 → [[the]]",
+        },
+        {
+          type: "explain",
+          title: "ほかにも [[the]] を使うとき",
+          text: ["**1つしかないもの**や、**その場でどれか分かるもの**にも the を使います。"],
           examples: [
-            { en: "I bought a bag. The bag was expensive.", ja: "私はバッグを買いました。そのバッグは高かったです。（2回目は「さっきのバッグ」）" },
-            { en: "Please close the door.", ja: "そのドアを閉めてください。（どのドアかみんな分かる）" },
-            { en: "Where is the bathroom?", ja: "トイレはどこですか？（その場所にあるトイレ）" },
-            { en: "The sun is bright today.", ja: "今日は太陽がまぶしいです。（太陽は1つに決まる）" },
+            { en: "[[The]] sun is bright today.", ja: "今日は太陽がまぶしいです。（1つしかない）" },
+            { en: "Please close [[the]] door.", ja: "そのドアを閉めてください。（その場で分かる）" },
+            { en: "Where is [[the]] bathroom?", ja: "トイレはどこですか？（その場で分かる）" },
           ],
         },
-        {
-          type: "explain",
-          title: "a / an と the の違い",
-          text: [
-            "一番大切なのは、「**相手がどれのことか分かるか**」です。",
-            "**a / an** = まだ特定されていない1つ　／　**the** = どれのことか特定できる",
-            "**POINT**：**初登場は a / an**、2回目以降に「さっきのそれ」と分かれば **the**、という流れがとてもよく出てきます。",
-          ],
-          examples: [
-            { en: "I want to buy a book.", ja: "本を1冊買いたいです。（どの本かはまだ決まっていない）" },
-            { en: "I want to buy the book.", ja: "その本を買いたいです。（どの本か2人とも分かっている）" },
-            { en: "I went to a cafe yesterday.", ja: "昨日、あるカフェに行きました。" },
-            { en: "The cafe was very quiet.", ja: "そのカフェはとても静かでした。" },
-          ],
-        },
-        {
-          type: "explain",
-          title: "練習：a / an / the / ×",
-          text: ["ここからは、空欄に **a / an / the** を入れます。冠詞がいらないときは **×（なし）** を選びます。"],
-        },
+        PRACTICE,
         {
           type: "choice",
           q: "I bought ___ new bag yesterday.",
           ja: "私は昨日、新しいバッグを1つ買いました。",
           choices: ARTICLE_CHOICES,
           answer: "a",
-          why: "初めて話に出てくる「1つのバッグ」なので **a** です。new は子音の音で始まります。",
+          why: "はじめて話に出る「1つのバッグ」なので [[a]] です。",
         },
         {
           type: "choice",
@@ -126,7 +115,7 @@ export const ARTICLES = {
           ja: "そのバッグは黒いです。",
           choices: ARTICLE_CHOICES,
           answer: "the",
-          why: "さっき話したバッグなので **The** です。",
+          why: "さっき話したバッグなので [[The]] です。",
         },
         {
           type: "choice",
@@ -134,7 +123,7 @@ export const ARTICLES = {
           ja: "私は犬を1匹飼っています。",
           choices: ARTICLE_CHOICES,
           answer: "a",
-          why: "初登場の「1匹の犬」なので **a** です。",
+          why: "はじめて話に出る「1匹の犬」なので [[a]] です。",
         },
         {
           type: "choice",
@@ -142,7 +131,7 @@ export const ARTICLES = {
           ja: "その犬はとても人懐っこいです。",
           choices: ARTICLE_CHOICES,
           answer: "the",
-          why: "さっき話した犬なので **The** です。",
+          why: "さっき話した犬なので [[The]] です。",
         },
         {
           type: "choice",
@@ -150,7 +139,7 @@ export const ARTICLES = {
           ja: "そのドアを閉めてください。",
           choices: ARTICLE_CHOICES,
           answer: "the",
-          why: "その場にいる人が、どのドアか分かっているので **the** です。",
+          why: "その場でどのドアか分かるので [[the]] です。",
         },
         {
           type: "choice",
@@ -158,15 +147,7 @@ export const ARTICLES = {
           ja: "彼女は英語の先生です。",
           choices: ARTICLE_CHOICES,
           answer: "an",
-          why: "職業なので a / an。English は母音の音（イ）で始まるので **an** です。",
-        },
-        {
-          type: "choice",
-          q: "I saw ___ old friend yesterday.",
-          ja: "私は昨日、昔の友達の1人に会いました。",
-          choices: ARTICLE_CHOICES,
-          answer: "an",
-          why: "何人かいる昔の友達の「1人」なので a / an。old は母音の音（オ）で始まるので **an** です。",
+          why: "職業なので a / an。English は「イ」の音で始まるので [[an]] です。",
         },
         {
           type: "choice",
@@ -174,40 +155,28 @@ export const ARTICLES = {
           ja: "今日は太陽がとてもまぶしいです。",
           choices: ARTICLE_CHOICES,
           answer: "the",
-          why: "太陽はどれのことか特定できるので **The** です。",
+          why: "太陽は1つしかないので [[The]] です。",
         },
         {
           type: "write",
           ja: "私は昨日、あるカフェに行きました。",
           answers: ["I went to a cafe yesterday.", "Yesterday I went to a cafe.", "I went to a coffee shop yesterday."],
           hint: "cafe（カフェ）",
-          why: "初めて話に出てくる「あるカフェ」なので **a cafe** です。",
+          why: "はじめて話に出る「あるカフェ」なので [[a]] cafe です。",
         },
         {
           type: "write",
           ja: "そのカフェはとても混んでいました。",
           answers: ["The cafe was very crowded.", "The cafe was very busy."],
           hint: "crowded（混んでいる）",
-          why: "さっきのカフェなので **The cafe** です。",
+          why: "さっきのカフェなので [[The]] cafe です。",
         },
         {
           type: "write",
           ja: "彼女は看護師です。",
           answers: ["She is a nurse."],
           hint: "nurse（看護師）",
-          why: "職業を言うときは **a / an** です。",
-        },
-        {
-          type: "explain",
-          title: "まとめ",
-          table: {
-            head: ["", "ポイント"],
-            rows: [
-              ["a / an", "まだ特定されていない「1つの〜」。初登場・職業"],
-              ["a と an", "次の単語の音で決める（an apple / a university / an hour）"],
-              ["the", "どれのことか特定できる「その〜」。2回目・その場で分かる物・1つしかない物"],
-            ],
-          },
+          why: "職業を言うときは [[a]] / [[an]] です。",
         },
       ],
     },
@@ -218,54 +187,31 @@ export const ARTICLES = {
       steps: [
         {
           type: "explain",
-          title: "数えられる名詞（可算名詞）",
-          text: [
-            "すべての名詞に a / an をつけられるわけではありません。大切なのは「**数えられる名詞**」と「**数えられない名詞**」です。",
-            "**数えられる名詞**は、1つ、2つ、3つ…と数えられる名詞です。1つだけなら a / an を使えます。",
-          ],
+          title: "数えられる名詞",
+          text: ["1つ、2つ…と**数えられる名詞**です。1つなら a / an をつけます。"],
           table: {
-            head: ["名詞", "数え方"],
+            head: ["1つ", "2つ以上"],
             rows: [
-              ["book", "one book / two books"],
-              ["apple", "one apple / two apples"],
-              ["dog", "one dog / two dogs"],
-              ["student", "one student / two students"],
+              ["[[a]] book", "two book[[s]]"],
+              ["[[an]] apple", "two apple[[s]]"],
+              ["[[a]] dog", "two dog[[s]]"],
             ],
           },
+          key: "数えられる → 1つなら [[a]] / [[an]]",
         },
         {
           type: "explain",
-          title: "数えられない名詞（不可算名詞）",
-          text: [
-            "1つ、2つ…と**そのまま数えられない名詞**です。よくあるパターンがあります。",
-            "※コーヒーを「1杯」と数えるときは a coffee（1杯）、two coffees（2杯）と言うこともあります。",
-            "※money（お金）は数えられません。dollar や yen などの単位は数えられます（one dollar、100 yen）。",
+          title: "数えられない名詞",
+          text: ["1つ、2つ…と**そのまま数えられない名詞**です。"],
+          chips: [
+            { label: "液体", tone: "plain", items: ["water", "coffee", "milk", "juice"] },
+            { label: "目に見えないもの", tone: "plain", items: ["music", "information", "advice", "money", "love"] },
+            { label: "粉・粒", tone: "plain", items: ["sugar", "salt", "rice"] },
+            { label: "素材", tone: "plain", items: ["paper", "wood", "meat"] },
+            { label: "天気", tone: "plain", items: ["rain", "snow", "weather"] },
           ],
-          table: {
-            head: ["パターン", "例"],
-            rows: [
-              ["① 液体", "water / coffee / milk / juice"],
-              ["② 抽象的なもの・情報・考え", "music / information / advice / money / love / happiness"],
-              ["③ 気体・粉・粒", "air / sugar / salt / rice / flour"],
-              ["④ 素材・材料", "wood / paper / gold / meat / glass"],
-              ["⑤ 天気・自然", "rain / snow / weather / sunshine"],
-            ],
-          },
-        },
-        {
-          type: "explain",
-          title: "同じ単語でも意味で変わる",
-          text: [
-            "素材として話すときは数えられませんが、意味が変わると数えられることがあります。",
-            "**paper** = 紙（素材）→ 数えられない　／　**a paper** = 論文・新聞 → 数えられる",
-            "**chicken** = 鶏肉 → 数えられない　／　**a chicken** = 1羽のニワトリ → 数えられる",
-            "※rice は米粒を数えることもできますが、英語では「米というまとまり」として扱います。",
-          ],
-          examples: [
-            { en: "We had a lot of rain.", ja: "雨がたくさん降りました。" },
-            { en: "There is snow outside.", ja: "外には雪があります。" },
-            { en: "The weather is nice today.", ja: "今日は天気がいいです。" },
-          ],
+          key: "数えられない → [[a]] / [[an]] はつけない",
+          note: ["※ money（お金）は数えられませんが、dollar や yen は数えられます。"],
         },
         {
           type: "choice",
@@ -273,7 +219,7 @@ export const ARTICLES = {
           ja: "1つ、2つ…と数えられないものを選びましょう。",
           choices: ["book", "information", "student"],
           answer: "information",
-          why: "information（情報）は**抽象的なもの**なので、数えられません。",
+          why: "information（情報）は**目に見えないもの**なので、数えられません。",
         },
         {
           type: "choice",
@@ -281,20 +227,17 @@ export const ARTICLES = {
           ja: "1つ、2つ…と数えられないものを選びましょう。",
           choices: ["dog", "apple", "money"],
           answer: "money",
-          why: "money（お金）という考えは数えられません。dollar や yen は数えられます。",
+          why: "money（お金）は数えられません。dollar や yen は数えられます。",
         },
         {
           type: "explain",
-          title: "information と advice",
-          text: [
-            "information も advice も数えられない名詞なので、**an information / an advice とは言いません**。",
-            "「いくつかの」と言いたいときは **some** を使います。",
-          ],
+          title: "「いくつかの」は [[some]]",
+          text: ["information や advice は数えられないので、**an はつけません**。"],
           examples: [
-            { en: "I have some information.", ja: "私はいくつか情報を持っています。" },
-            { en: "He gave me advice.", ja: "彼は私にアドバイスをくれました。" },
-            { en: "I gave him some advice.", ja: "私は彼にアドバイスをしました。" },
+            { en: "I have [[some]] information.", ja: "私はいくつか情報を持っています。" },
+            { en: "He gave me [[some]] advice.", ja: "彼は私にアドバイスをくれました。" },
           ],
+          key: "✕ an advice　→　〇 [[some]] advice",
         },
         {
           type: "choice",
@@ -302,36 +245,32 @@ export const ARTICLES = {
           ja: "彼は私にアドバイスをくれました。",
           choices: ["an", "some"],
           answer: "some",
-          why: "advice は数えられないので an はつけません。**some** advice、または何もつけずに advice と言います。",
+          why: "advice は数えられないので an はつけず、[[some]] advice です。",
         },
         {
           type: "explain",
-          title: "冠詞をつけないもの",
-          text: [
-            "「a / an も the もつけない」よくあるパターンです。",
-            "**国・都市**：Japan / Tokyo / France",
-            "**言語**：English / Japanese",
-            "**食事**：breakfast / lunch / dinner",
-            "※固有名詞には例外もありますが、まずは「Japan / Tokyo などには基本的に the をつけない」と覚えてOKです。",
+          title: "a / an も the もつけないもの",
+          chips: [
+            { label: "国・都市", tone: "plain", items: ["Japan", "Tokyo", "France"] },
+            { label: "言語", tone: "plain", items: ["English", "Japanese"] },
+            { label: "食事", tone: "plain", items: ["breakfast", "lunch", "dinner"] },
+            { label: "「〜というもの」全体（複数形にする）", tone: "plain", items: ["dogs", "cats", "books"] },
           ],
           examples: [
             { en: "I live in Japan.", ja: "私は日本に住んでいます。" },
             { en: "She speaks English.", ja: "彼女は英語を話します。" },
             { en: "We had lunch together.", ja: "私たちは一緒に昼食を食べました。" },
+            { en: "I like dogs.", ja: "私は犬が好きです。（犬というもの全体）" },
           ],
         },
-        {
-          type: "explain",
-          title: "練習：a / an / the / ×",
-          text: ["空欄に **a / an / the** を入れます。冠詞がいらないときは **×（なし）** を選びます。"],
-        },
+        PRACTICE,
         {
           type: "choice",
           q: "I drink ___ coffee every morning.",
           ja: "私は毎朝コーヒーを飲みます。",
           choices: ARTICLE_CHOICES,
           answer: NONE,
-          why: "coffee は**液体**なので、ふつうは冠詞をつけません。",
+          why: "coffee は**液体**なので、何もつけません。",
         },
         {
           type: "choice",
@@ -339,7 +278,7 @@ export const ARTICLES = {
           ja: "テーブルの上のコーヒーは冷たいです。",
           choices: ARTICLE_CHOICES,
           answer: "the",
-          why: "「テーブルの上の」と**どのコーヒーか特定できる**ので **The** です。",
+          why: "「テーブルの上の」と**どのコーヒーか分かる**ので [[The]] です。",
         },
         {
           type: "choice",
@@ -347,16 +286,16 @@ export const ARTICLES = {
           ja: "そのホテルについて情報が必要です。",
           choices: ARTICLE_CHOICES,
           answer: NONE,
-          why: "information は数えられない名詞なので、a / an はつけません。",
+          why: "information は数えられないので、a / an はつけません。",
         },
         {
-          // The document's answer is ×; the rule for general plurals is explained here.
+          // The document's answer is ×; the rule for general plurals is explained above.
           type: "choice",
           q: "I like ___ dogs.",
           ja: "私は犬が好きです。",
           choices: ARTICLE_CHOICES,
           answer: NONE,
-          why: "「犬というもの全体が好き」と言うときは、**複数形の dogs** にして冠詞をつけません。",
+          why: "「犬というもの全体」が好きなので、**複数形の dogs** にして何もつけません。",
         },
         {
           type: "choice",
@@ -364,7 +303,7 @@ export const ARTICLES = {
           ja: "彼は日本に住んでいます。",
           choices: ARTICLE_CHOICES,
           answer: NONE,
-          why: "国の名前には、ふつう冠詞をつけません。",
+          why: "国の名前には、何もつけません。",
         },
         {
           type: "choice",
@@ -372,7 +311,7 @@ export const ARTICLES = {
           ja: "彼女は英語を話します。",
           choices: ARTICLE_CHOICES,
           answer: NONE,
-          why: "言語には冠詞をつけません。",
+          why: "言語には、何もつけません。",
         },
         {
           type: "choice",
@@ -380,34 +319,21 @@ export const ARTICLES = {
           ja: "私たちは一緒に昼食を食べました。",
           choices: ARTICLE_CHOICES,
           answer: NONE,
-          why: "breakfast / lunch / dinner などの食事には、ふつう冠詞をつけません。",
+          why: "breakfast / lunch / dinner には、何もつけません。",
         },
         {
           type: "write",
           ja: "私は音楽が好きです。",
           answers: ["I like music.", "I love music."],
           hint: "music（音楽）",
-          why: "music は数えられない名詞なので、冠詞はつけません。",
+          why: "music は数えられないので、何もつけません。",
         },
         {
           type: "write",
           ja: "私はこのカフェのコーヒーが好きです。",
           answers: ["I like the coffee at this cafe.", "I like the coffee in this cafe.", "I like this cafe's coffee.", "I like the coffee here."],
           hint: "at this cafe（このカフェの）",
-          why: "「このカフェの」と特定されたコーヒーなので **the coffee** です。",
-        },
-        {
-          type: "explain",
-          title: "まとめ",
-          table: {
-            head: ["", "ポイント"],
-            rows: [
-              ["数えられる名詞", "1つなら a / an（a book / an apple）"],
-              ["数えられない名詞", "液体・情報・考え・粉や粒・素材・天気など。a / an はつけない（some はOK）"],
-              ["特定できるとき", "数えられない名詞でも the（the coffee on the table）"],
-              ["冠詞なし", "国・都市・言語・食事。「〜というもの全体」は複数形（I like dogs.）"],
-            ],
-          },
+          why: "「このカフェの」とどのコーヒーか分かるので [[the]] coffee です。",
         },
       ],
     },
