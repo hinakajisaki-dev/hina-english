@@ -47,6 +47,7 @@ function extract() {
           color: hex(cs.color).hex,
           size: parseFloat(cs.fontSize),
           bold: parseInt(cs.fontWeight, 10) >= 600,
+          letterSpacing: parseFloat(cs.letterSpacing) || 0,
           latinFont: cs.fontFamily.split(",")[0].replace(/["']/g, "").trim(),
           highlight: mark ? getComputedStyle(document.documentElement).getPropertyValue("--marker").trim().replace("#", "") : null,
         });
@@ -184,7 +185,8 @@ function extract() {
 // Latin glyphs come from the element's first font; everything else (kana, kanji,
 // full-width punctuation) falls back to the Japanese font, just like in the browser.
 // The PDF uses Liberation Sans, which is metric-compatible with Arial; PowerPoint and
-// Google Slides both have Arial, so the .pptx asks for that.
+// Google Slides both have Arial, so the .pptx asks for that. Other fonts (DM Sans, Caveat)
+// keep their name; Google Slides has them built in.
 const PPTX_FONT = { "Liberation Sans": "Arial" };
 function splitByScript(run) {
   const JA = "Noto Sans JP";
@@ -284,6 +286,7 @@ async function slim(buffer) {
             fontSize: Math.round(run.size * PT * 2) / 2,
             color: run.color,
             bold: run.bold,
+            ...(run.letterSpacing ? { charSpacing: run.letterSpacing * PT } : {}),
             ...(run.highlight ? { highlight: run.highlight } : {}),
           },
         }));

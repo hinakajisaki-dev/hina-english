@@ -1,0 +1,197 @@
+/* YouTube ライブ（瞬間英作文）のスライド。色とフォントはサロンの LP（salon/index.html）に合わせています。
+   .pptx にするときに再現できるのは、単色の塗り・角丸・枠線・上だけの線・影・塗りの SVG パスまでです。
+   グラデーションや回転は使わないでください。 */
+@font-face { font-family: "DM Sans"; font-weight: 700; src: url("../matome/fonts/DMSans-700.woff2") format("woff2"); }
+@font-face { font-family: "Caveat"; font-weight: 700; src: url("../matome/fonts/Caveat-700.woff2") format("woff2"); }
+@font-face { font-family: "Noto Sans JP"; font-weight: 700; src: url("../matome/fonts/NotoSansJP-700.woff2") format("woff2"); }
+@font-face { font-family: "Noto Sans JP"; font-weight: 900; src: url("../matome/fonts/NotoSansJP-900.woff2") format("woff2"); }
+
+@page { size: 1280px 720px; margin: 0; }
+
+:root {
+  --bg: #EAF2FB;
+  --card: #FFFFFF;
+  --ink: #1A2238;
+  --ink-2: #4B5569;
+  --muted: #5E6780;
+  --line: #D6E2F0;
+  --line-warm: #EFE3DA;
+
+  --accent: #F0521E;
+  --accent-text: #C23B12;
+  --accent-soft: #FFE6DC;
+
+  --en: "DM Sans", "Noto Sans JP", sans-serif;
+  --ja: "Noto Sans JP", sans-serif;
+  --hand: "Caveat", cursive;
+  --shadow: 0 12px 32px rgba(26, 34, 56, .07);
+}
+/* one colour per round, from the salon's daily timeline */
+.r1 { --rc: #FF9DB4; }
+.r2 { --rc: #7DBDEB; }
+.r3 { --rc: #FF8A57; }
+.r4 { --rc: #FFC94A; }
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { background: var(--bg); }
+body {
+  font-family: var(--ja);
+  font-weight: 700;
+  color: var(--ink);
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+ol, ul { list-style: none; }
+
+.slide {
+  width: 1280px;
+  height: 720px;
+  position: relative;
+  overflow: hidden;
+  padding: 40px 64px 44px;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg);
+  break-after: page;
+}
+.slide:last-child { break-after: auto; }
+.deco { position: absolute; left: 0; top: 0; width: 1280px; height: 720px; }
+.deco path { fill: #FFFFFF; }
+
+/* ---------- shared pieces ---------- */
+.lab { font-family: var(--en); font-size: 14px; letter-spacing: .2em; color: var(--accent-text); }
+.script { font-family: var(--hand); line-height: 1.1; color: var(--accent-text); }
+.chip {
+  font-size: 15px;
+  color: var(--accent-text);
+  background: var(--accent-soft);
+  padding: 5px 14px 6px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+.chip.w { background: var(--card); color: var(--ink); font-size: 17px; padding: 8px 20px 9px; }
+.slot, .v { color: var(--accent); }
+.dot { width: 12px; height: 12px; border-radius: 50%; background: var(--rc); flex: none; }
+.h { font-size: 40px; font-weight: 900; margin-top: 8px; }
+
+/* ---------- header ---------- */
+.top { display: flex; align-items: center; justify-content: space-between; height: 36px; flex: none; }
+.logo { display: flex; align-items: center; gap: 12px; }
+.mark { width: 36px; height: 36px; border-radius: 11px; background: var(--accent); } /* asterisk: .deco */
+.logo b { font-family: var(--en); font-size: 19px; letter-spacing: -.3px; }
+.where { display: flex; align-items: center; gap: 18px; }
+.round-tag { display: flex; align-items: center; gap: 10px; background: var(--card); border-radius: 999px; padding: 6px 18px 7px 14px; font-size: 15px; }
+.rn { font-family: var(--en); font-size: 14px; letter-spacing: .12em; color: var(--accent-text); }
+.no { font-family: var(--en); font-size: 16px; color: var(--muted); }
+.no b { font-size: 28px; color: var(--accent); letter-spacing: -.5px; }
+
+/* ---------- phrase (question / answer) ---------- */
+.pattern { font-family: var(--en); font-weight: 700; font-size: 58px; line-height: 1.1; letter-spacing: -1.2px; margin-top: 28px; }
+.meaning-row { display: flex; align-items: center; gap: 18px; margin-top: 14px; }
+.form { display: flex; align-items: baseline; gap: 8px; background: var(--card); border-radius: 999px; padding: 6px 18px 7px; font-size: 17px; color: var(--accent-text); }
+.fk { font-size: 13px; color: var(--muted); }
+.meaning { font-size: 30px; font-weight: 900; }
+
+.info { margin-top: 20px; background: rgba(255, 255, 255, .6); border-radius: 20px; padding: 2px 28px; flex: none; }
+.row { display: flex; align-items: center; gap: 20px; padding: 12px 0; }
+.row + .row { border-top: 2px dashed var(--line); }
+.row .lab { width: 92px; flex: none; font-size: 13px; }
+.ex { display: flex; align-items: baseline; gap: 20px; }
+.ex .en { font-family: var(--en); font-size: 25px; letter-spacing: -.2px; }
+.ex .ja { font-size: 17px; color: var(--ink-2); }
+.pt { font-size: 18px; color: var(--ink-2); }
+
+.qcard {
+  flex: 1;
+  min-height: 0;
+  margin-top: 18px;
+  background: var(--card);
+  border: 3px solid var(--card);
+  border-radius: 26px;
+  box-shadow: var(--shadow);
+  padding: 12px 30px 8px;
+  display: flex;
+  flex-direction: column;
+}
+.qcard.answer { border-color: var(--accent); }
+.qhead { display: flex; align-items: baseline; gap: 14px; }
+.qhead .script { font-size: 36px; }
+.qt { font-size: 18px; color: var(--ink-2); }
+.qs { flex: 1; display: flex; flex-direction: column; }
+.q { flex: 1; display: grid; grid-template-columns: 96px 44px 1fr; column-gap: 18px; align-items: center; }
+.q + .q { border-top: 2px solid var(--line-warm); }
+.lv { justify-self: start; font-size: 15px; padding: 5px 14px 6px; border-radius: 999px; }
+.lv.easy { background: #E1EFFB; color: #2C6496; }
+.lv.hard { background: var(--accent-soft); color: var(--accent-text); }
+.qn { width: 44px; height: 44px; border-radius: 50%; background: var(--ink); color: #FFFFFF; font-family: var(--en); font-size: 22px; display: grid; place-items: center; }
+.answer .qn { background: var(--accent); }
+.qj { font-size: 34px; }
+.aj { font-size: 17px; color: var(--muted); }
+.ae { font-family: var(--en); font-size: 30px; letter-spacing: -.3px; line-height: 1.3; margin-top: 2px; }
+
+/* ---------- cover & ending ---------- */
+.cbody { flex: 1; display: flex; flex-direction: column; justify-content: center; width: 640px; padding-bottom: 8px; }
+.eyebrow { display: flex; align-items: center; gap: 14px; }
+.cbody .script { font-size: 54px; margin-top: 16px; }
+.cbody h1 { font-size: 66px; font-weight: 900; line-height: 1.22; margin-top: 6px; }
+.ending h1 { font-size: 60px; }
+h1 .en { font-family: var(--en); font-weight: 700; color: var(--accent); letter-spacing: -1px; }
+.lead { font-size: 19px; color: var(--ink-2); line-height: 1.75; margin-top: 18px; }
+.stats { display: flex; margin-top: 28px; width: 590px; background: var(--card); border-radius: 22px; box-shadow: var(--shadow); }
+.stats > div { flex: 1; padding: 14px 22px 14px; }
+.stats > .sep { flex: none; width: 2px; padding: 0; margin: 16px 0; background: var(--line); }
+.stats dt { font-size: 13px; color: var(--muted); }
+.stats dd { font-size: 16px; font-weight: 900; }
+.stats .n { font-family: var(--en); font-weight: 700; font-size: 44px; line-height: 1.15; letter-spacing: -1.5px; color: var(--accent); margin-right: 4px; }
+.chips { display: flex; gap: 10px; margin-top: 28px; }
+
+.tile { position: absolute; left: 790px; top: 120px; width: 400px; height: 400px; border-radius: 96px; background: var(--accent); }
+.sample {
+  position: absolute;
+  left: 690px;
+  top: 330px;
+  width: 460px;
+  background: var(--card);
+  border-radius: 28px;
+  box-shadow: 0 30px 60px rgba(214, 62, 16, .18);
+  padding: 26px 32px 28px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+.sj { font-size: 28px; font-weight: 900; line-height: 1.45; margin-top: 14px; }
+.sline { align-self: stretch; height: 2px; background: var(--line-warm); margin: 16px 0 14px; }
+.se { font-family: var(--en); font-size: 30px; letter-spacing: -.4px; }
+.sample .script { font-size: 36px; }
+
+/* ---------- 今日の流れ ---------- */
+.flow .lab, .howto .lab { margin-top: 30px; }
+.menu { flex: 1; display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 18px; margin-top: 22px; }
+.mcard { background: var(--card); border-radius: 22px; box-shadow: var(--shadow); padding: 18px 28px; display: flex; flex-direction: column; }
+.mhead { display: flex; align-items: center; gap: 10px; }
+.mr { font-family: var(--en); font-size: 14px; letter-spacing: .12em; color: var(--accent-text); }
+.mt { font-size: 21px; font-weight: 900; }
+.mn { margin-left: auto; font-family: var(--en); font-size: 14px; color: var(--muted); }
+.ml { flex: 1; display: flex; flex-direction: column; justify-content: space-around; margin-top: 8px; }
+.ml li { font-family: var(--en); font-size: 19px; letter-spacing: -.2px; }
+
+/* ---------- やり方 ---------- */
+.steps { flex: 1; display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; margin-top: 26px; }
+.steps li { background: var(--card); border-radius: 26px; box-shadow: var(--shadow); padding: 32px 34px; display: flex; flex-direction: column; justify-content: center; align-items: flex-start; gap: 16px; }
+.sn { width: 76px; height: 76px; border-radius: 24px; background: var(--accent-soft); color: var(--accent); font-family: var(--en); font-size: 40px; display: grid; place-items: center; }
+.st { font-size: 32px; font-weight: 900; margin-top: 12px; }
+.sd { font-size: 20px; color: var(--ink-2); line-height: 1.7; }
+.tip { display: flex; align-items: center; gap: 16px; margin-top: 22px; font-size: 20px; background: var(--card); border-radius: 20px; padding: 16px 24px; }
+
+/* ---------- ラウンドの表紙 ---------- */
+.rbody { flex: 1; display: grid; grid-template-columns: 420px 1fr; gap: 44px; align-items: center; }
+.rleft .lab { font-size: 18px; }
+.big { font-family: var(--en); font-size: 220px; line-height: .9; letter-spacing: -6px; color: var(--accent); margin-top: 10px; }
+.rbar { width: 120px; height: 12px; border-radius: 6px; background: var(--rc); margin-top: 28px; }
+.rt { font-size: 42px; font-weight: 900; line-height: 1.3; margin-top: 18px; }
+.rlist { background: var(--card); border-radius: 26px; box-shadow: var(--shadow); padding: 6px 34px; }
+.rlist li { display: grid; grid-template-columns: 58px 1fr; align-items: center; padding: 14px 0; }
+.rlist li + li { border-top: 2px solid var(--line-warm); }
+.rlist .k { font-family: var(--en); font-size: 20px; color: var(--accent); }
+.rlist .p { font-family: var(--en); font-size: 28px; letter-spacing: -.4px; line-height: 1.2; }
+.rlist .m { font-size: 15px; color: var(--muted); margin-top: 3px; }

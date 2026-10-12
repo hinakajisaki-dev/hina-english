@@ -14,11 +14,11 @@ if (!input || !output) {
   const browser = await chromium.launch();
   const page = await browser.newPage({ viewport: { width: 1280, height: 720 } });
   await page.goto(pathToFileURL(resolve(input)).href, { waitUntil: "networkidle" });
-  await page.evaluate(() => document.fonts.ready);
   // Fonts live in matome/fonts; fail loudly instead of silently printing with a fallback font.
-  const missing = await page.evaluate(() => {
-    const loaded = new Set([...document.fonts].filter((f) => f.status === "loaded").map((f) => f.family.replace(/"/g, "")));
-    return ["Liberation Sans", "Noto Sans JP"].filter((f) => !loaded.has(f));
+  // Every @font-face the deck declares is loaded up front, so a missing file always shows up here.
+  const missing = await page.evaluate(async () => {
+    await Promise.all([...document.fonts].map((f) => f.load().catch(() => {})));
+    return [...document.fonts].filter((f) => f.status !== "loaded").map((f) => `${f.family.replace(/"/g, "")} ${f.weight}`);
   });
   if (missing.length) throw new Error(`fonts failed to load: ${missing.join(", ")}`);
   await page.pdf({

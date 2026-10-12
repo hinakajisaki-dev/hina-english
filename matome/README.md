@@ -19,4 +19,4 @@ npm run matome:pptx -- matome/9-phrases/slides.html matome/9-phrases/9-phrases-m
 
 `.pptx` はレイアウトを HTML からそのまま写した編集可能なスライドです。Google ドライブにアップロードすると Google スライドに変換されます（英語は Arial、日本語は Noto Sans JP を指定）。
 
-フォントは `fonts/` に同梱しています（Noto Sans JP と、Arial と同じ字幅の Liberation Sans。どちらも SIL Open Font License）。インターネット接続なしでビルドできます。
+フォントは `fonts/` に同梱しています（Noto Sans JP と、Arial と同じ字幅の Liberation Sans。YouTube ライブのスライド（`live/`）用に DM Sans と Caveat も。どれも SIL Open Font License）。インターネット接続なしでビルドできます。
