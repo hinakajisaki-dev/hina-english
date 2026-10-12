@@ -252,9 +252,9 @@ export const WEEK1 = {
           { en: "Follow the signs to find the parking area.", ja: "駐車場は標識に従って進んでください。", note: "複数形 signs もよく使う。", form: "signs" },
           { en: "There is a stop sign over there.", ja: "あそこに一時停止の標識があります。", note: "stop sign は『一時停止標識』。", form: "sign" },
         ] },
-        { id: "pay-n", word: "pay", meaning: "支払う", examples: [
-          { en: "Where do I pay?", ja: "お支払いはどこですか？", note: "", form: "pay" },
-          { en: "I will pay you $200.", ja: "200ドルあなたに支払います。", note: "", form: "pay" },
+        { id: "pay-n", word: "pay", meaning: "給料、支払い", examples: [
+          { en: "The pay is good, but the hours are long.", ja: "給料はいいけど、勤務時間が長い。", note: "名詞の pay は『給料・報酬』。the pay で『（その仕事の）給料』。", form: "pay" },
+          { en: "I got a pay raise this year.", ja: "今年、昇給しました。", note: "pay raise で『昇給』。動詞の pay（支払う）と同じ形なので、文の中での使い方で見分ける。", form: "pay" },
         ] },
         { id: "trip", word: "trip", meaning: "出張、旅行", examples: [
           { en: "I have a business trip to New York next week.", ja: "来週ニューヨークに出張があります。", note: "business trip で『出張』。trip to ... で『〜への旅行』。", form: "trip" },
