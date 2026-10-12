@@ -18,8 +18,3 @@ export function findPhrase(key) {
   const month = Number(String(key).match(/^m(\d+)\//)?.[1]);
   return monthPhrases(month).find((p) => p.key === key) || null;
 }
-
-// Every phrase the app may voice.
-export function pronSentences() {
-  return new Set(pronMonths().flatMap((month) => monthPhrases(month).map((p) => p.en)));
-}

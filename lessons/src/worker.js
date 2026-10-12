@@ -7,7 +7,7 @@ import { AiError, correctJournal } from "./ai.js";
 import { SpeechError, speechFor } from "./speech.js";
 import { findLesson, lessonExampleSentences, questionCount } from "../public/grammar/lessons.js";
 import { bookSentences, bookWords, setKey, weekWords, wordSets } from "../public/vocab/words.js";
-import { findPhrase, pronSentences } from "../public/pron/phrases.js";
+import { findPhrase } from "../public/pron/phrases.js";
 import {
   all, ensureSchema, first, itemRow, journalRow, now, run, studentBundle,
 } from "./db.js";
@@ -205,26 +205,15 @@ async function newJournal(request, env, student) {
   return correctOnce(env, student, meta.last_row_id);
 }
 
-// Audio is only made for text in the student's own content, the 単語帳, the
-// pronunciation phrases, the grammar lessons' examples or a piece of the
-// student's own corrected journal, so the endpoint can't voice anything else.
+// Audio is only made for text in the student's own content, the 単語帳 or the
+// grammar lessons' examples, so the endpoint can't be used to voice anything else.
+// (The pronunciation months play the teacher's own recordings instead.)
 const SPOKEN_FIELDS = { vocab: ["word", "example"], phrase: ["phrase"], pron: ["text"] };
 const LESSON_SENTENCES = lessonExampleSentences();
 const BOOK_SENTENCES = bookSentences();
-const PRON_SENTENCES = pronSentences();
-// The page reads a long journal in pieces of about this size.
-const JOURNAL_PIECE = 600;
 
 async function speech(env, student, text) {
-  let allowed = LESSON_SENTENCES.has(text) || BOOK_SENTENCES.has(text) || PRON_SENTENCES.has(text);
-  if (!allowed && text && text.length <= JOURNAL_PIECE) {
-    const rows = await all(
-      env.DB,
-      `SELECT correction FROM journals WHERE student_id = ? AND correction IS NOT NULL ORDER BY id DESC LIMIT 60`,
-      student.id,
-    );
-    allowed = rows.some((row) => JSON.parse(row.correction).corrected?.includes(text));
-  }
+  let allowed = LESSON_SENTENCES.has(text) || BOOK_SENTENCES.has(text);
   if (!allowed) {
     const rows = await all(
       env.DB,

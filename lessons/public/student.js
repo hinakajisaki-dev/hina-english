@@ -51,7 +51,7 @@ document.addEventListener("click", async (event) => {
   const button = event.target.closest("[data-say]");
   if (!button) return;
   button.classList.add("loading");
-  await speak(button.dataset.say, { device: "device" in button.dataset });
+  await speak(button.dataset.say, { device: "device" in button.dataset, src: button.dataset.src });
   button.classList.remove("loading");
 });
 
@@ -79,8 +79,9 @@ function topbar(title, back = "#/") {
   </div></header>`;
 }
 
-function sayButton(text, label = "聞く", { device = false } = {}) {
-  return `<button type="button" class="speak" data-say="${esc(text)}"${device ? " data-device" : ""}>${icons.speaker}${esc(label)}</button>`;
+// src: a recording to play instead of the made-up voice.
+function sayButton(text, label = "聞く", { device = false, src = "" } = {}) {
+  return `<button type="button" class="speak" data-say="${esc(text)}"${device ? " data-device" : ""}${src ? ` data-src="${esc(src)}"` : ""}>${icons.speaker}${esc(label)}</button>`;
 }
 
 function speedControl() {
@@ -342,7 +343,7 @@ function renderVocabSet(week, number) {
         <div class="bar"><i style="width:${Math.round(((V.index + 1) / set.words.length) * 100)}%"></i></div>
         <span class="counter">${V.index + 1} / ${set.words.length}</span>
       </div>
-      <section class="card stack word-card">
+      ${V.revealed ? `<section class="card stack word-card">
         ${word.pos ? `<p class="pos">${esc(word.pos)}</p>` : ""}
         <div class="word-row">
           <p class="word" lang="en">${esc(word.word)}</p>
@@ -362,19 +363,43 @@ function renderVocabSet(week, number) {
           <input type="checkbox" id="review-check" ${inReview(word.key) ? "checked" : ""}>
           <span>復習カードに入れる</span>
         </label>
-      </section>
+      </section>`
+      : `<section class="card word-card word-front" id="word-front" role="button" tabindex="0" aria-label="意味と例文を見る">
+        ${word.pos ? `<p class="pos">${esc(word.pos)}</p>` : ""}
+        <div class="word-row center-row">
+          <p class="word" lang="en">${esc(word.word)}</p>
+          ${sayIcon(speakable(word.word))}
+        </div>
+        <p class="hint">タップして、意味と例文を見る</p>
+      </section>`}
       <div class="lesson-nav">
         ${V.index > 0 ? `<button type="button" class="btn ghost" id="prev">← もどる</button>` : "<span></span>"}
         <button type="button" class="btn" id="next">${last ? "テストへ" : "次へ"}</button>
       </div>
     </main>`;
 
-  document.getElementById("review-check").addEventListener("change", (event) => {
+  // The card shows the English first; a tap (not on 🔊) turns it over.
+  const front = document.getElementById("word-front");
+  const turn = () => {
+    V.revealed = true;
+    renderVocabSet(week, number);
+  };
+  front?.addEventListener("click", (event) => {
+    if (!event.target.closest("[data-say]")) turn();
+  });
+  front?.addEventListener("keydown", (event) => {
+    if (event.target === front && (event.key === "Enter" || event.key === " ")) {
+      event.preventDefault();
+      turn();
+    }
+  });
+  document.getElementById("review-check")?.addEventListener("change", (event) => {
     setReview(word.key, event.target.checked);
     toast(event.target.checked ? "復習カードに入れました" : "復習カードから外しました");
   });
   document.getElementById("prev")?.addEventListener("click", () => {
     V.index -= 1;
+    V.revealed = false;
     rerender();
   });
   document.getElementById("next").addEventListener("click", () => {
@@ -385,6 +410,7 @@ function renderVocabSet(week, number) {
       return;
     }
     V.index += 1;
+    V.revealed = false;
     rerender();
   });
 }
@@ -834,7 +860,7 @@ function renderPronPractice(which) {
       <section class="card stack">
         <p class="sentence" lang="en">${esc(item.en)}</p>
         ${item.ja ? `<p class="pron-ja">${esc(item.ja)}</p>` : ""}
-        <div class="speak-row start">${sayButton(item.en, "お手本")} ${speedControl()}</div>
+        <div class="speak-row start">${sayButton(item.en, "お手本", { src: item.audio })} ${speedControl()}</div>
         ${item.tip ? `<div class="pron-note tip"><p class="label">発音のコツ</p><p>${note(item.tip)}</p></div>` : ""}
         ${item.usage ? `<div class="pron-note"><p class="label">使う場面・解説</p><p>${note(item.usage)}</p></div>` : ""}
       </section>
@@ -1468,7 +1494,6 @@ function renderJournalEntry(id) {
           ${j.topic ? `<p class="muted small">お題：${esc(j.topic)}</p>` : ""}
           <h3>添削した日記</h3>
           <p class="journal-text diff" lang="en">${diffHtml(j.body, c.corrected)}</p>
-          <div class="speak-row start">${sayButton(c.corrected, "読み上げる")} ${speedControl()}</div>
         </section>
         ${c.corrections.length ? `
           <section class="card stack">

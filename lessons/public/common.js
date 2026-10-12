@@ -101,60 +101,25 @@ export function setSpeed(speed) {
   if (player && !player.paused) player.playbackRate = speed;
 }
 
-// Reads text aloud at the chosen speed. `device` skips the server audio.
-// Long text (a corrected journal) is read in pieces of whole sentences, one
-// after another. Resolves once playback has started, or the fallback has.
-const PIECE = 600; // the server voices pieces up to this long
-let pieces = [];
-
-export function speak(text, { device = false } = {}) {
+// Reads text aloud at the chosen speed: the teacher's recording when there is
+// one (src), otherwise audio made by the server; the phone's own voice is the
+// fallback. `device` skips straight to it. Resolves once playback has started.
+export function speak(text, { device = false, src = null } = {}) {
   stopSpeaking();
   const speed = getSpeed();
   if (device || !player) {
     speakWithDevice(text, speed);
     return Promise.resolve();
   }
-  pieces = splitText(text);
-  return playPiece(speed);
-}
-
-function playPiece(speed) {
-  const piece = pieces.shift();
-  if (!piece) return Promise.resolve();
-  player.src = `/api/speech?text=${encodeURIComponent(piece)}`;
+  player.src = src || `/api/speech?text=${encodeURIComponent(text)}`;
   player.defaultPlaybackRate = player.playbackRate = speed;
   return player.play().catch((error) => {
     // AbortError means another button was tapped before this one started.
-    if (error?.name === "AbortError") return;
-    const rest = [piece, ...pieces].join(" ");
-    pieces = [];
-    speakWithDevice(rest, speed);
+    if (error?.name !== "AbortError") speakWithDevice(text, speed);
   });
 }
 
-player?.addEventListener("ended", () => {
-  if (pieces.length) playPiece(getSpeed());
-});
-
-// Whole sentences, cut straight from the text so each piece is a part of it.
-function splitText(text) {
-  if (text.length <= PIECE) return [text];
-  const sentences = text.match(/[^.!?\n]+[.!?]*[\s]*|[\s]+/g) || [text];
-  const out = [];
-  let current = "";
-  for (const sentence of sentences) {
-    if (current && (current + sentence).trim().length > PIECE) {
-      out.push(current.trim());
-      current = "";
-    }
-    current += sentence;
-  }
-  if (current.trim()) out.push(current.trim());
-  return out.filter(Boolean);
-}
-
 export function stopSpeaking() {
-  pieces = [];
   player?.pause();
   window.speechSynthesis?.cancel();
 }
