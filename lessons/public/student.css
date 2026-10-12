@@ -53,7 +53,18 @@
 .flash.back { background: var(--paper); border-color: var(--line-warm); }
 .card-actions { display: flex; gap: 10px; }
 .card-actions .btn { flex: 1; }
-.speak-row { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; }
+.speak-row { display: flex; justify-content: center; align-items: center; gap: 8px 12px; flex-wrap: wrap; }
+.speak-row.start { justify-content: flex-start; }
+
+/* audio speed: 0.5 / 0.75 / normal, shared by every 🔊 button */
+.speed { display: inline-flex; align-items: center; gap: 2px; background: var(--card); border: 1px solid var(--line); border-radius: 999px; padding: 3px; width: fit-content; }
+.speed > span { font-size: 12px; font-weight: 700; color: var(--muted); padding: 0 6px 0 8px; }
+.speed button {
+  border: 0; background: transparent; border-radius: 999px; min-height: 34px; min-width: 44px; padding: 0 10px;
+  font-family: var(--en); font-weight: 700; font-size: 13px; color: var(--ink-2); cursor: pointer;
+}
+.speed button:last-child { font-family: var(--ja); }
+.speed button[aria-pressed="true"] { background: var(--ink); color: #fff; }
 
 /* phrase list */
 .phrase-card .phrase { font-family: var(--en); font-weight: 800; font-size: 20px; line-height: 1.4; }
