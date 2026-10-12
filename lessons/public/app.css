@@ -179,9 +179,10 @@ del { color: var(--bad); text-decoration: line-through; text-decoration-thicknes
 .study-chart { margin: 0; display: flex; flex-direction: column; gap: 8px; }
 .chart-legend { display: flex; gap: 14px; flex-wrap: wrap; font-size: 13px; color: var(--ink-2); }
 .chart-legend span { display: inline-flex; align-items: center; gap: 6px; }
-.key { width: 12px; height: 12px; border-radius: 3px; display: inline-block; }
-.key.app { background: var(--study-app); }
-.key.other { background: var(--study-other); }
+/* (swatch, not "key": grammar lessons use .key for their ポイント line) */
+.swatch { width: 12px; height: 12px; border-radius: 3px; display: inline-block; }
+.swatch.app { background: var(--study-app); }
+.swatch.other { background: var(--study-other); }
 .chart-plot { position: relative; height: 180px; margin: 6px 0 34px 44px; }
 .chart-grid { position: absolute; inset: 0; border-bottom: 1px solid var(--line); }
 .chart-grid .tick { position: absolute; left: 0; right: 0; border-top: 1px solid var(--line); }
