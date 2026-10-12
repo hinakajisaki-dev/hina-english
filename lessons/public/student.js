@@ -1752,22 +1752,40 @@ const clearDraft = () => {
 
 const countWords = (text) => (text.match(/[A-Za-z0-9'’-]+/g) || []).length;
 
-// Today's お題: picked from the teacher's topics for this student, or from the
-// beginner list when there are none. The student may swap it three times a day;
-// the choice is remembered on their phone for the day.
+// Today's お題: from the teacher's topics for this student, or from the beginner
+// list when there are none. Each day has its own shuffled order of every topic;
+// 前 and 次 step through it and wrap around at either end, so a skipped topic
+// can always be found again. Where the student is in it is remembered on their
+// phone for the day.
 const TOPIC_KEY = "hina-lessons-topic";
-const TOPIC_SWAPS = 3;
 
 function topicPool() {
   const own = items("topic");
   return own.length ? own.map((t) => ({ ja: t.data.prompt, start: "" })) : TOPICS;
 }
 
+// The day's order of the topics: a shuffle that is the same all day.
+function topicOrder(day, count) {
+  let seed = day | 0; // mulberry32
+  const random = () => {
+    seed = (seed + 0x6D2B79F5) | 0;
+    let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+  const order = Array.from({ length: count }, (_, i) => i);
+  for (let i = count - 1; i > 0; i--) {
+    const j = Math.floor(random() * (i + 1));
+    [order[i], order[j]] = [order[j], order[i]];
+  }
+  return order;
+}
+
 function todaysTopic() {
   const day = japanDayNumber();
   let saved = null;
   try { saved = JSON.parse(localStorage.getItem(TOPIC_KEY)); } catch { /* private mode */ }
-  if (saved?.day !== day) saved = { day, index: day, swaps: 0, free: false };
+  if (saved?.day !== day || !Number.isInteger(saved.step)) saved = { day, step: 0, free: false };
   return saved;
 }
 
@@ -1779,8 +1797,9 @@ function renderJournal(id) {
   if (id) return renderJournalEntry(Number(id));
   const pool = topicPool();
   const topic = todaysTopic();
-  const current = pool[topic.index % pool.length];
-  const left = TOPIC_SWAPS - topic.swaps;
+  const order = topicOrder(topic.day, pool.length);
+  const step = ((topic.step % pool.length) + pool.length) % pool.length;
+  const current = pool[order[step]];
   const draft = readDraft();
 
   app.innerHTML = `${topbar("日記")}
@@ -1798,7 +1817,9 @@ function renderJournal(id) {
               <p class="topic-ja">${esc(current.ja)}</p>
               ${current.start ? `<p class="muted small">書き出しの例：<span lang="en">${esc(current.start)}</span></p>` : ""}
               <div class="topic-actions">
-                <button type="button" class="btn secondary small-btn" id="topic-swap" ${left > 0 && pool.length > 1 ? "" : "disabled"}>別のお題にする（あと ${left} 回）</button>
+                ${pool.length > 1 ? `
+                  <button type="button" class="btn secondary small-btn" id="topic-prev">← 前のお題</button>
+                  <button type="button" class="btn secondary small-btn" id="topic-next">次のお題 →</button>` : ""}
                 <button type="button" class="btn ghost small-btn" id="topic-free">お題なしで書く</button>
               </div>
             </div>`}
@@ -1819,12 +1840,12 @@ function renderJournal(id) {
     document.getElementById("wordcount").textContent = `${countWords(form.body.value)} words`;
     save();
   });
-  document.getElementById("topic-swap")?.addEventListener("click", () => {
-    // Any other topic, at random.
-    const others = pool.map((_, i) => i).filter((i) => i !== topic.index % pool.length);
-    saveTopic({ ...topic, index: others[Math.floor(Math.random() * others.length)], swaps: topic.swaps + 1 });
-    renderJournal();
-  });
+  for (const [id, move] of [["topic-prev", -1], ["topic-next", 1]]) {
+    document.getElementById(id)?.addEventListener("click", () => {
+      saveTopic({ ...topic, step: (step + move + pool.length) % pool.length });
+      renderJournal();
+    });
+  }
   document.getElementById("topic-free")?.addEventListener("click", () => {
     saveTopic({ ...topic, free: true });
     renderJournal();
