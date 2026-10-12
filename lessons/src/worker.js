@@ -9,7 +9,7 @@ import { findLesson, lessonExampleSentences, questionCount } from "../public/gra
 import { bookSentences, bookWords, setKey, weekWords, wordSets } from "../public/vocab/words.js";
 import { findPhrase } from "../public/pron/phrases.js";
 import {
-  all, ensureSchema, first, itemRow, journalRow, now, run, studentBundle,
+  all, ensureSchema, first, itemRow, japanDay, journalRow, now, run, studentBundle,
 } from "./db.js";
 
 const STUDENT_COOKIE = "hl_student";
@@ -71,7 +71,13 @@ async function route(request, env, url) {
       return saveLessonResult(request, env, student, parts[1]);
     }
     if (path === "/api/vocab/review" && method === "POST") return saveReview(request, env, student);
-    if (path === "/api/pron" && method === "POST") return savePronScore(request, env, student);
+    if (path === "/api/pron/done" && method === "POST") {
+      return finishPhrase(request, env, student, url.searchParams.get("key"), url.searchParams.get("seconds"));
+    }
+    if (path === "/api/study/ping" && method === "POST") return addStudyTime(request, env, student);
+    if (parts[0] === "study" && parts[1] === "days" && parts.length === 3 && method === "PUT") {
+      return saveStudyDay(request, env, student, parts[2]);
+    }
     if (parts[0] === "vocab" && parts[1] === "tests" && parts.length === 4 && method === "POST") {
       return saveVocabTest(request, env, student, parts[2], Number(parts[3]));
     }
@@ -100,8 +106,13 @@ async function route(request, env, url) {
     if (method === "PATCH") return updateStudent(request, db, student);
     if (method === "DELETE") {
       await run(db, `DELETE FROM students WHERE id = ?`, student.id);
+      await deleteRecordings(env, `rec/${student.id}/`);
       return json({ ok: true });
     }
+  }
+  if (parts[1] === "students" && parts[3] === "recording" && parts.length === 4 && method === "GET") {
+    const student = await findStudent(db, id(2));
+    return recordingAudio(request, env, student, String(url.searchParams.get("key") || ""));
   }
   if (parts[1] === "students" && parts[3] === "code" && parts.length === 4 && method === "POST") {
     const student = await findStudent(db, id(2));
@@ -123,10 +134,13 @@ async function route(request, env, url) {
       return json({ item: itemRow({ ...row, data: JSON.stringify(clean) }) });
     }
     if (method === "DELETE") {
+      const key = `item/${row.id}`;
       await db.batch([
         db.prepare(`DELETE FROM items WHERE id = ?`).bind(row.id),
-        db.prepare(`DELETE FROM vocab_review WHERE student_id = ? AND word_key = ?`).bind(row.student_id, `item/${row.id}`),
+        db.prepare(`DELETE FROM vocab_review WHERE student_id = ? AND word_key = ?`).bind(row.student_id, key),
+        db.prepare(`DELETE FROM pron_progress WHERE student_id = ? AND phrase_key = ?`).bind(row.student_id, key),
       ]);
+      if (row.kind === "pron") await env.AUDIO.delete(recordingKey(row.student_id, key));
       return json({ ok: true });
     }
   }
@@ -273,20 +287,95 @@ async function saveReview(request, env, student) {
   return json({ ok: true });
 }
 
-// The best and latest score for one shared pronunciation phrase.
-async function savePronScore(request, env, student) {
-  const { key, score } = await readJson(request);
-  if (!findPhrase(key)) throw new HttpError(404, "見つかりません。");
-  const clean = Math.max(0, Math.min(100, Math.round(Number(score)) || 0));
+// 完了 of one pronunciation phrase. The body is the student's recording (audio/*),
+// which goes to the teacher, or {} when the browser can't record. Sending again
+// replaces the recording; the first 完了 time is kept, since it counts toward
+// that day's task.
+const MAX_RECORDING = 1024 * 1024;
+const RECORDING_TYPES = ["audio/webm", "audio/mp4", "audio/ogg", "audio/mpeg", "audio/aac", "audio/x-m4a", "audio/wav"];
+const recordingKey = (studentId, key) => `rec/${studentId}/${key}`;
+
+async function finishPhrase(request, env, student, key, secondsParam) {
+  key = String(key || "");
+  await requirePhraseKey(env.DB, student, key);
+  const type = (request.headers.get("Content-Type") || "").split(";")[0].trim().toLowerCase();
+  let recording = null;
+  if (type.startsWith("audio/")) {
+    if (!RECORDING_TYPES.includes(type)) throw new HttpError(415, "この録音の形式は送れません。");
+    const tooLong = "録音が長すぎます。もう少し短く録音しなおしてください。";
+    if (Number(request.headers.get("Content-Length")) > MAX_RECORDING) throw new HttpError(413, tooLong);
+    const audio = await request.arrayBuffer();
+    if (audio.byteLength > MAX_RECORDING) throw new HttpError(413, tooLong);
+    if (!audio.byteLength) throw new HttpError(400, "録音が空でした。もう一度録音してください。");
+    await env.AUDIO.put(recordingKey(student.id, key), audio, { metadata: { type } });
+    const seconds = Math.round(Math.max(0, Math.min(600, Number(secondsParam) || 0)) * 10) / 10;
+    recording = { type, bytes: audio.byteLength, seconds: seconds || null };
+  } else {
+    await readJson(request);
+  }
   await run(
     env.DB,
-    `INSERT INTO pron_results (student_id, phrase_key, best_score, last_score, times, updated_at)
-     VALUES (?1, ?2, ?3, ?3, 1, ?4)
+    `INSERT INTO pron_progress (student_id, phrase_key, done_at, rec_type, rec_bytes, rec_seconds, sent_at)
+     VALUES (?1, ?2, ?3, ?4, ?5, ?6, CASE WHEN ?4 IS NULL THEN NULL ELSE ?3 END)
      ON CONFLICT (student_id, phrase_key) DO UPDATE SET
-       best_score = MAX(best_score, ?3), last_score = ?3, times = times + 1, updated_at = ?4`,
-    student.id, key, clean, now(),
+       rec_type = COALESCE(?4, rec_type),
+       rec_bytes = COALESCE(?5, rec_bytes),
+       rec_seconds = CASE WHEN ?4 IS NULL THEN rec_seconds ELSE ?6 END,
+       sent_at = CASE WHEN ?4 IS NULL THEN sent_at ELSE ?3 END`,
+    student.id, key, now(), recording?.type ?? null, recording?.bytes ?? null, recording?.seconds ?? null,
   );
-  return json({ ok: true });
+  const row = await first(env.DB, `SELECT * FROM pron_progress WHERE student_id = ? AND phrase_key = ?`, student.id, key);
+  return json({ done: { done_at: row.done_at, sent_at: row.sent_at, seconds: row.rec_seconds } });
+}
+
+// A phrase key must be a shared month phrase ("m1/05") or one of this student's own sentences ("item/12").
+async function requirePhraseKey(db, student, key) {
+  if (findPhrase(key)) return;
+  const item = key.match(/^item\/(\d+)$/);
+  if (item && (await first(db, `SELECT id FROM items WHERE id = ? AND student_id = ? AND kind = 'pron'`, Number(item[1]), student.id))) {
+    return;
+  }
+  throw new HttpError(404, "見つかりません。");
+}
+
+// Time spent in the app: the page sends the seconds it was open and in use, about
+// once a minute. At most two minutes are added at a time.
+async function addStudyTime(request, env, student) {
+  const { seconds } = await readJson(request);
+  const add = Math.max(0, Math.min(120, Math.round(Number(seconds)) || 0));
+  if (add) {
+    await run(
+      env.DB,
+      `INSERT INTO study_days (student_id, day, app_seconds, updated_at) VALUES (?1, ?2, ?3, ?4)
+       ON CONFLICT (student_id, day) DO UPDATE SET app_seconds = MIN(86400, app_seconds + ?3), updated_at = ?4`,
+      student.id, japanDay(), add, now(),
+    );
+  }
+  return json({ ok: true, day: japanDay(), added: add });
+}
+
+// The student's own numbers for one day: minutes in the app, other study, and a note.
+// App minutes the student didn't change (app_minutes_shown is what the form showed)
+// keep the seconds counted so far, which may have grown since the page loaded.
+async function saveStudyDay(request, env, student, day) {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(day) || Number.isNaN(Date.parse(day)) || day > japanDay()) {
+    throw new HttpError(400, "日付が正しくありません。");
+  }
+  const input = await readJson(request);
+  const minutes = (value) => Math.max(0, Math.min(1440, Math.round(Number(value)) || 0));
+  const old = await first(env.DB, `SELECT * FROM study_days WHERE student_id = ? AND day = ?`, student.id, day);
+  const appMinutes = minutes(input.app_minutes);
+  const unchanged = input.app_minutes_shown !== undefined && minutes(input.app_minutes_shown) === appMinutes;
+  const appSeconds = old && (unchanged || Math.round(old.app_seconds / 60) === appMinutes) ? old.app_seconds : appMinutes * 60;
+  const other = minutes(input.other_minutes);
+  const note = String(input.note ?? "").trim().slice(0, 300);
+  await run(
+    env.DB,
+    `INSERT INTO study_days (student_id, day, app_seconds, other_minutes, note, updated_at) VALUES (?1, ?2, ?3, ?4, ?5, ?6)
+     ON CONFLICT (student_id, day) DO UPDATE SET app_seconds = ?3, other_minutes = ?4, note = ?5, updated_at = ?6`,
+    student.id, day, appSeconds, other, note, now(),
+  );
+  return json({ day: { day, app_seconds: appSeconds, other_minutes: other, note } });
 }
 
 // A word key must be a 単語帳 word ("w1/go") or one of this student's own words ("item/12").
@@ -462,6 +551,41 @@ async function updateJournal(request, db, journalId) {
   const read = input.teacher_read === undefined ? row.teacher_read : input.teacher_read ? 1 : 0;
   await run(db, `UPDATE journals SET teacher_comment = ?, teacher_read = ? WHERE id = ?`, comment, read, journalId);
   return json({ journal: journalRow({ ...row, teacher_comment: comment, teacher_read: read }) });
+}
+
+// One recording, for the teacher's <audio> player. Safari asks for byte ranges.
+async function recordingAudio(request, env, student, key) {
+  const { value, metadata } = await env.AUDIO.getWithMetadata(recordingKey(student.id, key), "arrayBuffer");
+  if (!value) throw new HttpError(404, "録音が見つかりません。");
+  const headers = {
+    "Content-Type": metadata?.type || "audio/mp4",
+    "Accept-Ranges": "bytes",
+    "Cache-Control": "private, max-age=86400",
+    "X-Content-Type-Options": "nosniff",
+  };
+  const size = value.byteLength;
+  const range = (request.headers.get("Range") || "").match(/^bytes=(\d*)-(\d*)$/);
+  if (range && (range[1] || range[2])) {
+    const start = range[1] ? Number(range[1]) : Math.max(0, size - Number(range[2]));
+    const end = range[1] && range[2] ? Math.min(Number(range[2]), size - 1) : size - 1;
+    if (start >= size || start > end) {
+      return new Response(null, { status: 416, headers: { ...headers, "Content-Range": `bytes */${size}` } });
+    }
+    return new Response(value.slice(start, end + 1), {
+      status: 206,
+      headers: { ...headers, "Content-Range": `bytes ${start}-${end}/${size}` },
+    });
+  }
+  return new Response(value, { headers });
+}
+
+async function deleteRecordings(env, prefix) {
+  let cursor;
+  do {
+    const page = await env.AUDIO.list({ prefix, cursor });
+    await Promise.all(page.keys.map((k) => env.AUDIO.delete(k.name)));
+    cursor = page.list_complete ? null : page.cursor;
+  } while (cursor);
 }
 
 // ---------- helpers ----------

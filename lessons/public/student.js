@@ -1,17 +1,22 @@
 // Student app: sign in with a lesson code, then vocab cards and their 復習,
 // today's phrase, pronunciation, grammar and the journal with its correction.
 import {
-  ApiError, api, canListen, compareSpeech, diffHtml, esc, formatDate, icons, japanDayNumber, listen,
+  ApiError, api, diffHtml, esc, formatDate, icons, japanDayNumber,
   normalizeWords, SPEEDS, getSpeed, setSpeed, speak, startOfJapanDay, stopSpeaking, toast,
 } from "./common.js";
 import { UNITS, findLesson, plain, questionCount } from "./grammar/lessons.js";
 import { bookWeeks, setKey, speakable, splitOnForm, weekWords, wordSets } from "./vocab/words.js";
 import { MONTHS, monthPhrases, pronMonths } from "./pron/phrases.js";
 import { TOPICS } from "./journal/topics.js";
+import {
+  appMinutes, bindPanels, formatMinutes, monthPanel, monthStart, startStudyClock, studySplit, summary, today,
+  totalMinutes, weekDays, weekPanel, weekStart,
+} from "./study.js";
 
 const app = document.getElementById("app");
 const state = {
   me: null, vocab: null, vocabTest: null, review: null, pron: { which: null, index: 0 }, grammar: null, lesson: null, aiError: {},
+  study: null,
 };
 
 const asterisk = `<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><g stroke="currentColor" stroke-width="3.2" stroke-linecap="round"><path d="M12 3v18"/><path d="M4.2 7.5l15.6 9"/><path d="M4.2 16.5l15.6-9"/></g></svg>`;
@@ -35,8 +40,11 @@ async function load() {
 function render() {
   if (!state.me) return renderLogin();
   const [, screen, ...rest] = location.hash.split("/");
+  // Opening a pronunciation month goes to the first phrase that isn't 完了 yet.
+  if (screen === "pron") state.pron = { which: null, index: 0 };
   const screens = {
     vocab: renderVocab, review: renderReview, phrases: renderPhrases, pron: renderPron, grammar: renderGrammar, journal: renderJournal,
+    study: renderStudy,
   };
   (screens[screen] || renderHome)(...rest.map(decodeURIComponent));
 }
@@ -65,7 +73,27 @@ document.addEventListener("click", (event) => {
 
 (async () => {
   if (await load()) render();
+  if (state.me) startClock();
 })();
+
+// Time in the app counts as study time once signed in (see study.js).
+let clockStarted = false;
+function startClock() {
+  if (clockStarted) return;
+  clockStarted = true;
+  startStudyClock(() => !!state.me, (seconds) => {
+    if (!state.me) return;
+    const day = today();
+    let row = state.me.study.find((r) => r.day === day);
+    if (!row) state.me.study.push((row = { day, app_seconds: 0, other_minutes: 0, note: "" }));
+    row.app_seconds += seconds;
+    const total = document.getElementById("today-total");
+    if (total) {
+      total.textContent = formatMinutes(totalMinutes(row));
+      document.getElementById("today-split").textContent = studySplit(row);
+    }
+  });
+}
 
 // ---------- shared bits ----------
 
@@ -157,6 +185,7 @@ function renderLogin() {
     try {
       await api("/api/login", { method: "POST", body: { code: form.code.value } });
       await load();
+      startClock();
       location.hash = "#/";
       render();
     } catch (err) {
@@ -169,6 +198,22 @@ function renderLogin() {
 
 // ---------- home ----------
 
+// The two things to do every day: write the journal and finish one pronunciation phrase.
+function todaysTasks() {
+  const journal = wroteToday();
+  const next = nextPhrase();
+  const pron = pronDoneToday() || !next;
+  return [
+    { done: journal, href: "#/journal", title: "日記を書く", sub: journal ? "今日の日記は書けました" : "今日のお題で、英語の日記を1つ" },
+    {
+      done: pron,
+      href: next ? `#/pron/${next.month}` : "#/pron",
+      title: "発音を1文 完了する",
+      sub: pronDoneToday() ? "今日の発音はできました" : next ? `Month ${next.month} ・ ${next.index + 1}文目（${next.index + 1} / ${next.count}）` : "全部の Month が完了しています",
+    },
+  ];
+}
+
 function renderHome() {
   const weeks = [...new Set([...bookWeeks(), ...items("vocab").map((v) => v.data.week || "other")])];
   const sets = weeks.flatMap((week) => wordSets(studentWeekWords(week)).map((s) => setKey(week, s.number)));
@@ -176,11 +221,14 @@ function renderHome() {
   const review = reviewWords().length;
   const phrase = todaysPhrase();
   const shared = pronMonths().flatMap((m) => monthPhrases(m));
-  const pronCount = shared.length + items("pron").length;
-  const pronTried = shared.filter((p) => state.me.pronResults[p.key]).length
-    + items("pron").filter((p) => progress(p.id).best != null).length;
+  const pronFinished = shared.filter((p) => pronDone(p.key)).length;
   const grammar = items("grammar");
   const done = wroteToday();
+  const tasks = todaysTasks();
+  const left = tasks.filter((t) => !t.done).length;
+  const now = today();
+  const week = summary(weekDays(state.me.study, weekStart(now)));
+  const todayRow = state.me.study.find((r) => r.day === now);
 
   app.innerHTML = `
     <header class="topbar"><div class="topbar-in">
@@ -191,6 +239,14 @@ function renderHome() {
         <p class="muted">${esc(formatDate(new Date().toISOString()))}</p>
         <h2>こんにちは、${esc(state.me.student.name)}さん</h2>
       </div>
+      <section class="card tasks ${left ? "" : "all-done"}" aria-label="今日のやること">
+        <p class="label">${left ? `今日のやること（あと ${left} つ）` : "今日のやることは全部できました！🎉"}</p>
+        ${tasks.map((t) => `<a class="task ${t.done ? "done" : ""}" href="${t.href}">
+          <span class="check" aria-hidden="true">${t.done ? "✓" : ""}</span>
+          <div><b>${esc(t.title)}</b><span class="muted small">${esc(t.sub)}</span></div>
+          <span class="go" aria-hidden="true">›</span>
+        </a>`).join("")}
+      </section>
       ${phrase ? `
         <section class="card today" aria-label="今日のフレーズ">
           <p class="label">Today's phrase</p>
@@ -218,11 +274,16 @@ function renderHome() {
         </a>
         <a class="tile" href="#/pron">
           <span class="emoji" aria-hidden="true">🎤</span><b>発音</b>
-          <span class="muted">${pronCount ? `練習した文 ${pronTried} / ${pronCount}` : "まだありません"}</span>
+          <span class="muted">${shared.length ? `完了 ${pronFinished} / ${shared.length}` : "まだありません"}</span>
+          ${shared.length ? `<div class="bar"><i style="width:${Math.round((pronFinished / shared.length) * 100)}%"></i></div>` : ""}
         </a>
         <a class="tile wide" href="#/grammar">
           <span class="emoji" aria-hidden="true">✏️</span>
           <div><b>文法</b><p class="muted">${UNITS.map((u) => u.title).join("・")}${grammar.length ? ` ＋ 先生からの問題 ${grammar.length} 問` : ""}</p></div>
+        </a>
+        <a class="tile wide" href="#/study">
+          <span class="emoji" aria-hidden="true">⏱️</span>
+          <div><b>勉強時間</b><p class="muted">今日 ${formatMinutes(totalMinutes(todayRow))} ・ 今週 ${formatMinutes(week.total)}</p></div>
         </a>
       </nav>
       <p class="footer-links"><button type="button" class="btn ghost small-btn" id="logout">ログアウト</button></p>
@@ -234,6 +295,110 @@ function renderHome() {
     state.me = null;
     location.hash = "";
     render();
+  });
+}
+
+// ---------- study time ----------
+// Time in the app is counted by itself (study.js); the student adds study done
+// elsewhere and can fix either number. The charts show a week and a month.
+
+// The page fetches fresh numbers (at most every 30 seconds), in case the app
+// was also used on another phone or computer.
+let studyFetched = 0;
+
+function renderStudy(page, day) {
+  if (page === "edit") return renderStudyEdit(day);
+  if (Date.now() - studyFetched > 30e3) {
+    studyFetched = Date.now();
+    api("/api/me").then((fresh) => {
+      state.me = fresh;
+      if (location.hash === "#/study") renderStudy();
+    }).catch(() => {});
+  }
+  const now = today();
+  state.study ||= { week: weekStart(now), month: monthStart(now) };
+  const rows = state.me.study;
+  const todayRow = rows.find((r) => r.day === now);
+
+  app.innerHTML = `${topbar("勉強時間")}
+    <main class="wrap stack">
+      <section class="card stack study-today">
+        <p class="label">今日の勉強時間</p>
+        <p class="big" id="today-total">${formatMinutes(totalMinutes(todayRow))}</p>
+        <p class="muted" id="today-split">${studySplit(todayRow)}</p>
+        <a class="btn secondary" href="#/study/edit/${now}">記入・編集する</a>
+        <p class="muted small">アプリで勉強している時間は、自動で記録されます。本・動画・オンライン英会話など、アプリの外で勉強した時間は、自分で記入しましょう。</p>
+      </section>
+      ${weekPanel(rows, state.study.week, { editable: true })}
+      ${monthPanel(rows, state.study.month)}
+    </main>`;
+  bindPanels(app, state.study, () => renderStudy());
+}
+
+function renderStudyEdit(day) {
+  const now = today();
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(day || "") || day > now) day = now;
+  const row = state.me.study.find((r) => r.day === day);
+  app.innerHTML = `${topbar("勉強時間を記入", "#/study")}
+    <main class="wrap stack">
+      <form id="study-form" class="card stack">
+        <label class="field"><span>日付</span><input type="date" name="day" value="${day}" max="${now}" required></label>
+        <div class="stack">
+          <label class="field"><span>アプリで勉強した時間</span>
+            <span class="minutes-field"><input type="number" name="app" min="0" max="1440" step="1" inputmode="numeric" value="${appMinutes(row)}"> 分 <output></output></span>
+          </label>
+          <p class="muted small">アプリを開いている時間は、自動で記録されます。まちがっていたら直してください。</p>
+        </div>
+        <div class="stack">
+          <label class="field"><span>アプリ以外で勉強した時間</span>
+            <span class="minutes-field"><input type="number" name="other" min="0" max="1440" step="1" inputmode="numeric" value="${row?.other_minutes || 0}"> 分 <output></output></span>
+          </label>
+          <p class="muted small">本・動画・オンライン英会話など。60分 = 1時間です。</p>
+        </div>
+        <label class="field"><span>メモ（なくてもOK）</span>
+          <input type="text" name="note" maxlength="300" value="${esc(row?.note || "")}" placeholder="例：英語の動画を見た">
+        </label>
+        <p class="notice bad" id="study-error" role="alert" hidden></p>
+        <button class="btn block" type="submit">保存する</button>
+      </form>
+    </main>`;
+
+  const form = document.getElementById("study-form");
+  const showHours = () => form.querySelectorAll(".minutes-field").forEach((field) => {
+    const minutes = Math.max(0, Math.round(Number(field.querySelector("input").value)) || 0);
+    field.querySelector("output").textContent = minutes >= 60 ? `= ${formatMinutes(minutes)}` : "";
+  });
+  showHours();
+  form.addEventListener("input", showHours);
+  form.day.addEventListener("change", () => {
+    if (form.day.value) location.hash = `#/study/edit/${form.day.value}`;
+  });
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const button = form.querySelector("button[type=submit]");
+    const error = document.getElementById("study-error");
+    button.disabled = true;
+    error.hidden = true;
+    try {
+      const { day: saved } = await api(`/api/study/days/${form.day.value}`, {
+        method: "PUT",
+        body: {
+          app_minutes: Number(form.app.value) || 0,
+          app_minutes_shown: appMinutes(row),
+          other_minutes: Number(form.other.value) || 0,
+          note: form.note.value,
+        },
+      });
+      const study = state.me.study.filter((r) => r.day !== saved.day);
+      study.push(saved);
+      state.me.study = study.sort((a, b) => (a.day < b.day ? -1 : 1));
+      toast("保存しました");
+      location.hash = "#/study";
+    } catch (err) {
+      error.textContent = err.message;
+      error.hidden = false;
+      button.disabled = false;
+    }
   });
 }
 
@@ -677,7 +842,7 @@ const sameWord = (a, b) => a.trim().toLowerCase().replace(/[’]/g, "'").replace
 
 function level1Html(word, example, answer, R) {
   return `<section class="card stack word-card">
-      <p class="muted">この単語の意味は？　思いうかべてから「意味を見る」を押そう</p>
+      <p class="muted">単語の意味と例文を頭の中で言えるか確かめてみましょう！</p>
       <div class="word-row">
         <p class="word" lang="en">${esc(word.word)}</p>
         ${sayIcon(speakable(word.word))}
@@ -717,8 +882,7 @@ function level2Html(word, example, answer, R) {
       ${answer
         ? `<div class="word-examples one">${sayIcon(example.en)}<p class="question" lang="en">${exampleHtml(example)}</p></div>`
         : `<p class="question" lang="en">${exampleHtml(example, { blank: true })}</p>`}
-      ${answer ? "" : `<p class="muted small">ヒント：<span lang="en" class="letters">${esc(letters)}</span>（${form.length}文字）</p>
-        ${R.hint ? `<p class="hint-box">元の単語は <b lang="en">${esc(speakable(word.word))}</b>（${esc(word.meaning)}）。形が変わることもあります。</p>` : ""}
+      ${answer ? "" : `${R.hint ? `<p class="muted small" id="hint-line">ヒント：<span lang="en" class="letters">${esc(letters)}</span>（${form.length}文字）</p>` : ""}
         <form id="fill" class="stack">
           <input type="text" name="answer" lang="en" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="単語を入力">
           <button class="btn block" type="submit">答え合わせ</button>
@@ -745,9 +909,14 @@ function renderReviewResult(level, rerender) {
         <h3>${level === 1 ? "わからなかった単語" : "まちがえた単語"}</h3>
         <ul class="plain-list">${missed.map((w) => `<li><b lang="en">${esc(w.word)}</b>　${esc(w.meaning)}</li>`).join("")}</ul>
       </section>` : ""}
-      ${known.length ? `<section class="card stack">
-        <p>${level === 1 ? "わかった" : "正解した"}単語（${known.length} 語）を、復習カードから外しますか？</p>
-        <button type="button" class="btn secondary block" id="remove-known">外す</button>
+      ${known.length ? `<section class="card stack" id="known-box">
+        <h3>${level === 1 ? "わかった" : "正解した"}単語（${known.length} 語）</h3>
+        <p class="muted small">復習カードから外す単語にチェックを入れてください。チェックを外した単語は、復習カードに残ります。</p>
+        <ul class="pick-list">${known.map((w) => `<li><label>
+          <input type="checkbox" data-key="${esc(w.key)}" checked>
+          <span><b lang="en">${esc(w.word)}</b><span class="muted small">${esc(w.meaning)}</span></span>
+        </label></li>`).join("")}</ul>
+        <button type="button" class="btn secondary block" id="remove-known">チェックした単語を外す</button>
       </section>` : ""}
       <button type="button" class="btn block" id="again">もう一度</button>
       <a class="btn ghost block" href="#/review">復習にもどる</a>
@@ -755,9 +924,11 @@ function renderReviewResult(level, rerender) {
 
   document.getElementById("remove-known")?.addEventListener("click", async (event) => {
     event.target.disabled = true;
-    for (const w of known) await setReview(w.key, false);
-    toast(`${known.length} 語を復習カードから外しました`);
-    event.target.closest("section").remove();
+    const box = document.getElementById("known-box");
+    const picked = [...box.querySelectorAll("input[data-key]:checked")].map((input) => input.dataset.key);
+    for (const key of picked) await setReview(key, false);
+    const kept = known.length - picked.length;
+    box.innerHTML = `<p>${picked.length ? `${picked.length} 語を復習カードから外しました。` : "外した単語はありません。"}${kept ? `${kept} 語は復習カードに残しました。` : ""}</p>`;
   });
   document.getElementById("again").addEventListener("click", () => {
     state.review = null;
@@ -791,52 +962,122 @@ function renderPhrases() {
 }
 
 // ---------- pronunciation ----------
+// Each Month is a set of phrases for every student, one a day: listen to the
+// teacher's お手本, record yourself, then 完了 sends the recording to the
+// teacher (to go over in class). Opening a month goes to the first phrase that
+// isn't 完了 yet. The teacher's own sentences for this student are a group of their own.
 
-// Month 1, 2 … are shared phrases (public/pron/); the teacher's own sentences
-// for this student are a group of their own.
+const pronDone = (key) => state.me.pronDone[key];
+
+// The phrase to do next: the first one not 完了 in Month 1, then Month 2 …
+function nextPhrase() {
+  for (const month of pronMonths()) {
+    const phrases = monthPhrases(month);
+    const index = phrases.findIndex((p) => !pronDone(p.key));
+    if (index >= 0) return { month, index, count: phrases.length, phrase: phrases[index] };
+  }
+  return null;
+}
+
+const pronDoneToday = () => {
+  const start = startOfJapanDay();
+  return Object.values(state.me.pronDone).some((d) => new Date(d.done_at) >= start);
+};
+
 function renderPron(month) {
   if (month === "own") return renderPronPractice("own");
   if (month) return renderPronPractice(Number(month));
 
   const own = items("pron");
+  const ownDone = own.filter((item) => pronDone(`item/${item.id}`)).length;
   const months = Array.from({ length: MONTHS }, (_, i) => i + 1);
+  const next = nextPhrase();
   app.innerHTML = `${topbar("発音")}
     <main class="wrap stack">
-      <p class="muted">お手本を聞いて、マイクに向かって読んでみよう。聞き取れなかった単語が赤くなります。</p>
+      <p class="muted">1日1文。お手本を聞いて、自分の声を録音しよう。「完了」を押すと、録音が先生に届きます。授業でいっしょに確認します。</p>
       ${months.map((m) => {
         const phrases = monthPhrases(m);
         if (!phrases.length) return `<div class="lesson-card soon"><div><b>Month ${m}</b><span class="muted small">まだありません</span></div></div>`;
-        const tried = phrases.filter((p) => state.me.pronResults[p.key]).length;
+        const done = phrases.filter((p) => pronDone(p.key)).length;
+        const badge = done === phrases.length ? `<span class="badge done">✅ 完了</span>`
+          : next?.month === m ? `<span class="badge start">${done ? "つづきから" : "はじめる"}</span>`
+          : `<span class="badge">${done} / ${phrases.length}</span>`;
         return `<a class="lesson-card" href="#/pron/${m}">
-          <div><b>Month ${m}</b><span class="muted small">${phrases.length} 文 ・ 練習した文 ${tried} / ${phrases.length}</span></div>
-          ${tried ? `<span class="badge">${tried} / ${phrases.length}</span>` : `<span class="badge start">はじめる</span>`}
+          <div><b>Month ${m}</b><span class="muted small">${phrases.length} 文 ・ 完了 ${done} / ${phrases.length}</span></div>
+          ${badge}
         </a>`;
       }).join("")}
       ${own.length ? `<a class="lesson-card" href="#/pron/own">
-        <div><b>先生が追加した文</b><span class="muted small">${own.length} 文</span></div>
+        <div><b>先生が追加した文</b><span class="muted small">${own.length} 文 ・ 完了 ${ownDone} / ${own.length}</span></div>
         <span class="badge teacher">${own.length} 文</span>
       </a>` : ""}
     </main>`;
 }
 
-// The sentences of one month, or the teacher's own ones, as { key, en, ja, usage, tip, best, save }.
+// The sentences of one month, or the teacher's own ones, as { key, en, ja, usage, tip, audio }.
 function pronList(which) {
   if (which === "own") {
-    return items("pron").map((item) => ({
-      key: `item/${item.id}`, en: item.data.text, ja: "", usage: "", tip: item.data.tip,
-      best: progress(item.id).best, save: (score) => saveProgress(item.id, { score }),
-    }));
+    return items("pron").map((item) => ({ key: `item/${item.id}`, en: item.data.text, ja: "", usage: "", tip: item.data.tip }));
   }
-  return monthPhrases(which).map((p) => ({
-    ...p,
-    best: state.me.pronResults[p.key]?.best,
-    save: (score) => {
-      const old = state.me.pronResults[p.key];
-      state.me.pronResults[p.key] = { best: Math.max(old?.best ?? 0, score), last: score, times: (old?.times ?? 0) + 1 };
-      api("/api/pron", { method: "POST", body: { key: p.key, score } }).catch((error) => toast(error.message));
-    },
-  }));
+  return monthPhrases(which);
 }
+
+// ---------- recording ----------
+
+const canRecord = !!(navigator.mediaDevices?.getUserMedia && window.MediaRecorder);
+const RECORD_LIMIT = 20; // seconds
+
+function recordingType() {
+  for (const type of ["audio/webm;codecs=opus", "audio/mp4", "audio/webm", "audio/ogg;codecs=opus"]) {
+    if (MediaRecorder.isTypeSupported?.(type)) return type;
+  }
+  return "";
+}
+
+// Starts recording; onStop(blob, seconds) runs when it stops.
+async function startRecording(onStop) {
+  let stream;
+  try {
+    stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true } });
+  } catch (error) {
+    throw new Error(error?.name === "NotFoundError"
+      ? "マイクが見つかりませんでした。"
+      : "マイクが使えません。ブラウザの設定で、このページのマイクを「許可」にしてください。");
+  }
+  const type = recordingType();
+  const recorder = new MediaRecorder(stream, { ...(type ? { mimeType: type } : {}), audioBitsPerSecond: 64000 });
+  const chunks = [];
+  const started = Date.now();
+  recorder.addEventListener("dataavailable", (event) => event.data.size && chunks.push(event.data));
+  recorder.addEventListener("stop", () => {
+    stream.getTracks().forEach((track) => track.stop());
+    const mime = (recorder.mimeType || type || "audio/webm").split(";")[0].replace(/^video\//, "audio/");
+    onStop(new Blob(chunks, { type: mime }), (Date.now() - started) / 1000);
+  });
+  recorder.start();
+  return recorder;
+}
+
+// 完了: sends the recording (or nothing, when this browser can't record).
+async function finishPhrase(key, recording) {
+  const query = `key=${encodeURIComponent(key)}${recording ? `&seconds=${recording.seconds.toFixed(1)}` : ""}`;
+  let response;
+  try {
+    response = await fetch(`/api/pron/done?${query}`, {
+      method: "POST",
+      headers: { "Content-Type": recording ? recording.blob.type : "application/json" },
+      body: recording ? recording.blob : "{}",
+      credentials: "same-origin",
+    });
+  } catch {
+    throw new Error("インターネットにつながっていないようです。");
+  }
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok) throw new Error(data.error || "送れませんでした。もう一度ためしてください。");
+  state.me.pronDone[key] = data.done;
+}
+
+const shortDate = (iso) => new Date(iso).toLocaleDateString("ja-JP", { month: "numeric", day: "numeric" });
 
 function renderPronPractice(which) {
   const list = pronList(which);
@@ -845,10 +1086,20 @@ function renderPronPractice(which) {
     app.innerHTML = `${topbar(title, "#/pron")}<main class="wrap stack">${emptyState("まだ練習する文がありません。")}</main>`;
     return;
   }
-  if (state.pron.which !== which) state.pron = { which, index: 0 };
+  // Opening a month starts at the first phrase that isn't 完了 yet.
+  if (state.pron.which !== which) {
+    const first = list.findIndex((p) => !pronDone(p.key));
+    state.pron = { which, index: Math.max(0, first) };
+  }
   const index = Math.min(state.pron.index, list.length - 1);
   const item = list[index];
   const note = (text) => esc(text).replace(/\n/g, "<br>");
+  const go = (step) => {
+    stopAll();
+    state.pron.index = index + step;
+    renderPronPractice(which);
+    window.scrollTo(0, 0);
+  };
 
   app.innerHTML = `${topbar(title, "#/pron")}
     <main class="wrap stack">
@@ -861,57 +1112,134 @@ function renderPronPractice(which) {
         <p class="sentence" lang="en">${esc(item.en)}</p>
         ${item.ja ? `<p class="pron-ja">${esc(item.ja)}</p>` : ""}
         <div class="speak-row start">${sayButton(item.en, "お手本", { src: item.audio })} ${speedControl()}</div>
-        ${item.tip ? `<div class="pron-note tip"><p class="label">発音のコツ</p><p>${note(item.tip)}</p></div>` : ""}
+        ${item.tip ? `<div class="pron-note tip"><p class="label">発音のコツ ・ つなげて読むところ</p><p>${note(item.tip)}</p></div>` : ""}
         ${item.usage ? `<div class="pron-note"><p class="label">使う場面・解説</p><p>${note(item.usage)}</p></div>` : ""}
       </section>
-      ${canListen
-        ? `<section class="stack" style="text-align:center">
-            <button class="mic" id="mic" aria-label="読んでみる">${icons.mic}</button>
-            <p class="mic-label" id="mic-label">タップして、声に出して読んでみよう</p>
-          </section>`
-        : `<p class="notice">このブラウザでは、声のチェックが使えません。iPhone は Safari、Android とパソコンは Chrome で開いてください。<br>お手本を聞いて、声に出して練習しましょう。</p>`}
-      <section id="pron-result" class="card stack" hidden aria-live="polite"></section>
-      ${item.best != null ? `<p class="muted" style="text-align:center">これまでのベスト：${item.best} 点</p>` : ""}
+      <section class="card stack record" id="record" aria-live="polite"></section>
     </main>`;
 
-  app.querySelectorAll("[data-step]").forEach((button) =>
-    button.addEventListener("click", () => {
-      state.pron.index = index + Number(button.dataset.step);
-      renderPronPractice(which);
-      window.scrollTo(0, 0);
-    }),
-  );
+  app.querySelectorAll("[data-step]").forEach((button) => button.addEventListener("click", () => go(Number(button.dataset.step))));
 
-  const mic = document.getElementById("mic");
-  mic?.addEventListener("click", async () => {
-    if (mic.classList.contains("listening")) return;
-    const label = document.getElementById("mic-label");
-    const result = document.getElementById("pron-result");
-    stopSpeaking();
-    mic.classList.add("listening");
-    label.textContent = "聞いています… 読み終わったら少し待ってね";
-    try {
-      const heard = await listen();
-      if (!heard.length) throw new Error("声が聞こえませんでした。もう一度ためしてください。");
-      const best = heard
-        .map((text) => ({ text, ...compareSpeech(item.en, text) }))
-        .sort((a, b) => b.score - a.score)[0];
-      const message = best.score >= 90 ? "すばらしい！🎉" : best.score >= 70 ? "いい感じ！あと少し" : "赤い単語を、お手本を聞いてもう一度";
-      result.innerHTML = `
-        <p class="score">${best.score}<small> 点</small></p>
-        <p><b>${message}</b></p>
-        <p class="result-text" lang="en">${best.html}</p>
-        <p class="muted">聞きとった文：<span lang="en">${esc(best.text)}</span></p>`;
-      result.hidden = false;
-      item.save(best.score);
-    } catch (error) {
-      result.innerHTML = `<p class="notice bad">${esc(error.message)}</p>`;
-      result.hidden = false;
-    } finally {
-      mic.classList.remove("listening");
-      label.textContent = "もう一度読むときは、タップ";
+  const box = document.getElementById("record");
+  let recording = null; // { blob, seconds, url }
+  let recorder = null;
+  let timer = null;
+  let justFinished = false;
+  const player = new Audio();
+
+  const doneLine = () => {
+    const done = pronDone(item.key);
+    if (!done) return "";
+    return `<p class="done-line">✅ 完了（${shortDate(done.done_at)}）${done.sent_at ? ` ・ 録音は先生に届いています（${shortDate(done.sent_at)}）` : ""}</p>`;
+  };
+
+  const draw = (error = "") => {
+    const done = pronDone(item.key);
+    const last = index === list.length - 1;
+    if (justFinished) {
+      box.innerHTML = `
+        <p class="finished">✅ 完了しました！${done?.sent_at ? "録音が先生に届きました。" : ""}</p>
+        ${last
+          ? `<p>${which === "own" ? "先生が追加した文は、全部見ました。" : `Month ${which} の最後の文です。`}</p><a class="btn block" href="#/">ホームへ</a>`
+          : `<button class="btn block" id="next">次の文へ →</button>`}
+        <p class="muted small" style="text-align:center">今日の発音はこれでOK。もっとやりたいときは、次の文へ進めます。</p>`;
+      document.getElementById("next")?.addEventListener("click", () => go(1));
+      return;
     }
-  });
+    if (!canRecord) {
+      box.innerHTML = `
+        ${doneLine()}
+        <p class="notice">このブラウザでは録音ができません。iPhone は Safari、Android とパソコンは Chrome で開いてください。<br>お手本を聞いて声に出して練習したら、「完了」を押してください。</p>
+        ${done ? "" : `<button class="btn block" id="finish">完了</button>`}
+        ${error ? `<p class="notice bad" role="alert">${esc(error)}</p>` : ""}`;
+    } else if (recorder) {
+      box.innerHTML = `
+        <p class="label">録音中</p>
+        <div style="text-align:center" class="stack">
+          <button class="mic listening" id="mic" aria-label="録音を止める">${icons.mic}</button>
+          <p class="mic-label" id="rec-time">● 0秒 ・ 読み終わったら、もう一度タップ</p>
+        </div>`;
+    } else if (recording) {
+      box.innerHTML = `
+        ${doneLine()}
+        <p class="label">録音できました</p>
+        <div class="rec-actions">
+          <button class="btn secondary" id="play">${icons.speaker}自分の声を聞く</button>
+          <button class="btn ghost" id="again">${icons.mic}録音しなおす</button>
+        </div>
+        <p class="muted small">お手本と聞きくらべてみよう。これでよければ、先生に送ります。</p>
+        <button class="btn block" id="finish">${done ? "先生に送りなおす" : "完了して先生に送る"}</button>
+        ${error ? `<p class="notice bad" role="alert">${esc(error)}</p>` : ""}`;
+    } else {
+      box.innerHTML = `
+        ${doneLine()}
+        <p class="label">${done ? "もう一度録音することもできます" : "自分の声で読んでみよう"}</p>
+        <div style="text-align:center" class="stack">
+          <button class="mic" id="mic" aria-label="録音する">${icons.mic}</button>
+          <p class="mic-label">タップして録音。読み終わったら、もう一度タップ（${RECORD_LIMIT}秒まで）</p>
+        </div>
+        ${error ? `<p class="notice bad" role="alert">${esc(error)}</p>` : ""}`;
+    }
+    box.querySelector("#mic")?.addEventListener("click", toggle);
+    box.querySelector("#again")?.addEventListener("click", toggle);
+    box.querySelector("#play")?.addEventListener("click", () => {
+      stopSpeaking();
+      player.src = recording.url;
+      player.play().catch(() => {});
+    });
+    box.querySelector("#finish")?.addEventListener("click", async (event) => {
+      const button = event.currentTarget;
+      button.disabled = true;
+      button.textContent = "送っています…";
+      try {
+        await finishPhrase(item.key, recording);
+        justFinished = true;
+        draw();
+      } catch (err) {
+        draw(err.message);
+      }
+    });
+  };
+
+  async function toggle() {
+    if (recorder) {
+      recorder.stop();
+      return;
+    }
+    stopSpeaking();
+    player.pause();
+    try {
+      recorder = await startRecording((blob, seconds) => {
+        clearInterval(timer);
+        recorder = null;
+        if (recording) URL.revokeObjectURL(recording.url);
+        recording = blob.size ? { blob, seconds, url: URL.createObjectURL(blob) } : null;
+        draw(blob.size ? "" : "うまく録音できませんでした。もう一度ためしてください。");
+      });
+    } catch (error) {
+      recorder = null;
+      draw(error.message);
+      return;
+    }
+    draw();
+    const started = Date.now();
+    timer = setInterval(() => {
+      const seconds = Math.floor((Date.now() - started) / 1000);
+      const label = document.getElementById("rec-time");
+      if (label) label.textContent = `● ${seconds}秒 ・ 読み終わったら、もう一度タップ`;
+      if (seconds >= RECORD_LIMIT && recorder?.state === "recording") recorder.stop();
+    }, 250);
+  }
+
+  // Leaving the phrase (another phrase or another page) turns the microphone off.
+  function stopAll() {
+    clearInterval(timer);
+    if (recorder?.state === "recording") recorder.stop();
+    player.pause();
+  }
+  window.addEventListener("hashchange", stopAll, { once: true });
+
+  draw();
 }
 
 // ---------- grammar ----------

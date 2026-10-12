@@ -113,7 +113,7 @@ button, input, textarea, select { font: inherit; color: inherit; }
 .speak svg { width: 18px; height: 18px; }
 .speak.loading { opacity: .6; cursor: progress; }
 
-input[type="text"], input[type="password"], textarea, select {
+input[type="text"], input[type="password"], input[type="number"], input[type="date"], textarea, select {
   width: 100%; border: 2px solid var(--line); border-radius: 14px; background: var(--card);
   padding: 12px 14px; font-size: 16px; line-height: 1.6;
 }
@@ -148,8 +148,62 @@ label.field > span { display: block; margin-bottom: 6px; }
 .login form { margin-top: 18px; text-align: left; }
 .code-input { text-align: center; font-family: var(--en); font-size: 22px !important; letter-spacing: .12em; text-transform: uppercase; }
 
-/* ---------- word-level diff and pronunciation marks ---------- */
+/* ---------- row lists ---------- */
+.rows { list-style: none; margin: 0; padding: 0; }
+.rows > li { display: flex; gap: 10px; align-items: flex-start; padding: 12px 0; border-top: 1px solid var(--line); }
+.rows > li:first-child { border-top: 0; }
+.rows .main { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.rows .en-main { font-family: var(--en); font-weight: 700; }
+.rows .sub { font-size: 14px; color: var(--ink-2); }
+.rows .tools { display: flex; gap: 4px; flex: none; }
+.rows .edit-line { width: 100%; font-family: var(--en); }
+.pill { font-size: 12px; font-weight: 700; padding: 1px 8px; border-radius: 99px; background: var(--sky-soft); white-space: nowrap; }
+.pill.good { background: var(--good-soft); color: var(--good); }
+
+
+/* ---------- word-level diff ---------- */
 ins { background: var(--good-soft); color: var(--good); text-decoration: none; border-radius: 4px; padding: 0 2px; font-weight: 700; }
 del { color: var(--bad); text-decoration: line-through; text-decoration-thickness: 2px; opacity: .8; }
-.w-ok { color: var(--good); font-weight: 700; }
-.w-miss { color: var(--bad); text-decoration: underline wavy; text-decoration-thickness: 1.5px; text-underline-offset: 4px; }
+
+/* ---------- study time chart (student app and teacher page) ----------
+   Stacked columns per day: app time (accent) at the bottom, other study (blue)
+   on top, 2px surface gap between them, 4px rounded top, square at the baseline. */
+:root { --study-app: #F0521E; --study-other: #4A90D9; }
+.study-chart { margin: 0; display: flex; flex-direction: column; gap: 8px; }
+.chart-legend { display: flex; gap: 14px; flex-wrap: wrap; font-size: 13px; color: var(--ink-2); }
+.chart-legend span { display: inline-flex; align-items: center; gap: 6px; }
+.key { width: 12px; height: 12px; border-radius: 3px; display: inline-block; }
+.key.app { background: var(--study-app); }
+.key.other { background: var(--study-other); }
+.chart-plot { position: relative; height: 180px; margin: 6px 0 34px 44px; }
+.chart-grid { position: absolute; inset: 0; border-bottom: 1px solid var(--line); }
+.chart-grid .tick { position: absolute; left: 0; right: 0; border-top: 1px solid var(--line); }
+.chart-grid .tick span {
+  position: absolute; right: calc(100% + 6px); top: -9px; font-size: 11px; color: var(--muted);
+  white-space: nowrap; font-variant-numeric: tabular-nums;
+}
+.chart-cols { position: absolute; inset: 0; display: flex; }
+.chart-cols .col {
+  flex: 1 1 0; min-width: 0; position: relative; border: 0; padding: 0; margin: 0; background: none;
+  cursor: pointer; display: flex; justify-content: center; align-items: flex-end; border-radius: 6px;
+}
+.chart-cols .col[disabled] { cursor: default; }
+.chart-cols .col[aria-pressed="true"] { background: rgba(74, 144, 217, .1); }
+.stack-bar {
+  display: flex; flex-direction: column; gap: 2px; width: 60%; max-width: 24px; min-width: 3px;
+  border-radius: 4px 4px 0 0; overflow: hidden;
+}
+.stack-bar .seg { display: block; flex-basis: 0; min-height: 2px; }
+.seg.app { background: var(--study-app); }
+.seg.other { background: var(--study-other); }
+.col-label {
+  position: absolute; top: calc(100% + 4px); left: 50%; transform: translateX(-50%);
+  font-size: 11px; line-height: 1.25; color: var(--muted); text-align: center; white-space: nowrap;
+}
+.col.today .col-label { color: var(--ink); font-weight: 700; }
+.chart-readout { font-size: 13px; color: var(--ink-2); min-height: 2.6em; }
+.chart-nav { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.chart-nav h3 { font-size: 16px; text-align: center; flex: 1; }
+.chart-stats { display: flex; gap: 18px; flex-wrap: wrap; align-items: baseline; }
+.chart-stats .big { font-size: 28px; font-weight: 900; line-height: 1.1; }
+.chart-stats span { font-size: 13px; color: var(--ink-2); }

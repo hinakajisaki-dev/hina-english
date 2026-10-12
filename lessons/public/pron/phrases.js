@@ -1,9 +1,10 @@
 // Pronunciation phrases shared by the student app and the server: one set
 // of phrases per month, the same for every student. Each phrase gets a key
-// ("m1/05") that its best score is stored under.
+// ("m1/05") that its 完了 and the student's recording are stored under.
 import { MONTH1 } from "./month1.js";
+import { MONTH2 } from "./month2.js";
 
-const BOOKS = { 1: MONTH1 };
+const BOOKS = { 1: MONTH1, 2: MONTH2 };
 export const MONTHS = 6;
 
 export const pronMonths = () => Object.keys(BOOKS).map(Number);

@@ -72,15 +72,31 @@ const SCHEMA = [
     updated_at TEXT NOT NULL,
     PRIMARY KEY (student_id, set_key)
   )`,
-  // Scores of the shared pronunciation phrases; phrase_key is "m1/05" (public/pron/phrases.js).
-  `CREATE TABLE IF NOT EXISTS pron_results (
+  // Pronunciation phrases the student has finished (完了), and the latest recording
+  // they sent to the teacher. phrase_key is "m1/05" (public/pron/phrases.js) or
+  // "item/12" (the teacher's own sentence). The audio itself is in KV (AUDIO)
+  // under "rec/{student_id}/{phrase_key}"; rec_type is null until one is sent.
+  `CREATE TABLE IF NOT EXISTS pron_progress (
     student_id INTEGER NOT NULL REFERENCES students(id) ON DELETE CASCADE,
     phrase_key TEXT NOT NULL,
-    best_score INTEGER NOT NULL,
-    last_score INTEGER NOT NULL,
-    times INTEGER NOT NULL DEFAULT 1,
-    updated_at TEXT NOT NULL,
+    done_at TEXT NOT NULL,
+    rec_type TEXT,
+    rec_bytes INTEGER,
+    rec_seconds REAL,
+    sent_at TEXT,
     PRIMARY KEY (student_id, phrase_key)
+  )`,
+  // Study time for each day (Japan date, "2026-10-12"): app_seconds is counted while
+  // the app is open and being used, other_minutes is study the student writes in.
+  // The student can edit both.
+  `CREATE TABLE IF NOT EXISTS study_days (
+    student_id INTEGER NOT NULL REFERENCES students(id) ON DELETE CASCADE,
+    day TEXT NOT NULL,
+    app_seconds INTEGER NOT NULL DEFAULT 0,
+    other_minutes INTEGER NOT NULL DEFAULT 0,
+    note TEXT NOT NULL DEFAULT '',
+    updated_at TEXT NOT NULL,
+    PRIMARY KEY (student_id, day)
   )`,
 ];
 
@@ -93,6 +109,9 @@ export async function ensureSchema(db) {
 }
 
 export const now = () => new Date().toISOString();
+
+// Today's date in Japan, "2026-10-12"; offset moves it by whole days.
+export const japanDay = (offset = 0) => new Date(Date.now() + 9 * 3600e3 + offset * 86400e3).toISOString().slice(0, 10);
 
 export async function all(db, sql, ...params) {
   const { results } = await db.prepare(sql).bind(...params).all();
@@ -125,15 +144,16 @@ export function journalRow(row) {
 }
 
 // Everything one student's screen needs: items, progress, lesson results, the 復習 list,
-// set test results, pronunciation scores and recent journals.
+// set test results, finished pronunciation phrases, study time and recent journals.
 export async function studentBundle(db, studentId) {
-  const [items, progress, lessonRows, reviewRows, testRows, pronRows, journals] = await Promise.all([
+  const [items, progress, lessonRows, reviewRows, testRows, pronRows, studyRows, journals] = await Promise.all([
     all(db, `SELECT * FROM items WHERE student_id = ? ORDER BY id`, studentId),
     all(db, `SELECT * FROM progress WHERE student_id = ?`, studentId),
     all(db, `SELECT * FROM lesson_results WHERE student_id = ?`, studentId),
     all(db, `SELECT * FROM vocab_review WHERE student_id = ? ORDER BY added_at`, studentId),
     all(db, `SELECT * FROM vocab_tests WHERE student_id = ?`, studentId),
-    all(db, `SELECT * FROM pron_results WHERE student_id = ?`, studentId),
+    all(db, `SELECT * FROM pron_progress WHERE student_id = ?`, studentId),
+    all(db, `SELECT * FROM study_days WHERE student_id = ? AND day >= ? ORDER BY day`, studentId, japanDay(-400)),
     all(db, `SELECT * FROM journals WHERE student_id = ? ORDER BY id DESC LIMIT 60`, studentId),
   ]);
   const progressById = {};
@@ -154,11 +174,15 @@ export async function studentBundle(db, studentId) {
   for (const r of testRows) {
     vocabTests[r.set_key] = { best: r.best_score, last: r.last_score, total: r.total, times: r.times, updated_at: r.updated_at };
   }
-  const pronResults = {};
+  const pronDone = {};
   for (const r of pronRows) {
-    pronResults[r.phrase_key] = { best: r.best_score, last: r.last_score, times: r.times, updated_at: r.updated_at };
+    pronDone[r.phrase_key] = { done_at: r.done_at, sent_at: r.sent_at, seconds: r.rec_seconds };
   }
+  const study = studyRows.map((r) => ({
+    day: r.day, app_seconds: r.app_seconds, other_minutes: r.other_minutes, note: r.note,
+  }));
   return {
-    items: items.map(itemRow), progress: progressById, lessons, review, vocabTests, pronResults, journals: journals.map(journalRow),
+    items: items.map(itemRow), progress: progressById, lessons, review, vocabTests, pronDone, study,
+    journals: journals.map(journalRow),
   };
 }

@@ -139,38 +139,8 @@ function speakWithDevice(text, speed) {
   speechSynthesis.speak(utterance);
 }
 
-const Recognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-export const canListen = !!Recognition;
-
-// Listens for one English utterance. Resolves with the candidate transcripts.
-export function listen({ onStart } = {}) {
-  return new Promise((resolve, reject) => {
-    const rec = new Recognition();
-    rec.lang = "en-US";
-    rec.interimResults = false;
-    rec.maxAlternatives = 3;
-    let heard = [];
-    rec.onstart = () => onStart?.(rec);
-    rec.onresult = (event) => {
-      heard = [...event.results[0]].map((alt) => alt.transcript);
-    };
-    rec.onerror = (event) => {
-      const messages = {
-        "not-allowed": "マイクが使えません。ブラウザの設定で、マイクを「許可」にしてください。",
-        "service-not-allowed": "マイクが使えません。ブラウザの設定で、マイクを「許可」にしてください。",
-        "no-speech": "声が聞こえませんでした。もう一度ためしてください。",
-        "audio-capture": "マイクが見つかりません。",
-        network: "インターネットにつながっていないようです。",
-      };
-      if (event.error === "aborted") return;
-      reject(new Error(messages[event.error] || "うまく聞き取れませんでした。もう一度ためしてください。"));
-    };
-    rec.onend = () => resolve(heard);
-    rec.start();
-  });
-}
-
 // ---------- word comparison ----------
+// For grammar answers and the journal diff.
 
 const CONTRACTIONS = {
   "i'm": "i am", "you're": "you are", "we're": "we are", "they're": "they are", "he's": "he is",
@@ -213,29 +183,6 @@ function lcsPairs(a, b, same = (x, y) => x === y) {
     else j++;
   }
   return pairs;
-}
-
-// Marks each word of the target sentence as heard or missed. Returns
-// { html, score } where score is the percentage of words heard.
-export function compareSpeech(target, heard) {
-  const words = String(target).split(/\s+/).filter(Boolean);
-  // Map each display word to its normalized pieces so contractions line up.
-  const pieces = [];
-  words.forEach((word, index) => normalizeWords(word).forEach((p) => pieces.push({ p, index })));
-  const heardWords = normalizeWords(heard);
-  const matched = new Set(lcsPairs(pieces.map((x) => x.p), heardWords).map(([i]) => i));
-  const okByWord = words.map(() => true);
-  pieces.forEach((piece, i) => { if (!matched.has(i)) okByWord[piece.index] = false; });
-  const total = pieces.length || 1;
-  const score = Math.round((matched.size / total) * 100);
-  const html = words
-    .map((word, i) => {
-      const counts = pieces.some((x) => x.index === i);
-      if (!counts) return esc(word);
-      return `<span class="${okByWord[i] ? "w-ok" : "w-miss"}">${esc(word)}</span>`;
-    })
-    .join(" ");
-  return { html, score };
 }
 
 // Word-level diff between the student's text and the corrected text, as HTML
