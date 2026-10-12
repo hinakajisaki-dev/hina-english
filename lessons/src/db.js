@@ -41,6 +41,17 @@ const SCHEMA = [
     created_at TEXT NOT NULL
   )`,
   `CREATE INDEX IF NOT EXISTS journals_student ON journals(student_id, created_at)`,
+  // Best and latest score for each grammar lesson (lessons live in public/grammar/lessons.js).
+  `CREATE TABLE IF NOT EXISTS lesson_results (
+    student_id INTEGER NOT NULL REFERENCES students(id) ON DELETE CASCADE,
+    lesson_id TEXT NOT NULL,
+    best_score INTEGER NOT NULL,
+    last_score INTEGER NOT NULL,
+    total INTEGER NOT NULL,
+    times INTEGER NOT NULL DEFAULT 1,
+    updated_at TEXT NOT NULL,
+    PRIMARY KEY (student_id, lesson_id)
+  )`,
 ];
 
 let ready = false;
@@ -83,11 +94,12 @@ export function journalRow(row) {
   };
 }
 
-// Everything one student's screen needs: items, progress and recent journals.
+// Everything one student's screen needs: items, progress, lesson results and recent journals.
 export async function studentBundle(db, studentId) {
-  const [items, progress, journals] = await Promise.all([
+  const [items, progress, lessonRows, journals] = await Promise.all([
     all(db, `SELECT * FROM items WHERE student_id = ? ORDER BY id`, studentId),
     all(db, `SELECT * FROM progress WHERE student_id = ?`, studentId),
+    all(db, `SELECT * FROM lesson_results WHERE student_id = ?`, studentId),
     all(db, `SELECT * FROM journals WHERE student_id = ? ORDER BY id DESC LIMIT 60`, studentId),
   ]);
   const progressById = {};
@@ -99,5 +111,9 @@ export async function studentBundle(db, studentId) {
       best: p.best_score,
     };
   }
-  return { items: items.map(itemRow), progress: progressById, journals: journals.map(journalRow) };
+  const lessons = {};
+  for (const r of lessonRows) {
+    lessons[r.lesson_id] = { best: r.best_score, last: r.last_score, total: r.total, times: r.times, updated_at: r.updated_at };
+  }
+  return { items: items.map(itemRow), progress: progressById, lessons, journals: journals.map(journalRow) };
 }

@@ -2,10 +2,12 @@
 // pronunciation sentences, grammar problems and journal topics, and read
 // their journals with the AI corrections.
 import { ApiError, api, diffHtml, esc, formatDateTime, icons, startOfJapanDay, toast } from "./common.js";
+import { UNITS } from "./grammar/lessons.js";
 
 document.body.classList.add("teacher");
 const app = document.getElementById("app");
-const state = { students: [], current: null };
+const state = { students: [], current: null, vocabWeek: null };
+const WEEKS = 24;
 
 const KINDS = {
   vocab: {
@@ -371,11 +373,33 @@ function rowHtml(kind, item, progress) {
 function renderItems(panel, kind) {
   const spec = KINDS[kind];
   const { student, items, progress } = state.current;
-  const list = items.filter((item) => item.kind === kind).reverse();
+  let list = items.filter((item) => item.kind === kind).reverse();
+
+  // Words are added and listed one week at a time.
+  let week = null;
+  let weekPicker = "";
+  if (kind === "vocab") {
+    const weekOf = (item) => item.data.week || "other";
+    const count = (w) => list.filter((item) => weekOf(item) === w).length;
+    if (state.vocabWeek?.student !== student.id) {
+      const used = list.map((item) => item.data.week).filter(Boolean);
+      state.vocabWeek = { student: student.id, week: used.length ? Math.max(...used) : 1 };
+    }
+    week = state.vocabWeek.week;
+    const options = Array.from({ length: WEEKS }, (_, i) => i + 1);
+    if (count("other")) options.push("other");
+    weekPicker = `<label class="field"><span>Week をえらぶ</span>
+      <select id="week">${options.map((w) => `<option value="${w}" ${w === week ? "selected" : ""}>${w === "other" ? "そのほか（Week なし）" : `Week ${w}`}（${count(w)} 語）</option>`).join("")}</select>
+    </label>`;
+    list = list.filter((item) => weekOf(item) === week);
+  }
+  const weekName = week === "other" ? "そのほか" : `Week ${week}`;
 
   panel.innerHTML = `<div class="stack">
+    ${kind === "grammar" ? lessonResultsHtml() : ""}
     <section class="card stack">
-      <h3>${esc(spec.tab)}を追加</h3>
+      ${weekPicker}
+      <h3>${week ? `${weekName} に` : ""}${kind === "grammar" ? "先生からの問題（この生徒だけ）" : esc(spec.tab)}を追加</h3>
       <p class="format">1行に1つ。区切りは <code>|</code>（またはスプレッドシートからそのまま貼りつけ）<br>${esc(spec.format)}</p>
       <form id="bulk" class="stack">
         <textarea class="bulk" name="lines" lang="en" placeholder="${esc(spec.example)}"></textarea>
@@ -387,7 +411,7 @@ function renderItems(panel, kind) {
       ${kind === "topic" ? `<p class="muted small">日記のページで、毎日この中から順番に1つが「今日のテーマ」になります。生徒は別のテーマや、テーマなしも選べます。</p>` : ""}
     </section>
     <section class="card">
-      ${list.length ? `<ul class="rows">${list.map((item) => rowHtml(kind, item, progress)).join("")}</ul>` : `<p class="empty">まだありません。</p>`}
+      ${list.length ? `<ul class="rows" id="item-rows">${list.map((item) => rowHtml(kind, item, progress)).join("")}</ul>` : `<p class="empty">まだありません。</p>`}
     </section>
   </div>`;
 
@@ -407,9 +431,10 @@ function renderItems(panel, kind) {
     const button = form.querySelector("button");
     busy(button, "追加中…");
     try {
+      const data = parsed.map((p) => (week && week !== "other" ? { ...p.data, week } : p.data));
       await api(`/api/teacher/students/${student.id}/items`, {
         method: "POST",
-        body: { kind, items: parsed.map((p) => p.data) },
+        body: { kind, items: data },
       });
       toast(`${lines.length} こ追加しました`);
       await renderStudent(student.id, kind);
@@ -420,7 +445,13 @@ function renderItems(panel, kind) {
     }
   });
 
-  panel.querySelectorAll(".rows > li").forEach((row) => {
+  document.getElementById("week")?.addEventListener("change", (event) => {
+    const value = event.target.value;
+    state.vocabWeek.week = value === "other" ? "other" : Number(value);
+    renderItems(panel, kind);
+  });
+
+  panel.querySelectorAll("#item-rows > li").forEach((row) => {
     const item = items.find((i) => i.id === Number(row.dataset.id));
     row.querySelector("[data-delete]").addEventListener("click", async () => {
       if (!confirm("削除しますか？")) return;
@@ -457,6 +488,25 @@ function renderItems(panel, kind) {
       });
     });
   });
+}
+
+// How the student did in each grammar lesson (shown on the 文法 tab).
+function lessonResultsHtml() {
+  const results = state.current.lessons || {};
+  const lessons = UNITS.flatMap((unit) => unit.lessons.filter((l) => l.steps).map((l) => ({ unit, lesson: l })));
+  return `<section class="card stack">
+    <h3>文法レッスンの結果</h3>
+    <ul class="rows">${lessons.map(({ unit, lesson }) => {
+      const r = results[lesson.id];
+      return `<li><div class="main">
+        <div><b>${esc(unit.title)} ・ ${esc(lesson.title)}</b></div>
+        <div class="sub">${r
+          ? `ベスト ${r.best} / ${r.total}　前回 ${r.last} / ${r.total}　${r.times} 回　（${esc(formatDateTime(r.updated_at))}）`
+          : "まだやっていません"}</div>
+      </div></li>`;
+    }).join("")}</ul>
+    <p class="muted small">レッスンの中身は全員共通です。新しい単元やレッスンを足したいときは、Claude に頼んでください。下の「先生からの問題」は、この生徒だけの問題です。</p>
+  </section>`;
 }
 
 // ---------- settings ----------
