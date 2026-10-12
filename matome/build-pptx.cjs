@@ -115,6 +115,7 @@ function extract() {
             radius,
             oval: radius >= min / 2 - 0.5 && Math.abs(b.w - b.h) < 1,
             shadow: cs.boxShadow !== "none",
+            write: el.dataset.write || null, // data-write="memo" | "slot": a box to type into
           });
         }
         if (!borderAll && bw[0] > 0) {
@@ -178,7 +179,8 @@ function extract() {
     visit(slide);
     slides.push({ bg: hex(getComputedStyle(slide).backgroundColor) || hex(getComputedStyle(document.body).backgroundColor), items });
   }
-  return { title: document.title, slides };
+  const ink = getComputedStyle(document.documentElement).getPropertyValue("--ink").trim().replace("#", "");
+  return { title: document.title, ink, slides };
 }
 
 // Latin glyphs come from the element's first font; everything else (kana, kanji,
@@ -194,11 +196,17 @@ function splitByScript(run) {
   return parts.map((text) => ({ ...run, text, font: /^[\u0000-\u1fff]/.test(text) ? latin : JA }));
 }
 
+// Boxes marked data-write in the HTML: empty text boxes to type into. What you type
+// there is bold --ink in Noto Sans JP, like the rest of the deck.
+const WRITE_NAME = "記入欄";
+const WRITE_PT = { memo: 20, slot: 24 };
+const WRITE_STYLE = new RegExp(`(name="${WRITE_NAME}"[\\s\\S]*?)<a:endParaRPr lang="en-US" sz="(\\d+)" dirty="0"/>`, "g");
+
 // Slim the package down (it is small enough to upload anywhere, e.g. Google Drive):
 // pptxgenjs always writes an empty notes page per slide and some optional parts, and
 // its XML restates many defaults. None of that changes how the deck looks.
 const OPTIONAL = /^(ppt\/notes(Slides|Masters)\/|docProps\/|ppt\/(viewProps|tableStyles)\.xml$)/;
-async function slim(buffer) {
+async function slim(buffer, ink) {
   const zip = await JSZip.loadAsync(buffer);
   const out = new JSZip();
   for (const [path, entry] of Object.entries(zip.files)) {
@@ -216,6 +224,9 @@ async function slim(buffer) {
       data = data.replace(/<p:notesMasterIdLst>.*?<\/p:notesMasterIdLst>/, "");
     } else if (/^ppt\/slides\/slide\d+\.xml$/.test(path)) {
       data = data
+        .replace(WRITE_STYLE, (_, head, sz) =>
+          `${head}<a:endParaRPr lang="ja-JP" sz="${sz}" b="1"><a:solidFill><a:srgbClr val="${ink}"/></a:solidFill>` +
+          `<a:latin typeface="Noto Sans JP"/><a:ea typeface="Noto Sans JP"/></a:endParaRPr>`)
         .replace(/ (dirty|rtlCol|indent|marL)="0"| lang="en-US"| algn="l"| pitchFamily="\d+" charset="-?\d+"/g, "")
         .replace(/<a:buNone\/>|<a:endParaRPr[^>]*\/>|<a:cs typeface="[^"]*"\/>/g, "")
         .replace(/ name="(Text|Shape) \d+"/g, ' name=""')
@@ -253,7 +264,14 @@ async function slim(buffer) {
           shape = pres.shapes.ROUNDED_RECTANGLE;
           opts.rectRadius = it.radius * PX;
         }
-        slide.addShape(shape, opts);
+        if (it.write) {
+          // An empty text body, so clicking the box puts the cursor in it (styled in slim()).
+          const memo = it.write === "memo";
+          slide.addText([{ text: "", options: { fontSize: memo ? WRITE_PT.memo : WRITE_PT.slot } }], {
+            ...opts, shape, objectName: WRITE_NAME,
+            align: memo ? "left" : "center", valign: memo ? "top" : "middle", margin: memo ? 16 : 6,
+          });
+        } else slide.addShape(shape, opts);
       } else if (it.kind === "image") {
         slide.addImage({ path: fileURLToPath(it.src), altText: it.alt, x: px(it.x), y: px(it.y), w: px(it.w), h: px(it.h) });
       } else if (it.kind === "path") {
@@ -295,6 +313,6 @@ async function slim(buffer) {
     }
   }
 
-  writeFileSync(output, await slim(await pres.write({ outputType: "STREAM" })));
+  writeFileSync(output, await slim(await pres.write({ outputType: "STREAM" }), deck.ink));
   console.log(`wrote ${output}`);
 })();

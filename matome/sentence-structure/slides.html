@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<title>文章の構成</title>
+<style>
+  @font-face { font-family: "Liberation Sans"; font-weight: 700; src: url("../fonts/LiberationSans-Bold.ttf") format("truetype"); }
+  @font-face { font-family: "Noto Sans JP"; font-weight: 700; src: url("../fonts/NotoSansJP-700.woff2") format("woff2"); }
+  @font-face { font-family: "Noto Sans JP"; font-weight: 900; src: url("../fonts/NotoSansJP-900.woff2") format("woff2"); }
+
+  @page { size: 1280px 720px; margin: 0; }
+
+  /* Colors from the Hina English salon page (salon/index.html). */
+  :root {
+    --bg: #EAF2FB;
+    --paper: #FFFCF8;
+    --card: #FFFFFF;
+    --memo: #EEF4FB;
+    --ink: #1A2238;
+    --ink-2: #4B5569;
+    --muted: #8A93A8;
+    --accent: #F0521E;
+    --accent-text: #C23B12;
+    --accent-soft: #FFE6DC;
+
+    /* one color per part of the sentence */
+    --s: #D6E9FA;  --s-ink: #1F5F96;  --s-line: #9CC6EC;  /* 主語 */
+    --a: #F0521E;  --a-ink: #FFFFFF;  --a-line: #F5A285;  /* 助動詞 */
+    --v: #FFD9E2;  --v-ink: #B3304F;  --v-line: #F2A3B6;  /* 動詞 */
+    --o: #FFEDB8;  --o-ink: #8A5A00;  --o-line: #EBC864;  /* 目的語 */
+    --w: #D3F0E2;  --w-ink: #1F7A52;  --w-line: #8FD3B2;  /* W */
+    --n: #1A2238;  --n-ink: #FFFFFF;  --n-line: #8A93A8;  /* NOT */
+
+    --en: "Liberation Sans", Arial, "Noto Sans JP", sans-serif;
+    --ja: "Noto Sans JP", sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { background: var(--paper); }
+  body {
+    font-family: var(--ja);
+    font-weight: 700;
+    color: var(--ink);
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  .en { font-family: var(--en); }
+
+  .slide {
+    width: 1280px;
+    height: 720px;
+    position: relative;
+    overflow: hidden;
+    padding: 52px 80px 56px;
+    display: flex;
+    flex-direction: column;
+    background: var(--paper);
+    break-after: page;
+  }
+  .slide:last-child { break-after: auto; }
+
+  /* ---------- heading ---------- */
+  .h { display: flex; align-items: center; gap: 18px; }
+  .h .bar { width: 10px; height: 44px; border-radius: 5px; background: var(--accent); }
+  .h h2 { font-size: 40px; font-weight: 900; letter-spacing: .02em; }
+  .h .tag {
+    font-size: 18px;
+    color: var(--accent-text);
+    background: var(--accent-soft);
+    padding: 5px 16px 6px;
+    border-radius: 999px;
+  }
+
+  /* ---------- parts of the sentence ---------- */
+  .row { display: flex; align-items: center; gap: 12px; }
+  .c {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 150px;
+    height: 58px;
+    border-radius: 999px;
+    font-size: 24px;
+    font-weight: 900;
+    white-space: nowrap;
+  }
+  .c.s { background: var(--s); color: var(--s-ink); }
+  .c.a { background: var(--a); color: var(--a-ink); }
+  .c.v { background: var(--v); color: var(--v-ink); }
+  .c.o { background: var(--o); color: var(--o-ink); }
+  .c.w { background: var(--w); color: var(--w-ink); }
+  .c.n { background: var(--n); color: var(--n-ink); }
+  .c.w, .c.n { font-family: var(--en); letter-spacing: .04em; }
+  .qm { font-family: var(--en); font-size: 44px; color: var(--accent); width: 32px; text-align: center; }
+
+  /* ---------- 1: title ---------- */
+  .cover { background: var(--bg); justify-content: center; padding-left: 120px; }
+  .cover h1 { font-size: 104px; font-weight: 900; letter-spacing: .04em; line-height: 1.2; }
+  .cover .line { width: 120px; height: 8px; border-radius: 4px; background: var(--accent); margin-top: 34px; }
+  .cover .row { margin-top: 44px; gap: 14px; }
+  .cover .c { width: 140px; height: 54px; font-size: 22px; }
+
+  /* ---------- 2: 基本の形 ---------- */
+  .basic { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; padding-bottom: 20px; }
+  .basic .tiles { display: grid; grid-template-columns: repeat(3, 280px); column-gap: 36px; row-gap: 22px; }
+  .tile {
+    height: 150px;
+    border-radius: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 44px;
+    font-weight: 900;
+    letter-spacing: .04em;
+  }
+  .tile.s { background: var(--s); color: var(--s-ink); }
+  .tile.v { background: var(--v); color: var(--v-ink); }
+  .tile.o { background: var(--o); color: var(--o-ink); }
+  .word { font-family: var(--en); font-size: 46px; text-align: center; }
+  .basic .ja { font-size: 26px; color: var(--ink-2); margin-top: 34px; text-align: center; }
+
+  /* ---------- 3: 4つの形 ---------- */
+  .forms { display: flex; flex-direction: column; gap: 14px; margin-top: 30px; }
+  .forms .type { width: 190px; font-size: 21px; color: var(--ink-2); }
+  .emoji {
+    flex: 1;
+    margin-top: 28px;
+    background: var(--bg);
+    border-radius: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 44px;
+  }
+  .emoji .col { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+  .emoji .e { font-family: "Noto Color Emoji", var(--ja); font-size: 64px; line-height: 1.15; }
+  .emoji .c { width: 128px; height: 40px; font-size: 18px; }
+  .emoji .word { font-size: 30px; }
+
+  /* ---------- 4-7: one form + space to write ---------- */
+  .big { margin-top: 30px; gap: 14px; }
+  .big .c { width: 180px; height: 80px; font-size: 32px; }
+  .big .qm { font-size: 64px; width: 44px; }
+  .memo { flex: 1; margin-top: 32px; background: var(--memo); border-radius: 28px; }
+
+  /* ---------- 8-11: practice slots ---------- */
+  .sheet {
+    flex: 1;
+    display: grid;
+    grid-template-rows: 60px repeat(4, 1fr);
+    row-gap: 14px;
+    column-gap: 12px;
+    margin-top: 30px;
+  }
+  .sheet.k4 { grid-template-columns: 44px repeat(4, 1fr) 32px; }
+  .sheet.k5 { grid-template-columns: 44px repeat(5, 1fr) 32px; }
+  .sheet .c { width: auto; height: auto; font-size: 24px; }
+  .no {
+    align-self: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--accent-soft);
+    color: var(--accent-text);
+    font-family: var(--en);
+    font-size: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .slot { background: var(--card); border: 2px dashed; border-radius: 18px; }
+  .slot.s { border-color: var(--s-line); }
+  .slot.a { border-color: var(--a-line); }
+  .slot.v { border-color: var(--v-line); }
+  .slot.o { border-color: var(--o-line); }
+  .slot.w { border-color: var(--w-line); }
+  .slot.n { border-color: var(--n-line); }
+  .sheet .qm { align-self: center; font-size: 40px; }
+</style>
+</head>
+<body>
+
+<!-- ============ 1 文章の構成 ============ -->
+<section class="slide cover">
+  <h1>文章の構成</h1>
+  <div class="line"></div>
+  <div class="row">
+    <div class="c s">主語</div>
+    <div class="c a">助動詞</div>
+    <div class="c v">動詞</div>
+    <div class="c o">目的語</div>
+  </div>
+</section>
+
+<!-- ============ 2 基本の形 ============ -->
+<section class="slide">
+  <div class="h"><div class="bar"></div><h2>基本の形</h2></div>
+  <div class="basic">
+    <div class="tiles">
+      <div class="tile s">主語</div>
+      <div class="tile v">動詞</div>
+      <div class="tile o">目的語</div>
+      <p class="word">I</p>
+      <p class="word">eat</p>
+      <p class="word">sushi.</p>
+    </div>
+    <p class="ja">私は　すしを　食べる。</p>
+  </div>
+</section>
+
+<!-- ============ 3 4つの形 ============ -->
+<section class="slide">
+  <div class="h"><div class="bar"></div><h2>4つの形</h2></div>
+  <div class="forms">
+    <div class="row">
+      <p class="type">肯定文</p>
+      <div class="c s">主語</div><div class="c a">助動詞</div><div class="c v">動詞</div><div class="c o">目的語</div>
+    </div>
+    <div class="row">
+      <p class="type">疑問文</p>
+      <div class="c a">助動詞</div><div class="c s">主語</div><div class="c v">動詞</div><div class="c o">目的語</div><p class="qm">?</p>
+    </div>
+    <div class="row">
+      <p class="type">疑問詞の疑問文</p>
+      <div class="c w">W</div><div class="c a">助動詞</div><div class="c s">主語</div><div class="c v">動詞</div><div class="c o">目的語</div><p class="qm">?</p>
+    </div>
+    <div class="row">
+      <p class="type">否定文</p>
+      <div class="c s">主語</div><div class="c a">助動詞</div><div class="c n">NOT</div><div class="c v">動詞</div><div class="c o">目的語</div>
+    </div>
+  </div>
+  <div class="emoji">
+    <div class="col"><p class="e">🙋</p><p class="word">I</p><div class="c s">主語</div></div>
+    <div class="col"><p class="e">💪</p><p class="word">can</p><div class="c a">助動詞</div></div>
+    <div class="col"><p class="e">😋</p><p class="word">eat</p><div class="c v">動詞</div></div>
+    <div class="col"><p class="e">🍣</p><p class="word">sushi.</p><div class="c o">目的語</div></div>
+  </div>
+</section>
+
+<!-- ============ 4-7 それぞれの形 + 記入スペース ============ -->
+<section class="slide">
+  <div class="h"><div class="bar"></div><h2>肯定文</h2></div>
+  <div class="row big">
+    <div class="c s">主語</div><div class="c a">助動詞</div><div class="c v">動詞</div><div class="c o">目的語</div>
+  </div>
+  <div class="memo" data-write="memo"></div>
+</section>
+
+<section class="slide">
+  <div class="h"><div class="bar"></div><h2>疑問文</h2></div>
+  <div class="row big">
+    <div class="c a">助動詞</div><div class="c s">主語</div><div class="c v">動詞</div><div class="c o">目的語</div><p class="qm">?</p>
+  </div>
+  <div class="memo" data-write="memo"></div>
+</section>
+
+<section class="slide">
+  <div class="h"><div class="bar"></div><h2>疑問詞の疑問文</h2></div>
+  <div class="row big">
+    <div class="c w">W</div><div class="c a">助動詞</div><div class="c s">主語</div><div class="c v">動詞</div><div class="c o">目的語</div><p class="qm">?</p>
+  </div>
+  <div class="memo" data-write="memo"></div>
+</section>
+
+<section class="slide">
+  <div class="h"><div class="bar"></div><h2>否定文</h2></div>
+  <div class="row big">
+    <div class="c s">主語</div><div class="c a">助動詞</div><div class="c n">NOT</div><div class="c v">動詞</div><div class="c o">目的語</div>
+  </div>
+  <div class="memo" data-write="memo"></div>
+</section>
+
+<!-- ============ 8-11 練習（ことばを入れる枠） ============ -->
+<section class="slide">
+  <div class="h"><div class="bar"></div><h2>肯定文</h2><span class="tag">練習</span></div>
+  <div class="sheet k4">
+    <div></div><div class="c s">主語</div><div class="c a">助動詞</div><div class="c v">動詞</div><div class="c o">目的語</div><div></div>
+    <div class="no">1</div><div class="slot s" data-write="slot"></div><div class="slot a" data-write="slot"></div><div class="slot v" data-write="slot"></div><div class="slot o" data-write="slot"></div><div></div>
+    <div class="no">2</div><div class="slot s" data-write="slot"></div><div class="slot a" data-write="slot"></div><div class="slot v" data-write="slot"></div><div class="slot o" data-write="slot"></div><div></div>
+    <div class="no">3</div><div class="slot s" data-write="slot"></div><div class="slot a" data-write="slot"></div><div class="slot v" data-write="slot"></div><div class="slot o" data-write="slot"></div><div></div>
+    <div class="no">4</div><div class="slot s" data-write="slot"></div><div class="slot a" data-write="slot"></div><div class="slot v" data-write="slot"></div><div class="slot o" data-write="slot"></div><div></div>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="h"><div class="bar"></div><h2>疑問文</h2><span class="tag">練習</span></div>
+  <div class="sheet k4">
+    <div></div><div class="c a">助動詞</div><div class="c s">主語</div><div class="c v">動詞</div><div class="c o">目的語</div><div></div>
+    <div class="no">1</div><div class="slot a" data-write="slot"></div><div class="slot s" data-write="slot"></div><div class="slot v" data-write="slot"></div><div class="slot o" data-write="slot"></div><p class="qm">?</p>
+    <div class="no">2</div><div class="slot a" data-write="slot"></div><div class="slot s" data-write="slot"></div><div class="slot v" data-write="slot"></div><div class="slot o" data-write="slot"></div><p class="qm">?</p>
+    <div class="no">3</div><div class="slot a" data-write="slot"></div><div class="slot s" data-write="slot"></div><div class="slot v" data-write="slot"></div><div class="slot o" data-write="slot"></div><p class="qm">?</p>
+    <div class="no">4</div><div class="slot a" data-write="slot"></div><div class="slot s" data-write="slot"></div><div class="slot v" data-write="slot"></div><div class="slot o" data-write="slot"></div><p class="qm">?</p>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="h"><div class="bar"></div><h2>疑問詞の疑問文</h2><span class="tag">練習</span></div>
+  <div class="sheet k5">
+    <div></div><div class="c w">W</div><div class="c a">助動詞</div><div class="c s">主語</div><div class="c v">動詞</div><div class="c o">目的語</div><div></div>
+    <div class="no">1</div><div class="slot w" data-write="slot"></div><div class="slot a" data-write="slot"></div><div class="slot s" data-write="slot"></div><div class="slot v" data-write="slot"></div><div class="slot o" data-write="slot"></div><p class="qm">?</p>
+    <div class="no">2</div><div class="slot w" data-write="slot"></div><div class="slot a" data-write="slot"></div><div class="slot s" data-write="slot"></div><div class="slot v" data-write="slot"></div><div class="slot o" data-write="slot"></div><p class="qm">?</p>
+    <div class="no">3</div><div class="slot w" data-write="slot"></div><div class="slot a" data-write="slot"></div><div class="slot s" data-write="slot"></div><div class="slot v" data-write="slot"></div><div class="slot o" data-write="slot"></div><p class="qm">?</p>
+    <div class="no">4</div><div class="slot w" data-write="slot"></div><div class="slot a" data-write="slot"></div><div class="slot s" data-write="slot"></div><div class="slot v" data-write="slot"></div><div class="slot o" data-write="slot"></div><p class="qm">?</p>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="h"><div class="bar"></div><h2>否定文</h2><span class="tag">練習</span></div>
+  <div class="sheet k5">
+    <div></div><div class="c s">主語</div><div class="c a">助動詞</div><div class="c n">NOT</div><div class="c v">動詞</div><div class="c o">目的語</div><div></div>
+    <div class="no">1</div><div class="slot s" data-write="slot"></div><div class="slot a" data-write="slot"></div><div class="slot n" data-write="slot"></div><div class="slot v" data-write="slot"></div><div class="slot o" data-write="slot"></div><div></div>
+    <div class="no">2</div><div class="slot s" data-write="slot"></div><div class="slot a" data-write="slot"></div><div class="slot n" data-write="slot"></div><div class="slot v" data-write="slot"></div><div class="slot o" data-write="slot"></div><div></div>
+    <div class="no">3</div><div class="slot s" data-write="slot"></div><div class="slot a" data-write="slot"></div><div class="slot n" data-write="slot"></div><div class="slot v" data-write="slot"></div><div class="slot o" data-write="slot"></div><div></div>
+    <div class="no">4</div><div class="slot s" data-write="slot"></div><div class="slot a" data-write="slot"></div><div class="slot n" data-write="slot"></div><div class="slot v" data-write="slot"></div><div class="slot o" data-write="slot"></div><div></div>
+  </div>
+</section>
+
+</body>
+</html>

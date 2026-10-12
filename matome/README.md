@@ -1,10 +1,11 @@
 # まとめスライド
 
-動画ごとの「まとめ」PDFスライド。
+動画ごとの「まとめ」と、授業で使う PDF スライド。
 
 | フォルダ | 内容 |
 | --- | --- |
 | `9-phrases/` | 日常英会話フレーズ 9選（`9-phrases-matome.pdf` / 編集できる `9-phrases-matome.pptx`）。スライド11枚＋練習問題45問と解答 |
+| `sentence-structure/` | 授業資料「文章の構成」（`sentence-structure.pdf` / 編集できる `sentence-structure.pptx`）。基本の形、助動詞を使った4つの形、形ごとの記入スペース、練習用の記入枠。スライド11枚 |
 
 ## PDF の作り直し方
 
@@ -17,6 +18,6 @@ npm run matome -- matome/9-phrases/slides.html matome/9-phrases/9-phrases-matome
 npm run matome:pptx -- matome/9-phrases/slides.html matome/9-phrases/9-phrases-matome.pptx
 ```
 
-`.pptx` はレイアウトを HTML からそのまま写した編集可能なスライドです。Google ドライブにアップロードすると Google スライドに変換されます（英語は Arial、日本語は Noto Sans JP を指定）。
+`.pptx` はレイアウトを HTML からそのまま写した編集可能なスライドです。HTML で `data-write="memo"`（左上から書くメモ欄）や `data-write="slot"`（まん中に書くことばの枠）をつけた枠は、クリックするとそのまま文字を打てる「記入欄」になります。Google ドライブにアップロードすると Google スライドに変換されます（英語は Arial、日本語は Noto Sans JP を指定）。
 
 フォントは `fonts/` に同梱しています（Noto Sans JP と、Arial と同じ字幅の Liberation Sans。どちらも SIL Open Font License）。インターネット接続なしでビルドできます。
