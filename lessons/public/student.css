@@ -25,6 +25,31 @@
 .tile.wide > div { flex: 1; min-width: 0; }
 .tile.done { background: var(--good-soft); border-color: transparent; }
 
+/* 今日のやること */
+.tasks { display: flex; flex-direction: column; gap: 10px; border: 2px solid var(--accent); }
+.tasks .label { color: var(--accent-text); }
+.tasks.all-done { border-color: transparent; background: var(--good-soft); }
+.tasks.all-done .label { color: var(--good); }
+.task {
+  display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 14px;
+  background: var(--paper); border: 1px solid var(--line-warm); color: var(--ink); text-decoration: none;
+}
+.task > div { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.task .check {
+  flex: none; width: 26px; height: 26px; border-radius: 50%; border: 2px solid var(--line);
+  display: grid; place-items: center; font-size: 15px; background: #fff;
+}
+.task.done .check { border-color: var(--good); background: var(--good); color: #fff; }
+.task.done b { color: var(--ink-2); text-decoration: line-through; text-decoration-thickness: 1.5px; }
+.task .go { color: var(--muted); font-size: 22px; line-height: 1; }
+
+/* 勉強時間 */
+.study-today .big { font-size: 40px; font-weight: 900; line-height: 1.1; }
+.study-days li { align-items: center; }
+.minutes-field { display: flex; align-items: center; gap: 8px; }
+.minutes-field input { max-width: 120px; }
+.minutes-field output { font-size: 14px; color: var(--ink-2); }
+
 .bar { height: 8px; border-radius: 99px; background: var(--sky-soft); overflow: hidden; margin-top: 6px; }
 .bar > i { display: block; height: 100%; background: var(--accent); border-radius: 99px; }
 
@@ -66,7 +91,12 @@
 .mic-label { text-align: center; font-weight: 700; font-size: 14px; color: var(--ink-2); }
 .score { font-family: var(--en); font-weight: 800; font-size: 40px; line-height: 1; }
 .score small { font-size: 16px; font-family: var(--ja); }
-.result-text { font-family: var(--en); font-size: 20px; line-height: 1.6; }
+.record .label { color: var(--ink-2); }
+.rec-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+.rec-actions .btn { flex: 1 1 auto; display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding-inline: 14px; white-space: nowrap; }
+.rec-actions svg { width: 18px; height: 18px; }
+.done-line { font-size: 14px; font-weight: 700; color: var(--good); }
+.finished { font-size: 18px; font-weight: 900; color: var(--good); text-align: center; }
 .pager { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
 
 /* grammar */
@@ -140,6 +170,7 @@ a.week:hover { border-color: var(--sky); }
 .lesson-card .badge { flex: none; white-space: nowrap; }
 .lesson-card.soon { opacity: .6; box-shadow: none; }
 .badge.start { background: var(--accent); color: #fff; }
+.badge.done { background: var(--good-soft); color: var(--good); }
 
 /* lesson player */
 .lesson-progress { display: flex; align-items: center; gap: 10px; }

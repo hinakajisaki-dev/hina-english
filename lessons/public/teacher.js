@@ -5,10 +5,11 @@ import { ApiError, api, diffHtml, esc, formatDateTime, icons, startOfJapanDay, t
 import { UNITS } from "./grammar/lessons.js";
 import { bookWeeks, bookWords, setKey, weekWords, wordSets } from "./vocab/words.js";
 import { monthPhrases, pronMonths } from "./pron/phrases.js";
+import { bindPanels, formatMinutes, monthPanel, monthStart, summary, today, weekDays, weekPanel, weekStart } from "./study.js";
 
 document.body.classList.add("teacher");
 const app = document.getElementById("app");
-const state = { students: [], current: null, vocabWeek: null };
+const state = { students: [], current: null, vocabWeek: null, studyView: null };
 const WEEKS = 24;
 
 const KINDS = {
@@ -211,9 +212,13 @@ async function renderStudent(id, tab) {
   const unread = journals.filter((j) => !j.teacher_read).length;
   const weekAgo = new Date(startOfJapanDay().getTime() - 6 * 86400e3);
   const thisWeek = journals.filter((j) => new Date(j.created_at) >= weekAgo).length;
+  const shared = pronMonths().flatMap((m) => monthPhrases(m));
+  const pronFinished = shared.filter((p) => data.pronDone?.[p.key]).length;
+  const studyWeek = summary(weekDays(data.study || [], weekStart(today())));
 
   const tabs = [
     ["journals", `日記${unread ? `（未読 ${unread}）` : ""}`],
+    ["study", "勉強時間"],
     ...Object.entries(KINDS).map(([kind, spec]) => [kind, `${spec.tab} ${byKind(kind).length}`]),
     ["settings", "設定・コード"],
   ];
@@ -229,6 +234,8 @@ async function renderStudent(id, tab) {
         <div class="stat"><b>${journals.length}</b><span>日記（この7日で ${thisWeek}）</span></div>
         <div class="stat"><b>${vocabTested} / ${vocabSets.length}</b><span>単語テスト（復習カード ${(data.review || []).length} 語）</span></div>
         <div class="stat"><b>${tries ? `${Math.round((grammarTries.right / tries) * 100)}%` : "—"}</b><span>文法の正解率</span></div>
+        <div class="stat"><b>${pronFinished} / ${shared.length}</b><span>発音の完了</span></div>
+        <div class="stat"><b>${formatMinutes(studyWeek.total)}</b><span>今週の勉強時間</span></div>
       </div>
       <nav class="tabs" aria-label="内容">
         ${tabs.map(([key, label]) => `<a href="#/s/${student.id}/${key}" ${key === tab ? 'aria-current="page"' : ""}>${esc(label)}</a>`).join("")}
@@ -239,6 +246,7 @@ async function renderStudent(id, tab) {
   document.getElementById("copy-invite").addEventListener("click", () => copy(inviteText(student)));
   const panel = document.getElementById("tab");
   if (tab === "journals") renderJournals(panel);
+  else if (tab === "study") renderStudyTab(panel);
   else if (tab === "settings") renderSettings(panel);
   else if (KINDS[tab]) renderItems(panel, tab);
   else renderJournals(panel);
@@ -343,6 +351,7 @@ function rowHtml(kind, item, progress) {
   let main = "";
   let sub = "";
   let pill = "";
+  let extra = "";
   if (kind === "vocab") {
     main = d.word; sub = [d.meaning, d.example].filter(Boolean).join(" ・ ");
     if ((state.current.review || []).some((r) => r.key === `item/${item.id}`)) pill = `<span class="pill">復習カード</span>`;
@@ -350,7 +359,9 @@ function rowHtml(kind, item, progress) {
     main = d.phrase; sub = [d.meaning, d.note].filter(Boolean).join(" ・ ");
   } else if (kind === "pron") {
     main = d.text; sub = d.tip;
-    if (p.best != null) pill = `<span class="pill">ベスト ${p.best}点</span>`;
+    const key = `item/${item.id}`;
+    if (state.current.pronDone?.[key]) pill = `<span class="pill good">完了</span>`;
+    if (state.current.pronDone?.[key]?.sent_at) extra = recordingPlayer(key);
   } else if (kind === "grammar") {
     main = d.question;
     sub = [`答え：${d.answer}`, d.choices?.length ? `選択肢：${d.choices.join(" / ")}` : "", d.explanation].filter(Boolean).join(" ・ ");
@@ -364,6 +375,7 @@ function rowHtml(kind, item, progress) {
     <div class="main">
       <div class="${kind === "topic" ? "" : "en-main"}" ${mainLang}>${esc(main)} ${pill}</div>
       ${sub ? `<div class="sub">${esc(sub)}</div>` : ""}
+      ${extra}
     </div>
     <div class="tools">
       <button class="btn ghost small-btn" data-edit>編集</button>
@@ -401,7 +413,7 @@ function renderItems(panel, kind) {
   panel.innerHTML = `<div class="stack">
     ${kind === "grammar" ? lessonResultsHtml() : ""}
     ${kind === "vocab" ? vocabResultsHtml() : ""}
-    ${kind === "pron" ? pronResultsHtml() : ""}
+    ${kind === "pron" ? pronRecordingsHtml() : ""}
     <section class="card stack">
       ${weekPicker}
       ${book ? `<p class="notice">${weekName} には、全員共通の単語帳（${book} 語）が入っています。ここで足した単語は、この生徒の ${weekName} の最後に加わります。</p>` : ""}
@@ -542,25 +554,52 @@ function vocabResultsHtml() {
   </section>`;
 }
 
-// The shared pronunciation months: best score per phrase.
-function pronResultsHtml() {
-  const results = state.current.pronResults || {};
+// A student's recording of one phrase. The sent time in the URL makes a new
+// recording load instead of the browser's saved copy.
+function recordingPlayer(key) {
+  const { student, pronDone } = state.current;
+  const done = pronDone[key];
+  const src = `/api/teacher/students/${student.id}/recording?key=${encodeURIComponent(key)}&v=${encodeURIComponent(done.sent_at)}`;
+  return `<div class="recording">
+    <audio controls preload="none" src="${esc(src)}"></audio>
+    <span class="muted small">${esc(formatDateTime(done.sent_at))} に送信${done.seconds ? `・${done.seconds}秒` : ""}</span>
+  </div>`;
+}
+
+// The shared pronunciation months: how far the student is, and the recordings
+// they sent with 完了, newest first, to go over in class.
+function pronRecordingsHtml() {
+  const done = state.current.pronDone || {};
   return pronMonths().map((month) => {
     const phrases = monthPhrases(month);
-    const tried = phrases.filter((p) => results[p.key]);
-    const average = tried.length ? Math.round(tried.reduce((n, p) => n + results[p.key].best, 0) / tried.length) : null;
+    const finished = phrases.filter((p) => done[p.key]).length;
+    const sent = phrases.filter((p) => done[p.key]?.sent_at)
+      .sort((a, b) => (done[a.key].sent_at < done[b.key].sent_at ? 1 : -1));
     return `<section class="card stack">
       <h3>発音 Month ${month}（全員共通 ${phrases.length} 文）</h3>
-      <p class="muted small">練習した文 ${tried.length} / ${phrases.length}${average != null ? `　ベストの平均 ${average} 点` : ""}。ここで足した文は、生徒の画面では「先生が追加した文」に出ます。</p>
-      <details><summary>文ごとのベスト</summary>
-        <ul class="rows">${phrases.map((p) => {
-          const r = results[p.key];
-          return `<li><div class="main"><div><b lang="en">${esc(p.en)}</b></div>
-            <div class="sub">${r ? `ベスト ${r.best} 点　前回 ${r.last} 点　${r.times} 回` : "まだ練習していません"}</div></div></li>`;
-        }).join("")}</ul>
-      </details>
+      <p class="muted small">完了 ${finished} / ${phrases.length}　録音 ${sent.length} 件${sent.length > 1 ? "（新しい順）" : ""}</p>
+      ${sent.length ? `<ul class="rows">${sent.map((p) => `<li><div class="main">
+        <div class="en-main" lang="en">${Number(p.id)}. ${esc(p.en)}</div>
+        <div class="sub">${esc(p.ja)}</div>
+        ${recordingPlayer(p.key)}
+      </div></li>`).join("")}</ul>` : `<p class="empty">まだ録音はありません。</p>`}
     </section>`;
-  }).join("");
+  }).join("") + `<p class="muted small">下で足した文は、生徒の画面では「先生が追加した文」に出ます。録音はそれぞれの文の下で聞けます。</p>`;
+}
+
+// ---------- study time ----------
+
+function renderStudyTab(panel) {
+  const { student, study } = state.current;
+  if (state.studyView?.student !== student.id) {
+    state.studyView = { student: student.id, week: weekStart(today()), month: monthStart(today()) };
+  }
+  panel.innerHTML = `<div class="stack">
+    <p class="muted small">アプリを開いて使っていた時間（自動）と、生徒が自分で記入したアプリ以外の勉強時間です。生徒はどちらも直せます。</p>
+    ${weekPanel(study || [], state.studyView.week)}
+    ${monthPanel(study || [], state.studyView.month)}
+  </div>`;
+  bindPanels(panel, state.studyView, () => renderStudyTab(panel));
 }
 
 // ---------- settings ----------
