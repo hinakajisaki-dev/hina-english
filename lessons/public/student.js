@@ -1,15 +1,17 @@
 // Student app: sign in with a lesson code, then vocab cards and their 復習,
-// today's phrase, pronunciation, grammar and the journal with AI correction.
+// today's phrase, pronunciation, grammar and the journal with its correction.
 import {
   ApiError, api, canListen, compareSpeech, diffHtml, esc, formatDate, icons, japanDayNumber, listen,
   normalizeWords, SPEEDS, getSpeed, setSpeed, speak, startOfJapanDay, stopSpeaking, toast,
 } from "./common.js";
 import { UNITS, findLesson, plain, questionCount } from "./grammar/lessons.js";
 import { bookWeeks, setKey, speakable, splitOnForm, weekWords, wordSets } from "./vocab/words.js";
+import { MONTHS, monthPhrases, pronMonths } from "./pron/phrases.js";
+import { TOPICS } from "./journal/topics.js";
 
 const app = document.getElementById("app");
 const state = {
-  me: null, vocab: null, vocabTest: null, review: null, pron: { index: 0 }, grammar: null, lesson: null, aiError: {},
+  me: null, vocab: null, vocabTest: null, review: null, pron: { which: null, index: 0 }, grammar: null, lesson: null, aiError: {},
 };
 
 const asterisk = `<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><g stroke="currentColor" stroke-width="3.2" stroke-linecap="round"><path d="M12 3v18"/><path d="M4.2 7.5l15.6 9"/><path d="M4.2 16.5l15.6-9"/></g></svg>`;
@@ -49,7 +51,7 @@ document.addEventListener("click", async (event) => {
   const button = event.target.closest("[data-say]");
   if (!button) return;
   button.classList.add("loading");
-  await speak(button.dataset.say, { device: "device" in button.dataset });
+  await speak(button.dataset.say, { device: "device" in button.dataset, src: button.dataset.src });
   button.classList.remove("loading");
 });
 
@@ -77,8 +79,9 @@ function topbar(title, back = "#/") {
   </div></header>`;
 }
 
-function sayButton(text, label = "聞く", { device = false } = {}) {
-  return `<button type="button" class="speak" data-say="${esc(text)}"${device ? " data-device" : ""}>${icons.speaker}${esc(label)}</button>`;
+// src: a recording to play instead of the made-up voice.
+function sayButton(text, label = "聞く", { device = false, src = "" } = {}) {
+  return `<button type="button" class="speak" data-say="${esc(text)}"${device ? " data-device" : ""}${src ? ` data-src="${esc(src)}"` : ""}>${icons.speaker}${esc(label)}</button>`;
 }
 
 function speedControl() {
@@ -172,7 +175,10 @@ function renderHome() {
   const tested = sets.filter((key) => state.me.vocabTests[key]).length;
   const review = reviewWords().length;
   const phrase = todaysPhrase();
-  const pron = items("pron");
+  const shared = pronMonths().flatMap((m) => monthPhrases(m));
+  const pronCount = shared.length + items("pron").length;
+  const pronTried = shared.filter((p) => state.me.pronResults[p.key]).length
+    + items("pron").filter((p) => progress(p.id).best != null).length;
   const grammar = items("grammar");
   const done = wroteToday();
 
@@ -195,7 +201,7 @@ function renderHome() {
       <nav class="tiles" aria-label="メニュー">
         <a class="tile wide ${done ? "done" : ""}" href="#/journal">
           <span class="emoji" aria-hidden="true">${done ? "✅" : "✍️"}</span>
-          <div><b>日記を書く</b><p class="muted">${done ? "今日の日記は書けました！" : state.me.ai ? "英語で日記を書いて、AI に添削してもらおう" : "英語で日記を書いて、先生に送ろう"}</p></div>
+          <div><b>日記を書く</b><p class="muted">${done ? "今日の日記は書けました！" : "今日のお題で、英語の日記を書こう"}</p></div>
         </a>
         <a class="tile" href="#/vocab">
           <span class="emoji" aria-hidden="true">🃏</span><b>単語カード</b>
@@ -212,7 +218,7 @@ function renderHome() {
         </a>
         <a class="tile" href="#/pron">
           <span class="emoji" aria-hidden="true">🎤</span><b>発音</b>
-          <span class="muted">${pron.length ? `${pron.length} 文` : "まだありません"}</span>
+          <span class="muted">${pronCount ? `練習した文 ${pronTried} / ${pronCount}` : "まだありません"}</span>
         </a>
         <a class="tile wide" href="#/grammar">
           <span class="emoji" aria-hidden="true">✏️</span>
@@ -337,7 +343,7 @@ function renderVocabSet(week, number) {
         <div class="bar"><i style="width:${Math.round(((V.index + 1) / set.words.length) * 100)}%"></i></div>
         <span class="counter">${V.index + 1} / ${set.words.length}</span>
       </div>
-      <section class="card stack word-card">
+      ${V.revealed ? `<section class="card stack word-card">
         ${word.pos ? `<p class="pos">${esc(word.pos)}</p>` : ""}
         <div class="word-row">
           <p class="word" lang="en">${esc(word.word)}</p>
@@ -357,19 +363,43 @@ function renderVocabSet(week, number) {
           <input type="checkbox" id="review-check" ${inReview(word.key) ? "checked" : ""}>
           <span>復習カードに入れる</span>
         </label>
-      </section>
+      </section>`
+      : `<section class="card word-card word-front" id="word-front" role="button" tabindex="0" aria-label="意味と例文を見る">
+        ${word.pos ? `<p class="pos">${esc(word.pos)}</p>` : ""}
+        <div class="word-row center-row">
+          <p class="word" lang="en">${esc(word.word)}</p>
+          ${sayIcon(speakable(word.word))}
+        </div>
+        <p class="hint">タップして、意味と例文を見る</p>
+      </section>`}
       <div class="lesson-nav">
         ${V.index > 0 ? `<button type="button" class="btn ghost" id="prev">← もどる</button>` : "<span></span>"}
         <button type="button" class="btn" id="next">${last ? "テストへ" : "次へ"}</button>
       </div>
     </main>`;
 
-  document.getElementById("review-check").addEventListener("change", (event) => {
+  // The card shows the English first; a tap (not on 🔊) turns it over.
+  const front = document.getElementById("word-front");
+  const turn = () => {
+    V.revealed = true;
+    renderVocabSet(week, number);
+  };
+  front?.addEventListener("click", (event) => {
+    if (!event.target.closest("[data-say]")) turn();
+  });
+  front?.addEventListener("keydown", (event) => {
+    if (event.target === front && (event.key === "Enter" || event.key === " ")) {
+      event.preventDefault();
+      turn();
+    }
+  });
+  document.getElementById("review-check")?.addEventListener("change", (event) => {
     setReview(word.key, event.target.checked);
     toast(event.target.checked ? "復習カードに入れました" : "復習カードから外しました");
   });
   document.getElementById("prev")?.addEventListener("click", () => {
     V.index -= 1;
+    V.revealed = false;
     rerender();
   });
   document.getElementById("next").addEventListener("click", () => {
@@ -380,6 +410,7 @@ function renderVocabSet(week, number) {
       return;
     }
     V.index += 1;
+    V.revealed = false;
     rerender();
   });
 }
@@ -761,17 +792,65 @@ function renderPhrases() {
 
 // ---------- pronunciation ----------
 
-function renderPron() {
-  const list = items("pron");
+// Month 1, 2 … are shared phrases (public/pron/); the teacher's own sentences
+// for this student are a group of their own.
+function renderPron(month) {
+  if (month === "own") return renderPronPractice("own");
+  if (month) return renderPronPractice(Number(month));
+
+  const own = items("pron");
+  const months = Array.from({ length: MONTHS }, (_, i) => i + 1);
+  app.innerHTML = `${topbar("発音")}
+    <main class="wrap stack">
+      <p class="muted">お手本を聞いて、マイクに向かって読んでみよう。聞き取れなかった単語が赤くなります。</p>
+      ${months.map((m) => {
+        const phrases = monthPhrases(m);
+        if (!phrases.length) return `<div class="lesson-card soon"><div><b>Month ${m}</b><span class="muted small">まだありません</span></div></div>`;
+        const tried = phrases.filter((p) => state.me.pronResults[p.key]).length;
+        return `<a class="lesson-card" href="#/pron/${m}">
+          <div><b>Month ${m}</b><span class="muted small">${phrases.length} 文 ・ 練習した文 ${tried} / ${phrases.length}</span></div>
+          ${tried ? `<span class="badge">${tried} / ${phrases.length}</span>` : `<span class="badge start">はじめる</span>`}
+        </a>`;
+      }).join("")}
+      ${own.length ? `<a class="lesson-card" href="#/pron/own">
+        <div><b>先生が追加した文</b><span class="muted small">${own.length} 文</span></div>
+        <span class="badge teacher">${own.length} 文</span>
+      </a>` : ""}
+    </main>`;
+}
+
+// The sentences of one month, or the teacher's own ones, as { key, en, ja, usage, tip, best, save }.
+function pronList(which) {
+  if (which === "own") {
+    return items("pron").map((item) => ({
+      key: `item/${item.id}`, en: item.data.text, ja: "", usage: "", tip: item.data.tip,
+      best: progress(item.id).best, save: (score) => saveProgress(item.id, { score }),
+    }));
+  }
+  return monthPhrases(which).map((p) => ({
+    ...p,
+    best: state.me.pronResults[p.key]?.best,
+    save: (score) => {
+      const old = state.me.pronResults[p.key];
+      state.me.pronResults[p.key] = { best: Math.max(old?.best ?? 0, score), last: score, times: (old?.times ?? 0) + 1 };
+      api("/api/pron", { method: "POST", body: { key: p.key, score } }).catch((error) => toast(error.message));
+    },
+  }));
+}
+
+function renderPronPractice(which) {
+  const list = pronList(which);
+  const title = which === "own" ? "発音 ・ 先生が追加した文" : `発音 ・ Month ${which}`;
   if (!list.length) {
-    app.innerHTML = `${topbar("発音")}<main class="wrap stack">${emptyState("まだ発音の練習文がありません。<br>先生が追加すると、ここに出てきます。")}</main>`;
+    app.innerHTML = `${topbar(title, "#/pron")}<main class="wrap stack">${emptyState("まだ練習する文がありません。")}</main>`;
     return;
   }
+  if (state.pron.which !== which) state.pron = { which, index: 0 };
   const index = Math.min(state.pron.index, list.length - 1);
   const item = list[index];
-  const best = progress(item.id).best;
+  const note = (text) => esc(text).replace(/\n/g, "<br>");
 
-  app.innerHTML = `${topbar("発音")}
+  app.innerHTML = `${topbar(title, "#/pron")}
     <main class="wrap stack">
       <div class="pager">
         <button class="btn secondary small-btn" data-step="-1" ${index === 0 ? "disabled" : ""}>← 前</button>
@@ -779,9 +858,11 @@ function renderPron() {
         <button class="btn secondary small-btn" data-step="1" ${index === list.length - 1 ? "disabled" : ""}>次 →</button>
       </div>
       <section class="card stack">
-        <p class="sentence" lang="en">${esc(item.data.text)}</p>
-        ${item.data.tip ? `<p class="muted">💡 ${esc(item.data.tip)}</p>` : ""}
-        <div class="speak-row start">${sayButton(item.data.text, "お手本")} ${speedControl()}</div>
+        <p class="sentence" lang="en">${esc(item.en)}</p>
+        ${item.ja ? `<p class="pron-ja">${esc(item.ja)}</p>` : ""}
+        <div class="speak-row start">${sayButton(item.en, "お手本", { src: item.audio })} ${speedControl()}</div>
+        ${item.tip ? `<div class="pron-note tip"><p class="label">発音のコツ</p><p>${note(item.tip)}</p></div>` : ""}
+        ${item.usage ? `<div class="pron-note"><p class="label">使う場面・解説</p><p>${note(item.usage)}</p></div>` : ""}
       </section>
       ${canListen
         ? `<section class="stack" style="text-align:center">
@@ -790,13 +871,14 @@ function renderPron() {
           </section>`
         : `<p class="notice">このブラウザでは、声のチェックが使えません。iPhone は Safari、Android とパソコンは Chrome で開いてください。<br>お手本を聞いて、声に出して練習しましょう。</p>`}
       <section id="pron-result" class="card stack" hidden aria-live="polite"></section>
-      ${best != null ? `<p class="muted" style="text-align:center">これまでのベスト：${best} 点</p>` : ""}
+      ${item.best != null ? `<p class="muted" style="text-align:center">これまでのベスト：${item.best} 点</p>` : ""}
     </main>`;
 
   app.querySelectorAll("[data-step]").forEach((button) =>
     button.addEventListener("click", () => {
       state.pron.index = index + Number(button.dataset.step);
-      renderPron();
+      renderPronPractice(which);
+      window.scrollTo(0, 0);
     }),
   );
 
@@ -812,7 +894,7 @@ function renderPron() {
       const heard = await listen();
       if (!heard.length) throw new Error("声が聞こえませんでした。もう一度ためしてください。");
       const best = heard
-        .map((text) => ({ text, ...compareSpeech(item.data.text, text) }))
+        .map((text) => ({ text, ...compareSpeech(item.en, text) }))
         .sort((a, b) => b.score - a.score)[0];
       const message = best.score >= 90 ? "すばらしい！🎉" : best.score >= 70 ? "いい感じ！あと少し" : "赤い単語を、お手本を聞いてもう一度";
       result.innerHTML = `
@@ -821,7 +903,7 @@ function renderPron() {
         <p class="result-text" lang="en">${best.html}</p>
         <p class="muted">聞きとった文：<span lang="en">${esc(best.text)}</span></p>`;
       result.hidden = false;
-      saveProgress(item.id, { score: best.score });
+      item.save(best.score);
     } catch (error) {
       result.innerHTML = `<p class="notice bad">${esc(error.message)}</p>`;
       result.hidden = false;
@@ -1265,43 +1347,87 @@ const clearDraft = () => {
 
 const countWords = (text) => (text.match(/[A-Za-z0-9'’-]+/g) || []).length;
 
+// Today's お題: picked from the teacher's topics for this student, or from the
+// beginner list when there are none. The student may swap it three times a day;
+// the choice is remembered on their phone for the day.
+const TOPIC_KEY = "hina-lessons-topic";
+const TOPIC_SWAPS = 3;
+
+function topicPool() {
+  const own = items("topic");
+  return own.length ? own.map((t) => ({ ja: t.data.prompt, start: "" })) : TOPICS;
+}
+
+function todaysTopic() {
+  const day = japanDayNumber();
+  let saved = null;
+  try { saved = JSON.parse(localStorage.getItem(TOPIC_KEY)); } catch { /* private mode */ }
+  if (saved?.day !== day) saved = { day, index: day, swaps: 0, free: false };
+  return saved;
+}
+
+function saveTopic(topic) {
+  try { localStorage.setItem(TOPIC_KEY, JSON.stringify(topic)); } catch { /* private mode */ }
+}
+
 function renderJournal(id) {
   if (id) return renderJournalEntry(Number(id));
-  const topics = items("topic");
-  const todayTopic = topics.length ? topics[japanDayNumber() % topics.length] : null;
+  const pool = topicPool();
+  const topic = todaysTopic();
+  const current = pool[topic.index % pool.length];
+  const left = TOPIC_SWAPS - topic.swaps;
   const draft = readDraft();
-  const chosen = draft.topic ?? todayTopic?.data.prompt ?? "";
 
   app.innerHTML = `${topbar("日記")}
     <main class="wrap stack">
+      <p class="notice">📝 ここに書いた日記がたまっていくと、それをもとに苦手なところを分析していきます。<b>辞書や翻訳で調べずに</b>、できるだけ長く、がんばって書いてみてください。</p>
       <form id="journal" class="card stack">
-        ${topics.length ? `
-          <div class="topic-box">
-            <label class="field"><span class="label">Topic ・ テーマ</span>
-              <select name="topic">
-                ${topics.map((t) => `<option value="${esc(t.data.prompt)}" ${t.data.prompt === chosen ? "selected" : ""}>${esc(t.data.prompt)}${t === todayTopic ? "（今日のテーマ）" : ""}</option>`).join("")}
-                <option value="" ${chosen === "" ? "selected" : ""}>テーマなしで自由に書く</option>
-              </select>
-            </label>
-          </div>` : ""}
+        ${topic.free
+          ? `<div class="topic-box">
+              <p class="label">お題</p>
+              <p>お題なしで、自由に書きます。</p>
+              <button type="button" class="btn ghost small-btn" id="topic-back">お題にもどる</button>
+            </div>`
+          : `<div class="topic-box">
+              <p class="label">今日のお題</p>
+              <p class="topic-ja">${esc(current.ja)}</p>
+              ${current.start ? `<p class="muted small">書き出しの例：<span lang="en">${esc(current.start)}</span></p>` : ""}
+              <div class="topic-actions">
+                <button type="button" class="btn secondary small-btn" id="topic-swap" ${left > 0 && pool.length > 1 ? "" : "disabled"}>別のお題にする（あと ${left} 回）</button>
+                <button type="button" class="btn ghost small-btn" id="topic-free">お題なしで書く</button>
+              </div>
+            </div>`}
         <label class="field"><span>英語で書いてみよう</span>
-          <textarea name="body" lang="en" rows="9" spellcheck="false" placeholder="Today I ...">${esc(draft.body || "")}</textarea>
+          <textarea name="body" lang="en" rows="9" spellcheck="false" placeholder="${esc(!topic.free && current.start ? current.start : "Today I ...")}">${esc(draft.body || "")}</textarea>
         </label>
         <p class="wordcount" id="wordcount" aria-live="polite">${countWords(draft.body || "")} words</p>
-        <p class="muted small">${state.me.ai ? "送ると、AI が 1 回添削します。書き終わってから送ってね。" : "送ると、先生に届きます。"}</p>
+        <p class="muted small">${state.me.ai ? "送ると、添削が届きます。書き終わってから送ってね。" : "送ると、先生に届きます。"}</p>
         <p class="notice bad" id="journal-error" role="alert" hidden></p>
-        <button class="btn block" type="submit">${submitLabel()}</button>
+        <button class="btn block" type="submit">日記を送る</button>
       </form>
       ${historyHtml()}
     </main>`;
 
   const form = document.getElementById("journal");
-  const save = () => writeDraft({ topic: form.topic ? form.topic.value : "", body: form.body.value });
+  const save = () => writeDraft({ body: form.body.value });
   form.body.addEventListener("input", () => {
     document.getElementById("wordcount").textContent = `${countWords(form.body.value)} words`;
     save();
   });
-  form.topic?.addEventListener("change", save);
+  document.getElementById("topic-swap")?.addEventListener("click", () => {
+    // Any other topic, at random.
+    const others = pool.map((_, i) => i).filter((i) => i !== topic.index % pool.length);
+    saveTopic({ ...topic, index: others[Math.floor(Math.random() * others.length)], swaps: topic.swaps + 1 });
+    renderJournal();
+  });
+  document.getElementById("topic-free")?.addEventListener("click", () => {
+    saveTopic({ ...topic, free: true });
+    renderJournal();
+  });
+  document.getElementById("topic-back")?.addEventListener("click", () => {
+    saveTopic({ ...topic, free: false });
+    renderJournal();
+  });
   form.addEventListener("submit", async (event) => {
     event.preventDefault();
     const body = form.body.value.trim();
@@ -1318,7 +1444,7 @@ function renderJournal(id) {
     try {
       const result = await api("/api/journals", {
         method: "POST",
-        body: { topic: form.topic ? form.topic.value : "", body },
+        body: { topic: topic.free ? "" : current.ja, body },
       });
       clearDraft();
       state.me.journals.unshift(result.journal);
@@ -1328,12 +1454,10 @@ function renderJournal(id) {
       error.textContent = err.message;
       error.hidden = false;
       button.disabled = false;
-      button.textContent = submitLabel();
+      button.textContent = "日記を送る";
     }
   });
 }
-
-const submitLabel = () => (state.me.ai ? "送って添削してもらう" : "日記を送る");
 
 function historyHtml() {
   const journals = state.me.journals;
@@ -1367,10 +1491,9 @@ function renderJournalEntry(id) {
       ${j.teacher_comment ? `<section class="feedback teacher"><h3>先生からのコメント</h3><p style="white-space:pre-wrap">${esc(j.teacher_comment)}</p></section>` : ""}
       ${c ? `
         <section class="card stack">
-          ${j.topic ? `<p class="muted small">テーマ：${esc(j.topic)}</p>` : ""}
+          ${j.topic ? `<p class="muted small">お題：${esc(j.topic)}</p>` : ""}
           <h3>添削した日記</h3>
           <p class="journal-text diff" lang="en">${diffHtml(j.body, c.corrected)}</p>
-          <div>${sayButton(c.corrected, "読み上げる", { device: true })}</div>
         </section>
         ${c.corrections.length ? `
           <section class="card stack">
@@ -1383,13 +1506,13 @@ function renderJournalEntry(id) {
           </section>` : `<p class="notice good">まちがいはありませんでした！すばらしい！</p>`}
         <details class="card"><summary>はじめに書いた文を見る</summary><p class="journal-text" lang="en" style="margin-top:10px">${esc(j.body)}</p></details>
       ` : `
-        ${state.me.ai ? `<p class="notice ${aiError ? "bad" : ""}">${esc(aiError || "この日記は、まだ AI の添削がありません。")}</p>` : ""}
+        ${state.me.ai ? `<p class="notice ${aiError ? "bad" : ""}">${esc(aiError || "この日記は、まだ添削がありません。")}</p>` : ""}
         <section class="card stack">
-          ${j.topic ? `<p class="muted small">テーマ：${esc(j.topic)}</p>` : ""}
+          ${j.topic ? `<p class="muted small">お題：${esc(j.topic)}</p>` : ""}
           <p class="journal-text" lang="en">${esc(j.body)}</p>
         </section>
         ${state.me.ai
-          ? `<button class="btn block" id="retry">${aiError ? "もう一度ためす" : "AI に添削してもらう"}</button>`
+          ? `<button class="btn block" id="retry">${aiError ? "もう一度ためす" : "添削してもらう"}</button>`
           : j.teacher_comment ? "" : `<p class="muted" style="text-align:center">先生が読んで、コメントをくれます。</p>`}
       `}
       <a class="btn secondary block" href="#/journal">日記のページにもどる</a>

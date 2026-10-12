@@ -101,17 +101,17 @@ export function setSpeed(speed) {
   if (player && !player.paused) player.playbackRate = speed;
 }
 
-// Reads text aloud at the chosen speed. `device` skips the server audio (for
-// text that has none, like a corrected journal). Resolves once playback has
-// started, or the fallback has.
-export function speak(text, { device = false } = {}) {
+// Reads text aloud at the chosen speed: the teacher's recording when there is
+// one (src), otherwise audio made by the server; the phone's own voice is the
+// fallback. `device` skips straight to it. Resolves once playback has started.
+export function speak(text, { device = false, src = null } = {}) {
   stopSpeaking();
   const speed = getSpeed();
   if (device || !player) {
     speakWithDevice(text, speed);
     return Promise.resolve();
   }
-  player.src = `/api/speech?text=${encodeURIComponent(text)}`;
+  player.src = src || `/api/speech?text=${encodeURIComponent(text)}`;
   player.defaultPlaybackRate = player.playbackRate = speed;
   return player.play().catch((error) => {
     // AbortError means another button was tapped before this one started.
@@ -240,19 +240,28 @@ export function compareSpeech(target, heard) {
 
 // Word-level diff between the student's text and the corrected text, as HTML
 // with <del> for removed words and <ins> for added ones. Line breaks are kept.
+// Punctuation is left as the student wrote it and never marked as a change
+// (the teacher doesn't correct commas, periods, hyphens and the like).
 export function diffHtml(before, after) {
-  const tokenize = (text) => String(text).split(/(\n)|[ \t]+/).filter((t) => t !== undefined && t !== "");
+  // "yesterday,so" is two words.
+  const tokenize = (text) =>
+    String(text).replace(/([,;:])(?=[A-Za-z])/g, "$1 ").split(/(\n)|[ \t]+/).filter((t) => t !== undefined && t !== "");
   const a = tokenize(before);
   const b = tokenize(after);
-  const strip = (w) => w.toLowerCase();
-  const pairs = lcsPairs(a, b, (x, y) => strip(x) === strip(y));
+  const edge = /^([^\p{L}\p{N}']*)(.*?)([^\p{L}\p{N}']*)$/u;
+  const parts = (w) => w.match(edge);
+  const core = (w) => parts(w)[2].toLowerCase();
+  const isPunct = (w) => w !== "\n" && core(w) === "";
+  const pairs = lcsPairs(a, b, (x, y) => (x === "\n" || y === "\n" ? x === y : core(x) === core(y)));
   const out = [];
   let i = 0, j = 0;
   const word = (t) => (t === "\n" ? "<br>" : esc(t));
   const flush = (ai, bj) => {
     const removed = a.slice(i, ai).filter((t) => t !== "\n");
-    const added = b.slice(j, bj);
-    if (removed.length) out.push(`<del>${removed.map(esc).join(" ")}</del>`);
+    const added = b.slice(j, bj).filter((t) => !isPunct(t));
+    const words = removed.filter((t) => !isPunct(t));
+    if (words.length) out.push(`<del>${words.map(esc).join(" ")}</del>`);
+    if (removed.length > words.length) out.push(removed.filter(isPunct).map(esc).join(" "));
     if (added.length) {
       const text = added.map(word).join(" ").replace(/ ?<br> ?/g, "<br>");
       out.push(added.every((t) => t === "\n") ? text : `<ins>${text}</ins>`);
@@ -260,7 +269,9 @@ export function diffHtml(before, after) {
   };
   for (const [ai, bj] of pairs) {
     flush(ai, bj);
-    out.push(word(b[bj]));
+    // The corrected word with the student's own punctuation around it.
+    const [, lead, , trail] = parts(a[ai]);
+    out.push(b[bj] === "\n" ? "<br>" : esc(lead + parts(b[bj])[2] + trail));
     i = ai + 1;
     j = bj + 1;
   }

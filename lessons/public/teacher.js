@@ -4,6 +4,7 @@
 import { ApiError, api, diffHtml, esc, formatDateTime, icons, startOfJapanDay, toast } from "./common.js";
 import { UNITS } from "./grammar/lessons.js";
 import { bookWeeks, bookWords, setKey, weekWords, wordSets } from "./vocab/words.js";
+import { monthPhrases, pronMonths } from "./pron/phrases.js";
 
 document.body.classList.add("teacher");
 const app = document.getElementById("app");
@@ -400,6 +401,7 @@ function renderItems(panel, kind) {
   panel.innerHTML = `<div class="stack">
     ${kind === "grammar" ? lessonResultsHtml() : ""}
     ${kind === "vocab" ? vocabResultsHtml() : ""}
+    ${kind === "pron" ? pronResultsHtml() : ""}
     <section class="card stack">
       ${weekPicker}
       ${book ? `<p class="notice">${weekName} には、全員共通の単語帳（${book} 語）が入っています。ここで足した単語は、この生徒の ${weekName} の最後に加わります。</p>` : ""}
@@ -538,6 +540,27 @@ function vocabResultsHtml() {
       </div></li>`;
     }).join("")}</ul>
   </section>`;
+}
+
+// The shared pronunciation months: best score per phrase.
+function pronResultsHtml() {
+  const results = state.current.pronResults || {};
+  return pronMonths().map((month) => {
+    const phrases = monthPhrases(month);
+    const tried = phrases.filter((p) => results[p.key]);
+    const average = tried.length ? Math.round(tried.reduce((n, p) => n + results[p.key].best, 0) / tried.length) : null;
+    return `<section class="card stack">
+      <h3>発音 Month ${month}（全員共通 ${phrases.length} 文）</h3>
+      <p class="muted small">練習した文 ${tried.length} / ${phrases.length}${average != null ? `　ベストの平均 ${average} 点` : ""}。ここで足した文は、生徒の画面では「先生が追加した文」に出ます。</p>
+      <details><summary>文ごとのベスト</summary>
+        <ul class="rows">${phrases.map((p) => {
+          const r = results[p.key];
+          return `<li><div class="main"><div><b lang="en">${esc(p.en)}</b></div>
+            <div class="sub">${r ? `ベスト ${r.best} 点　前回 ${r.last} 点　${r.times} 回` : "まだ練習していません"}</div></div></li>`;
+        }).join("")}</ul>
+      </details>
+    </section>`;
+  }).join("");
 }
 
 // ---------- settings ----------
