@@ -83,20 +83,39 @@ if ("speechSynthesis" in window) speechSynthesis.addEventListener?.("voiceschang
 // sentences; the phone's built-in voice is the fallback.
 const player = typeof Audio === "function" ? new Audio() : null;
 
-// Reads text aloud. `slow` plays it more slowly; `device` skips the server
-// audio (for text that has none, like a corrected journal). Resolves once
-// playback has started, or the fallback has.
-export function speak(text, { slow = false, device = false } = {}) {
+// Playback speed, chosen by the student and remembered on their phone.
+export const SPEEDS = [0.5, 0.75, 1];
+const SPEED_KEY = "hina-lessons-speed";
+
+export function getSpeed() {
+  try {
+    const saved = Number(localStorage.getItem(SPEED_KEY));
+    return SPEEDS.includes(saved) ? saved : 1;
+  } catch {
+    return 1;
+  }
+}
+
+export function setSpeed(speed) {
+  try { localStorage.setItem(SPEED_KEY, String(speed)); } catch { /* private mode */ }
+  if (player && !player.paused) player.playbackRate = speed;
+}
+
+// Reads text aloud at the chosen speed. `device` skips the server audio (for
+// text that has none, like a corrected journal). Resolves once playback has
+// started, or the fallback has.
+export function speak(text, { device = false } = {}) {
   stopSpeaking();
+  const speed = getSpeed();
   if (device || !player) {
-    speakWithDevice(text, slow);
+    speakWithDevice(text, speed);
     return Promise.resolve();
   }
   player.src = `/api/speech?text=${encodeURIComponent(text)}`;
-  player.defaultPlaybackRate = player.playbackRate = slow ? 0.75 : 1;
+  player.defaultPlaybackRate = player.playbackRate = speed;
   return player.play().catch((error) => {
     // AbortError means another button was tapped before this one started.
-    if (error?.name !== "AbortError") speakWithDevice(text, slow);
+    if (error?.name !== "AbortError") speakWithDevice(text, speed);
   });
 }
 
@@ -105,7 +124,7 @@ export function stopSpeaking() {
   window.speechSynthesis?.cancel();
 }
 
-function speakWithDevice(text, slow) {
+function speakWithDevice(text, speed) {
   if (!("speechSynthesis" in window)) {
     toast("このブラウザでは音声が出せません。");
     return;
@@ -113,7 +132,8 @@ function speakWithDevice(text, slow) {
   speechSynthesis.cancel();
   const utterance = new SpeechSynthesisUtterance(text);
   utterance.lang = "en-US";
-  utterance.rate = slow ? 0.65 : 0.95;
+  // The built-in voices run a little fast at 1.0.
+  utterance.rate = speed === 1 ? 0.95 : speed;
   const voice = pickVoice();
   if (voice) utterance.voice = voice;
   speechSynthesis.speak(utterance);

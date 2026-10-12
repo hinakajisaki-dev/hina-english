@@ -2,7 +2,7 @@
 // pronunciation, grammar and the journal with AI correction.
 import {
   ApiError, api, canListen, compareSpeech, diffHtml, esc, formatDate, icons, japanDayNumber, listen,
-  normalizeWords, speak, startOfJapanDay, stopSpeaking, toast,
+  normalizeWords, SPEEDS, getSpeed, setSpeed, speak, startOfJapanDay, stopSpeaking, toast,
 } from "./common.js";
 
 const app = document.getElementById("app");
@@ -43,8 +43,16 @@ document.addEventListener("click", async (event) => {
   const button = event.target.closest("[data-say]");
   if (!button) return;
   button.classList.add("loading");
-  await speak(button.dataset.say, { slow: "slow" in button.dataset, device: "device" in button.dataset });
+  await speak(button.dataset.say, { device: "device" in button.dataset });
   button.classList.remove("loading");
+});
+
+// Speed buttons change the speed for every 🔊 button, now and later.
+document.addEventListener("click", (event) => {
+  const button = event.target.closest("[data-speed]");
+  if (!button) return;
+  setSpeed(Number(button.dataset.speed));
+  document.querySelectorAll("[data-speed]").forEach((b) => b.setAttribute("aria-pressed", b === button));
 });
 
 (async () => {
@@ -63,9 +71,16 @@ function topbar(title) {
   </div></header>`;
 }
 
-function sayButton(text, label = "聞く", { slow = false, device = false } = {}) {
-  const flags = `${slow ? " data-slow" : ""}${device ? " data-device" : ""}`;
-  return `<button type="button" class="speak" data-say="${esc(text)}"${flags}>${icons.speaker}${esc(label)}</button>`;
+function sayButton(text, label = "聞く", { device = false } = {}) {
+  return `<button type="button" class="speak" data-say="${esc(text)}"${device ? " data-device" : ""}>${icons.speaker}${esc(label)}</button>`;
+}
+
+function speedControl() {
+  const current = getSpeed();
+  return `<div class="speed" role="group" aria-label="音声の速さ">
+    <span>速さ</span>
+    ${SPEEDS.map((speed) => `<button type="button" data-speed="${speed}" aria-pressed="${speed === current}">${speed === 1 ? "ふつう" : speed}</button>`).join("")}
+  </div>`;
 }
 
 function emptyState(message) {
@@ -167,7 +182,7 @@ function renderHome() {
           <p class="label">Today's phrase</p>
           <p class="phrase" lang="en">${esc(phrase.data.phrase)}</p>
           <p class="meaning">${esc(phrase.data.meaning)}</p>
-          <div>${sayButton(phrase.data.phrase)}</div>
+          <div class="speak-row start">${sayButton(phrase.data.phrase)} ${speedControl()}</div>
         </section>` : ""}
       <nav class="tiles" aria-label="メニュー">
         <a class="tile wide ${done ? "done" : ""}" href="#/journal">
@@ -242,6 +257,7 @@ function renderVocab() {
         ${sayButton(d.word)}
         ${flipped && d.example ? sayButton(d.example, "例文を聞く") : ""}
       </div>
+      <div class="speak-row">${speedControl()}</div>
       <div class="card-actions">
         <button class="btn secondary" data-answer="again">もう一回</button>
         <button class="btn" data-answer="known">覚えた！</button>
@@ -304,11 +320,11 @@ function renderPhrases() {
       </div>
       <p><b>${esc(p.data.meaning)}</b></p>
       ${p.data.note ? `<p class="note">${esc(p.data.note)}</p>` : ""}
-      <div class="btn-row" style="flex-wrap:nowrap">${sayButton(p.data.phrase)} ${sayButton(p.data.phrase, "ゆっくり", { slow: true })}</div>
+      <div>${sayButton(p.data.phrase)}</div>
     </article>`;
   app.innerHTML = `${topbar("フレーズ")}
     <main class="wrap stack">
-      ${today ? card(today, true) + others.map((p) => card(p, false)).join("") : emptyState("まだフレーズがありません。<br>先生が追加すると、ここに出てきます。")}
+      ${today ? speedControl() + card(today, true) + others.map((p) => card(p, false)).join("") : emptyState("まだフレーズがありません。<br>先生が追加すると、ここに出てきます。")}
     </main>`;
 }
 
@@ -334,7 +350,7 @@ function renderPron() {
       <section class="card stack">
         <p class="sentence" lang="en">${esc(item.data.text)}</p>
         ${item.data.tip ? `<p class="muted">💡 ${esc(item.data.tip)}</p>` : ""}
-        <div class="btn-row" style="flex-wrap:nowrap">${sayButton(item.data.text, "お手本")} ${sayButton(item.data.text, "ゆっくり", { slow: true })}</div>
+        <div class="speak-row start">${sayButton(item.data.text, "お手本")} ${speedControl()}</div>
       </section>
       ${canListen
         ? `<section class="stack" style="text-align:center">
