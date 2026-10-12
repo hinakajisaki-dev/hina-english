@@ -72,6 +72,16 @@ const SCHEMA = [
     updated_at TEXT NOT NULL,
     PRIMARY KEY (student_id, set_key)
   )`,
+  // Scores of the shared pronunciation phrases; phrase_key is "m1/05" (public/pron/phrases.js).
+  `CREATE TABLE IF NOT EXISTS pron_results (
+    student_id INTEGER NOT NULL REFERENCES students(id) ON DELETE CASCADE,
+    phrase_key TEXT NOT NULL,
+    best_score INTEGER NOT NULL,
+    last_score INTEGER NOT NULL,
+    times INTEGER NOT NULL DEFAULT 1,
+    updated_at TEXT NOT NULL,
+    PRIMARY KEY (student_id, phrase_key)
+  )`,
 ];
 
 let ready = false;
@@ -115,14 +125,15 @@ export function journalRow(row) {
 }
 
 // Everything one student's screen needs: items, progress, lesson results, the 復習 list,
-// set test results and recent journals.
+// set test results, pronunciation scores and recent journals.
 export async function studentBundle(db, studentId) {
-  const [items, progress, lessonRows, reviewRows, testRows, journals] = await Promise.all([
+  const [items, progress, lessonRows, reviewRows, testRows, pronRows, journals] = await Promise.all([
     all(db, `SELECT * FROM items WHERE student_id = ? ORDER BY id`, studentId),
     all(db, `SELECT * FROM progress WHERE student_id = ?`, studentId),
     all(db, `SELECT * FROM lesson_results WHERE student_id = ?`, studentId),
     all(db, `SELECT * FROM vocab_review WHERE student_id = ? ORDER BY added_at`, studentId),
     all(db, `SELECT * FROM vocab_tests WHERE student_id = ?`, studentId),
+    all(db, `SELECT * FROM pron_results WHERE student_id = ?`, studentId),
     all(db, `SELECT * FROM journals WHERE student_id = ? ORDER BY id DESC LIMIT 60`, studentId),
   ]);
   const progressById = {};
@@ -143,5 +154,11 @@ export async function studentBundle(db, studentId) {
   for (const r of testRows) {
     vocabTests[r.set_key] = { best: r.best_score, last: r.last_score, total: r.total, times: r.times, updated_at: r.updated_at };
   }
-  return { items: items.map(itemRow), progress: progressById, lessons, review, vocabTests, journals: journals.map(journalRow) };
+  const pronResults = {};
+  for (const r of pronRows) {
+    pronResults[r.phrase_key] = { best: r.best_score, last: r.last_score, times: r.times, updated_at: r.updated_at };
+  }
+  return {
+    items: items.map(itemRow), progress: progressById, lessons, review, vocabTests, pronResults, journals: journals.map(journalRow),
+  };
 }

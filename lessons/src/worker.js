@@ -7,6 +7,7 @@ import { AiError, correctJournal } from "./ai.js";
 import { SpeechError, speechFor } from "./speech.js";
 import { findLesson, lessonExampleSentences, questionCount } from "../public/grammar/lessons.js";
 import { bookSentences, bookWords, setKey, weekWords, wordSets } from "../public/vocab/words.js";
+import { findPhrase, pronSentences } from "../public/pron/phrases.js";
 import {
   all, ensureSchema, first, itemRow, journalRow, now, run, studentBundle,
 } from "./db.js";
@@ -70,6 +71,7 @@ async function route(request, env, url) {
       return saveLessonResult(request, env, student, parts[1]);
     }
     if (path === "/api/vocab/review" && method === "POST") return saveReview(request, env, student);
+    if (path === "/api/pron" && method === "POST") return savePronScore(request, env, student);
     if (parts[0] === "vocab" && parts[1] === "tests" && parts.length === 4 && method === "POST") {
       return saveVocabTest(request, env, student, parts[2], Number(parts[3]));
     }
@@ -203,14 +205,26 @@ async function newJournal(request, env, student) {
   return correctOnce(env, student, meta.last_row_id);
 }
 
-// Audio is only made for text in the student's own content, the 単語帳 or the
-// grammar lessons' examples, so the endpoint can't be used to voice anything else.
+// Audio is only made for text in the student's own content, the 単語帳, the
+// pronunciation phrases, the grammar lessons' examples or a piece of the
+// student's own corrected journal, so the endpoint can't voice anything else.
 const SPOKEN_FIELDS = { vocab: ["word", "example"], phrase: ["phrase"], pron: ["text"] };
 const LESSON_SENTENCES = lessonExampleSentences();
 const BOOK_SENTENCES = bookSentences();
+const PRON_SENTENCES = pronSentences();
+// The page reads a long journal in pieces of about this size.
+const JOURNAL_PIECE = 600;
 
 async function speech(env, student, text) {
-  let allowed = LESSON_SENTENCES.has(text) || BOOK_SENTENCES.has(text);
+  let allowed = LESSON_SENTENCES.has(text) || BOOK_SENTENCES.has(text) || PRON_SENTENCES.has(text);
+  if (!allowed && text && text.length <= JOURNAL_PIECE) {
+    const rows = await all(
+      env.DB,
+      `SELECT correction FROM journals WHERE student_id = ? AND correction IS NOT NULL ORDER BY id DESC LIMIT 60`,
+      student.id,
+    );
+    allowed = rows.some((row) => JSON.parse(row.correction).corrected?.includes(text));
+  }
   if (!allowed) {
     const rows = await all(
       env.DB,
@@ -267,6 +281,22 @@ async function saveReview(request, env, student) {
   } else {
     await run(env.DB, `DELETE FROM vocab_review WHERE student_id = ? AND word_key = ?`, student.id, key);
   }
+  return json({ ok: true });
+}
+
+// The best and latest score for one shared pronunciation phrase.
+async function savePronScore(request, env, student) {
+  const { key, score } = await readJson(request);
+  if (!findPhrase(key)) throw new HttpError(404, "見つかりません。");
+  const clean = Math.max(0, Math.min(100, Math.round(Number(score)) || 0));
+  await run(
+    env.DB,
+    `INSERT INTO pron_results (student_id, phrase_key, best_score, last_score, times, updated_at)
+     VALUES (?1, ?2, ?3, ?3, 1, ?4)
+     ON CONFLICT (student_id, phrase_key) DO UPDATE SET
+       best_score = MAX(best_score, ?3), last_score = ?3, times = times + 1, updated_at = ?4`,
+    student.id, key, clean, now(),
+  );
   return json({ ok: true });
 }
 

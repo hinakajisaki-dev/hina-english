@@ -217,3 +217,13 @@ a.week:hover { border-color: var(--sky); }
 .hint-box { background: var(--cream); border-radius: 12px; padding: 8px 12px; font-size: 14px; }
 .letters { letter-spacing: .12em; font-weight: 700; }
 .center { text-align: center; }
+
+/* journal お題 */
+.topic-box .topic-ja { font-size: 17px; font-weight: 900; line-height: 1.5; }
+.topic-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+
+/* pronunciation notes */
+.pron-ja { font-size: 15px; color: var(--ink-2); }
+.pron-note { border-radius: 12px; padding: 10px 12px; background: var(--sky-soft); font-size: 14px; line-height: 1.6; }
+.pron-note.tip { background: var(--cream); }
+.pron-note .label { margin-bottom: 2px; }
