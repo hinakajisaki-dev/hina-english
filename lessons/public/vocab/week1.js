@@ -1,10 +1,11 @@
 // 単語帳 Week 1, from the teacher's slides. Every student gets the same words.
 //
 // Each word: id (unique in the week, never change it: students' review lists
-// use it), word, meaning, examples. Each example: en, ja, note (the
-// explanation under it; \n starts a new line) and form, the exact word as it
-// appears in the sentence (made, going …). The cards show it in red and the
-// fill-in game blanks it out.
+// use it), word, meaning, examples, and pos when it differs from its group's.
+// Each example: en, ja, note (the explanation under it; \n starts a new line),
+// form, the exact word as it appears in the sentence (made, going …; the cards
+// show it in red and the fill-in game blanks it out), and tag, a label such as
+// 名詞 / 動詞 when one word's examples use it in different ways.
 
 export const WEEK1 = {
   week: 1,
@@ -252,9 +253,9 @@ export const WEEK1 = {
           { en: "Follow the signs to find the parking area.", ja: "駐車場は標識に従って進んでください。", note: "複数形 signs もよく使う。", form: "signs" },
           { en: "There is a stop sign over there.", ja: "あそこに一時停止の標識があります。", note: "stop sign は『一時停止標識』。", form: "sign" },
         ] },
-        { id: "pay-n", word: "pay", meaning: "給料、支払い", examples: [
-          { en: "The pay is good, but the hours are long.", ja: "給料はいいけど、勤務時間が長い。", note: "名詞の pay は『給料・報酬』。the pay で『（その仕事の）給料』。", form: "pay" },
-          { en: "I got a pay raise this year.", ja: "今年、昇給しました。", note: "pay raise で『昇給』。動詞の pay（支払う）と同じ形なので、文の中での使い方で見分ける。", form: "pay" },
+        { id: "pay-n", word: "pay", pos: "名詞・動詞", meaning: "【名詞】給料、支払い\n【動詞】支払う", examples: [
+          { tag: "名詞", en: "The pay is good, but the hours are long.", ja: "給料はいいけど、勤務時間が長い。", note: "名詞の pay は『給料・報酬』。the pay で『（その仕事の）給料』。", form: "pay" },
+          { tag: "動詞", en: "Where do I pay?", ja: "お支払いはどこですか？", note: "動詞の pay は『支払う』。名詞と同じ形なので、文の中での使い方で見分ける。", form: "pay" },
         ] },
         { id: "trip", word: "trip", meaning: "出張、旅行", examples: [
           { en: "I have a business trip to New York next week.", ja: "来週ニューヨークに出張があります。", note: "business trip で『出張』。trip to ... で『〜への旅行』。", form: "trip" },

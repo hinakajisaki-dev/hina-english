@@ -268,6 +268,8 @@ function exampleHtml(ex, { blank = false } = {}) {
 }
 
 const noteHtml = (note) => esc(note).replace(/\n/g, "<br>");
+// 名詞 / 動詞 above an example, when a word's examples use it in different ways.
+const exTag = (ex) => (ex.tag ? `<span class="ex-tag">${esc(ex.tag)}</span>` : "");
 
 function renderVocab(week, setNumber, mode) {
   const w = week === "other" ? "other" : Number(week);
@@ -341,11 +343,11 @@ function renderVocabSet(week, number) {
           <p class="word" lang="en">${esc(word.word)}</p>
           ${sayIcon(speakable(word.word))}
         </div>
-        <p class="meaning">${esc(word.meaning)}</p>
+        <p class="meaning">${noteHtml(word.meaning)}</p>
         ${word.examples.length ? `<ul class="word-examples">${word.examples.map((ex) => `<li>
           ${sayIcon(ex.en)}
           <div>
-            <p class="en" lang="en">${exampleHtml(ex)}</p>
+            ${exTag(ex)}<p class="en" lang="en">${exampleHtml(ex)}</p>
             ${ex.ja ? `<p class="ja">${esc(ex.ja)}</p>` : ""}
             ${ex.note ? `<p class="word-note">${noteHtml(ex.note)}</p>` : ""}
           </div>
@@ -650,10 +652,10 @@ function level1Html(word, example, answer, R) {
         ${sayIcon(speakable(word.word))}
       </div>
       ${example ? `<div class="word-examples one">${sayIcon(example.en)}<div>
-        <p class="en" lang="en">${exampleHtml(example)}</p>
+        ${exTag(example)}<p class="en" lang="en">${exampleHtml(example)}</p>
         ${R.revealed && example.ja ? `<p class="ja">${esc(example.ja)}</p>` : ""}
       </div></div>` : ""}
-      ${R.revealed ? `<p class="meaning reveal">${esc(word.meaning)}</p>` : ""}
+      ${R.revealed ? `<p class="meaning reveal">${noteHtml(word.meaning)}</p>` : ""}
     </section>
     ${R.revealed
       ? `<p class="muted center">分かりましたか？</p>
@@ -680,7 +682,7 @@ function level2Html(word, example, answer, R) {
   }
   return `<section class="card stack">
       <p class="muted">日本語に合うように、空いているところに入る単語を書こう</p>
-      ${example.ja ? `<p class="question-ja">${esc(example.ja)}</p>` : ""}
+      ${exTag(example)}${example.ja ? `<p class="question-ja">${esc(example.ja)}</p>` : ""}
       ${answer
         ? `<div class="word-examples one">${sayIcon(example.en)}<p class="question" lang="en">${exampleHtml(example)}</p></div>`
         : `<p class="question" lang="en">${exampleHtml(example, { blank: true })}</p>`}

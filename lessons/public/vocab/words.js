@@ -18,7 +18,7 @@ export function bookWords(week) {
       key: `w${week}/${w.id}`,
       word: w.word,
       meaning: w.meaning,
-      pos: group.pos,
+      pos: w.pos || group.pos,
       group: group.title,
       examples: w.examples,
     })),
