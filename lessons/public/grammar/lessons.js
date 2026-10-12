@@ -3,7 +3,8 @@
 // sentences may be voiced.
 //
 // A lesson is a list of steps, one screen each:
-//   explain: title, text (paragraphs; **bold** allowed), table { head, rows }, examples [{ en, ja }]
+//   explain: title, text (paragraphs; **bold** allowed), table { head, rows }, note (paragraphs
+//            shown under the table), examples [{ en, ja }], highlight (words shown in red)
 //   choice:  q (a ___ marks the blank), ja, choices, answer, why
 //   order:   ja, words (in the right order), end (final punctuation), why
 //   write:   ja, answers (accepted English sentences), hint, why

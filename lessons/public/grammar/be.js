@@ -13,6 +13,7 @@ export const BE = {
       steps: [
         {
           type: "explain",
+          highlight: ["am", "is", "are"],
           title: "be動詞とは？",
           text: [
             "be動詞は、**「主語＝説明」をつなぐ動詞**です。",
@@ -34,6 +35,7 @@ export const BE = {
         },
         {
           type: "explain",
+          highlight: ["am", "is", "are"],
           title: "am / is / are の使い分け",
           text: [
             "どれを使うかは、**主語**で決まります。覚えるのは3つです。",
@@ -153,21 +155,6 @@ export const BE = {
           hint: "at school（学校に）",
           why: "We は複数なので **are** です。",
         },
-        {
-          type: "explain",
-          title: "まとめ",
-          table: {
-            head: ["", "ポイント"],
-            rows: [
-              ["意味", "主語＝説明（〜です／〜にいます／〜の状態です）"],
-              ["am", "I"],
-              ["are", "You / We / They（複数）"],
-              ["is", "He / She / It（三人称の単数）"],
-              ["否定文", "be動詞 + not（She is not busy.）"],
-              ["疑問文", "Be動詞 + 主語 …?（Are you busy?）"],
-            ],
-          },
-        },
       ],
     },
     {
@@ -177,6 +164,7 @@ export const BE = {
       steps: [
         {
           type: "explain",
+          highlight: ["was", "were"],
           title: "過去形の be動詞",
           text: [
             "be動詞の過去形は、「〜でした」「〜にいました」「〜の状態でした」のように、**過去の状態**を表します。",
@@ -243,15 +231,6 @@ export const BE = {
           ],
         },
         {
-          type: "explain",
-          title: "POINT：did は使わない",
-          text: [
-            "was / were は **be動詞**なので、否定文・疑問文で **did は使いません**。",
-            "✕ Did you were busy?　→　〇 Were you busy?",
-          ],
-          examples: [{ en: "Were you busy?", ja: "あなたは忙しかったですか？" }],
-        },
-        {
           type: "choice",
           q: "___ you busy yesterday?",
           ja: "あなたは昨日、忙しかったですか？",
@@ -300,21 +279,6 @@ export const BE = {
           answers: ["I was not busy yesterday.", "Yesterday I was not busy."],
           hint: "busy（忙しい）",
           why: "I なので **was**、否定文なので **was not（wasn’t）** です。",
-        },
-        {
-          type: "explain",
-          title: "まとめ",
-          table: {
-            head: ["", "ポイント"],
-            rows: [
-              ["意味", "過去の状態（〜でした／〜にいました）"],
-              ["was", "I / He / She / It（am・is の過去形）"],
-              ["were", "You / We / They（are の過去形）"],
-              ["否定文", "was / were + not（wasn’t / weren’t）"],
-              ["疑問文", "Was / Were + 主語 …?"],
-              ["注意", "be動詞の文に did は使わない"],
-            ],
-          },
         },
       ],
     },

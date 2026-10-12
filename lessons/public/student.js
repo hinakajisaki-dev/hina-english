@@ -605,18 +605,27 @@ function renderLesson(unit, lessonId) {
   }
 }
 
+// Words listed in a step's `highlight` (like am / is / are) are shown in red.
+function highlighter(step) {
+  if (!step.highlight?.length) return (html) => html;
+  const words = new RegExp(`\\b(${step.highlight.join("|")})\\b`, "gi");
+  return (html) => html.replace(words, '<span class="hl">$1</span>');
+}
+
 function explainHtml(step) {
+  const hl = highlighter(step);
   return `<section class="card stack explain">
-    <h2>${fmt(step.title)}</h2>
-    ${(step.text || []).map((p) => `<p>${fmt(p)}</p>`).join("")}
+    <h2>${hl(fmt(step.title))}</h2>
+    ${(step.text || []).map((p) => `<p>${hl(fmt(p))}</p>`).join("")}
     ${step.table ? `<div class="table-wrap"><table>
       <thead><tr>${step.table.head.map((h) => `<th>${esc(h)}</th>`).join("")}</tr></thead>
-      <tbody>${step.table.rows.map((row) => `<tr>${row.map((cell) => `<td>${fmt(cell)}</td>`).join("")}</tr>`).join("")}</tbody>
+      <tbody>${step.table.rows.map((row) => `<tr>${row.map((cell) => `<td>${hl(fmt(cell))}</td>`).join("")}</tr>`).join("")}</tbody>
     </table></div>` : ""}
+    ${(step.note || []).map((p) => `<p class="note">${hl(fmt(p))}</p>`).join("")}
     ${step.examples?.length ? `<ul class="examples">${step.examples.map((ex) => `
       <li>
         <button type="button" class="speak icon-only" data-say="${esc(ex.en)}" aria-label="${esc(ex.en)} を聞く">${icons.speaker}</button>
-        <div><p class="en" lang="en">${esc(ex.en)}</p><p class="ja">${esc(ex.ja)}</p></div>
+        <div><p class="en" lang="en">${hl(esc(ex.en))}</p><p class="ja">${esc(ex.ja)}</p></div>
       </li>`).join("")}</ul>
       <div>${speedControl()}</div>` : ""}
   </section>`;

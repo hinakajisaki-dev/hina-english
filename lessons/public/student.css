@@ -166,6 +166,8 @@ a.week:hover { border-color: var(--sky); }
 .lesson-nav { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
 .lesson-nav .btn:not(.ghost) { min-width: 140px; }
 .explain h2 { font-size: 19px; font-weight: 900; line-height: 1.5; }
+.explain .hl { color: var(--bad); font-weight: 800; }
+.explain .note { font-size: 14px; color: var(--ink-2); background: var(--cream); border-radius: 12px; padding: 10px 12px; }
 .table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 12px; }
 .table-wrap table { width: 100%; border-collapse: collapse; font-size: 14px; }
 .table-wrap th { background: var(--sky-soft); text-align: left; padding: 8px 10px; font-size: 13px; white-space: nowrap; }
