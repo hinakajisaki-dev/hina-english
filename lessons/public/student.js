@@ -196,6 +196,78 @@ function renderLogin() {
   });
 }
 
+// ---------- home screen app ----------
+// Added to the home screen (manifest.webmanifest), the app opens on its own,
+// without the browser bars. Until then, the home screen shows how to add it.
+
+const INSTALL_KEY = "hina-lessons-install-hidden";
+const isStandalone = () => matchMedia("(display-mode: standalone)").matches || navigator.standalone === true;
+const isIos = /iPhone|iPad|iPod/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+const isAndroid = /Android/.test(navigator.userAgent);
+const onHome = () => !location.hash.split("/")[1];
+let installPrompt = null; // Android Chrome's own "install" dialog, when it offers one
+
+addEventListener("beforeinstallprompt", (event) => {
+  event.preventDefault();
+  installPrompt = event;
+  if (state.me && onHome()) render();
+});
+
+function installHidden() {
+  try { return localStorage.getItem(INSTALL_KEY) === "1"; } catch { return false; }
+}
+
+function setInstallHidden(hidden) {
+  try {
+    if (hidden) localStorage.setItem(INSTALL_KEY, "1");
+    else localStorage.removeItem(INSTALL_KEY);
+  } catch { /* private mode */ }
+}
+
+const canInstall = () => !isStandalone() && (isIos || isAndroid);
+
+function installCard() {
+  if (!canInstall() || installHidden()) return "";
+  const steps = isIos
+    ? [
+      "画面の下（または上）にある共有ボタン <b>（□に↑のマーク）</b> をタップ",
+      "メニューを下にスクロールして <b>「ホーム画面に追加」</b> をタップ",
+      "右上の <b>「追加」</b> をタップ",
+    ]
+    : [
+      "Chrome の右上の <b>「︙」</b> をタップ",
+      "<b>「ホーム画面に追加」</b>（または「アプリをインストール」）をタップ",
+      "<b>「追加」</b>（または「インストール」）をタップ",
+    ];
+  return `<section class="card install stack" aria-label="ホーム画面に追加">
+    <p class="label">📲 ホーム画面に追加しよう</p>
+    <p>ホーム画面のアイコンから、アプリのように開けるようになります。</p>
+    ${installPrompt
+      ? `<button class="btn block" id="install">ホーム画面に追加する</button>`
+      : `<ol>${steps.map((step) => `<li>${step}</li>`).join("")}</ol>`}
+    ${isIos ? `<p class="muted small">ホーム画面のアイコンから初めて開いたときは、もう一度レッスンコードを入れてください。</p>` : ""}
+    <button type="button" class="btn ghost small-btn" id="install-hide">閉じる</button>
+  </section>`;
+}
+
+function bindInstall() {
+  document.getElementById("install")?.addEventListener("click", async () => {
+    installPrompt.prompt();
+    await installPrompt.userChoice.catch(() => {});
+    installPrompt = null;
+    render();
+  });
+  document.getElementById("install-hide")?.addEventListener("click", () => {
+    setInstallHidden(true);
+    render();
+  });
+  document.getElementById("install-show")?.addEventListener("click", () => {
+    setInstallHidden(false);
+    render();
+    window.scrollTo(0, 0);
+  });
+}
+
 // ---------- home ----------
 
 // The two things to do every day: write the journal and finish one pronunciation phrase.
@@ -239,6 +311,7 @@ function renderHome() {
         <p class="muted">${esc(formatDate(new Date().toISOString()))}</p>
         <h2>こんにちは、${esc(state.me.student.name)}さん</h2>
       </div>
+      ${installCard()}
       <section class="card tasks ${left ? "" : "all-done"}" aria-label="今日のやること">
         <p class="label">${left ? `今日のやること（あと ${left} つ）` : "今日のやることは全部できました！🎉"}</p>
         ${tasks.map((t) => `<a class="task ${t.done ? "done" : ""}" href="${t.href}">
@@ -286,9 +359,13 @@ function renderHome() {
           <div><b>勉強時間</b><p class="muted">今日 ${formatMinutes(totalMinutes(todayRow))} ・ 今週 ${formatMinutes(week.total)}</p></div>
         </a>
       </nav>
-      <p class="footer-links"><button type="button" class="btn ghost small-btn" id="logout">ログアウト</button></p>
+      <p class="footer-links">
+        ${canInstall() && installHidden() ? `<button type="button" class="btn ghost small-btn" id="install-show">ホーム画面に追加する方法</button>` : ""}
+        <button type="button" class="btn ghost small-btn" id="logout">ログアウト</button>
+      </p>
     </main>`;
 
+  bindInstall();
   document.getElementById("logout").addEventListener("click", async () => {
     if (!confirm("ログアウトしますか？ もう一度入るときは、レッスンコードが必要です。")) return;
     await api("/api/logout", { method: "POST" }).catch(() => {});

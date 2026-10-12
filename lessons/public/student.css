@@ -25,6 +25,11 @@
 .tile.wide > div { flex: 1; min-width: 0; }
 .tile.done { background: var(--good-soft); border-color: transparent; }
 
+/* ホーム画面に追加 */
+.install { background: var(--cream); border-color: transparent; }
+.install .label { color: var(--ink); font-size: 16px; }
+.install ol { margin: 0; padding-left: 1.4em; display: grid; gap: 6px; font-size: 15px; }
+
 /* 今日のやること */
 .tasks { display: flex; flex-direction: column; gap: 10px; border: 2px solid var(--accent); }
 .tasks .label { color: var(--accent-text); }
