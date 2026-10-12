@@ -169,15 +169,18 @@ a.week:hover { border-color: var(--sky); }
 /* lesson colors: red = what changes, blue = where it goes */
 .hl { color: var(--bad); font-weight: 800; }
 .hl2 { color: #1D5FC2; font-weight: 800; }
-.compare { display: grid; gap: 8px; }
-.cmp-head, .cmp-row { display: grid; grid-template-columns: minmax(0, 1fr) 20px minmax(0, 1fr); align-items: center; gap: 6px; }
-.cmp-head > span { font-size: 12px; font-weight: 700; color: var(--muted); text-align: center; }
-.cmp { display: flex; align-items: center; gap: 6px; min-width: 0; border-radius: 14px; padding: 8px; border: 2px solid var(--line); background: var(--card); }
-.cmp p { font-family: var(--en); font-weight: 700; font-size: 16px; line-height: 1.35; min-width: 0; overflow-wrap: anywhere; }
+/* compare: each pair stacked, the plain sentence above the changed one */
+.compare { display: grid; gap: 10px; }
+.cmp-row { display: grid; gap: 2px; padding: 8px; border-radius: 18px; background: color-mix(in srgb, var(--sky-soft) 55%, transparent); }
+.cmp { display: flex; align-items: center; gap: 10px; border-radius: 14px; padding: 8px 10px 8px 14px; border: 2px solid var(--line); background: var(--card); }
+.cmp > div { flex: 1; min-width: 0; }
+.cmp-label { font-size: 12px; font-weight: 700; color: var(--muted); }
+.cmp .en { font-weight: 700; font-size: 17px; line-height: 1.4; overflow-wrap: anywhere; }
+.cmp .ja { font-size: 13px; line-height: 1.5; color: var(--ink-2); }
 .cmp.after { border-color: var(--bad-soft); background: color-mix(in srgb, var(--bad-soft) 45%, var(--card)); }
-.cmp .speak.icon-only { width: 32px; min-height: 32px; }
-.cmp .speak svg { width: 16px; height: 16px; }
-.cmp-arrow { text-align: center; font-weight: 900; color: var(--bad); }
+.cmp .speak.icon-only { width: 36px; min-height: 36px; flex: none; }
+.cmp .speak svg { width: 18px; height: 18px; }
+.cmp-arrow { text-align: center; font-weight: 900; color: var(--bad); line-height: 1.2; }
 .chip-group { display: grid; gap: 6px; }
 .chip-label { font-size: 13px; font-weight: 700; color: var(--ink-2); }
 .chip-group ul { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px; }

@@ -14,16 +14,24 @@ export const BE = {
         {
           type: "explain",
           title: "be動詞とは？",
-          text: ["**「〜です」「〜にいます」**を表す言葉です。"],
+          text: [
+            "am / is / are は「**〜は**」を表す言葉です。",
+            "**主語**と**内容**のあいだに入って、「**＝（イコール）**」でつなぎます。",
+          ],
           table: {
-            head: ["英文", "イメージ"],
+            head: ["主語", "＝", "内容"],
             rows: [
-              ["I [[am]] tired.", "I ＝ tired"],
-              ["She [[is]] a teacher.", "She ＝ a teacher"],
-              ["They [[are]] at home.", "They ＝ at home"],
+              ["I（私）", "[[am]]", "tired（疲れている）"],
+              ["She（彼女）", "[[is]]", "a teacher（先生）"],
+              ["They（彼ら）", "[[are]]", "at home（家に）"],
             ],
           },
-          key: "[[am]] / [[is]] / [[are]] は「＝（イコール）」",
+          key: ["主語 ＝ 内容", "この「＝」が [[am]] / [[is]] / [[are]]"],
+          examples: [
+            { en: "I [[am]] tired.", ja: "私は疲れています。（I ＝ tired）" },
+            { en: "She [[is]] a teacher.", ja: "彼女は先生です。（She ＝ a teacher）" },
+            { en: "They [[are]] at home.", ja: "彼らは家にいます。（They ＝ at home）" },
+          ],
         },
         {
           type: "explain",
@@ -38,9 +46,9 @@ export const BE = {
             ],
           },
           examples: [
-            { en: "I [[am]] happy.", ja: "私は幸せです。" },
-            { en: "He [[is]] a doctor.", ja: "彼は医者です。" },
-            { en: "We [[are]] students.", ja: "私たちは学生です。" },
+            { en: "I [[am]] from Japan.", ja: "私は日本出身です。" },
+            { en: "He [[is]] my brother.", ja: "彼は私の兄です。" },
+            { en: "We [[are]] friends.", ja: "私たちは友達です。" },
           ],
         },
         {
@@ -90,8 +98,14 @@ export const BE = {
           compare: {
             labels: ["ふつうの文", "否定文"],
             rows: [
-              ["She is busy.", "She is [[not]] busy."],
-              ["I am a student.", "I am [[not]] a student."],
+              [
+                { en: "He [[is]] sleepy.", ja: "彼は眠いです。" },
+                { en: "He [[is]] [[not]] sleepy.", ja: "彼は眠くありません。" },
+              ],
+              [
+                { en: "I [[am]] hungry.", ja: "私はお腹が空いています。" },
+                { en: "I [[am]] [[not]] hungry.", ja: "私はお腹が空いていません。" },
+              ],
             ],
           },
           key: "am / is / are のうしろに [[not]]",
@@ -104,14 +118,35 @@ export const BE = {
           why: "is のうしろに [[not]] です。",
         },
         {
+          type: "choice",
+          q: "My father ___ at home.",
+          ja: "父は家にいません。",
+          choices: ["is not", "not is"],
+          answer: "is not",
+          why: "not は is の**うしろ**なので [[is not]] です。",
+        },
+        {
+          type: "order",
+          ja: "彼らは学生ではありません。",
+          words: ["They", "are", "not", "students"],
+          end: ".",
+          why: "are のうしろに [[not]] です。",
+        },
+        {
           type: "explain",
           title: "疑問文：前に出す",
           text: ["「〜ですか？」は、am / is / are を**前に**出します。"],
           compare: {
             labels: ["ふつうの文", "疑問文"],
             rows: [
-              ["You are busy.", "[[Are]] you busy?"],
-              ["He is a teacher.", "[[Is]] he a teacher?"],
+              [
+                { en: "You [[are]] hungry.", ja: "あなたはお腹が空いています。" },
+                { en: "[[Are]] you hungry?", ja: "あなたはお腹が空いていますか？" },
+              ],
+              [
+                { en: "It [[is]] cold today.", ja: "今日は寒いです。" },
+                { en: "[[Is]] it cold today?", ja: "今日は寒いですか？" },
+              ],
             ],
           },
           key: "am / is / are を主語の**前**へ",
@@ -124,10 +159,32 @@ export const BE = {
           why: "[[Is]] を he の前に出します。",
         },
         {
+          type: "choice",
+          q: "___ she a nurse?",
+          ja: "彼女は看護師ですか？",
+          choices: ["Am", "Is", "Are"],
+          answer: "Is",
+          why: "She なので [[Is]] を前に出します。",
+        },
+        {
+          type: "order",
+          ja: "あなたは学生ですか？",
+          words: ["Are", "you", "a", "student"],
+          end: "?",
+          why: "You なので [[Are]] を前に出します。",
+        },
+        {
+          type: "order",
+          ja: "彼らは忙しいですか？",
+          words: ["Are", "they", "busy"],
+          end: "?",
+          why: "They なので [[Are]] を前に出します。",
+        },
+        {
           type: "write",
-          ja: "私は学生です。",
-          answers: ["I am a student."],
-          hint: "student（学生）",
+          ja: "私は幸せです。",
+          answers: ["I am happy."],
+          hint: "happy（幸せ）",
           why: "I のときは [[am]] です。",
         },
         {
@@ -158,8 +215,14 @@ export const BE = {
           compare: {
             labels: ["いま", "過去"],
             rows: [
-              ["I am tired.", "I [[was]] tired."],
-              ["They are at home.", "They [[were]] at home."],
+              [
+                { en: "I [[am]] tired.", ja: "私は疲れています。" },
+                { en: "I [[was]] tired.", ja: "私は疲れていました。" },
+              ],
+              [
+                { en: "They [[are]] at home.", ja: "彼らは家にいます。" },
+                { en: "They [[were]] at home.", ja: "彼らは家にいました。" },
+              ],
             ],
           },
           key: ["am・is → [[was]]", "are → [[were]]"],
@@ -182,8 +245,8 @@ export const BE = {
         },
         {
           type: "choice",
-          q: "I ___ tired yesterday.",
-          ja: "私は昨日疲れていました。",
+          q: "I ___ happy yesterday.",
+          ja: "私は昨日うれしかったです。",
           choices: ["was", "were"],
           answer: "was",
           why: "I は am のなかまなので [[was]] です。",
@@ -195,8 +258,14 @@ export const BE = {
           compare: {
             labels: ["ふつうの文", "否定文・疑問文"],
             rows: [
-              ["He was at home.", "He was [[not]] at home."],
-              ["They were busy.", "[[Were]] they busy?"],
+              [
+                { en: "It [[was]] cold.", ja: "寒かったです。" },
+                { en: "It [[was]] [[not]] cold.", ja: "寒くありませんでした。" },
+              ],
+              [
+                { en: "You [[were]] tired.", ja: "あなたは疲れていました。" },
+                { en: "[[Were]] you tired?", ja: "あなたは疲れていましたか？" },
+              ],
             ],
           },
           key: ["否定文 → [[not]] をつける", "疑問文 → was / were を**前**へ"],

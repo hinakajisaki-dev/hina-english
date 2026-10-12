@@ -48,8 +48,14 @@ export const TENSE = {
           compare: {
             labels: ["いままで", "[[He]] / [[She]] のとき"],
             rows: [
-              ["I play tennis.", "[[He]] play[[s]] tennis."],
-              ["I eat lunch.", "[[She]] eat[[s]] lunch."],
+              [
+                { en: "I play tennis.", ja: "私はテニスをします。" },
+                { en: "[[He]] play[[s]] tennis.", ja: "彼はテニスをします。" },
+              ],
+              [
+                { en: "I eat lunch.", ja: "私は昼食を食べます。" },
+                { en: "[[She]] eat[[s]] lunch.", ja: "彼女は昼食を食べます。" },
+              ],
             ],
           },
           key: "[[He]] / [[She]] / [[It]] / [[Tom]] → 動詞に [[s]]",
@@ -57,16 +63,24 @@ export const TENSE = {
         {
           type: "explain",
           title: "この形を「三単現」といいます",
-          text: ["自分（I）と相手（you）**以外**の、**1人・1つ**のことです。"],
+          text: ["**I と You 以外の第三者**で、**登場人物が1人**のときです。"],
           chips: [
             { label: "三単現 → 動詞に [[s]]", tone: "red", items: ["He", "She", "It", "Tom", "my mother"] },
-            { label: "三単現ではない → そのまま", tone: "plain", items: ["I", "You", "We", "They", "Tom and Ken"] },
           ],
+          table: {
+            head: ["三単現ではない", "どうして？"],
+            rows: [
+              ["I / You", "自分と相手（第三者ではない）"],
+              ["We", "第三者ではない＋複数"],
+              ["They", "第三者だけど、複数人"],
+              ["Tom and Ken", "第三者だけど、複数人"],
+            ],
+          },
         },
         {
           type: "choice",
-          q: "She ___ tennis.",
-          ja: "彼女はテニスをします。",
+          q: "She ___ the piano.",
+          ja: "彼女はピアノを弾きます。",
           choices: ["play", "plays"],
           answer: "plays",
           why: "[[She]] は三単現なので、play[[s]] です。",
@@ -105,27 +119,27 @@ export const TENSE = {
         },
         {
           type: "choice",
-          q: "watch → ___",
-          ja: "watch の三単現の形は？",
+          q: "I watch TV. → He ___ TV.",
+          ja: "彼はテレビを見ます。",
           choices: ["watchs", "watches", "watchies"],
           answer: "watches",
-          why: "watch は watch[[es]] です。",
+          why: "[[He]] なので、watch は watch[[es]] です。",
         },
         {
           type: "choice",
-          q: "study → ___",
-          ja: "study の三単現の形は？",
+          q: "I study English. → She ___ English.",
+          ja: "彼女は英語を勉強します。",
           choices: ["studys", "studies", "studyes"],
           answer: "studies",
-          why: "study は stud[[ies]] です。",
+          why: "[[She]] なので、study は stud[[ies]] です。",
         },
         {
           type: "choice",
-          q: "have → ___",
-          ja: "have の三単現の形は？",
+          q: "I have a dog. → Tom ___ a dog.",
+          ja: "トムは犬を飼っています。",
           choices: ["haves", "has", "havs"],
           answer: "has",
-          why: "have は特別で [[has]] になります。",
+          why: "[[Tom]] なので、have は特別で [[has]] になります。",
         },
         {
           type: "order",
@@ -136,10 +150,10 @@ export const TENSE = {
         },
         {
           type: "order",
-          ja: "太陽は東から昇ります。",
-          words: ["The", "sun", "rises", "in", "the", "east"],
+          ja: "トムはサッカーが好きです。",
+          words: ["Tom", "likes", "soccer"],
           end: ".",
-          why: "[[The sun]] は三単現なので rise[[s]] です。",
+          why: "[[Tom]] は三単現なので like[[s]] です。",
         },
         {
           type: "order",
@@ -158,7 +172,7 @@ export const TENSE = {
           key: "これらは**動詞の前**に置きます。",
           examples: [
             { en: "I {{always}} drink water in the morning.", ja: "私はいつも朝に水を飲みます。" },
-            { en: "She {{usually}} walks to school.", ja: "彼女はたいてい歩いて学校に行きます。" },
+            { en: "My father {{usually}} reads the newspaper.", ja: "父はたいてい新聞を読みます。" },
             { en: "We {{often}} eat lunch together.", ja: "私たちはよく一緒に昼食を食べます。" },
           ],
         },
@@ -202,9 +216,9 @@ export const TENSE = {
           title: "現在進行形とは？",
           text: ["**今まさにしている途中**のことを表します。日本語の「**今〜しています**」です。"],
           examples: [
-            { en: "I [[am studying]] English {{now}}.", ja: "私は今、英語を勉強しています。" },
-            { en: "She [[is cooking]] dinner.", ja: "彼女は夕食を作っています。" },
-            { en: "They [[are playing]] outside.", ja: "彼らは外で遊んでいます。" },
+            { en: "I [[am drinking]] coffee {{now}}.", ja: "私は今、コーヒーを飲んでいます。" },
+            { en: "She [[is talking]] on the phone.", ja: "彼女は電話で話しています。" },
+            { en: "They [[are singing]] a song.", ja: "彼らは歌を歌っています。" },
           ],
         },
         {
@@ -214,18 +228,24 @@ export const TENSE = {
           compare: {
             labels: ["いつも", "今"],
             rows: [
-              ["I play tennis.", "I [[am]] play[[ing]] tennis."],
-              ["They eat lunch.", "They [[are]] eat[[ing]] lunch."],
+              [
+                { en: "I play tennis.", ja: "私はテニスをします。" },
+                { en: "I [[am]] play[[ing]] tennis.", ja: "私はテニスをしています。" },
+              ],
+              [
+                { en: "They eat lunch.", ja: "彼らは昼食を食べます。" },
+                { en: "They [[are]] eat[[ing]] lunch.", ja: "彼らは昼食を食べています。" },
+              ],
             ],
           },
           key: "[[am]] / [[is]] / [[are]] ＋ 動詞[[ing]]",
         },
         {
           type: "order",
-          ja: "私は今テニスをしています。",
-          words: ["I", "am", "playing", "tennis", "now"],
+          ja: "私は今、本を読んでいます。",
+          words: ["I", "am", "reading", "a", "book", "now"],
           end: ".",
-          why: "I なので [[am]]、play に [[ing]] をつけます。",
+          why: "I なので [[am]]、read に [[ing]] をつけます。",
         },
         {
           type: "choice",
@@ -269,16 +289,16 @@ export const TENSE = {
         },
         {
           type: "choice",
-          q: "make → ___",
-          ja: "make の ing形は？",
+          q: "I make lunch. → I am ___ lunch.",
+          ja: "私は昼食を作っています。",
           choices: ["makeing", "making", "makking"],
           answer: "making",
           why: "make は e をとって mak[[ing]] です。",
         },
         {
           type: "choice",
-          q: "run → ___",
-          ja: "run の ing形は？",
+          q: "He runs. → He is ___ now.",
+          ja: "彼は今、走っています。",
           choices: ["runing", "running", "runeing"],
           answer: "running",
           why: "run は n を重ねて run[[ning]] です。",
@@ -290,16 +310,22 @@ export const TENSE = {
           compare: {
             labels: ["ふつうの文", "否定文・疑問文"],
             rows: [
-              ["I am sleeping.", "I am [[not]] sleeping."],
-              ["You are listening.", "[[Are]] you listening?"],
+              [
+                { en: "I [[am]] watching TV.", ja: "私はテレビを見ています。" },
+                { en: "I [[am]] [[not]] watching TV.", ja: "私はテレビを見ていません。" },
+              ],
+              [
+                { en: "He [[is]] working.", ja: "彼は働いています。" },
+                { en: "[[Is]] he working?", ja: "彼は働いていますか？" },
+              ],
             ],
           },
           key: ["否定文 → [[not]] をつける", "疑問文 → am / is / are を**前**へ"],
         },
         {
           type: "order",
-          ja: "彼女は今、テレビを見ていません。",
-          words: ["She", "is", "not", "watching", "TV", "now"],
+          ja: "彼は今、勉強していません。",
+          words: ["He", "is", "not", "studying", "now"],
           end: ".",
           why: "is のうしろに [[not]] です。",
         },
@@ -318,7 +344,7 @@ export const TENSE = {
             { tone: "plain", items: ["{{now}} 今", "{{right now}} まさに今", "{{today}} 今日は", "{{this week}} 今週は", "{{Look!}} 見て！", "{{Listen!}} 聞いて！"] },
           ],
           examples: [
-            { en: "I am working {{now}}.", ja: "私は今、働いています。" },
+            { en: "I am doing my homework {{now}}.", ja: "私は今、宿題をしています。" },
             { en: "{{Look!}} The dog is running.", ja: "見て！犬が走っています。" },
             { en: "We are studying for the test {{this week}}.", ja: "私たちは今週、テスト勉強をしています。" },
           ],
@@ -329,8 +355,14 @@ export const TENSE = {
           compare: {
             labels: ["いつもすること", "今していること"],
             rows: [
-              ["I study English {{every day}}.", "I [[am studying]] English {{now}}."],
-              ["He plays soccer {{on Sundays}}.", "He [[is playing]] soccer {{now}}."],
+              [
+                { en: "He walks to school {{every day}}.", ja: "彼は毎日歩いて学校に行きます。" },
+                { en: "He [[is walking]] to school {{now}}.", ja: "彼は今、歩いて学校に向かっています。" },
+              ],
+              [
+                { en: "She plays the piano {{every day}}.", ja: "彼女は毎日ピアノを弾きます。" },
+                { en: "She [[is playing]] the piano {{now}}.", ja: "彼女は今ピアノを弾いています。" },
+              ],
             ],
           },
           key: ["いつも → 現在形", "今 → 現在進行形"],
@@ -368,8 +400,8 @@ export const TENSE = {
           ],
           key: "これらは ing にしないで**現在形**",
           examples: [
-            { en: "I know him.", ja: "私は彼を知っています。" },
-            { en: "She wants a new phone.", ja: "彼女は新しい電話をほしがっています。" },
+            { en: "I like this song.", ja: "私はこの歌が好きです。" },
+            { en: "We need water.", ja: "私たちは水が必要です。" },
           ],
         },
         {
@@ -390,17 +422,17 @@ export const TENSE = {
         },
         {
           type: "write",
-          ja: "私は今、夕食を作っています。",
-          answers: ["I am cooking dinner now.", "I am making dinner now.", "Now I am cooking dinner.", "Now I am making dinner."],
-          hint: "cook（作る）",
-          why: "I なので [[am]] ＋ cook[[ing]] です。",
+          ja: "私は今、手紙を書いています。",
+          answers: ["I am writing a letter now.", "Now I am writing a letter."],
+          hint: "write（書く）、letter（手紙）",
+          why: "I なので [[am]]。write は e をとって writ[[ing]] です。",
         },
         {
           type: "write",
-          ja: "彼らは公園で走っています。",
-          answers: ["They are running in the park."],
-          hint: "run（走る）、park（公園）",
-          why: "They なので [[are]]。run は n を重ねて run[[ning]] です。",
+          ja: "彼らはプールで泳いでいます。",
+          answers: ["They are swimming in the pool."],
+          hint: "swim（泳ぐ）、pool（プール）",
+          why: "They なので [[are]]。swim は m を重ねて swim[[ming]] です。",
         },
         {
           type: "write",
@@ -421,8 +453,8 @@ export const TENSE = {
           title: "過去形とは？",
           text: ["**もう終わったこと**を表します。日本語の「**〜しました**」です。"],
           examples: [
-            { en: "I play[[ed]] tennis {{yesterday}}.", ja: "私は昨日テニスをしました。" },
             { en: "I visit[[ed]] Kyoto {{last year}}.", ja: "私は去年、京都を訪れました。" },
+            { en: "We cook[[ed]] dinner {{yesterday}}.", ja: "私たちは昨日、夕食を作りました。" },
           ],
         },
         {
@@ -432,8 +464,14 @@ export const TENSE = {
           compare: {
             labels: ["いつも", "過去"],
             rows: [
-              ["I play tennis.", "I play[[ed]] tennis."],
-              ["She watches TV.", "She watch[[ed]] TV."],
+              [
+                { en: "I walk to school.", ja: "私は歩いて学校に行きます。" },
+                { en: "I walk[[ed]] to school.", ja: "私は歩いて学校に行きました。" },
+              ],
+              [
+                { en: "She cleans her room.", ja: "彼女は部屋を掃除します。" },
+                { en: "She clean[[ed]] her room.", ja: "彼女は部屋を掃除しました。" },
+              ],
             ],
           },
           key: "過去のこと → 動詞に [[ed]]",
@@ -470,24 +508,24 @@ export const TENSE = {
         },
         {
           type: "choice",
-          q: "like → ___",
-          ja: "like の過去形は？",
+          q: "I like the movie. → I ___ the movie.",
+          ja: "私はその映画が気に入りました。",
           choices: ["likeed", "liked", "likd"],
           answer: "liked",
           why: "e で終わる動詞は、like[[d]] のように d だけです。",
         },
         {
           type: "choice",
-          q: "study → ___",
-          ja: "study の過去形は？",
+          q: "I study English. → I ___ English yesterday.",
+          ja: "私は昨日、英語を勉強しました。",
           choices: ["studyed", "studied", "studed"],
           answer: "studied",
           why: "study は stud[[ied]] です。",
         },
         {
           type: "choice",
-          q: "stop → ___",
-          ja: "stop の過去形は？",
+          q: "The bus stops here. → The bus ___ here.",
+          ja: "バスはここで止まりました。",
           choices: ["stoped", "stopped", "stopt"],
           answer: "stopped",
           why: "stop は p を重ねて stop[[ped]] です。",
@@ -511,16 +549,16 @@ export const TENSE = {
         },
         {
           type: "choice",
-          q: "go → ___",
-          ja: "go の過去形は？",
+          q: "I go to the park. → I ___ to the park yesterday.",
+          ja: "私は昨日、公園へ行きました。",
           choices: ["goed", "went", "gone"],
           answer: "went",
           why: "go の過去形は [[went]] です。",
         },
         {
           type: "choice",
-          q: "buy → ___",
-          ja: "buy の過去形は？",
+          q: "I buy bread. → I ___ bread this morning.",
+          ja: "私は今朝パンを買いました。",
           choices: ["buyed", "bought", "brought"],
           answer: "bought",
           why: "buy の過去形は [[bought]] です（brought は bring の過去形）。",
@@ -540,11 +578,17 @@ export const TENSE = {
           compare: {
             labels: ["ふつうの文", "否定文・疑問文"],
             rows: [
-              ["I watched TV.", "I [[did not]] watch TV."],
-              ["You went there.", "[[Did]] you go there?"],
+              [
+                { en: "I watched TV.", ja: "私はテレビを見ました。" },
+                { en: "I [[did not]] watch TV.", ja: "私はテレビを見ませんでした。" },
+              ],
+              [
+                { en: "He came here.", ja: "彼はここに来ました。" },
+                { en: "[[Did]] he come here?", ja: "彼はここに来ましたか？" },
+              ],
             ],
           },
-          key: "[[did]] のあとは**元の形**（went → go）",
+          key: ["[[did]] のあとは**元の形**", "（came → come）"],
         },
         {
           type: "choice",
@@ -613,7 +657,7 @@ export const TENSE = {
           title: "未来形とは？",
           text: ["**これからのこと**を表します。**will** と **be going to** の2つがあります。"],
           examples: [
-            { en: "I [[will]] call you {{tonight}}.", ja: "今夜、あなたに電話します。" },
+            { en: "It [[will]] rain {{tomorrow}}.", ja: "明日は雨が降るでしょう。" },
             { en: "I [[am going to]] visit Kyoto {{next week}}.", ja: "来週、京都を訪れる予定です。" },
           ],
         },
@@ -624,8 +668,14 @@ export const TENSE = {
           compare: {
             labels: ["いつも", "これから"],
             rows: [
-              ["I study English.", "I [[will]] study English {{tonight}}."],
-              ["She plays tennis.", "She [[will]] play tennis {{tomorrow}}."],
+              [
+                { en: "I study English.", ja: "私は英語を勉強します。" },
+                { en: "I [[will]] study English {{tonight}}.", ja: "私は今夜、英語を勉強します。" },
+              ],
+              [
+                { en: "She plays tennis.", ja: "彼女はテニスをします。" },
+                { en: "She [[will]] play tennis {{tomorrow}}.", ja: "彼女は明日テニスをするでしょう。" },
+              ],
             ],
           },
           key: "[[will]] ＋ 動詞の**元の形**",
@@ -652,8 +702,14 @@ export const TENSE = {
           compare: {
             labels: ["ふつうの文", "否定文・疑問文"],
             rows: [
-              ["I will go.", "I [[will not]] go."],
-              ["You will come.", "[[Will]] you come?"],
+              [
+                { en: "I [[will]] go.", ja: "私は行きます。" },
+                { en: "I [[will not]] go.", ja: "私は行きません。" },
+              ],
+              [
+                { en: "She [[will]] help us.", ja: "彼女は私たちを手伝ってくれます。" },
+                { en: "[[Will]] she help us?", ja: "彼女は私たちを手伝ってくれますか？" },
+              ],
             ],
           },
           key: ["否定文 → [[will not]]", "疑問文 → [[Will]] を**前**へ"],
@@ -673,8 +729,14 @@ export const TENSE = {
           compare: {
             labels: ["ふつうの文", "予定"],
             rows: [
-              ["I visit Kyoto.", "I [[am going to]] visit Kyoto."],
-              ["She cooks dinner.", "She [[is going to]] cook dinner."],
+              [
+                { en: "I buy a new bag.", ja: "私は新しいかばんを買います。" },
+                { en: "I [[am going to]] buy a new bag.", ja: "私は新しいかばんを買う予定です。" },
+              ],
+              [
+                { en: "She cooks dinner.", ja: "彼女は夕食を作ります。" },
+                { en: "She [[is going to]] cook dinner.", ja: "彼女は夕食を作る予定です。" },
+              ],
             ],
           },
           key: "[[am]] / [[is]] / [[are]] ＋ going to ＋ **元の形**",
@@ -706,9 +768,10 @@ export const TENSE = {
             ],
           },
           examples: [
-            { en: "The phone is ringing. I [[will]] answer it.", ja: "電話が鳴っている。私が出ます。（その場で決めた）" },
+            { en: "I am hungry. I [[will]] make a sandwich.", ja: "お腹が空いた。サンドイッチを作ろう。（その場で決めた）" },
             { en: "I [[am going to]] call my mother {{tonight}}.", ja: "今夜、母に電話する予定です。（前から決めていた）" },
-            { en: "Look at those clouds. It [[is going to]] rain.", ja: "あの雲を見て。雨が降りそうです。（見てわかる）" },
+            { en: "I think he [[will]] win.", ja: "彼は勝つと思います。（自分の考え）" },
+            { en: "Look at the sky. It [[is going to]] snow.", ja: "空を見て。雪が降りそうです。（見てわかる）" },
           ],
         },
         {

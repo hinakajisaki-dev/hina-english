@@ -3,7 +3,8 @@
 // sentences may be voiced.
 //
 // A lesson is a list of steps, one screen each:
-//   explain: title, text (paragraphs), compare { labels, rows: [[before, after]] }, chips
+//   explain: title, text (paragraphs), compare { labels, rows: [[before, after]] } where each side
+//            is { en, ja }, chips
 //            [{ label (optional), items, tone: "red" | "plain" }], table { head, rows }, note (paragraphs
 //            under the key), key (what to remember, shown big; a list shows one per line), examples
 //            [{ en, ja }], highlight (whole words shown in red)
@@ -43,7 +44,7 @@ export function lessonExampleSentences() {
     for (const lesson of unit.lessons) {
       for (const step of lesson.steps || []) {
         for (const example of step.examples || []) sentences.add(plain(example.en));
-        for (const row of step.compare?.rows || []) row.forEach((s) => sentences.add(plain(s)));
+        for (const row of step.compare?.rows || []) row.forEach((side) => sentences.add(plain(side.en ?? side)));
       }
     }
   }

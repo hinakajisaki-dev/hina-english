@@ -620,6 +620,16 @@ function sayIcon(text) {
   return `<button type="button" class="speak icon-only" data-say="${esc(words)}" aria-label="${esc(words)} を聞く">${icons.speaker}</button>`;
 }
 
+// One side of a compare row: an English sentence, its Japanese and its audio.
+// Only the first row carries the labels (ふつうの文 / 否定文 …).
+function cmpCard(cell, side, label, line) {
+  const { en, ja } = typeof cell === "string" ? { en: cell } : cell;
+  return `<div class="cmp ${side}"><div>
+    ${label ? `<p class="cmp-label">${line(label)}</p>` : ""}
+    <p class="en" lang="en">${line(en)}</p>${ja ? `<p class="ja">${line(ja)}</p>` : ""}
+  </div>${sayIcon(en)}</div>`;
+}
+
 function explainHtml(step) {
   const hl = highlighter(step);
   const line = (text) => hl(fmt(text));
@@ -627,11 +637,10 @@ function explainHtml(step) {
     <h2>${line(step.title)}</h2>
     ${(step.text || []).map((p) => `<p>${line(p)}</p>`).join("")}
     ${step.compare ? `<div class="compare">
-      <div class="cmp-head"><span>${line(step.compare.labels[0])}</span><span></span><span>${line(step.compare.labels[1])}</span></div>
-      ${step.compare.rows.map(([before, after]) => `<div class="cmp-row">
-        <div class="cmp before">${sayIcon(before)}<p lang="en">${line(before)}</p></div>
-        <span class="cmp-arrow" aria-hidden="true">→</span>
-        <div class="cmp after">${sayIcon(after)}<p lang="en">${line(after)}</p></div>
+      ${step.compare.rows.map(([before, after], i) => `<div class="cmp-row">
+        ${cmpCard(before, "before", i ? "" : step.compare.labels[0], line)}
+        <span class="cmp-arrow" aria-hidden="true">↓</span>
+        ${cmpCard(after, "after", i ? "" : step.compare.labels[1], line)}
       </div>`).join("")}
     </div>` : ""}
     ${(step.chips || []).map((group) => `<div class="chip-group ${group.tone || "plain"}">
