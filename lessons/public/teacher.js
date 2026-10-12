@@ -3,6 +3,7 @@
 // their journals with the AI corrections.
 import { ApiError, api, diffHtml, esc, formatDateTime, icons, startOfJapanDay, toast } from "./common.js";
 import { UNITS } from "./grammar/lessons.js";
+import { bookWeeks, bookWords, setKey, weekWords, wordSets } from "./vocab/words.js";
 
 document.body.classList.add("teacher");
 const app = document.getElementById("app");
@@ -199,8 +200,8 @@ async function renderStudent(id, tab) {
   state.current = data;
   const { student, items, progress, journals } = data;
   const byKind = (kind) => items.filter((item) => item.kind === kind);
-  const vocab = byKind("vocab");
-  const known = vocab.filter((v) => progress[v.id]?.known).length;
+  const vocabSets = vocabSetList(data);
+  const vocabTested = vocabSets.filter((s) => data.vocabTests?.[s.key]).length;
   const grammarTries = byKind("grammar").reduce(
     (sum, q) => ({ right: sum.right + (progress[q.id]?.right || 0), wrong: sum.wrong + (progress[q.id]?.wrong || 0) }),
     { right: 0, wrong: 0 },
@@ -225,7 +226,7 @@ async function renderStudent(id, tab) {
     <main class="wrap stack">
       <div class="stats">
         <div class="stat"><b>${journals.length}</b><span>日記（この7日で ${thisWeek}）</span></div>
-        <div class="stat"><b>${known} / ${vocab.length}</b><span>覚えた単語</span></div>
+        <div class="stat"><b>${vocabTested} / ${vocabSets.length}</b><span>単語テスト（復習カード ${(data.review || []).length} 語）</span></div>
         <div class="stat"><b>${tries ? `${Math.round((grammarTries.right / tries) * 100)}%` : "—"}</b><span>文法の正解率</span></div>
       </div>
       <nav class="tabs" aria-label="内容">
@@ -343,7 +344,7 @@ function rowHtml(kind, item, progress) {
   let pill = "";
   if (kind === "vocab") {
     main = d.word; sub = [d.meaning, d.example].filter(Boolean).join(" ・ ");
-    if (p.known) pill = `<span class="pill good">覚えた</span>`;
+    if ((state.current.review || []).some((r) => r.key === `item/${item.id}`)) pill = `<span class="pill">復習カード</span>`;
   } else if (kind === "phrase") {
     main = d.phrase; sub = [d.meaning, d.note].filter(Boolean).join(" ・ ");
   } else if (kind === "pron") {
@@ -395,10 +396,13 @@ function renderItems(panel, kind) {
   }
   const weekName = week === "other" ? "そのほか" : `Week ${week}`;
 
+  const book = kind === "vocab" && week !== "other" ? bookWords(week).length : 0;
   panel.innerHTML = `<div class="stack">
     ${kind === "grammar" ? lessonResultsHtml() : ""}
+    ${kind === "vocab" ? vocabResultsHtml() : ""}
     <section class="card stack">
       ${weekPicker}
+      ${book ? `<p class="notice">${weekName} には、全員共通の単語帳（${book} 語）が入っています。ここで足した単語は、この生徒の ${weekName} の最後に加わります。</p>` : ""}
       <h3>${week ? `${weekName} に` : ""}${kind === "grammar" ? "先生からの問題（この生徒だけ）" : esc(spec.tab)}を追加</h3>
       <p class="format">1行に1つ。区切りは <code>|</code>（またはスプレッドシートからそのまま貼りつけ）<br>${esc(spec.format)}</p>
       <form id="bulk" class="stack">
@@ -506,6 +510,33 @@ function lessonResultsHtml() {
       </div></li>`;
     }).join("")}</ul>
     <p class="muted small">レッスンの中身は全員共通です。新しい単元やレッスンを足したいときは、Claude に頼んでください。下の「先生からの問題」は、この生徒だけの問題です。</p>
+  </section>`;
+}
+
+// Every ten-word set this student has (単語帳 and their own words), with its key.
+function vocabSetList(data) {
+  const weeks = [...new Set([...bookWeeks(), ...data.items.filter((i) => i.kind === "vocab").map((i) => i.data.week || "other")])];
+  return weeks.flatMap((week) =>
+    wordSets(weekWords(week, data.items)).map((set) => ({ week, ...set, key: setKey(week, set.number) })),
+  );
+}
+
+function vocabResultsHtml() {
+  const results = state.current.vocabTests || {};
+  const review = state.current.review || [];
+  const fromTests = review.filter((r) => r.source === "test").length;
+  return `<section class="card stack">
+    <h3>単語テストの結果</h3>
+    <p class="muted small">復習カード：${review.length} 語（テストでまちがえた ${fromTests} 語、自分でチェックした ${review.length - fromTests} 語）</p>
+    <ul class="rows">${vocabSetList(state.current).map((set) => {
+      const r = results[set.key];
+      return `<li><div class="main">
+        <div><b>${set.week === "other" ? "そのほか" : `Week ${set.week}`} ・ ${set.number}. ${esc(set.title)}</b></div>
+        <div class="sub">${r
+          ? `ベスト ${r.best} / ${r.total}　前回 ${r.last} / ${r.total}　${r.times} 回　（${esc(formatDateTime(r.updated_at))}）`
+          : "まだやっていません"}</div>
+      </div></li>`;
+    }).join("")}</ul>
   </section>`;
 }
 

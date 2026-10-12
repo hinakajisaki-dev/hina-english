@@ -6,6 +6,7 @@
 import { AiError, correctJournal } from "./ai.js";
 import { SpeechError, speechFor } from "./speech.js";
 import { findLesson, lessonExampleSentences, questionCount } from "../public/grammar/lessons.js";
+import { bookSentences, bookWords, setKey, weekWords, wordSets } from "../public/vocab/words.js";
 import {
   all, ensureSchema, first, itemRow, journalRow, now, run, studentBundle,
 } from "./db.js";
@@ -68,6 +69,10 @@ async function route(request, env, url) {
     if (parts[0] === "lessons" && parts.length === 2 && method === "POST") {
       return saveLessonResult(request, env, student, parts[1]);
     }
+    if (path === "/api/vocab/review" && method === "POST") return saveReview(request, env, student);
+    if (parts[0] === "vocab" && parts[1] === "tests" && parts.length === 4 && method === "POST") {
+      return saveVocabTest(request, env, student, parts[2], Number(parts[3]));
+    }
     if (path === "/api/journals" && method === "POST") return newJournal(request, env, student);
     if (parts[0] === "journals" && parts[2] === "correct" && parts.length === 3 && method === "POST") {
       return retryCorrection(env, student, id(1));
@@ -116,7 +121,10 @@ async function route(request, env, url) {
       return json({ item: itemRow({ ...row, data: JSON.stringify(clean) }) });
     }
     if (method === "DELETE") {
-      await run(db, `DELETE FROM items WHERE id = ?`, row.id);
+      await db.batch([
+        db.prepare(`DELETE FROM items WHERE id = ?`).bind(row.id),
+        db.prepare(`DELETE FROM vocab_review WHERE student_id = ? AND word_key = ?`).bind(row.student_id, `item/${row.id}`),
+      ]);
       return json({ ok: true });
     }
   }
@@ -195,13 +203,14 @@ async function newJournal(request, env, student) {
   return correctOnce(env, student, meta.last_row_id);
 }
 
-// Audio is only made for text in the student's own content or in the grammar
-// lessons' examples, so the endpoint can't be used to voice anything else.
+// Audio is only made for text in the student's own content, the 単語帳 or the
+// grammar lessons' examples, so the endpoint can't be used to voice anything else.
 const SPOKEN_FIELDS = { vocab: ["word", "example"], phrase: ["phrase"], pron: ["text"] };
 const LESSON_SENTENCES = lessonExampleSentences();
+const BOOK_SENTENCES = bookSentences();
 
 async function speech(env, student, text) {
-  let allowed = LESSON_SENTENCES.has(text);
+  let allowed = LESSON_SENTENCES.has(text) || BOOK_SENTENCES.has(text);
   if (!allowed) {
     const rows = await all(
       env.DB,
@@ -239,6 +248,55 @@ async function saveLessonResult(request, env, student, lessonId) {
      ON CONFLICT (student_id, lesson_id) DO UPDATE SET
        best_score = MAX(best_score, ?3), last_score = ?3, total = ?4, times = times + 1, updated_at = ?5`,
     student.id, lessonId, clean, total, now(),
+  );
+  return json({ ok: true });
+}
+
+// The 復習 list: on adds a word (source "check" when ticked on its card, "test"
+// when missed in a set test), off takes it out. A word already in the list keeps
+// its first source.
+async function saveReview(request, env, student) {
+  const { key, on, source } = await readJson(request);
+  await requireWordKey(env.DB, student, String(key || ""));
+  if (on) {
+    await run(
+      env.DB,
+      `INSERT OR IGNORE INTO vocab_review (student_id, word_key, source, added_at) VALUES (?, ?, ?, ?)`,
+      student.id, key, source === "test" ? "test" : "check", now(),
+    );
+  } else {
+    await run(env.DB, `DELETE FROM vocab_review WHERE student_id = ? AND word_key = ?`, student.id, key);
+  }
+  return json({ ok: true });
+}
+
+// A word key must be a 単語帳 word ("w1/go") or one of this student's own words ("item/12").
+async function requireWordKey(db, student, key) {
+  const book = key.match(/^w(\d+)\/(.+)$/);
+  if (book && bookWords(Number(book[1])).some((w) => w.key === key)) return;
+  const item = key.match(/^item\/(\d+)$/);
+  if (item && (await first(db, `SELECT id FROM items WHERE id = ? AND student_id = ? AND kind = 'vocab'`, Number(item[1]), student.id))) {
+    return;
+  }
+  throw new HttpError(404, "見つかりません。");
+}
+
+// The score of a ten-word set test. The total is the set's size, worked out here.
+async function saveVocabTest(request, env, student, weekParam, number) {
+  const week = weekParam === "other" ? "other" : Number(weekParam);
+  const items = (await all(env.DB, `SELECT * FROM items WHERE student_id = ? AND kind = 'vocab'`, student.id)).map(itemRow);
+  const set = wordSets(weekWords(week, items)).find((s) => s.number === number);
+  if (!set) throw new HttpError(404, "見つかりません。");
+  const total = set.words.length;
+  const { score } = await readJson(request);
+  const clean = Math.max(0, Math.min(total, Math.round(Number(score)) || 0));
+  await run(
+    env.DB,
+    `INSERT INTO vocab_tests (student_id, set_key, best_score, last_score, total, times, updated_at)
+     VALUES (?1, ?2, ?3, ?3, ?4, 1, ?5)
+     ON CONFLICT (student_id, set_key) DO UPDATE SET
+       best_score = MAX(best_score, ?3), last_score = ?3, total = ?4, times = times + 1, updated_at = ?5`,
+    student.id, setKey(week, number), clean, total, now(),
   );
   return json({ ok: true });
 }

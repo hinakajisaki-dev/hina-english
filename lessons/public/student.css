@@ -30,27 +30,8 @@
 
 .footer-links { text-align: center; margin-top: 28px; }
 
-/* segmented filter */
-.segment { display: flex; background: var(--card); border: 1px solid var(--line); border-radius: 999px; padding: 4px; }
-.segment button {
-  flex: 1; border: 0; background: transparent; border-radius: 999px; min-height: 38px; font-weight: 700;
-  font-size: 14px; cursor: pointer; color: var(--ink-2);
-}
-.segment button[aria-pressed="true"] { background: var(--ink); color: #fff; }
-
-/* flashcards */
+/* counters and paired buttons */
 .counter { text-align: center; font-family: var(--en); font-weight: 700; color: var(--muted); font-size: 14px; }
-.flash {
-  width: 100%; min-height: 260px; border: 0; cursor: pointer; text-align: center;
-  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px;
-  background: var(--card); border-radius: 24px; box-shadow: var(--shadow); padding: 28px 20px;
-  border: 1px solid var(--line);
-}
-.flash .word { font-family: var(--en); font-weight: 800; font-size: clamp(28px, 9vw, 40px); line-height: 1.2; overflow-wrap: anywhere; }
-.flash .meaning { font-size: 22px; font-weight: 900; }
-.flash .example { font-family: var(--en); color: var(--ink-2); font-size: 16px; }
-.flash .hint { color: var(--muted); font-size: 13px; }
-.flash.back { background: var(--paper); border-color: var(--line-warm); }
 .card-actions { display: flex; gap: 10px; }
 .card-actions .btn { flex: 1; }
 .speak-row { display: flex; justify-content: center; align-items: center; gap: 8px 12px; flex-wrap: wrap; }
@@ -156,6 +137,7 @@ a.week:hover { border-color: var(--sky); }
 .lesson-card { align-items: center; justify-content: space-between; gap: 12px; }
 .lesson-card > div { display: flex; flex-direction: column; min-width: 0; }
 .lesson-card b { font-size: 17px; }
+.lesson-card .badge { flex: none; white-space: nowrap; }
 .lesson-card.soon { opacity: .6; box-shadow: none; }
 .badge.start { background: var(--accent); color: #fff; }
 
@@ -210,3 +192,27 @@ a.week:hover { border-color: var(--sky); }
 }
 .answer-line .chip { border-color: var(--sky); background: var(--sky-soft); }
 .chip:disabled { visibility: hidden; }
+
+/* vocab word cards, set tests and 復習 */
+.word-card .pos { width: fit-content; font-size: 12px; font-weight: 700; padding: 1px 10px; border-radius: 99px; background: var(--sky-soft); color: var(--ink-2); }
+.word-row { display: flex; align-items: center; gap: 12px; }
+.word-row .word { font-family: var(--en); font-weight: 800; font-size: clamp(28px, 8vw, 36px); line-height: 1.2; overflow-wrap: anywhere; }
+.word-card .meaning { font-size: 20px; font-weight: 900; line-height: 1.5; }
+.word-card .meaning.reveal { color: var(--accent-text); }
+.word-examples { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; }
+.word-examples li, .word-examples.one { display: flex; gap: 10px; align-items: flex-start; }
+.word-examples li > div, .word-examples.one > div { min-width: 0; }
+.word-examples .en { font-family: var(--en); font-weight: 700; font-size: 17px; line-height: 1.5; }
+.word-examples .ja { font-size: 14px; color: var(--ink-2); }
+.word-note { font-size: 13px; line-height: 1.6; color: var(--ink-2); border-left: 3px solid var(--line-warm); padding: 2px 0 2px 10px; margin-top: 6px; }
+.review-check { display: flex; align-items: center; gap: 10px; padding: 12px 14px; border: 2px dashed var(--line); border-radius: 14px; font-weight: 700; cursor: pointer; }
+.review-check input { width: 22px; height: 22px; margin: 0; accent-color: var(--accent); }
+.review-check:has(input:checked) { border-style: solid; border-color: var(--accent); background: var(--accent-soft); }
+.plain-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.review-list { list-style: none; margin: 0; padding: 0; display: grid; }
+.review-list li { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-top: 1px solid var(--line); }
+.review-list li:first-child { border-top: 0; }
+.review-list li > div { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.hint-box { background: var(--cream); border-radius: 12px; padding: 8px 12px; font-size: 14px; }
+.letters { letter-spacing: .12em; font-weight: 700; }
+.center { text-align: center; }
