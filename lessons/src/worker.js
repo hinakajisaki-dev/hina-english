@@ -536,7 +536,7 @@ async function explainedQuestion(env, student, input) {
     return {
       source: `phrase/${phrase.key}/${drill.n}`,
       japanese: drill.ja,
-      hint: `${phrase.en}（${phrase.ja}）`,
+      hint: [phrase.chunk ? `塊：${phrase.chunk}` : phrase.en, drill.hint].filter(Boolean).join(" / "),
       note: phrase.note,
       answers: drill.answers,
     };

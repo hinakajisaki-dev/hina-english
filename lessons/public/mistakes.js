@@ -21,6 +21,9 @@ const CONTRACTIONS = {
   "can't": "can not", "cannot": "can not", "won't": "will not", "isn't": "is not", "aren't": "are not",
   "wasn't": "was not", "weren't": "were not", "haven't": "have not", "hasn't": "has not",
   "couldn't": "could not", "shouldn't": "should not", "wouldn't": "would not", "let's": "let us",
+  "how's": "how is", "where's": "where is", "who's": "who is", "here's": "here is", "he'll": "he will",
+  "she'll": "she will", "it'll": "it will", "that'll": "that will", "we'd": "we would", "they'd": "they would",
+  "mustn't": "must not",
 };
 
 // Lowercase words without punctuation; contractions expanded so "I'm" matches "I am".
@@ -37,14 +40,16 @@ export function normalizeWords(text) {
     .flatMap((w) => (CONTRACTIONS[w] || w).split(" "));
 }
 
-// Each word of a text as { raw, norm }: raw as typed (with its punctuation),
-// norm lowercased without punctuation. "I'm" becomes two words, I and am.
+// Each word of a text as { raw, norm, tok, src }: raw as typed (with its
+// punctuation), norm lowercased without punctuation. "I'm" becomes two words,
+// I and am; both keep tok (which typed word they come from) and src ("I'm"),
+// so they can be shown as the one word again.
 function words(text) {
-  return String(text).trim().split(/\s+/).filter(Boolean).flatMap((piece) => {
+  return String(text).trim().split(/\s+/).filter(Boolean).flatMap((piece, tok) => {
     const norms = normalizeWords(piece);
-    if (norms.length === 1) return [{ raw: piece, norm: norms[0] }];
+    if (norms.length === 1) return [{ raw: piece, norm: norms[0], tok, src: piece }];
     const capital = /^[A-Z]/.test(piece);
-    return norms.map((norm, i) => ({ raw: i === 0 && capital ? norm[0].toUpperCase() + norm.slice(1) : norm, norm }));
+    return norms.map((norm, i) => ({ raw: i === 0 && capital ? norm[0].toUpperCase() + norm.slice(1) : norm, norm, tok, src: piece }));
   });
 }
 

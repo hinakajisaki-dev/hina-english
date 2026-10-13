@@ -572,7 +572,7 @@ function phraseResultsHtml() {
     ${sets.length ? `<ul class="rows">${sets.map((set) => {
       const r = results[set.key];
       return `<li><div class="main">
-        <div><b>Week ${set.week} ・ ${set.number}. フレーズ ${esc(set.title)}</b></div>
+        <div><b>Week ${set.week} ・ ${esc(set.title)}</b></div>
         <div class="sub">${r
           ? `ベスト ${r.best} / ${r.total}　前回 ${r.last} / ${r.total}　${r.times} 回　（${esc(formatDateTime(r.updated_at))}）`
           : "まだやっていません"}</div>
