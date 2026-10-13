@@ -1,6 +1,7 @@
 // スモールトーク Week 2: 「話題を広げて、気持ちよく会話を終える」51 フレーズ、7 日分.
 // From smalltalk/week2.md (branch claude/fervent-clarke-wg3uno). Every student gets the same phrases.
 // Fields as in public/phrases/book.js. Keep the ids: students' フレーズ復習 lists use them.
+// Made by scripts/smalltalk-to-js.mjs (with the teacher's changes in smalltalk-overrides.json): don't edit by hand.
 
 export const WEEK2 = {
   week: 2,
@@ -19,7 +20,7 @@ export const WEEK2 = {
       ],
     },
     {
-      id: "51", day: 1, scene: "場面15：先週末",
+      id: "51", day: 1, scene: "場面15：先週末", replyTo: "50",
       en: "Not much. I just relaxed at home.",
       ja: "特に何も. 家でのんびりしてたよ",
       chunk: "I just ＋ 動詞（過去形）",
@@ -52,7 +53,7 @@ export const WEEK2 = {
       ],
     },
     {
-      id: "54", day: 1, scene: "場面16：週末の予定",
+      id: "54", day: 1, scene: "場面16：週末の予定", replyTo: "53",
       en: "I'm going to go snorkeling.",
       ja: "シュノーケリングに行くつもり",
       chunk: "I'm going to ＋ 動詞 / go ＋ 動詞ing",
@@ -63,7 +64,7 @@ export const WEEK2 = {
       ],
     },
     {
-      id: "55", day: 1, scene: "場面16：週末の予定",
+      id: "55", day: 1, scene: "場面16：週末の予定", replyTo: "53",
       en: "It's my first time, so I'm a little nervous.",
       ja: "初めてだから、ちょっと緊張してる",
       chunk: "理由 ＋ , so ＋ 結果",
@@ -86,7 +87,7 @@ export const WEEK2 = {
     },
     // ---------- Day 2 ----------
     {
-      id: "57", day: 2, scene: "場面17：食べ物",
+      id: "57", day: 2, scene: "場面17：食べ物", replyTo: "56",
       en: "Yes! I had poke yesterday.",
       ja: "うん！昨日ポケを食べたよ",
       chunk: "have / had ＋ 食べ物・飲み物",
@@ -108,7 +109,7 @@ export const WEEK2 = {
       ],
     },
     {
-      id: "59", day: 2, scene: "場面17：食べ物",
+      id: "59", day: 2, scene: "場面17：食べ物", replyTo: "58",
       en: "It was so good! I want to go back.",
       ja: "すごくおいしかった！また行きたい",
       chunk: "go back (to ＋ 場所)",
@@ -130,7 +131,7 @@ export const WEEK2 = {
       ],
     },
     {
-      id: "61", day: 2, scene: "場面18：おすすめを聞く",
+      id: "61", day: 2, scene: "場面18：おすすめを聞く", replyTo: "60",
       en: "You should try the Thai place down the street.",
       ja: "この先のタイ料理のお店、行ってみて",
       chunk: "You should ＋ 動詞",
@@ -164,7 +165,7 @@ export const WEEK2 = {
     },
     // ---------- Day 3 ----------
     {
-      id: "64", day: 3, scene: "場面19：運動",
+      id: "64", day: 3, scene: "場面19：運動", replyTo: "63",
       en: "I try to walk every morning.",
       ja: "毎朝歩くようにしています",
       chunk: "I try to ＋ 動詞",
@@ -197,7 +198,7 @@ export const WEEK2 = {
       ],
     },
     {
-      id: "67", day: 3, scene: "場面20：毎日の生活",
+      id: "67", day: 3, scene: "場面20：毎日の生活", replyTo: "66",
       en: "Around six. I'm a morning person.",
       ja: "6時ごろ. 朝型なんです",
       chunk: "I'm a morning person / a night owl",
@@ -242,7 +243,7 @@ export const WEEK2 = {
     },
     // ---------- Day 4 ----------
     {
-      id: "71", day: 4, scene: "場面21：天気",
+      id: "71", day: 4, scene: "場面21：天気", replyTo: "70",
       en: "In summer, yes. But it's more humid.",
       ja: "夏はね. でももっと蒸し暑いよ",
       chunk: "形容詞er / more ＋ 形容詞 ＋ than ＋ 名詞",
@@ -264,7 +265,7 @@ export const WEEK2 = {
       ],
     },
     {
-      id: "73", day: 4, scene: "場面22：映画・ドラマ",
+      id: "73", day: 4, scene: "場面22：映画・ドラマ", replyTo: "72",
       en: "I watched a really good one on Netflix.",
       ja: "Netflix ですごくいいのを見たよ",
       chunk: "a ＋ 形容詞 ＋ one",
@@ -297,7 +298,7 @@ export const WEEK2 = {
       ],
     },
     {
-      id: "76", day: 4, scene: "場面23：音楽",
+      id: "76", day: 4, scene: "場面23：音楽", replyTo: "75",
       en: "I'm really into K-pop right now.",
       ja: "今 K-POP にすごくハマってる",
       chunk: "文 ＋ right now",
@@ -328,7 +329,7 @@ export const WEEK2 = {
       ],
     },
     {
-      id: "79", day: 5, scene: "場面24：英語の話",
+      id: "79", day: 5, scene: "場面24：英語の話", replyTo: "78",
       en: "Thank you! I'm still learning.",
       ja: "ありがとう！まだ勉強中です",
       chunk: "I'm still ＋ 動詞ing",
@@ -350,7 +351,7 @@ export const WEEK2 = {
       ],
     },
     {
-      id: "81", day: 5, scene: "場面24：英語の話",
+      id: "81", day: 5, scene: "場面24：英語の話", replyTo: "80",
       en: "About three months ago.",
       ja: "3か月くらい前です",
       chunk: "期間 ＋ ago",
@@ -372,7 +373,7 @@ export const WEEK2 = {
       ],
     },
     {
-      id: "83", day: 5, scene: "場面25：言語",
+      id: "83", day: 5, scene: "場面25：言語", replyTo: "82",
       en: "I speak a little Spanish.",
       ja: "スペイン語を少し話せるよ",
       chunk: "a little ＋ 名詞",
@@ -406,7 +407,7 @@ export const WEEK2 = {
       ],
     },
     {
-      id: "86", day: 6, scene: "場面26：通勤",
+      id: "86", day: 6, scene: "場面26：通勤", replyTo: "85",
       en: "I take the train.",
       ja: "電車で行きます",
       chunk: "take ＋ 乗り物",
@@ -439,7 +440,7 @@ export const WEEK2 = {
       ],
     },
     {
-      id: "89", day: 6, scene: "場面27：ほめる",
+      id: "89", day: 6, scene: "場面27：ほめる", replyTo: "88",
       en: "Thanks! I got it in Japan.",
       ja: "ありがとう！日本で買ったの",
       chunk: "get / got ＋ 物",
@@ -528,7 +529,7 @@ export const WEEK2 = {
       ],
     },
     {
-      id: "97", day: 7, scene: "場面30：さようなら",
+      id: "97", day: 7, scene: "場面30：さようなら", replyTo: "96",
       en: "Sure! Let's keep in touch.",
       ja: "もちろん！連絡取り合おうね",
       chunk: "Let's ＋ 動詞",
@@ -550,7 +551,7 @@ export const WEEK2 = {
       ],
     },
     {
-      id: "99", day: 7, scene: "場面30：さようなら",
+      id: "99", day: 7, scene: "場面30：さようなら", replyTo: "98",
       en: "Thanks! Have a great day!",
       ja: "ありがとう！よい一日を！",
       chunk: "Have a great ＋ 名詞!",

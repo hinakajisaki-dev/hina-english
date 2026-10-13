@@ -501,8 +501,9 @@ async function judgeTyped(request, env, student) {
   const found = findMistakes(given, question.answers);
   if (!found.mistakes.length) return json({ acceptable: true, comment: "", points: [] });
 
-  // "judge" keeps these apart from the explanations kept before answers were judged.
-  const key = await sha256(JSON.stringify(["judge", question.source, question.answers, given.replace(/\s+/g, " ")]));
+  // The tag keeps these apart from verdicts kept under earlier rules (explanations
+  // only, then stricter judging); change it whenever the judging rules change.
+  const key = await sha256(JSON.stringify(["judge-2", question.source, question.answers, given.replace(/\s+/g, " ")]));
   const kept = await first(env.DB, `SELECT points FROM explanations WHERE key = ?`, key);
   if (kept) return json(JSON.parse(kept.points));
 
@@ -536,7 +537,8 @@ async function explainedQuestion(env, student, input) {
     return {
       source: `phrase/${phrase.key}/${drill.n}`,
       japanese: drill.ja,
-      hint: [phrase.chunk ? `塊：${phrase.chunk}` : phrase.en, drill.hint].filter(Boolean).join(" / "),
+      chunk: phrase.chunk || phrase.en,
+      hint: drill.hint || "",
       note: phrase.note,
       answers: drill.answers,
     };

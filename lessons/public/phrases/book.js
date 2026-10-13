@@ -6,12 +6,14 @@
 // A week file (week1.js …) exports { week, title, phrases }. Each phrase:
 //   id      unique in the week; never change it (students' 復習 lists use it)
 //   day     the day it is learnt on (optional)
-//   scene   the bit of conversation it belongs to ("場面1：あいさつ（ホテルのプールで）", optional)
+//   scene   the bit of conversation it belongs to ("場面1：あいさつ", optional)
+//   replyTo the id of the phrase it answers, when it is an example answer (返答例)
 //   en      the phrase as shown and read aloud
 //   say     what 🔊 reads instead, when en has a slot (optional; "~" is left out anyway)
 //   ja      和訳
 //   chunk   塊: the form to learn ("How's ＋ 名詞 ＋ going?", optional)
 //   note    解説: how the chunk works (optional; \n starts a new line)
+//   examples 例文 with the chunk, shown under the 解説 (optional): [{ en, ja }]
 //   drills  瞬間英作文 with the chunk, up to two (none is fine):
 //           { ja, answers: ["How's work going?", …], hint }; the first answer
 //           is the one shown and read aloud, the others are also right, and
@@ -33,13 +35,18 @@ export const weekTitle = (week) => BOOKS[week]?.title || "";
 // "be about to ~" is read as "be about to".
 const speakable = (en) => en.replace(/[~〜]/g, " ").replace(/\s+/g, " ").trim();
 
+// A week's phrases. no is the course's running number (#50 …); replyTo, for
+// a 返答例, is { no, en } of the phrase it answers.
 export function weekPhrases(week) {
   const book = BOOKS[week];
   if (!book) return [];
+  const byId = new Map(book.phrases.map((p, i) => [p.id, { no: Number(p.id) || i + 1, en: p.en }]));
   return book.phrases.map((p, i) => ({
     key: `p${week}/${p.id}`,
     week,
     number: i + 1,
+    no: Number(p.id) || i + 1,
+    replyTo: (p.replyTo && byId.get(p.replyTo)) || null,
     en: p.en,
     day: p.day || null,
     scene: p.scene || "",
@@ -47,6 +54,7 @@ export function weekPhrases(week) {
     ja: p.ja,
     chunk: p.chunk || "",
     note: p.note || "",
+    examples: p.examples || [],
     drills: (p.drills || []).map((drill, n) => ({ ja: drill.ja, answers: drill.answers, hint: drill.hint || "", n })),
   }));
 }
@@ -65,6 +73,9 @@ export function phraseSets(week) {
   }
   return sets;
 }
+
+// The phrase numbers a day covers: "#1〜7".
+export const setNumbers = (set) => `#${set.phrases[0].no}〜${set.phrases[set.phrases.length - 1].no}`;
 
 // The scenes a day covers, for its card: "あいさつ・名前・仕事".
 export const setScenes = (set) =>
@@ -87,6 +98,7 @@ export function phraseSentences() {
   for (const week of phraseWeeks()) {
     for (const p of weekPhrases(week)) {
       texts.add(p.say);
+      for (const ex of p.examples) texts.add(ex.en);
       for (const drill of p.drills) texts.add(drill.answers[0]);
     }
   }
