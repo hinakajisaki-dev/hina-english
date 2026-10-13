@@ -1,5 +1,5 @@
 // スモールトーク Week 2: 「話題を広げて、気持ちよく会話を終える」51 フレーズ、7 日分.
-// From smalltalk/week2.md (branch claude/fervent-clarke-wg3uno). Every student gets the same phrases.
+// From smalltalk/week2.md. Every student gets the same phrases.
 // Fields as in public/phrases/book.js. Keep the ids: students' フレーズ復習 lists use them.
 
 export const WEEK2 = {
@@ -12,7 +12,8 @@ export const WEEK2 = {
       en: "What did you do last weekend?",
       ja: "先週末は何をしたの？",
       chunk: "What did you ＋ 動詞?",
-      note: "『何を〜したの？』と過去のことを聞く形. did のあとの動詞は原形. 週明けの会話の定番.",
+      note: "『何を〜したの？』と過去のことを聞く形.\ndid のあとの動詞は原形.\n週明けの会話の定番.",
+      example: { en: "What did you buy?", ja: "何を買ったの？" },
       drills: [
         { ja: "昨日は何したの？", answers: ["What did you do yesterday?"] },
         { ja: "お昼は何を食べたの？", answers: ["What did you have for lunch?"], hint: "食べる ＝ have" },
@@ -23,7 +24,8 @@ export const WEEK2 = {
       en: "Not much. I just relaxed at home.",
       ja: "特に何も. 家でのんびりしてたよ",
       chunk: "I just ＋ 動詞（過去形）",
-      note: "just は『ただ〜しただけ』特別なことをしなかったときに使う. Not much. は『特に何も』",
+      note: "just は『ただ〜しただけ』\n特別なことをしなかったときに使う.\nNot much. は『特に何も』",
+      example: { en: "I just slept all day.", ja: "一日中寝てただけ" },
       drills: [
         { ja: "家にいただけ", answers: ["I just stayed home."], hint: "家にいる ＝ stay home" },
         { ja: "テレビを見てただけ", answers: ["I just watched TV."] },
@@ -34,7 +36,8 @@ export const WEEK2 = {
       en: "That sounds nice.",
       ja: "いいね",
       chunk: "That sounds ＋ 形容詞",
-      note: "『（聞いた感じ）〜そうだね』相手の話に感想を返すあいづち.",
+      note: "『（聞いた感じ）〜そうだね』\n相手の話に感想を返すあいづち.",
+      example: { en: "That sounds great!", ja: "いいね！" },
       drills: [
         { ja: "楽しそう！", answers: ["That sounds fun!"] },
         { ja: "大変そう", answers: ["That sounds hard."], hint: "大変 ＝ hard" },
@@ -45,7 +48,8 @@ export const WEEK2 = {
       en: "What are you up to this weekend?",
       ja: "今週末は何するの？",
       chunk: "What are you up to ＋ 時?",
-      note: "『何してるの？何する予定？』のカジュアルな言い方. うしろに時を表す言葉をつけて、予定を聞く.",
+      note: "『何してるの？何する予定？』のカジュアルな言い方.\nうしろに時を表す言葉をつけて、予定を聞く.",
+      example: { en: "What are you up to tomorrow?", ja: "明日は何するの？" },
       drills: [
         { ja: "今夜は何するの？", answers: ["What are you up to tonight?"] },
         { ja: "このあと何するの？", answers: ["What are you up to after this?"], hint: "このあと ＝ after this" },
@@ -55,8 +59,9 @@ export const WEEK2 = {
       id: "54", day: 1, scene: "場面16：週末の予定",
       en: "I'm going to go snorkeling.",
       ja: "シュノーケリングに行くつもり",
-      chunk: "I'm going to ＋ 動詞 / go ＋ 動詞ing",
-      note: "be going to は『〜するつもり』と決まっている予定を言う形. go snorkeling のように、遊びやアクティビティに「行く」は go ＋ 動詞ing で、to はつけない.",
+      chunk: "I'm going to ＋ 動詞\ngo ＋ 動詞ing",
+      note: "be going to は『〜するつもり』と決まっている予定を言う形.\n遊びやアクティビティに「行く」は go ＋ 動詞ing で、to はつけない.\ngo snorkeling（シュノーケリングに行く）\ngo surfing（サーフィンに行く）",
+      example: { en: "I'm going to visit my friend next week.", ja: "来週友だちに会いに行くつもり" },
       drills: [
         { ja: "明日買い物に行くつもり", answers: ["I'm going to go shopping tomorrow."], hint: "買い物に行く ＝ go shopping" },
         { ja: "日曜日にハイキングに行く予定", answers: ["I'm going to go hiking on Sunday."], hint: "日曜日に ＝ on Sunday" },
@@ -66,8 +71,9 @@ export const WEEK2 = {
       id: "55", day: 1, scene: "場面16：週末の予定",
       en: "It's my first time, so I'm a little nervous.",
       ja: "初めてだから、ちょっと緊張してる",
-      chunk: "理由 ＋ , so ＋ 結果",
-      note: "『〜だから〜』so の前が理由、うしろが結果.",
+      chunk: "理由, so 結果",
+      note: "『〜だから〜』\nso の前が理由、うしろが結果.",
+      example: { en: "I was hungry, so I had a big lunch.", ja: "おなかがすいていたので、お昼をたくさん食べた" },
       drills: [
         { ja: "疲れていたので早く寝た", answers: ["I was tired, so I went to bed early."], hint: "寝る ＝ go to bed → went to bed" },
         { ja: "雨だったので家にいた", answers: ["It was raining, so I stayed home."], hint: "雨が降っていた ＝ It was raining" },
@@ -78,7 +84,8 @@ export const WEEK2 = {
       en: "Have you tried any local food yet?",
       ja: "ご当地グルメはもう食べてみた？",
       chunk: "Have you ＋ 過去分詞 ＋ yet?",
-      note: "『もう〜した？』yet は質問の最後に置く. try は食べ物だと『（初めて）食べてみる』",
+      note: "『もう〜した？』\nyet は質問の最後に置く.\ntry は食べ物だと『（初めて）食べてみる』",
+      example: { en: "Have you seen the sunset yet?", ja: "もう夕日見た？" },
       drills: [
         { ja: "もうお昼食べた？", answers: ["Have you had lunch yet?"], hint: "have の過去分詞は had" },
         { ja: "もうビーチには行った？", answers: ["Have you been to the beach yet?"], hint: "行った ＝ been to" },
@@ -89,8 +96,9 @@ export const WEEK2 = {
       id: "57", day: 2, scene: "場面17：食べ物",
       en: "Yes! I had poke yesterday.",
       ja: "うん！昨日ポケを食べたよ",
-      chunk: "have / had ＋ 食べ物・飲み物",
-      note: "have は「持つ」だけでなく『食べる・飲む』の意味でよく使う. 会話では eat より自然に聞こえることが多い. had は過去形.",
+      chunk: "have ＋ 食べ物・飲み物\nhad ＋ 食べ物・飲み物（過去）",
+      note: "have は「持つ」だけでなく『食べる・飲む』の意味でよく使う.\n会話では eat より自然に聞こえることが多い.\nhad は過去形.",
+      example: { en: "Let's have lunch together.", ja: "一緒にお昼食べよう" },
       drills: [
         { ja: "朝ごはんにパンケーキを食べた", answers: ["I had pancakes for breakfast."], hint: "朝ごはんに ＝ for breakfast" },
         { ja: "今朝コーヒーを飲んだ", answers: ["I had coffee this morning."] },
@@ -102,6 +110,7 @@ export const WEEK2 = {
       ja: "おいしかった？",
       chunk: "Was it ＋ 形容詞?",
       note: "『〜だった？』と過去の感想を聞く形.",
+      example: { en: "Was it fun?", ja: "楽しかった？" },
       drills: [
         { ja: "高かった？", answers: ["Was it expensive?"] },
         { ja: "混んでた？", answers: ["Was it crowded?"], hint: "混んでいる ＝ crowded" },
@@ -111,8 +120,9 @@ export const WEEK2 = {
       id: "59", day: 2, scene: "場面17：食べ物",
       en: "It was so good! I want to go back.",
       ja: "すごくおいしかった！また行きたい",
-      chunk: "go back (to ＋ 場所)",
-      note: "『（〜に）また行く、戻る』気に入った場所やお店について言うときに使う.",
+      chunk: "go back\ngo back to ＋ 場所",
+      note: "『また行く、戻る』\n気に入った場所やお店について言うときに使う.",
+      example: { en: "Let's go back to the hotel.", ja: "ホテルに戻ろう" },
       drills: [
         { ja: "来年またハワイに行きたい", answers: ["I want to go back to Hawaii next year."], hint: "I want to go back to 〜" },
         { ja: "いつ日本に帰るの？", answers: ["When are you going back to Japan?"], hint: "When are you going back to 〜?" },
@@ -123,7 +133,8 @@ export const WEEK2 = {
       en: "Do you know any good restaurants around here?",
       ja: "この辺でいいレストラン知ってる？",
       chunk: "Do you know any good ＋ 名詞（複数）?",
-      note: "『何かいい〜知ってる？』と情報を聞く形. 地元の人におすすめを聞くときにぴったり.",
+      note: "『何かいい〜知ってる？』と情報を聞く形.\n地元の人におすすめを聞くときにぴったり.",
+      example: { en: "Do you know any good beaches?", ja: "いいビーチ知ってる？" },
       drills: [
         { ja: "いいカフェ知ってる？", answers: ["Do you know any good cafés?"] },
         { ja: "買い物にいい場所知ってる？", answers: ["Do you know any good places for shopping?"], hint: "買い物に ＝ for shopping" },
@@ -134,7 +145,8 @@ export const WEEK2 = {
       en: "You should try the Thai place down the street.",
       ja: "この先のタイ料理のお店、行ってみて",
       chunk: "You should ＋ 動詞",
-      note: "『〜したほうがいいよ、ぜひ〜してみて』とおすすめする形. 命令ではなく、親切な提案. down the street は『この通りの先』",
+      note: "『〜したほうがいいよ、ぜひ〜してみて』とおすすめする形.\n命令ではなく、親切な提案.\ndown the street は『この通りの先』",
+      example: { en: "You should visit Kyoto in the fall.", ja: "秋の京都はぜひ行ってみて" },
       drills: [
         { ja: "ノースショアに行くといいよ", answers: ["You should go to the North Shore."] },
         { ja: "シェイブアイスはぜひ食べてみて！", answers: ["You should try shave ice!"], hint: "食べてみる ＝ try" },
@@ -145,7 +157,8 @@ export const WEEK2 = {
       en: "Thanks for the tip!",
       ja: "教えてくれてありがとう！",
       chunk: "Thanks for ＋ 名詞",
-      note: "『〜をありがとう』for のうしろに、何に感謝しているかを入れる. tip は『ちょっとしたアドバイス、情報』",
+      note: "『〜をありがとう』\nfor のうしろに、何に感謝しているかを入れる.\ntip は『ちょっとしたアドバイス、情報』",
+      example: { en: "Thanks for the coffee!", ja: "コーヒーありがとう！" },
       drills: [
         { ja: "手伝ってくれてありがとう！", answers: ["Thanks for your help!"], hint: "手伝い ＝ help" },
         { ja: "おすすめしてくれてありがとう！", answers: ["Thanks for the recommendation!"], hint: "おすすめ ＝ recommendation" },
@@ -156,7 +169,8 @@ export const WEEK2 = {
       en: "How often do you work out?",
       ja: "どれくらい運動してる？",
       chunk: "work out",
-      note: "『運動する、トレーニングする』ジムでの運動によく使う. How often と組み合わせて習慣を聞ける.",
+      note: "『運動する、トレーニングする』\nジムでの運動によく使う.\nHow often と組み合わせて習慣を聞ける.",
+      example: { en: "Do you work out?", ja: "運動してる？" },
       drills: [
         { ja: "週に3回運動しています", answers: ["I work out three times a week."] },
         { ja: "仕事のあとジムで運動しています", answers: ["I work out at the gym after work."], hint: "仕事のあと ＝ after work" },
@@ -168,7 +182,8 @@ export const WEEK2 = {
       en: "I try to walk every morning.",
       ja: "毎朝歩くようにしています",
       chunk: "I try to ＋ 動詞",
-      note: "『〜するようにしている、〜しようと努力している』健康や習慣の話でよく使う.",
+      note: "『〜するようにしている、〜しようと努力している』\n健康や習慣の話でよく使う.",
+      example: { en: "I try to drink a lot of water.", ja: "水をたくさん飲むようにしている" },
       drills: [
         { ja: "体にいいものを食べるようにしている", answers: ["I try to eat healthy."], hint: "体にいいものを食べる ＝ eat healthy" },
         { ja: "早く寝るようにしている", answers: ["I try to go to bed early."] },
@@ -179,7 +194,8 @@ export const WEEK2 = {
       en: "Good for you! I hardly ever exercise.",
       ja: "えらいね！私はほとんど運動しないよ",
       chunk: "I hardly ever ＋ 動詞",
-      note: "『ほとんど〜しない』never（一度もない）の一歩手前. 動詞の前に置く. 最初の Good for you! は『えらいね、よかったね』",
+      note: "『ほとんど〜しない』\nnever（一度もない）の一歩手前.\n動詞の前に置く.\n最初の Good for you! は『えらいね、よかったね』",
+      example: { en: "I hardly ever cook.", ja: "料理はほとんどしない" },
       drills: [
         { ja: "テレビはほとんど見ない", answers: ["I hardly ever watch TV."] },
         { ja: "朝ごはんはほとんど食べない", answers: ["I hardly ever eat breakfast."] },
@@ -190,7 +206,8 @@ export const WEEK2 = {
       en: "What time do you usually get up?",
       ja: "ふだん何時に起きる？",
       chunk: "What time do you usually ＋ 動詞?",
-      note: "『ふだん何時に〜する？』と生活のリズムを聞く形. usually（ふだん、たいてい）は動詞の前に置く.",
+      note: "『ふだん何時に〜する？』と生活のリズムを聞く形.\nusually（ふだん、たいてい）は動詞の前に置く.",
+      example: { en: "What time do you usually leave work?", ja: "ふだん何時に仕事を出る？" },
       drills: [
         { ja: "ふだん何時に寝る？", answers: ["What time do you usually go to bed?"], hint: "寝る ＝ go to bed" },
         { ja: "ふだん何時に夕食を食べる？", answers: ["What time do you usually eat dinner?"] },
@@ -200,8 +217,9 @@ export const WEEK2 = {
       id: "67", day: 3, scene: "場面20：毎日の生活",
       en: "Around six. I'm a morning person.",
       ja: "6時ごろ. 朝型なんです",
-      chunk: "I'm a morning person / a night owl",
-      note: "a morning person は『朝型の人』、a night owl（夜のフクロウ）は『夜型の人』Around six の around は『〜ごろ』",
+      chunk: "I'm a morning person\nI'm a night owl",
+      note: "a morning person は『朝型の人』\na night owl（夜のフクロウ）は『夜型の人』\nAround six の around は『〜ごろ』",
+      example: { en: "Are you a morning person?", ja: "朝型？" },
       drills: [
         { ja: "朝はまったく苦手です", answers: ["I'm not a morning person at all."], hint: "まったく〜ない ＝ not 〜 at all" },
         { ja: "兄は夜型です", answers: ["My brother is a night owl."] },
@@ -212,7 +230,8 @@ export const WEEK2 = {
       en: "I could never get up that early!",
       ja: "私はそんなに早く起きられない！",
       chunk: "I could never ＋ 動詞",
-      note: "『私には絶対〜できない』相手のすごさに驚きながら、自分のことを言う形.",
+      note: "『私には絶対〜できない』\n相手のすごさに驚きながら、自分のことを言う形.",
+      example: { en: "I could never run a marathon!", ja: "私にはマラソンなんて絶対無理！" },
       drills: [
         { ja: "私には大都会に住むのは無理", answers: ["I could never live in a big city."] },
         { ja: "そんなにたくさん食べられない！", answers: ["I could never eat that much!"], hint: "そんなにたくさん ＝ that much" },
@@ -223,7 +242,8 @@ export const WEEK2 = {
       en: "It's so hot today!",
       ja: "今日はすごく暑いね！",
       chunk: "so ＋ 形容詞",
-      note: "『すごく〜』very より気持ちがこもった言い方で、会話でよく使う.",
+      note: "『すごく〜』\nvery より気持ちがこもった言い方で、会話でよく使う.",
+      example: { en: "I'm so tired today.", ja: "今日はすごく疲れた" },
       drills: [
         { ja: "今日はすごく寒い！", answers: ["It's so cold today!"] },
         { ja: "これすごくおいしい！", answers: ["This is so good!"], hint: "おいしい ＝ good" },
@@ -234,7 +254,8 @@ export const WEEK2 = {
       en: "I know! Is it this hot in Japan?",
       ja: "だよね！日本もこんなに暑いの？",
       chunk: "this ＋ 形容詞",
-      note: "『こんなに〜』目の前の状態とくらべて言う形. 最初の I know! は『だよね！』という同意.",
+      note: "『こんなに〜』\n目の前の状態とくらべて言う形.\n最初の I know! は『だよね！』という同意.",
+      example: { en: "I've never seen the ocean this blue.", ja: "こんなに青い海は初めて見た" },
       drills: [
         { ja: "いつもこんなに混んでるの？", answers: ["Is it always this crowded?"], hint: "Is it always 〜?" },
         { ja: "こんなに大きいなんて知らなかった！", answers: ["I didn't know it was this big!"], hint: "I didn't know it was 〜" },
@@ -245,8 +266,9 @@ export const WEEK2 = {
       id: "71", day: 4, scene: "場面21：天気",
       en: "In summer, yes. But it's more humid.",
       ja: "夏はね. でももっと蒸し暑いよ",
-      chunk: "形容詞er / more ＋ 形容詞 ＋ than ＋ 名詞",
-      note: "『もっと〜』短い形容詞は -er（hotter）、長い形容詞は more（more humid）をつける. くらべる相手は than のうしろに置く.",
+      chunk: "形容詞er ＋ than ＋ 名詞\nmore ＋ 形容詞 ＋ than ＋ 名詞",
+      note: "『〜より…』『もっと〜』\n短い形容詞は -er、長い形容詞は more をつける.\nhotter（もっと暑い）\nmore humid（もっと蒸し暑い）\nくらべる相手は than のうしろに置く.",
+      example: { en: "This café is cheaper than that one.", ja: "このカフェはあっちより安い" },
       drills: [
         { ja: "東京は大阪より大きい", answers: ["Tokyo is bigger than Osaka."], hint: "big → bigger（g を重ねる）" },
         { ja: "ハワイは東京よりのんびりできる", answers: ["Hawaii is more relaxing than Tokyo."], hint: "のんびりできる ＝ relaxing" },
@@ -256,8 +278,9 @@ export const WEEK2 = {
       id: "72", day: 4, scene: "場面22：映画・ドラマ",
       en: "Have you seen any good movies lately?",
       ja: "最近何かいい映画見た？",
-      chunk: "文 ＋ lately",
-      note: "『最近』I've ＋ 過去分詞 や Have you ＋ 過去分詞? の文と一緒によく使う.",
+      chunk: "lately",
+      note: "『最近』\n文の最後に置く.\nI've ＋ 過去分詞 や Have you ＋ 過去分詞? の文と一緒によく使う.",
+      example: { en: "Have you been to any good restaurants lately?", ja: "最近いいレストランに行った？" },
       drills: [
         { ja: "最近忙しい", answers: ["I've been busy lately."], hint: "I've been 〜" },
         { ja: "最近何かいい本読んだ？", answers: ["Have you read any good books lately?"], hint: "read の過去分詞は read（発音は「レッド」）" },
@@ -268,7 +291,8 @@ export const WEEK2 = {
       en: "I watched a really good one on Netflix.",
       ja: "Netflix ですごくいいのを見たよ",
       chunk: "a ＋ 形容詞 ＋ one",
-      note: "one は、前に出た名詞（ここでは movie）のくり返しを避けるために使う. a good one ＝ a good movie.",
+      note: "one は、前に出た名詞のくり返しを避けるために使う.\na good one ＝ a good movie（ここでは movie の代わり）",
+      example: { en: "I like the red one.", ja: "赤いのがいい" },
       drills: [
         { ja: "かばんが古いから、新しいのが必要", answers: ["My bag is old. I need a new one."] },
         { ja: "どれがいい？", answers: ["Which one do you want?"], hint: "どれ ＝ which one" },
@@ -279,7 +303,8 @@ export const WEEK2 = {
       en: "What's it about?",
       ja: "どんな話？",
       chunk: "What's ＋ 名詞 ＋ about?",
-      note: "『〜は何についての話？』と、映画、本、ドラマのあらすじを聞く形.",
+      note: "『〜は何についての話？』\n映画、本、ドラマのあらすじを聞く形.",
+      example: { en: "What's the movie about?", ja: "その映画はどんな話？" },
       drills: [
         { ja: "その本はどんな話？", answers: ["What's the book about?"] },
         { ja: "そのドラマはどんな話？", answers: ["What's the show about?"], hint: "ドラマ ＝ show" },
@@ -290,7 +315,8 @@ export const WEEK2 = {
       en: "What kind of music are you into?",
       ja: "どんな音楽が好き？",
       chunk: "be into ＋ 名詞",
-      note: "『〜にハマっている、〜が大好き』のカジュアルな言い方. 今夢中になっているものを言うときにぴったり.",
+      note: "『〜にハマっている、〜が大好き』のカジュアルな言い方.\n今夢中になっているものを言うときにぴったり.",
+      example: { en: "My son is into soccer.", ja: "息子はサッカーにハマっている" },
       drills: [
         { ja: "最近ヨガにハマってる", answers: ["I'm into yoga these days."], hint: "最近 ＝ these days" },
         { ja: "スポーツは好き？", answers: ["Are you into sports?"] },
@@ -300,8 +326,9 @@ export const WEEK2 = {
       id: "76", day: 4, scene: "場面23：音楽",
       en: "I'm really into K-pop right now.",
       ja: "今 K-POP にすごくハマってる",
-      chunk: "文 ＋ right now",
-      note: "『今』この瞬間だけでなく、「ここ最近」の意味でも使う.",
+      chunk: "right now",
+      note: "『今』\nこの瞬間だけでなく、「ここ最近」の意味でも使う.",
+      example: { en: "I'm reading a good book right now.", ja: "今いい本を読んでいるところ" },
       drills: [
         { ja: "今すごく忙しい", answers: ["I'm really busy right now."] },
         { ja: "今、料理を習っているところ", answers: ["I'm learning to cook right now."], hint: "料理を習う ＝ learn to cook" },
@@ -311,8 +338,9 @@ export const WEEK2 = {
       id: "77", day: 4, scene: "場面23：音楽",
       en: "Me too! Who's your favorite group?",
       ja: "私も！好きなグループは？",
-      chunk: "Me too / Me neither",
-      note: "『私も』相手が「〜だ・〜する」と言ったら Me too、「〜じゃない・〜しない」と言ったら Me neither（私も〜ない）を使う.",
+      chunk: "Me too\nMe neither",
+      note: "『私も』\n相手が「〜だ・〜する」と言ったら Me too.\n「〜じゃない・〜しない」と言ったら Me neither（私も〜ない）を使う.",
+      example: { en: "I don't like cold weather. — Me neither.", ja: "寒いのは苦手. — 私も" },
       drills: [],
     },
     // ---------- Day 5 ----------
@@ -321,7 +349,8 @@ export const WEEK2 = {
       en: "Your English is really good!",
       ja: "英語すごく上手だね！",
       chunk: "Your ＋ 名詞 ＋ is really ＋ 形容詞!",
-      note: "『あなたの〜、すごく〜だね！』と気軽にほめる形. ネイティブとの会話でよく言われるので、聞き取れるようにしておく.",
+      note: "『あなたの〜、すごく〜だね！』と気軽にほめる形.\nネイティブとの会話でよく言われるので、聞き取れるようにしておく.",
+      example: { en: "Your dog is really cute!", ja: "ワンちゃん、すごくかわいい！" },
       drills: [
         { ja: "日本語すごく上手だね！", answers: ["Your Japanese is really good!"] },
         { ja: "そのかばん、すごくかわいい！", answers: ["Your bag is really cute!"] },
@@ -332,7 +361,8 @@ export const WEEK2 = {
       en: "Thank you! I'm still learning.",
       ja: "ありがとう！まだ勉強中です",
       chunk: "I'm still ＋ 動詞ing",
-      note: "『まだ〜しているところ』ほめられたら No, no と否定せず、まず Thank you! と受け取るのが英語の自然な返し方.",
+      note: "『まだ〜しているところ』\nほめられたら No, no と否定せず、まず Thank you! と受け取るのが英語の自然な返し方.",
+      example: { en: "I'm still looking for a job.", ja: "まだ仕事を探しているところ" },
       drills: [
         { ja: "まだ考え中", answers: ["I'm still thinking about it."], hint: "考える ＝ think about" },
         { ja: "まだやっているところ", answers: ["I'm still working on it."], hint: "（何かを）やっている ＝ work on" },
@@ -343,7 +373,8 @@ export const WEEK2 = {
       en: "When did you start learning?",
       ja: "いつ勉強を始めたの？",
       chunk: "start ＋ 動詞ing",
-      note: "『〜し始める』start to ＋ 動詞 でも同じ意味. 過去のことなので When did you …? で聞く.",
+      note: "『〜し始める』\nstart to ＋ 動詞 でも同じ意味.\n過去のことなので When did you …? で聞く.",
+      example: { en: "It started raining.", ja: "雨が降り始めた" },
       drills: [
         { ja: "そこではいつ働き始めたの？", answers: ["When did you start working there?"], hint: "When did you start 〜ing?" },
         { ja: "去年テニスを始めました", answers: ["I started playing tennis last year."], hint: "テニスをする ＝ play tennis" },
@@ -354,7 +385,8 @@ export const WEEK2 = {
       en: "About three months ago.",
       ja: "3か月くらい前です",
       chunk: "期間 ＋ ago",
-      note: "『〜前に』過去形の文で使う. About は『だいたい』",
+      note: "『〜前に』\n過去形の文で使う.\nAbout は『だいたい』",
+      example: { en: "I came to Hawaii three days ago.", ja: "3日前にハワイに来ました" },
       drills: [
         { ja: "2年前にここに引っ越しました", answers: ["I moved here two years ago."], hint: "引っ越す ＝ move" },
         { ja: "ずっと前に出会いました", answers: ["We met a long time ago."], hint: "ずっと前 ＝ a long time ago" },
@@ -365,7 +397,8 @@ export const WEEK2 = {
       en: "Do you speak any other languages?",
       ja: "ほかに話せる言語はある？",
       chunk: "any other ＋ 名詞（複数）",
-      note: "『ほかに何か〜』質問で使う. うしろの名詞は複数形.",
+      note: "『ほかに何か〜』\n質問で使う.\nうしろの名詞は複数形.",
+      example: { en: "Do you have any other plans?", ja: "ほかに予定はある？" },
       drills: [
         { ja: "ほかに質問はある？", answers: ["Do you have any other questions?"] },
         { ja: "ほかにいいビーチある？", answers: ["Are there any other good beaches?"], hint: "Are there any 〜?" },
@@ -376,7 +409,8 @@ export const WEEK2 = {
       en: "I speak a little Spanish.",
       ja: "スペイン語を少し話せるよ",
       chunk: "a little ＋ 名詞",
-      note: "『少し〜』言語なら I speak a little ＋ 言語 で「少し話せる」と控えめに言える.",
+      note: "『少し〜』\n言語なら I speak a little ＋ 言語 で「少し話せる」と控えめに言える.",
+      example: { en: "I speak a little Korean.", ja: "韓国語を少し話せます" },
       drills: [
         { ja: "英語を少し話せます", answers: ["I speak a little English."] },
         { ja: "ワインについて少し知っています", answers: ["I know a little about wine."], hint: "〜について ＝ about" },
@@ -387,7 +421,8 @@ export const WEEK2 = {
       en: "How do you say \"thank you\" in Spanish?",
       ja: "スペイン語で「ありがとう」は何て言うの？",
       chunk: "How do you say ＋ 言葉 ＋ in ＋ 言語?",
-      note: "『〜は〜語で何て言うの？』相手の言語に興味を示すと会話が盛り上がる. 英語での言い方がわからないときにも使える.",
+      note: "『〜は〜語で何て言うの？』\n相手の言語に興味を示すと会話が盛り上がる.\n英語での言い方がわからないときにも使える.",
+      example: { en: "How do you say \"おいしい\" in English?", ja: "「おいしい」は英語で何て言うの？" },
       drills: [
         { ja: "ハワイ語で「こんにちは」は何て言うの？", answers: ["How do you say \"hello\" in Hawaiian?"], hint: "ハワイ語 ＝ Hawaiian" },
         { ja: "この言葉は英語で何て言うの？", answers: ["How do you say this word in English?"] },
@@ -399,7 +434,8 @@ export const WEEK2 = {
       en: "How do you get to work?",
       ja: "仕事にはどうやって行ってるの？",
       chunk: "How do you get to ＋ 場所?",
-      note: "『〜にはどうやって行くの？』と、行き方や交通手段を聞く形. get to は『〜に着く、行く』work の前に the はつけない.",
+      note: "『〜にはどうやって行くの？』と、行き方や交通手段を聞く形.\nget to は『〜に着く、行く』\nwork の前に the はつけない.",
+      example: { en: "How do you get to school?", ja: "学校にはどうやって行ってるの？" },
       drills: [
         { ja: "空港へはどうやって行くの？", answers: ["How do you get to the airport?"] },
         { ja: "ビーチへはどう行けばいい？", answers: ["How do I get to the beach?"], hint: "自分が行くときは How do I 〜?" },
@@ -410,7 +446,8 @@ export const WEEK2 = {
       en: "I take the train.",
       ja: "電車で行きます",
       chunk: "take ＋ 乗り物",
-      note: "『〜に乗って行く』by train（電車で）という言い方もある.",
+      note: "『〜に乗って行く』\nby train（電車で）という言い方もある.",
+      example: { en: "I usually take the subway.", ja: "ふだん地下鉄に乗ります" },
       drills: [
         { ja: "バスで通勤しています", answers: ["I take the bus to work."], hint: "〜で通勤する ＝ take 〜 to work" },
         { ja: "タクシーに乗ろう", answers: ["Let's take a taxi."] },
@@ -421,7 +458,8 @@ export const WEEK2 = {
       en: "How long does it take?",
       ja: "どれくらいかかるの？",
       chunk: "How long does it take to ＋ 動詞?",
-      note: "『（〜するのに）どれくらい時間がかかる？』答えは It takes ＋ 時間. How often（頻度）とのちがいに注意.",
+      note: "『（〜するのに）どれくらい時間がかかる？』\n答えは It takes ＋ 時間.\nHow often（頻度）とのちがいに注意.",
+      example: { en: "How long does it take to walk there?", ja: "そこまで歩いてどれくらい？" },
       drills: [
         { ja: "そこに行くのにどれくらいかかる？", answers: ["How long does it take to get there?"], hint: "そこに行く ＝ get there" },
         { ja: "30分くらいかかります", answers: ["It takes about 30 minutes."], hint: "It takes 〜" },
@@ -432,7 +470,8 @@ export const WEEK2 = {
       en: "I love your bag!",
       ja: "そのかばん、すてき！",
       chunk: "I love your ＋ 名詞!",
-      note: "『その〜、すてき！』知らない人にも気軽に言えるほめ言葉で、そこから会話が始まることも多い.",
+      note: "『その〜、すてき！』\n知らない人にも気軽に言えるほめ言葉で、そこから会話が始まることも多い.",
+      example: { en: "I love your dress!", ja: "そのワンピースすてき！" },
       drills: [
         { ja: "そのシャツすてき！", answers: ["I love your shirt!"] },
         { ja: "その髪型いいね！", answers: ["I love your hair!"], hint: "髪型 ＝ hair" },
@@ -442,8 +481,9 @@ export const WEEK2 = {
       id: "89", day: 6, scene: "場面27：ほめる",
       en: "Thanks! I got it in Japan.",
       ja: "ありがとう！日本で買ったの",
-      chunk: "get / got ＋ 物",
-      note: "get は『買う』『もらう』の意味でよく使い、buy より会話的. got は過去形.",
+      chunk: "get ＋ 物\ngot ＋ 物（過去）",
+      note: "get は『買う』『もらう』の意味でよく使い、buy より会話的.\ngot は過去形.",
+      example: { en: "I got this for my birthday.", ja: "これは誕生日にもらったの" },
       drills: [
         { ja: "それどこで買ったの？", answers: ["Where did you get that?"], hint: "Where did you 〜?" },
         { ja: "これはマーケットで買いました", answers: ["I got this at a market."] },
@@ -454,7 +494,8 @@ export const WEEK2 = {
       en: "No way! That's where I'm from!",
       ja: "うそ！私の出身地だよ！",
       chunk: "That's where ＋ 主語 ＋ 動詞",
-      note: "『そこが〜するところ』No way! は「いやだ」ではなく『うそでしょ！』という驚き.",
+      note: "『そこが〜するところ』\nNo way! は「いやだ」ではなく『うそでしょ！』という驚き.",
+      example: { en: "That's where I grew up!", ja: "そこ、私が育ったところ！" },
       drills: [
         { ja: "そこ、私の職場だよ！", answers: ["That's where I work!"], hint: "職場 → 私が働いているところ" },
         { ja: "そこで私たち出会ったんだよ！", answers: ["That's where we met!"], hint: "出会う ＝ meet → met" },
@@ -465,7 +506,8 @@ export const WEEK2 = {
       en: "Sorry, I didn't catch that.",
       ja: "ごめんなさい、聞き取れませんでした",
       chunk: "I didn't catch ＋ 名詞",
-      note: "catch には「つかまえる」のほかに『（言葉を）聞き取る』という意味がある. 聞き返すときの自然な言い方.",
+      note: "catch には「つかまえる」のほかに『（言葉を）聞き取る』という意味がある.\n聞き返すときの自然な言い方.",
+      example: { en: "Sorry, I didn't catch the last part.", ja: "すみません、最後のところが聞き取れませんでした" },
       drills: [
         { ja: "お名前が聞き取れませんでした", answers: ["I didn't catch your name."] },
         { ja: "今の聞き取れた？", answers: ["Did you catch that?"], hint: "Did you 〜?" },
@@ -476,7 +518,8 @@ export const WEEK2 = {
       en: "Could you speak a little more slowly?",
       ja: "もう少しゆっくり話してもらえますか？",
       chunk: "Could you ＋ 動詞?",
-      note: "『〜してもらえますか？』とていねいにお願いする形. Can you ＋ 動詞? よりやわらかい.",
+      note: "『〜してもらえますか？』とていねいにお願いする形.\nCan you ＋ 動詞? よりやわらかい.",
+      example: { en: "Could you speak a little louder?", ja: "もう少し大きな声で話してもらえますか？" },
       drills: [
         { ja: "私たちの写真を撮ってもらえますか？", answers: ["Could you take a picture of us?"], hint: "〜の写真を撮る ＝ take a picture of 〜" },
         { ja: "もう一度言ってもらえますか？", answers: ["Could you say that again?"] },
@@ -488,7 +531,8 @@ export const WEEK2 = {
       en: "What does \"pau hana\" mean?",
       ja: "「パウハナ」ってどういう意味？",
       chunk: "What does ＋ 言葉 ＋ mean?",
-      note: "『〜ってどういう意味？』知らない言葉が出たら、そのまま聞けば会話が止まらない. 答えは It means ＋ 意味. pau hana はハワイ語で『仕事終わり』",
+      note: "『〜ってどういう意味？』\n知らない言葉が出たら、そのまま聞けば会話が止まらない.\n答えは It means ＋ 意味.\npau hana はハワイ語で『仕事終わり』",
+      example: { en: "What does \"aloha\" mean?", ja: "「アロハ」ってどういう意味？" },
       drills: [
         { ja: "「マハロ」ってどういう意味？", answers: ["What does \"mahalo\" mean?"] },
         { ja: "この言葉はどういう意味？", answers: ["What does this word mean?"] },
@@ -499,7 +543,8 @@ export const WEEK2 = {
       en: "Well, I should get going.",
       ja: "じゃあ、そろそろ行かなきゃ",
       chunk: "I should ＋ 動詞",
-      note: "『そろそろ〜しないと』会話を自然に終えるときの定番. 最初の Well, は「さて、じゃあ」と話を区切る合図. get going は『出発する』",
+      note: "『そろそろ〜しないと』\n会話を自然に終えるときの定番.\n最初の Well, は「さて、じゃあ」と話を区切る合図.\nget going は『出発する』",
+      example: { en: "I should call my mom.", ja: "そろそろ母に電話しないと" },
       drills: [
         { ja: "そろそろホテルに戻らないと", answers: ["I should get back to my hotel."], hint: "戻る ＝ get back" },
         { ja: "今夜は早く寝ないと", answers: ["I should go to bed early tonight."] },
@@ -511,6 +556,7 @@ export const WEEK2 = {
       ja: "話せて本当に楽しかったです",
       chunk: "It was nice ＋ 動詞ing",
       note: "『〜できてよかった』と別れぎわに言う形.",
+      example: { en: "It was nice chatting with you.", ja: "おしゃべりできて楽しかった" },
       drills: [
         { ja: "（初対面の人と別れるときに）お会いできてよかったです", answers: ["It was nice meeting you."] },
         { ja: "また会えてよかった", answers: ["It was nice seeing you again."], hint: "2回目以降の「会う」は see" },
@@ -521,7 +567,8 @@ export const WEEK2 = {
       en: "You too! Can I get your Instagram?",
       ja: "こちらこそ！インスタ教えてもらえる？",
       chunk: "Can I get ＋ 名詞?",
-      note: "『〜をもらえる？』連絡先を聞くときにも、お店で注文するときにも使える.",
+      note: "『〜をもらえる？』\n連絡先を聞くときにも、お店で注文するときにも使える.",
+      example: { en: "Can I get the check, please?", ja: "お会計お願いします" },
       drills: [
         { ja: "電話番号教えてもらえる？", answers: ["Can I get your number?"], hint: "電話番号 ＝ number" },
         { ja: "（お店で）コーヒーをください", answers: ["Can I get a coffee, please?"] },
@@ -532,7 +579,8 @@ export const WEEK2 = {
       en: "Sure! Let's keep in touch.",
       ja: "もちろん！連絡取り合おうね",
       chunk: "Let's ＋ 動詞",
-      note: "『〜しよう』と誘う形. keep in touch は『連絡を取り合う』",
+      note: "『〜しよう』と誘う形.\nkeep in touch は『連絡を取り合う』",
+      example: { en: "Let's meet again next week!", ja: "来週また会おう！" },
       drills: [
         { ja: "今度コーヒーでも行こう！", answers: ["Let's get coffee sometime!"], hint: "コーヒーに行く ＝ get coffee ／ 今度 ＝ sometime" },
         { ja: "写真撮ろう！", answers: ["Let's take a picture!"] },
@@ -543,7 +591,8 @@ export const WEEK2 = {
       en: "Enjoy the rest of your trip!",
       ja: "残りの旅行も楽しんでね！",
       chunk: "Enjoy ＋ 名詞!",
-      note: "『〜を楽しんで！』と、別れぎわに相手を送り出す言葉. the rest of ＋ 名詞 は『残りの〜』",
+      note: "『〜を楽しんで！』と、別れぎわに相手を送り出す言葉.\nthe rest of ＋ 名詞 は『残りの〜』",
+      example: { en: "Enjoy your meal!", ja: "食事を楽しんでね！" },
       drills: [
         { ja: "滞在を楽しんで！", answers: ["Enjoy your stay!"], hint: "滞在 ＝ stay" },
         { ja: "このあとも楽しい一日を！", answers: ["Enjoy the rest of your day!"], hint: "the rest of 〜" },
@@ -554,7 +603,8 @@ export const WEEK2 = {
       en: "Thanks! Have a great day!",
       ja: "ありがとう！よい一日を！",
       chunk: "Have a great ＋ 名詞!",
-      note: "『よい〜を！』という別れのあいさつ. 言われたら You too! と返す.",
+      note: "『よい〜を！』という別れのあいさつ.\n言われたら You too! と返す.",
+      example: { en: "Have a great weekend!", ja: "よい週末を！" },
       drills: [],
     },
     {
@@ -562,7 +612,8 @@ export const WEEK2 = {
       en: "Take care!",
       ja: "元気でね！",
       chunk: "Take care!（決まり文句）",
-      note: "『元気でね、気をつけてね』しばらく会わない相手への温かい別れのあいさつ. このまま覚える.",
+      note: "『元気でね、気をつけてね』\nしばらく会わない相手への温かい別れのあいさつ.\nこのまま覚える.",
+      example: { en: "See you next year. Take care!", ja: "また来年ね. 元気でね！" },
       drills: [],
     },
   ],

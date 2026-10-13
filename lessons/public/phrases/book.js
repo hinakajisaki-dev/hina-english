@@ -10,8 +10,10 @@
 //   en      the phrase as shown and read aloud
 //   say     what 🔊 reads instead, when en has a slot (optional; "~" is left out anyway)
 //   ja      和訳
-//   chunk   塊: the form to learn ("How's ＋ 名詞 ＋ going?", optional)
+//   chunk   塊: the form to learn ("How is 名詞?", optional; \n starts a
+//           new line, one form per line)
 //   note    解説: how the chunk works (optional; \n starts a new line)
+//   example 例文: one more sentence with the chunk, { en, ja } (optional)
 //   drills  瞬間英作文 with the chunk, up to two (none is fine):
 //           { ja, answers: ["How's work going?", …], hint }; the first answer
 //           is the one shown and read aloud, the others are also right, and
@@ -47,6 +49,7 @@ export function weekPhrases(week) {
     ja: p.ja,
     chunk: p.chunk || "",
     note: p.note || "",
+    example: p.example || null,
     drills: (p.drills || []).map((drill, n) => ({ ja: drill.ja, answers: drill.answers, hint: drill.hint || "", n })),
   }));
 }
