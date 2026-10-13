@@ -133,6 +133,10 @@
 .mistakes s { color: var(--bad); }
 .mistakes b { color: var(--good); }
 .mistakes .where { display: inline-block; }
+.mistakes .why { display: block; margin-top: 2px; color: var(--muted); font-size: 14px; line-height: 1.6; }
+.mtag.ok { background: var(--good-soft); color: var(--good); }
+.ai-note { display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: 12px; }
+.ai-note .spinner { width: 12px; height: 12px; border-width: 2px; }
 .mtag { flex: none; font-size: 12px; font-weight: 900; padding: 1px 8px; border-radius: 99px; background: var(--bad-soft); color: var(--bad); }
 .mtag.spelling { background: var(--cream); color: var(--ink); }
 

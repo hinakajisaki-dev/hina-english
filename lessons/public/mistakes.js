@@ -6,9 +6,36 @@
 //   extra     a word that isn't needed
 //   missing   a word that is left out
 //   order     the right words in the wrong order
-import { normalizeWords } from "./common.js";
+//
+// Shared by the student app and the server (which asks the AI to explain
+// the same mistakes), so nothing here touches the page.
 
 // ---------- words ----------
+
+const CONTRACTIONS = {
+  "i'm": "i am", "you're": "you are", "we're": "we are", "they're": "they are", "he's": "he is",
+  "she's": "she is", "it's": "it is", "that's": "that is", "there's": "there is", "what's": "what is",
+  "i've": "i have", "you've": "you have", "we've": "we have", "they've": "they have",
+  "i'll": "i will", "you'll": "you will", "we'll": "we will", "they'll": "they will",
+  "i'd": "i would", "you'd": "you would", "don't": "do not", "doesn't": "does not", "didn't": "did not",
+  "can't": "can not", "cannot": "can not", "won't": "will not", "isn't": "is not", "aren't": "are not",
+  "wasn't": "was not", "weren't": "were not", "haven't": "have not", "hasn't": "has not",
+  "couldn't": "could not", "shouldn't": "should not", "wouldn't": "would not", "let's": "let us",
+};
+
+// Lowercase words without punctuation; contractions expanded so "I'm" matches "I am".
+// Typed answers are right when these match.
+export function normalizeWords(text) {
+  return String(text)
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "") // café → cafe
+    .replace(/[’‘]/g, "'")
+    .split(/\s+/)
+    .map((w) => w.replace(/^[^a-z0-9']+|[^a-z0-9']+$/g, ""))
+    .filter(Boolean)
+    .flatMap((w) => (CONTRACTIONS[w] || w).split(" "));
+}
 
 // Each word of a text as { raw, norm }: raw as typed (with its punctuation),
 // norm lowercased without punctuation. "I'm" becomes two words, I and am.
