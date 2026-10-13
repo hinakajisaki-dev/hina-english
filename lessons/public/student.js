@@ -1094,12 +1094,14 @@ function renderPhraseWeek(week) {
 
 // A 瞬間英作文 as a grammar write step, so it is checked and explained the same
 // way. Its hint, the 塊 and the drill's own hint, waits behind a ヒントを見る button.
+// A 塊 of several lines (one form per line) keeps its lines, lined up under 塊：.
+const chunkHint = (chunk) => `塊：${chunk.split("\n").join("\n　　")}`;
 const drillStep = (phrase, drill, { label = "瞬間英作文" } = {}) => ({
   type: "write",
   label,
   ja: drill.ja,
   answers: drill.answers,
-  hint: [phrase.chunk ? `塊：${phrase.chunk}` : `フレーズ：${phrase.en}`, drill.hint].filter(Boolean).join("\n"),
+  hint: [phrase.chunk ? chunkHint(phrase.chunk) : `フレーズ：${phrase.en}`, drill.hint].filter(Boolean).join("\n"),
   hintLater: true,
   say: drill.answers[0],
 });
@@ -1145,10 +1147,13 @@ function phraseCardHtml(phrase, revealed) {
       ${sayIcon(phrase.say)}
     </div>
     <p ${oneLine(phrase.ja)}>${esc(phrase.ja)}</p>
-    ${phrase.chunk ? `<div class="chunk-box"><p class="label">塊</p><p class="chunk">${esc(phrase.chunk)}</p></div>` : ""}
+    ${phrase.chunk ? `<div class="chunk-box"><p class="label">塊</p><p class="chunk" lang="en">${noteHtml(phrase.chunk)}</p></div>` : ""}
     ${phrase.note ? `<div class="phrase-note"><p class="label">解説</p><p>${noteHtml(phrase.note)}</p></div>` : ""}
-    ${phrase.examples.length ? `<div class="phrase-examples"><p class="label">例文</p>
-      <ul>${phrase.examples.map((ex) => `<li>${sayIcon(ex.en)}<div><p class="en" lang="en">${esc(ex.en)}</p>${ex.ja ? `<p class="ja">${esc(ex.ja)}</p>` : ""}</div></li>`).join("")}</ul>
+    ${phrase.example ? `<div class="phrase-example"><p class="label">例文</p>
+      <div class="example-row">
+        <div><p class="en" lang="en">${esc(phrase.example.en)}</p><p class="ja">${esc(phrase.example.ja)}</p></div>
+        ${sayIcon(phrase.example.en)}
+      </div>
     </div>` : ""}
     <div>${speedControl()}</div>
     ${reviewButtonHtml(phrase)}
