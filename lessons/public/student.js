@@ -6,7 +6,8 @@ import {
 } from "./common.js";
 import { UNITS, findLesson, plain, questionCount } from "./grammar/lessons.js";
 import { bookWeeks, setKey, speakable, splitOnForm, weekWords, wordSets } from "./vocab/words.js";
-import { MONTHS, monthPhrases, pronMonths } from "./pron/phrases.js";
+import { MONTHS, currentMonth, monthPhrases, pronMonths } from "./pron/phrases.js";
+import { CURRENT_WEEK } from "./course.js";
 import { TOPICS } from "./journal/topics.js";
 import {
   TEST_SIZE, phraseByKey, phraseSetKey, phraseSets, phraseWeeks, setDrills, setScenes, testSize, weekPhrases, weekTitle,
@@ -287,15 +288,16 @@ function todaysTasks() {
 }
 
 function renderHome() {
-  const weeks = [...new Set([...bookWeeks(), ...items("vocab").map((v) => v.data.week || "other")])];
-  const sets = weeks.flatMap((week) => wordSets(studentWeekWords(week)).map((s) => setKey(week, s.number)));
+  // Progress counts this week's 単語 and フレーズ (course.js) and this month's 発音.
+  const sets = wordSets(studentWeekWords(CURRENT_WEEK)).map((s) => setKey(CURRENT_WEEK, s.number));
   const tested = sets.filter((key) => state.me.vocabTests[key]).length;
   const review = reviewWords().length;
-  const phraseTests = phraseTestCount(phraseWeeks());
+  const phraseTests = phraseTestCount(phraseWeeks().includes(CURRENT_WEEK) ? [CURRENT_WEEK] : []);
   const phraseReviewCount = reviewPhrases().length;
   const lessonTotal = UNITS.reduce((n, u) => n + u.lessons.filter((l) => l.steps).length, 0);
   const lessonsDone = UNITS.reduce((n, u) => n + u.lessons.filter((l) => state.me.lessons[l.id]).length, 0);
-  const shared = pronMonths().flatMap((m) => monthPhrases(m));
+  const pronMonth = currentMonth(pronDone);
+  const shared = monthPhrases(pronMonth);
   const pronFinished = shared.filter((p) => pronDone(p.key)).length;
   const grammar = items("grammar");
   const done = wroteToday();
@@ -330,7 +332,7 @@ function renderHome() {
         </a>
         <a class="tile" href="#/vocab">
           <span class="emoji" aria-hidden="true">🃏</span><b>単語カード</b>
-          <span class="muted">${sets.length ? `テスト ${tested} / ${sets.length}` : "まだありません"}</span>
+          <span class="muted">${sets.length ? `Week ${CURRENT_WEEK} ・ テスト ${tested} / ${sets.length}` : "まだありません"}</span>
           ${sets.length ? `<div class="bar"><i style="width:${Math.round((tested / sets.length) * 100)}%"></i></div>` : ""}
         </a>
         <a class="tile" href="#/review">
@@ -339,7 +341,7 @@ function renderHome() {
         </a>
         <a class="tile" href="#/phrases">
           <span class="emoji" aria-hidden="true">💬</span><b>フレーズ</b>
-          <span class="muted">${phraseTests.total ? `テスト ${phraseTests.done} / ${phraseTests.total}` : phraseWeeks().length ? "はじめよう" : "準備中"}</span>
+          <span class="muted">${phraseTests.total ? `Week ${CURRENT_WEEK} ・ テスト ${phraseTests.done} / ${phraseTests.total}` : phraseWeeks().length ? "はじめよう" : "準備中"}</span>
           ${phraseTests.total ? `<div class="bar"><i style="width:${Math.round((phraseTests.done / phraseTests.total) * 100)}%"></i></div>` : ""}
         </a>
         <a class="tile" href="#/phrase-review">
@@ -353,7 +355,7 @@ function renderHome() {
         </a>
         <a class="tile" href="#/pron">
           <span class="emoji" aria-hidden="true">🎤</span><b>発音課題</b>
-          <span class="muted">${shared.length ? `完了 ${pronFinished} / ${shared.length}` : "まだありません"}</span>
+          <span class="muted">${shared.length ? `Month ${pronMonth} ・ 完了 ${pronFinished} / ${shared.length}` : "まだありません"}</span>
           ${shared.length ? `<div class="bar"><i style="width:${Math.round((pronFinished / shared.length) * 100)}%"></i></div>` : ""}
         </a>
         <a class="tile wide" href="#/study">
@@ -1093,14 +1095,13 @@ function renderPhraseWeek(week) {
 }
 
 // A 瞬間英作文 as a grammar write step, so it is checked and explained the same
-// way. Its hint waits behind a ヒントを見る button; in a test, where the card
-// isn't just before it, the hint also names the 塊.
-const drillStep = (phrase, drill, { withChunk = false, label = "瞬間英作文" } = {}) => ({
+// way. Its hint, the 塊 and the drill's own hint, waits behind a ヒントを見る button.
+const drillStep = (phrase, drill, { label = "瞬間英作文" } = {}) => ({
   type: "write",
   label,
   ja: drill.ja,
   answers: drill.answers,
-  hint: [withChunk ? (phrase.chunk ? `塊：${phrase.chunk}` : `フレーズ：${phrase.en}`) : "", drill.hint].filter(Boolean).join("\n"),
+  hint: [phrase.chunk ? `塊：${phrase.chunk}` : `フレーズ：${phrase.en}`, drill.hint].filter(Boolean).join("\n"),
   hintLater: true,
   say: drill.answers[0],
 });
@@ -1264,7 +1265,7 @@ function renderPhraseTest(week, number) {
   const id = phraseSetKey(week, number);
   if (state.phraseTest?.id !== id) {
     const questions = shuffle(setDrills(set)).slice(0, TEST_SIZE)
-      .map(({ phrase, drill }) => ({ phrase, drill, step: drillStep(phrase, drill, { withChunk: true, label: "テスト" }) }));
+      .map(({ phrase, drill }) => ({ phrase, drill, step: drillStep(phrase, drill, { label: "テスト" }) }));
     state.phraseTest = { id, questions, index: 0, answers: [], saved: false };
   }
   const T = state.phraseTest;
