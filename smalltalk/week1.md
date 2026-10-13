@@ -43,8 +43,9 @@
 - 塊：
   - How is 名詞?
   - How's 名詞?
-- 解説：
+- 塊の意味：
   - 『〜はどう？』と様子を聞く形.
+- 解説：
   - How's は How is の短い形.
   - How's it going? は How are you? のカジュアル版で、あいさつとして使う.
   - うしろに going をつけて How's 〜 going? と言うこともできる.
@@ -57,18 +58,20 @@
 #### 2. Pretty good, thanks. How about you?
 - 和訳：けっこういいよ、ありがとう. あなたは？
 - 塊：How about you?
-- 解説：
+- 塊の意味：
   - 自分が答えたあとに『あなたは？』と同じ質問を相手に返す形.
-  - これを言うと会話が一方通行にならず、キャッチボールが続く.
   - What about you? も同じ意味.
+- 解説：
+  - これを言うと会話が一方通行にならず、キャッチボールが続く.
 - 例文：I love coffee. How about you?（コーヒーが大好き. あなたは？）
 - 瞬間英作文：なし
 
 #### 3. Not bad! Beautiful day, isn't it?
 - 和訳：悪くないよ！いい天気だね
 - 塊：内容, isn't it?
-- 解説：
+- 塊の意味：
   - 文の最後につけて『〜ですよね？』と相手に同意を求める形.
+- 解説：
   - 相手は Yes, it is! と答えやすいので、知らない人に話しかけるきっかけにぴったり.
 - 例文：The view is amazing, isn't it?（景色すごいですよね）
 - 瞬間英作文①：今日は暑いですよね → It's hot today, isn't it?
@@ -80,8 +83,9 @@
 #### 4. I'm Yuki, by the way.
 - 和訳：ちなみに、私はユキです
 - 塊：By the way, ＋ 文
-- 解説：
+- 塊の意味：
   - 『ところで、ちなみに』
+- 解説：
   - 話題を変えたり、言い忘れたことを足したりするときの言葉.
   - 会話の途中で名前を言うときにも自然に使える.
   - 文の最初にも最後にも置ける.
@@ -95,6 +99,8 @@
 - 塊：
   - Nice to meet you
   - Nice to see you
+- 塊の意味：
+  - 『会えてうれしい』という、会ったときのあいさつ.
 - 解説：
   - meet は「初めて会う」なので、Nice to meet you は初対面のときだけ.
   - 2回目からは see を使う.
@@ -104,8 +110,9 @@
 #### 6. You can call me Mike.
 - 和訳：マイクって呼んでね
 - 塊：call me 名前
-- 解説：
+- 塊の意味：
   - 『〜って呼んでね』と、自分の呼び方を伝える形.
+- 解説：
   - You can 〜 は『〜していいよ』
   - 英語では Michael → Mike のような短い呼び名（ニックネーム）がよくある.
 - 例文：Please call me Hina.（ひなって呼んでください）
@@ -121,8 +128,9 @@
 - 塊：
   - What do you do?
   - What does ＋ 人 ＋ do?
-- 解説：
+- 塊の意味：
   - 『お仕事は何？』と聞く定番の形.
+- 解説：
   - What's your job? より自然.
   - What are you doing?（今何してる？）とはちがうので注意.
   - ほかの人1人のことを聞くときは does を使う.
@@ -144,6 +152,8 @@
 - 塊：
   - I'm a ＋ 職業
   - I'm an ＋ 職業
+- 塊の意味：
+  - 『私は〜です』と職業を言う形.
 - 解説：
   - 職業を言うときは a をつける.
   - engineer のように母音（ア・イ・ウ・エ・オの音）で始まる職業は an.
@@ -161,6 +171,8 @@
   - work for ＋ 会社
   - work at ＋ 場所
   - work in ＋ 分野
+- 塊の意味：
+  - 『〜で働いている』と、どこで働いているかを言う形.
 - 解説：
   - どこで働いているかは前置詞で使い分ける.
   - for のうしろは会社、at のうしろは場所、in のうしろは業界や分野.
@@ -175,8 +187,9 @@
 #### 10. How long have you been doing that?
 - 和訳：その仕事はどれくらい続けているの？
 - 塊：How long have you been ＋ 動詞ing?
-- 解説：
+- 塊の意味：
   - 『（過去から今まで）どれくらい〜しているの？』と期間を聞く形.
+- 解説：
   - 答え方：
   - For five years（5年です）
   - Since 2020（2020年からです）
@@ -192,8 +205,9 @@
 - 塊：
   - enjoy ＋ 名詞
   - enjoy ＋ 動詞ing
-- 解説：
+- 塊の意味：
   - 『〜を楽しむ』
+- 解説：
   - うしろには名詞か 〜ing が来る.
   - I enjoy my job（仕事を楽しんでいます）
   - I enjoy reading（読書を楽しんでいます）
@@ -206,8 +220,9 @@
 #### 12. Yeah. It's busy, but it's fun.
 - 和訳：うん. 忙しいけど、楽しいよ
 - 塊：文, but 文
-- 解説：
+- 塊の意味：
   - 『〜だけど〜』と、マイナスとプラスの両方を言う形.
+- 解説：
   - but のうしろに本当に言いたいことが来ることが多い.
 - 例文：It's hard, but I love it.（大変だけど、大好き）
 - 瞬間英作文①：狭いけど、居心地がいい → It's small, but it's cozy.
@@ -220,9 +235,10 @@
 - 塊：
   - The best part is 〜
   - The best part of 名詞 is 〜
-- 解説：
+- 塊の意味：
   - 『いちばんいいところは〜』
   - of 〜 をつけると『〜のいちばんいいところは』
+- 解説：
   - 相手の仕事や住んでいる場所について、もう一歩深く話せる.
 - 例文：The best part of Hawaii is the weather.（ハワイのいちばんいいところは天気です）
 - 瞬間英作文①：ここに住んでいていちばんいいところは？ → What's the best part of living here?
@@ -237,8 +253,9 @@
 - 塊：
   - Where are you from?
   - Where is 〜 from?
-- 解説：
+- 塊の意味：
   - 『どこ出身？どこから来たの？』
+- 解説：
   - 人にも物にも使える.
   - 1人・1つなら is、2人以上・複数なら are.
 - 例文：Where are your parents from?（ご両親はどこの出身？）
@@ -256,8 +273,9 @@
 #### 15. I'm from Japan. Osaka, actually.
 - 和訳：日本から来ました. 大阪です
 - 塊：文, actually
-- 解説：
+- 塊の意味：
   - actually は『実は』
+- 解説：
   - ざっくり答えたあとに「くわしく言うと〜」と情報を足すときに使う.
   - 相手の思いちがいをやんわり直すときにも使う.
 - 例文：I live in Hawaii, actually.（実はハワイに住んでいるんです）
@@ -268,8 +286,9 @@
 #### 16. Oh, cool! I've always wanted to go to Japan.
 - 和訳：へえ、いいね！ずっと日本に行ってみたかったんだ
 - 塊：I've always wanted to ＋ 動詞
-- 解説：
+- 塊の意味：
   - 『ずっと〜したいと思っていた』
+- 解説：
   - 昔から今まで続いている願いを言う形.
   - 相手の出身地や趣味に興味を示すときによく使う.
 - 例文：I've always wanted to learn Japanese.（ずっと日本語を勉強したかった）
@@ -282,9 +301,10 @@
 - 塊：
   - Have you ever ＋ 過去分詞?
   - Have you ever been to ＋ 場所?
-- 解説：
+- 塊の意味：
   - 『今までに〜したことある？』と経験を聞く形.
   - 「〜に行ったことある？」は been to を使う.
+- 解説：
   - 答え方：
   - Yes, once（1回ある）
   - No, never（一度もない）
@@ -299,8 +319,9 @@
 #### 18. What's Osaka like?
 - 和訳：大阪ってどんなところ？
 - 塊：What's ＋ 名詞 ＋ like?
-- 解説：
+- 塊の意味：
   - 『〜ってどんな感じ？』と説明してもらう質問.
+- 解説：
   - この like は「好き」ではなく「〜のような」という意味.
   - 場所、人、食べ物などに使える.
 - 例文：What's the food like there?（そこの食べ物はどんな感じ？）
@@ -312,8 +333,9 @@
 #### 19. There's a lot to do there.
 - 和訳：そこはやることがたくさんあるよ
 - 塊：There's a lot to ＋ 動詞
-- 解説：
+- 塊の意味：
   - 『〜するもの（こと）がたくさんある』
+- 解説：
   - 街や観光地を紹介するときによく使う.
   - There's は There is の短い形.
   - a lot は『たくさん』
@@ -325,8 +347,9 @@
 #### 20. It's famous for its food.
 - 和訳：食べ物で有名です
 - 塊：is famous for ＋ 名詞
-- 解説：
+- 塊の意味：
   - 『〜で有名』
+- 解説：
   - 地元の自慢を言うときに便利.
   - its は「その（街の）」
 - 例文：Osaka is famous for takoyaki.（大阪はたこ焼きで有名です）
@@ -339,8 +362,9 @@
 #### 21. Do you live around here?
 - 和訳：この辺りに住んでるの？
 - 塊：around here
-- 解説：
+- 塊の意味：
   - 『この辺り、この近く』
+- 解説：
   - 文の最後に置く.
   - お店や場所を聞くときにもよく使う.
 - 例文：I'm new around here.（この辺は初めてなんです）
@@ -359,9 +383,10 @@
 - 塊：
   - since ＋ 始まった時
   - for ＋ 期間
-- 解説：
+- 塊の意味：
   - since は『〜から（ずっと）』
   - for は『〜の間』
+- 解説：
   - since 2015（2015年から）
   - for three years（3年間）
   - どちらも I've ＋ 過去分詞（I've lived など）の文でよく使う.
@@ -374,8 +399,9 @@
 #### 23. Lucky you!
 - 和訳：いいなあ！
 - 塊：Lucky you!（決まり文句）
-- 解説：
+- 塊の意味：
   - 『いいなあ！うらやましい！』と、相手のいいことを明るくうらやむ言葉.
+- 解説：
   - 嫌味はなく、ほめ言葉に近い.
   - このまま覚える.
 - 例文：I'm going to Hawaii next week. — Lucky you!（来週ハワイに行くんだ. — いいなあ！）
@@ -386,8 +412,9 @@
 #### 24. Do you have any brothers or sisters?
 - 和訳：きょうだいはいる？
 - 塊：Do you have any ＋ 名詞（複数）?
-- 解説：
+- 塊の意味：
   - 『〜はある？いる？』
+- 解説：
   - 質問では some ではなく any を使う.
   - うしろの名詞は複数形.
 - 例文：Do you have any hobbies?（何か趣味はある？）
@@ -400,9 +427,10 @@
 - 塊：
   - older ＋ brother・sister
   - younger ＋ brother・sister
+- 塊の意味：
+  - older（年上の）、younger（年下の）をつけて言う.
 - 解説：
   - 英語には「兄」「弟」のような別々の言葉がない.
-  - older（年上の）、younger（年下の）をつけて言う.
   - ふだんは brother, sister だけで言うことも多い.
 - 例文：I have two older sisters.（姉が2人います）
 - 瞬間英作文①：弟がいます → I have a younger brother.
@@ -412,8 +440,9 @@
 #### 26. Are you close?
 - 和訳：仲はいいの？
 - 塊：be close with ＋ 人
-- 解説：
+- 塊の意味：
   - close は「近い」だけでなく『仲がいい』という意味もある.
+- 解説：
   - この意味では「クロース」と発音する.
   - close the door（ドアを閉める）の「クローズ」とはちがう.
 - 例文：I'm really close with my sister.（姉とすごく仲がいい）
@@ -424,8 +453,9 @@
 #### 27. Yeah, we get along really well.
 - 和訳：うん、すごく仲がいいよ
 - 塊：get along with ＋ 人
-- 解説：
+- 塊の意味：
   - 『（〜と）うまくやっている、仲よくしている』
+- 解説：
   - 家族、同僚、友だちなど、人との関係を言うときに使う.
 - 例文：We don't get along very well.（私たちはあまり仲がよくない）
 - 瞬間英作文①：同僚とうまくやっています → I get along well with my coworkers.
@@ -440,8 +470,9 @@
 - 塊：
   - kid（子ども1人）
   - kids（子どもたち）
-- 解説：
+- 塊の意味：
   - kids は children のカジュアルな言い方.
+- 解説：
   - 会話ではこちらが自然.
 - 例文：I don't have kids yet.（まだ子どもはいません）
 - 瞬間英作文①：うちの子たちはビーチが大好き → My kids love the beach.
@@ -457,8 +488,9 @@
 #### 29. Yes, I have two. How many do you have?
 - 和訳：うん、2人. あなたは何人？
 - 塊：How many ＋ 名詞（複数）＋ do you have?
-- 解説：
+- 塊の意味：
   - 『〜は何人（いくつ）いる？』と数を聞く形.
+- 解説：
   - How many のうしろは複数形の名詞.
   - 話の流れでわかるときは名詞を省ける.
   - I have two（2人います）
@@ -473,8 +505,9 @@
 - 塊：
   - How old is ＋ 人?
   - How old are ＋ 人（複数）?
-- 解説：
+- 塊の意味：
   - 『〜は何歳？』
+- 解説：
   - 1人なら is、2人以上なら are.
   - yours は「あなたの（子どもたち）」で、同じ言葉のくり返しを避けている.
 - 例文：How old is your dog?（ワンちゃんは何歳？）
@@ -485,6 +518,8 @@
 #### 31. My son is eight, and my daughter is five.
 - 和訳：息子は8歳で、娘は5歳です
 - 塊：人 ＋ is ＋ 年齢
+- 塊の意味：
+  - 『（人）は〜歳です』と年齢を言う形.
 - 解説：
   - 年齢は「人 is 数字」だけで言える.
   - years old はつけてもつけなくても OK.
@@ -498,8 +533,9 @@
 #### 32. Is that your dog? He's so cute!
 - 和訳：あれはあなたの犬？かわいい！
 - 塊：Is that your ＋ 名詞?
-- 解説：
+- 塊の意味：
   - 『あれ（それ）はあなたの〜？』
+- 解説：
   - 話しかけるきっかけに便利.
   - 名前や性別がわかっているペットは it ではなく he / she で呼ぶのがふつう.
 - 例文：Is that your bike?（あれはあなたの自転車？）
@@ -512,8 +548,9 @@
 - 塊：
   - His name is ＋ 名前
   - Her name is ＋ 名前
-- 解説：
+- 塊の意味：
   - 『名前は〜』
+- 解説：
   - オスや男の人は His、メスや女の人は Her.
   - ペットや家族を紹介するときに使う.
 - 例文：His name is Taro. He's my best friend.（彼の名前はタロウ. 親友です）
@@ -523,8 +560,9 @@
 #### 34. What kind of dog is he?
 - 和訳：何の犬種？
 - 塊：What kind of ＋ 名詞?
-- 解説：
+- 塊の意味：
   - 『どんな種類の〜？』
+- 解説：
   - 名詞を入れかえるだけで、いろいろなことが聞ける.
 - 例文：What kind of car do you drive?（どんな車に乗ってるの？）
 - 瞬間英作文①：どんな食べ物が好き？ → What kind of food do you like?
@@ -538,8 +576,9 @@
 - 塊：
   - How often do you ＋ 動詞?
   - How often are you in ＋ 場所?
-- 解説：
+- 塊の意味：
   - 『どれくらいの頻度で〜？』と回数を聞く質問.
+- 解説：
   - 答え方：
   - once a year（年1回）
   - from time to time（ときどき）
@@ -559,9 +598,10 @@
 #### 36. I'm here from time to time.
 - 和訳：ときどき来ています
 - 塊：from time to time
-- 解説：
+- 塊の意味：
   - 『ときどき』
   - sometimes とほぼ同じ意味.
+- 解説：
   - 文の最後に置くことが多い.
 - 例文：We go out for dinner from time to time.（ときどき夜ごはんを食べに出かけます）
 - 瞬間英作文①：ときどきお寿司を食べます → I eat sushi from time to time.
@@ -571,8 +611,9 @@
 #### 37. Maybe once or twice a year.
 - 和訳：年に1、2回かな
 - 塊：回数 ＋ a ＋ 期間
-- 解説：
+- 塊の意味：
   - 「週・月・年に何回」の言い方.
+- 解説：
   - 1回は once、2回は twice、3回からは 数字 ＋ times.
   - once a month（月1回）
   - twice a year（年2回）
@@ -586,8 +627,9 @@
 #### 38. Wow, you must really love it here!
 - 和訳：へえ、ここが本当に好きなんだね！
 - 塊：must ＋ 動詞
-- 解説：
+- 塊の意味：
   - ここの must は「〜しなければならない」ではなく『きっと〜にちがいない』という推測.
+- 解説：
   - 相手の話を聞いて、気持ちを想像して返すときに便利.
 - 例文：It must be nice to live here.（ここに住めるなんていいだろうね）
 - 瞬間英作文①：（相手に）疲れてるでしょう！ → You must be tired!
@@ -602,9 +644,10 @@
 - 塊：
   - on vacation
   - on business
-- 解説：
+- 塊の意味：
   - 『休暇で（旅行中で）』は on vacation.
   - 『仕事で』は on business.
+- 解説：
   - 旅行先での定番の質問.
 - 例文：I'm here on vacation with my friends.（友だちと休暇で来ています）
 - 瞬間英作文①：お仕事で来ているんですか？ → Are you here on business?
@@ -615,9 +658,10 @@
 - 塊：
   - with ＋ 人
   - for ＋ 期間
-- 解説：
+- 塊の意味：
   - with は『〜と一緒に』
   - for は『〜の間』
+- 解説：
   - この2つで「誰と、どれくらい」を一度に言える.
 - 例文：I'm staying with my sister for two weeks.（姉のところに2週間泊まっています）
 - 瞬間英作文①：友だちと3日間来ています → I'm here with my friends for three days.
@@ -628,8 +672,9 @@
 #### 41. How do you like it so far?
 - 和訳：ここまでどう？
 - 塊：How do you like ＋ 名詞?
-- 解説：
+- 塊の意味：
   - 『〜はどう？気に入った？』と感想を聞く形.
+- 解説：
   - so far は『今のところ』
 - 例文：How do you like Japan?（日本はどう？）
 - 瞬間英作文①：新しい仕事はどう？ → How do you like your new job?
@@ -639,8 +684,9 @@
 #### 42. I love it! Everyone is so friendly.
 - 和訳：大好き！みんなすごくフレンドリー
 - 塊：Everyone is ＋ 形容詞
-- 解説：
+- 塊の意味：
   - everyone は『みんな』
+- 解説：
   - 意味は複数でも、文法上は1人あつかいなので are ではなく is.
 - 例文：Everyone at work is really nice.（職場のみんなはすごくいい人）
 - 瞬間英作文①：ここはみんなすごく優しい → Everyone is so nice here.
@@ -657,8 +703,9 @@
 #### 43. Have you been anywhere else?
 - 和訳：ほかにどこか行った？
 - 塊：anywhere else
-- 解説：
+- 塊の意味：
   - 『ほかのどこか』
+- 解説：
   - 質問の文で使う.
   - else は『ほかの』
 - 例文：Have you lived anywhere else?（ほかの場所に住んだことある？）
@@ -670,8 +717,9 @@
 #### 44. I went to Bali last year.
 - 和訳：去年バリに行きました
 - 塊：過去形 ＋ last ＋ 時
-- 解説：
+- 塊の意味：
   - last をつけると『この前の〜』という意味になる.
+- 解説：
   - last year（去年）
   - last week（先週）
   - 一緒に使う動詞は過去形.
@@ -684,10 +732,11 @@
 #### 45. I've heard it's beautiful there.
 - 和訳：そこはきれいだって聞いたことがある
 - 塊：I've heard ＋ 文
-- 解説：
+- 塊の意味：
   - 『〜って聞いたことがある』
-  - 自分は行ったことがなくても、話を広げられる.
   - I've heard that 〜 と that を入れてもいい.
+- 解説：
+  - 自分は行ったことがなくても、話を広げられる.
 - 例文：I've heard it's really cold there in winter.（そこは冬すごく寒いって聞いた）
 - 瞬間英作文①：そこは食べ物が最高だって聞いた → I've heard the food is amazing there.
   - ヒント：最高 ＝ amazing
@@ -699,8 +748,9 @@
 #### 46. What do you do for fun?
 - 和訳：ひまなときは何してるの？
 - 塊：動詞 ＋ for fun
-- 解説：
+- 塊の意味：
   - 『楽しみで、趣味で』
+- 解説：
   - 趣味を聞くときは What's your hobby? より What do you do for fun? のほうが自然.
 - 例文：I take photos for fun.（趣味で写真を撮っています）
 - 瞬間英作文①：趣味でテニスをしています → I play tennis for fun.
@@ -710,8 +760,9 @@
 #### 47. I like cooking and going to cafés.
 - 和訳：料理とカフェめぐりが好き
 - 塊：I like ＋ 動詞ing
-- 解説：
+- 塊の意味：
   - 『〜するのが好き』
+- 解説：
   - 動詞に ing をつけると「〜すること」になる.
   - and で2つ以上つなげられる.
 - 例文：I like watching movies at home.（家で映画を見るのが好き）
@@ -721,9 +772,10 @@
 #### 48. Oh, nice! What do you like to cook?
 - 和訳：いいね！何を作るのが好き？
 - 塊：What do you like to ＋ 動詞?
-- 解説：
+- 塊の意味：
   - 『何を〜するのが好き？』
   - like to ＋ 動詞 も like ＋ 動詞ing と同じ意味.
+- 解説：
   - 相手の答えからもう一歩深く聞く質問.
 - 例文：What do you like to read?（どんな本を読むのが好き？）
 - 瞬間英作文①：週末は何をするのが好き？ → What do you like to do on weekends?
@@ -735,8 +787,9 @@
 - 塊：
   - Mostly ＋ 名詞
   - I mostly ＋ 動詞
-- 解説：
+- 塊の意味：
   - 『ほとんど、主に』
+- 解説：
   - 全部ではないけれど大部分、という感じ.
   - 質問に短く答えるときは Mostly 〜 だけでいい.
 - 例文：I mostly listen to pop music.（主にポップスを聞きます）

@@ -86,6 +86,7 @@
 .phrase-example .en { font-family: var(--en); font-weight: 700; font-size: 16px; line-height: 1.4; overflow-wrap: anywhere; }
 .phrase-example .ja { font-size: 13px; color: var(--ink-2); margin-top: 2px; }
 .chunk-box { border-radius: 14px; padding: 12px 14px; background: var(--sky-soft); }
+.chunk-box .chunk-ja { margin-top: 6px; padding-top: 6px; border-top: 1px dashed var(--sky); font-size: 15px; line-height: 1.7; }
 .chunk-box .chunk { font-family: var(--en); font-weight: 800; font-size: 17px; line-height: 1.5; overflow-wrap: anywhere; }
 .week-theme { font-size: 20px; }
 .phrase-note { border-radius: 14px; padding: 12px 14px; background: var(--cream); font-size: 15px; line-height: 1.7; }

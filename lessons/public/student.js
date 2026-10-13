@@ -1147,7 +1147,8 @@ function phraseCardHtml(phrase, revealed) {
       ${sayIcon(phrase.say)}
     </div>
     <p ${oneLine(phrase.ja)}>${esc(phrase.ja)}</p>
-    ${phrase.chunk ? `<div class="chunk-box"><p class="label">塊</p><p class="chunk" lang="en">${noteHtml(phrase.chunk)}</p></div>` : ""}
+    ${phrase.chunk ? `<div class="chunk-box"><p class="label">塊</p><p class="chunk" lang="en">${noteHtml(phrase.chunk)}</p>
+      ${phrase.chunkJa ? `<p class="chunk-ja">${noteHtml(phrase.chunkJa)}</p>` : ""}</div>` : ""}
     ${phrase.note ? `<div class="phrase-note"><p class="label">解説</p><p>${noteHtml(phrase.note)}</p></div>` : ""}
     ${phrase.example ? `<div class="phrase-example"><p class="label">例文</p>
       <div class="example-row">
