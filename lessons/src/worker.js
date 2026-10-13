@@ -9,6 +9,7 @@ import { findLesson, lessonExampleSentences, plain, questionCount } from "../pub
 import { findMistakes } from "../public/mistakes.js";
 import { bookSentences, bookWords, setKey, weekWords, wordSets } from "../public/vocab/words.js";
 import { findPhrase } from "../public/pron/phrases.js";
+import { phraseByKey, phraseSentences, phraseSetKey, phraseSets, testSize } from "../public/phrases/book.js";
 import {
   all, ensureSchema, first, itemRow, japanDay, journalRow, now, run, studentBundle,
 } from "./db.js";
@@ -20,14 +21,13 @@ const YEAR = 365 * 24 * 3600;
 // Fields each kind of item keeps; the first `required` of them must be filled.
 const KINDS = {
   vocab: { fields: ["word", "meaning", "example"], required: 2 },
-  phrase: { fields: ["phrase", "meaning", "note"], required: 2 },
   pron: { fields: ["text", "tip"], required: 1 },
   grammar: { fields: ["question", "answer", "choices", "explanation"], required: 2 },
   topic: { fields: ["prompt"], required: 1 },
 };
 const WEEKS = 24;
 const FIELD_NAMES = {
-  word: "単語", meaning: "意味", phrase: "フレーズ", text: "文", question: "問題", answer: "答え", prompt: "テーマ",
+  word: "単語", meaning: "意味", text: "文", question: "問題", answer: "答え", prompt: "テーマ",
 };
 
 class HttpError extends Error {
@@ -81,6 +81,10 @@ async function route(request, env, url) {
     }
     if (parts[0] === "vocab" && parts[1] === "tests" && parts.length === 4 && method === "POST") {
       return saveVocabTest(request, env, student, parts[2], Number(parts[3]));
+    }
+    if (path === "/api/phrases/review" && method === "POST") return savePhraseReview(request, env, student);
+    if (parts[0] === "phrases" && parts[1] === "tests" && parts.length === 4 && method === "POST") {
+      return savePhraseTest(request, env, student, Number(parts[2]), Number(parts[3]));
     }
     if (path === "/api/explain" && method === "POST") return explainAnswer(request, env, student);
     if (path === "/api/journals" && method === "POST") return newJournal(request, env, student);
@@ -221,19 +225,21 @@ async function newJournal(request, env, student) {
   return correctOnce(env, student, meta.last_row_id);
 }
 
-// Audio is only made for text in the student's own content, the 単語帳 or the
-// grammar lessons' examples, so the endpoint can't be used to voice anything else.
+// Audio is only made for text in the student's own content, the 単語帳, the
+// フレーズ or the grammar lessons' examples, so the endpoint can't be used to
+// voice anything else.
 // (The pronunciation months play the teacher's own recordings instead.)
-const SPOKEN_FIELDS = { vocab: ["word", "example"], phrase: ["phrase"], pron: ["text"] };
+const SPOKEN_FIELDS = { vocab: ["word", "example"], pron: ["text"] };
 const LESSON_SENTENCES = lessonExampleSentences();
 const BOOK_SENTENCES = bookSentences();
+const PHRASE_SENTENCES = phraseSentences();
 
 async function speech(env, student, text) {
-  let allowed = LESSON_SENTENCES.has(text) || BOOK_SENTENCES.has(text);
+  let allowed = LESSON_SENTENCES.has(text) || BOOK_SENTENCES.has(text) || PHRASE_SENTENCES.has(text);
   if (!allowed) {
     const rows = await all(
       env.DB,
-      `SELECT kind, data FROM items WHERE student_id = ? AND kind IN ('vocab', 'phrase', 'pron')`,
+      `SELECT kind, data FROM items WHERE student_id = ? AND kind IN ('vocab', 'pron')`,
       student.id,
     );
     allowed = rows.some((row) => {
@@ -411,6 +417,41 @@ async function saveVocabTest(request, env, student, weekParam, number) {
   return json({ ok: true });
 }
 
+// The フレーズ復習 list, like the words' 復習 list: on adds a phrase (source
+// "check" from its card, "test" when missed in a set test), off takes it out.
+async function savePhraseReview(request, env, student) {
+  const { key, on, source } = await readJson(request);
+  if (!phraseByKey(key)) throw new HttpError(404, "見つかりません。");
+  if (on) {
+    await run(
+      env.DB,
+      `INSERT OR IGNORE INTO phrase_review (student_id, phrase_key, source, added_at) VALUES (?, ?, ?, ?)`,
+      student.id, key, source === "test" ? "test" : "check", now(),
+    );
+  } else {
+    await run(env.DB, `DELETE FROM phrase_review WHERE student_id = ? AND phrase_key = ?`, student.id, key);
+  }
+  return json({ ok: true });
+}
+
+// The score of a phrase set's test. The number of questions is worked out here.
+async function savePhraseTest(request, env, student, week, number) {
+  const set = phraseSets(week).find((s) => s.number === number);
+  if (!set || !testSize(set)) throw new HttpError(404, "見つかりません。");
+  const total = testSize(set);
+  const { score } = await readJson(request);
+  const clean = Math.max(0, Math.min(total, Math.round(Number(score)) || 0));
+  await run(
+    env.DB,
+    `INSERT INTO phrase_tests (student_id, set_key, best_score, last_score, total, times, updated_at)
+     VALUES (?1, ?2, ?3, ?3, ?4, 1, ?5)
+     ON CONFLICT (student_id, set_key) DO UPDATE SET
+       best_score = MAX(best_score, ?3), last_score = ?3, total = ?4, times = times + 1, updated_at = ?5`,
+    student.id, phraseSetKey(week, number), clean, total, now(),
+  );
+  return json({ ok: true });
+}
+
 // Only an entry with no correction yet (its first try failed) can be sent again.
 async function retryCorrection(env, student, journalId) {
   const row = await first(env.DB, `SELECT * FROM journals WHERE id = ? AND student_id = ?`, journalId, student.id);
@@ -444,7 +485,8 @@ const aiEnabled = (env) => !!env.ANTHROPIC_API_KEY;
 
 // Why a wrong typed grammar answer is wrong, from the AI: one point per mistake
 // that mistakes.js finds ({ n, kind, topic, why }). The question is looked up
-// here (a lesson step, or one of the student's own teacher problems), never
+// here (a lesson step, a フレーズ's 瞬間英作文, or one of the student's own
+// teacher problems), never
 // taken from the request, so this can't be used to ask the AI anything else.
 const EXPLAINS_PER_DAY = 100;
 
@@ -482,8 +524,20 @@ async function explainAnswer(request, env, student) {
   return json({ points });
 }
 
-// The question a typed answer was for: { lesson, step } or { item }.
+// The question a typed answer was for: { lesson, step }, { phrase, drill } or { item }.
 async function explainedQuestion(env, student, input) {
+  if (input.phrase) {
+    const phrase = phraseByKey(input.phrase);
+    const drill = phrase?.drills[Number(input.drill)];
+    if (!drill) throw new HttpError(404, "見つかりません。");
+    return {
+      source: `phrase/${phrase.key}/${drill.n}`,
+      japanese: drill.ja,
+      hint: `${phrase.en}（${phrase.ja}）`,
+      note: phrase.note,
+      answers: drill.answers,
+    };
+  }
   if (input.lesson) {
     const index = Number(input.step);
     const step = findLesson(String(input.lesson))?.lesson.steps?.[index];

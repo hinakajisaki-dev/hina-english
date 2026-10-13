@@ -8,6 +8,9 @@ import { UNITS, findLesson, plain, questionCount } from "./grammar/lessons.js";
 import { bookWeeks, setKey, speakable, splitOnForm, weekWords, wordSets } from "./vocab/words.js";
 import { MONTHS, monthPhrases, pronMonths } from "./pron/phrases.js";
 import { TOPICS } from "./journal/topics.js";
+import {
+  TEST_SIZE, phraseByKey, phraseSetKey, phraseSets, phraseWeeks, setDrills, testSize, weekPhrases,
+} from "./phrases/book.js";
 import { findMistakes, normalizeWords } from "./mistakes.js";
 import {
   appMinutes, bindPanels, formatMinutes, monthPanel, monthStart, startStudyClock, studySplit, summary, today,
@@ -44,8 +47,8 @@ function render() {
   // Opening a pronunciation month goes to the first phrase that isn't 完了 yet.
   if (screen === "pron") state.pron = { which: null, index: 0 };
   const screens = {
-    vocab: renderVocab, review: renderReview, phrases: renderPhrases, pron: renderPron, grammar: renderGrammar, journal: renderJournal,
-    study: renderStudy,
+    vocab: renderVocab, review: renderReview, phrases: renderPhrases, "phrase-review": renderPhraseReview, pron: renderPron,
+    grammar: renderGrammar, journal: renderJournal, study: renderStudy,
   };
   (screens[screen] || renderHome)(...rest.map(decodeURIComponent));
 }
@@ -147,11 +150,6 @@ function shuffle(list) {
     [copy[i], copy[j]] = [copy[j], copy[i]];
   }
   return copy;
-}
-
-function todaysPhrase() {
-  const phrases = items("phrase");
-  return phrases.length ? phrases[japanDayNumber() % phrases.length] : null;
 }
 
 function wroteToday() {
@@ -292,7 +290,10 @@ function renderHome() {
   const sets = weeks.flatMap((week) => wordSets(studentWeekWords(week)).map((s) => setKey(week, s.number)));
   const tested = sets.filter((key) => state.me.vocabTests[key]).length;
   const review = reviewWords().length;
-  const phrase = todaysPhrase();
+  const phraseTests = phraseTestCount(phraseWeeks());
+  const phraseReviewCount = reviewPhrases().length;
+  const lessonTotal = UNITS.reduce((n, u) => n + u.lessons.filter((l) => l.steps).length, 0);
+  const lessonsDone = UNITS.reduce((n, u) => n + u.lessons.filter((l) => state.me.lessons[l.id]).length, 0);
   const shared = pronMonths().flatMap((m) => monthPhrases(m));
   const pronFinished = shared.filter((p) => pronDone(p.key)).length;
   const grammar = items("grammar");
@@ -321,13 +322,6 @@ function renderHome() {
           <span class="go" aria-hidden="true">›</span>
         </a>`).join("")}
       </section>
-      ${phrase ? `
-        <section class="card today" aria-label="今日のフレーズ">
-          <p class="label">Today's phrase</p>
-          <p class="phrase" lang="en">${esc(phrase.data.phrase)}</p>
-          <p class="meaning">${esc(phrase.data.meaning)}</p>
-          <div class="speak-row start">${sayButton(phrase.data.phrase)} ${speedControl()}</div>
-        </section>` : ""}
       <nav class="tiles" aria-label="メニュー">
         <a class="tile wide ${done ? "done" : ""}" href="#/journal">
           <span class="emoji" aria-hidden="true">${done ? "✅" : "✍️"}</span>
@@ -339,21 +333,27 @@ function renderHome() {
           ${sets.length ? `<div class="bar"><i style="width:${Math.round((tested / sets.length) * 100)}%"></i></div>` : ""}
         </a>
         <a class="tile" href="#/review">
-          <span class="emoji" aria-hidden="true">🔁</span><b>復習</b>
+          <span class="emoji" aria-hidden="true">🔁</span><b>単語復習</b>
           <span class="muted">${review ? `復習カード ${review} 語` : "まだありません"}</span>
         </a>
         <a class="tile" href="#/phrases">
           <span class="emoji" aria-hidden="true">💬</span><b>フレーズ</b>
-          <span class="muted">${items("phrase").length ? `${items("phrase").length} こ` : "まだありません"}</span>
+          <span class="muted">${phraseTests.total ? `テスト ${phraseTests.done} / ${phraseTests.total}` : phraseWeeks().length ? "はじめよう" : "準備中"}</span>
+          ${phraseTests.total ? `<div class="bar"><i style="width:${Math.round((phraseTests.done / phraseTests.total) * 100)}%"></i></div>` : ""}
+        </a>
+        <a class="tile" href="#/phrase-review">
+          <span class="emoji" aria-hidden="true">🔄</span><b>フレーズ復習</b>
+          <span class="muted">${phraseReviewCount ? `${phraseReviewCount} フレーズ` : "まだありません"}</span>
+        </a>
+        <a class="tile" href="#/grammar">
+          <span class="emoji" aria-hidden="true">✏️</span><b>文法</b>
+          <span class="muted">レッスン ${lessonsDone} / ${lessonTotal}${grammar.length ? ` ＋ 先生からの問題 ${grammar.length} 問` : ""}</span>
+          <div class="bar"><i style="width:${Math.round((lessonsDone / (lessonTotal || 1)) * 100)}%"></i></div>
         </a>
         <a class="tile" href="#/pron">
-          <span class="emoji" aria-hidden="true">🎤</span><b>発音</b>
+          <span class="emoji" aria-hidden="true">🎤</span><b>発音課題</b>
           <span class="muted">${shared.length ? `完了 ${pronFinished} / ${shared.length}` : "まだありません"}</span>
           ${shared.length ? `<div class="bar"><i style="width:${Math.round((pronFinished / shared.length) * 100)}%"></i></div>` : ""}
-        </a>
-        <a class="tile wide" href="#/grammar">
-          <span class="emoji" aria-hidden="true">✏️</span>
-          <div><b>文法</b><p class="muted">${UNITS.map((u) => u.title).join("・")}${grammar.length ? ` ＋ 先生からの問題 ${grammar.length} 問` : ""}</p></div>
         </a>
         <a class="tile wide" href="#/study">
           <span class="emoji" aria-hidden="true">⏱️</span>
@@ -800,7 +800,7 @@ function renderReview(level) {
   const words = reviewWords();
   const level2 = words.filter((w) => blankable(w).length).length;
 
-  app.innerHTML = `${topbar("復習")}
+  app.innerHTML = `${topbar("単語復習")}
     <main class="wrap stack">
       ${words.length ? `
         <p class="muted">復習する単語：<b>${words.length} 語</b>（1回 ${REVIEW_SESSION} 語まで、順番はばらばらに出ます）</p>
@@ -1019,24 +1019,423 @@ function renderReviewResult(level, rerender) {
 }
 
 // ---------- phrases ----------
+// The フレーズ book (public/phrases/book.js), in weeks. Each phrase is a card
+// (the English first; a tap shows the 日本語訳 and 解説), then up to two
+// 瞬間英作文 with its chunk, typed and checked like the grammar answers. Ten
+// phrases make a set, and each set ends with a short test. Phrases put in
+// from their card, or missed in a test, make the フレーズ復習 list.
 
-function renderPhrases() {
-  const today = todaysPhrase();
-  const others = items("phrase").filter((p) => p !== today).reverse();
-  const card = (p, isToday) => `
-    <article class="card phrase-card stack ${isToday ? "is-today" : ""}">
-      ${isToday ? `<p class="label">Today's phrase</p>` : ""}
-      <div class="phrase-head">
-        <p class="phrase" lang="en">${esc(p.data.phrase)}</p>
-      </div>
-      <p><b>${esc(p.data.meaning)}</b></p>
-      ${p.data.note ? `<p class="note">${esc(p.data.note)}</p>` : ""}
-      <div>${sayButton(p.data.phrase)}</div>
-    </article>`;
+const inPhraseReview = (key) => state.me.phraseReview.some((r) => r.key === key);
+const phraseTestResult = (week, number) => state.me.phraseTests[phraseSetKey(week, number)];
+const findPhraseSet = (week, number) => phraseSets(week).find((s) => s.number === number);
+
+async function setPhraseReview(key, on, source = "check") {
+  if (on && !inPhraseReview(key)) state.me.phraseReview.push({ key, source, added_at: new Date().toISOString() });
+  if (!on) state.me.phraseReview = state.me.phraseReview.filter((r) => r.key !== key);
+  try {
+    await api("/api/phrases/review", { method: "POST", body: { key, on, source } });
+  } catch (error) {
+    toast(error.message);
+  }
+}
+
+// Sets with a test, and how many of them are done (for the week tiles and home).
+function phraseTestCount(weeks) {
+  const sets = weeks.flatMap((week) => phraseSets(week).filter(testSize).map((s) => ({ week, number: s.number })));
+  return { done: sets.filter((s) => phraseTestResult(s.week, s.number)).length, total: sets.length };
+}
+
+function renderPhrases(week, setNumber, mode) {
+  if (week && setNumber && mode === "test") return renderPhraseTest(Number(week), Number(setNumber));
+  if (week && setNumber) return renderPhraseSet(Number(week), Number(setNumber));
+  if (week) return renderPhraseWeek(Number(week));
+
+  const tiles = phraseWeeks().map((week) => {
+    const phrases = weekPhrases(week);
+    const tests = phraseTestCount([week]);
+    return `<a class="week ${tests.total && tests.done === tests.total ? "done" : ""}" href="#/phrases/${week}">
+      <b>Week ${week}</b>
+      <span>${phrases.length} フレーズ${tests.total ? ` ・ テスト ${tests.done} / ${tests.total}` : ""}</span>
+      ${tests.total ? `<div class="bar"><i style="width:${Math.round((tests.done / tests.total) * 100)}%"></i></div>` : ""}
+    </a>`;
+  });
   app.innerHTML = `${topbar("フレーズ")}
     <main class="wrap stack">
-      ${today ? speedControl() + card(today, true) + others.map((p) => card(p, false)).join("") : emptyState("まだフレーズがありません。<br>先生が追加すると、ここに出てきます。")}
+      ${tiles.length ? `<div class="weeks">${tiles.join("")}</div>` : emptyState("フレーズは準備中です。<br>用意ができたら、ここに出てきます。")}
     </main>`;
+}
+
+function renderPhraseWeek(week) {
+  state.phraseSet = null;
+  state.phraseTest = null;
+  const sets = phraseSets(week);
+  app.innerHTML = `${topbar(`フレーズ ・ Week ${week}`, "#/phrases")}
+    <main class="wrap stack">
+      <p class="muted">10フレーズずつ、意味と使い方を見て、瞬間英作文をします。最後にテスト（${TEST_SIZE}問）。まちがえたフレーズは「フレーズ復習」に入ります。</p>
+      ${sets.length ? "" : emptyState("この週のフレーズは、まだありません。")}
+      ${sets.map((set) => {
+        const result = phraseTestResult(week, set.number);
+        return `<a class="lesson-card" href="#/phrases/${week}/${set.number}">
+          <div><b>${set.number}. フレーズ ${esc(set.title)}</b><span class="muted small" lang="en">${set.phrases.map((p) => esc(p.en)).join(" ・ ")}</span></div>
+          ${result ? `<span class="badge">✓ ${result.best} / ${result.total}</span>` : `<span class="badge start">はじめる</span>`}
+        </a>`;
+      }).join("")}
+    </main>`;
+}
+
+// A 瞬間英作文 as a grammar write step, so it is checked and explained the same
+// way. In a test or the review the hint waits behind a button.
+const drillStep = (phrase, drill, { hintLater = false, label = "瞬間英作文" } = {}) => ({
+  type: "write",
+  label,
+  ja: drill.ja,
+  answers: drill.answers,
+  hint: `${phrase.en}（${phrase.ja}）`,
+  hintLater,
+  say: drill.answers[0],
+});
+
+function reviewButtonHtml(phrase) {
+  return inPhraseReview(phrase.key)
+    ? `<button type="button" class="btn secondary block review-on" id="phrase-review" aria-pressed="true" aria-describedby="review-off-note">✓ 復習タブに入っています</button>
+      <p class="muted small center" id="review-off-note">もう一度押すと、復習タブから外せます</p>`
+    : `<button type="button" class="btn ghost block review-add" id="phrase-review" aria-pressed="false">＋ 復習タブに入れる</button>`;
+}
+
+function phraseCardHtml(phrase, revealed) {
+  if (!revealed) {
+    return `<section class="card word-card word-front" id="phrase-front" role="button" tabindex="0" aria-label="日本語訳と解説を見る">
+      <div class="word-row center-row">
+        <p class="phrase-en" lang="en">${esc(phrase.en)}</p>
+        ${sayIcon(phrase.say)}
+      </div>
+      <p class="hint">タップして、日本語訳と解説を見る</p>
+    </section>`;
+  }
+  return `<section class="card stack word-card">
+    <div class="word-row">
+      <p class="phrase-en" lang="en">${esc(phrase.en)}</p>
+      ${sayIcon(phrase.say)}
+    </div>
+    <p class="meaning">${esc(phrase.ja)}</p>
+    ${phrase.note ? `<div class="phrase-note"><p class="label">解説</p><p>${noteHtml(phrase.note)}</p></div>` : ""}
+    <div>${speedControl()}</div>
+    ${reviewButtonHtml(phrase)}
+  </section>`;
+}
+
+// Steps for a run of phrases: each card, then its 瞬間英作文.
+const phraseSteps = (phrases, drillOptions) =>
+  phrases.flatMap((phrase) => [
+    { kind: "card", phrase },
+    ...phrase.drills.map((drill) => ({
+      kind: "drill", phrase, drill,
+      step: drillStep(phrase, drill, { ...drillOptions, label: `瞬間英作文${phrase.drills.length > 1 ? ` ${drill.n + 1} / ${phrase.drills.length}` : ""}` }),
+    })),
+  ]);
+
+// Plays a run of phrase steps (a set, or a フレーズ復習 round): P is
+// { steps, index, revealed, answers }. finish() runs after the last step.
+function renderPhraseSteps(P, { title, back, again, finishLabel, finish }) {
+  const step = P.steps[P.index];
+  const { phrase } = step;
+  const phrases = [...new Set(P.steps.map((s) => s.phrase))];
+  const answer = P.answers[P.index];
+  const last = P.index === P.steps.length - 1;
+  if (step.kind === "drill" && answer) askAiWhy(answer, { phrase: phrase.key, drill: step.drill.n }, step.drill.answers);
+  const body = step.kind === "card" ? phraseCardHtml(phrase, P.revealed[P.index]) : questionStepHtml(step.step, answer);
+  const showNext = step.kind === "card" || answer;
+
+  app.innerHTML = `${topbar(title, back)}
+    <main class="wrap stack">
+      <div class="lesson-progress" role="progressbar" aria-valuemin="1" aria-valuemax="${P.steps.length}" aria-valuenow="${P.index + 1}">
+        <div class="bar"><i style="width:${Math.round(((P.index + 1) / P.steps.length) * 100)}%"></i></div>
+        <span class="counter">${phrases.indexOf(phrase) + 1} / ${phrases.length}</span>
+      </div>
+      ${body}
+      <div class="lesson-nav">
+        ${P.index > 0 ? `<button type="button" class="btn ghost" id="prev">← もどる</button>` : "<span></span>"}
+        ${showNext ? `<button type="button" class="btn" id="next">${last ? finishLabel : "次へ"}</button>` : ""}
+      </div>
+    </main>`;
+
+  const go = (index) => {
+    P.index = index;
+    again();
+    window.scrollTo(0, 0);
+  };
+  document.getElementById("prev")?.addEventListener("click", () => go(P.index - 1));
+  document.getElementById("next")?.addEventListener("click", () => (last ? finish() : go(P.index + 1)));
+
+  if (step.kind === "card") {
+    const front = document.getElementById("phrase-front");
+    const turn = () => {
+      P.revealed[P.index] = true;
+      again();
+    };
+    front?.addEventListener("click", (event) => {
+      if (!event.target.closest("[data-say]")) turn();
+    });
+    front?.addEventListener("keydown", (event) => {
+      if (event.target === front && (event.key === "Enter" || event.key === " ")) {
+        event.preventDefault();
+        turn();
+      }
+    });
+    bindPhraseReviewButton(phrase);
+    return;
+  }
+  if (answer) {
+    document.getElementById("next")?.focus();
+    return;
+  }
+  bindWriteForm(step.drill.answers, (given, right) => {
+    P.answers[P.index] = { given, right };
+    again();
+    document.getElementById("verdict")?.scrollIntoView({ block: "nearest" });
+  });
+}
+
+function bindPhraseReviewButton(phrase) {
+  const button = document.getElementById("phrase-review");
+  button?.addEventListener("click", () => {
+    const on = !inPhraseReview(phrase.key);
+    setPhraseReview(phrase.key, on);
+    toast(on ? "フレーズ復習に入れました" : "フレーズ復習から外しました");
+    document.getElementById("review-off-note")?.remove();
+    button.outerHTML = reviewButtonHtml(phrase);
+    bindPhraseReviewButton(phrase);
+  });
+}
+
+// The typed-answer form of a write step: record(given, right).
+function bindWriteForm(answers, record) {
+  const form = document.getElementById("write");
+  form.answer.focus();
+  form.addEventListener("submit", (event) => {
+    event.preventDefault();
+    const given = form.answer.value.trim();
+    if (!given) return;
+    record(given, answers.some((a) => normalizeAnswer(a) === normalizeAnswer(given)));
+  });
+  document.getElementById("give-up").addEventListener("click", () => record("", false));
+}
+
+function renderPhraseSet(week, number) {
+  const set = findPhraseSet(week, number);
+  if (!set) return renderPhraseWeek(week);
+  const id = phraseSetKey(week, number);
+  if (state.phraseSet?.id !== id) state.phraseSet = { id, steps: phraseSteps(set.phrases), index: 0, revealed: {}, answers: {} };
+  const hasTest = testSize(set) > 0;
+  renderPhraseSteps(state.phraseSet, {
+    title: `Week ${week} ・ ${set.number}. フレーズ ${set.title}`,
+    back: `#/phrases/${week}`,
+    again: () => renderPhraseSet(week, number),
+    finishLabel: hasTest ? "テストへ" : "おわり",
+    finish: () => {
+      state.phraseSet = null;
+      state.phraseTest = null;
+      location.hash = hasTest ? `#/phrases/${week}/${number}/test` : `#/phrases/${week}`;
+    },
+  });
+}
+
+// ---------- phrase test ----------
+// TEST_SIZE 瞬間英作文 from the set, with the chunk as a hint behind a button.
+// A miss puts its phrase in フレーズ復習.
+
+function renderPhraseTest(week, number) {
+  const set = findPhraseSet(week, number);
+  if (!set || !testSize(set)) return renderPhraseWeek(week);
+  const id = phraseSetKey(week, number);
+  if (state.phraseTest?.id !== id) {
+    const questions = shuffle(setDrills(set)).slice(0, TEST_SIZE)
+      .map(({ phrase, drill }) => ({ phrase, drill, step: drillStep(phrase, drill, { hintLater: true, label: "テスト" }) }));
+    state.phraseTest = { id, questions, index: 0, answers: [], saved: false };
+  }
+  const T = state.phraseTest;
+  const again = () => {
+    renderPhraseTest(week, number);
+    window.scrollTo(0, 0);
+  };
+  const title = `テスト ・ ${set.number}. フレーズ ${set.title}`;
+  if (T.index >= T.questions.length) return renderPhraseTestResult(week, set, title, again);
+
+  const { phrase, drill, step } = T.questions[T.index];
+  const answer = T.answers[T.index];
+  if (answer) askAiWhy(answer, { phrase: phrase.key, drill: drill.n }, drill.answers);
+  app.innerHTML = `${topbar(title, `#/phrases/${week}`)}
+    <main class="wrap stack">
+      <div class="lesson-progress" role="progressbar" aria-valuemin="1" aria-valuemax="${T.questions.length}" aria-valuenow="${T.index + 1}">
+        <div class="bar"><i style="width:${Math.round((T.index / T.questions.length) * 100)}%"></i></div>
+        <span class="counter">${T.index + 1} / ${T.questions.length}</span>
+      </div>
+      ${questionStepHtml(step, answer)}
+      ${answer && !answer.right ? `<p class="muted small">「<span lang="en">${esc(phrase.en)}</span>」をフレーズ復習に入れました。</p>` : ""}
+      ${answer ? `<div class="lesson-nav"><span></span><button type="button" class="btn" id="next">${T.index === T.questions.length - 1 ? "結果を見る" : "次へ"}</button></div>` : ""}
+    </main>`;
+
+  if (answer) {
+    document.getElementById("next").addEventListener("click", () => {
+      T.index += 1;
+      again();
+    });
+    document.getElementById("next").focus();
+    return;
+  }
+  bindWriteForm(drill.answers, (given, right) => {
+    T.answers[T.index] = { given, right };
+    if (!right) setPhraseReview(phrase.key, true, "test");
+    renderPhraseTest(week, number);
+    document.getElementById("verdict")?.scrollIntoView({ block: "nearest" });
+  });
+}
+
+function renderPhraseTestResult(week, set, title, again) {
+  const T = state.phraseTest;
+  const score = T.answers.filter((a) => a.right).length;
+  const missed = [...new Set(T.questions.filter((_, i) => !T.answers[i].right).map((q) => q.phrase))];
+  if (!T.saved) {
+    T.saved = true;
+    const key = phraseSetKey(week, set.number);
+    const old = state.me.phraseTests[key];
+    state.me.phraseTests[key] = {
+      best: Math.max(old?.best ?? 0, score), last: score, total: T.questions.length, times: (old?.times ?? 0) + 1,
+    };
+    api(`/api/phrases/tests/${week}/${set.number}`, { method: "POST", body: { score } }).catch((error) => toast(error.message));
+  }
+  const next = findPhraseSet(week, set.number + 1);
+  const perfect = score === T.questions.length;
+  app.innerHTML = `${topbar(title, `#/phrases/${week}`)}
+    <main class="wrap stack">
+      <section class="card stack" style="text-align:center">
+        <p style="font-size:40px">${perfect ? "🎉" : "👏"}</p>
+        <p class="score">${score} / ${T.questions.length}<small> 問正解</small></p>
+        <p>${perfect ? "全問正解！" : "まちがえたフレーズは、フレーズ復習に入れました。"}</p>
+      </section>
+      ${missed.length ? `<section class="card stack">
+        <h3>フレーズ復習に入れたフレーズ</h3>
+        <ul class="plain-list">${missed.map((p) => `<li><b lang="en">${esc(p.en)}</b>　${esc(p.ja)}</li>`).join("")}</ul>
+      </section>` : ""}
+      ${next ? `<a class="btn block" href="#/phrases/${week}/${next.number}">次の10フレーズへ（${next.number}. フレーズ ${esc(next.title)}）</a>` : ""}
+      <button type="button" class="btn secondary block" id="again">もう一度テスト</button>
+      <a class="btn ghost block" href="#/phrases/${week}">Week ${week} にもどる</a>
+    </main>`;
+  document.getElementById("again").addEventListener("click", () => {
+    state.phraseTest = null;
+    again();
+  });
+}
+
+// ---------- phrase review ----------
+// The フレーズ復習 list. A round takes up to PHRASE_REVIEW_SESSION of its
+// phrases at random: each card, then right away its 瞬間英作文 as a test.
+
+const PHRASE_REVIEW_SESSION = 10;
+
+function reviewPhrases() {
+  return state.me.phraseReview.map((r) => {
+    const phrase = phraseByKey(r.key);
+    return phrase && { ...phrase, source: r.source };
+  }).filter(Boolean);
+}
+
+function renderPhraseReview(mode) {
+  if (mode === "go") return renderPhraseReviewRound();
+  state.phraseReviewRound = null;
+  const phrases = reviewPhrases();
+  app.innerHTML = `${topbar("フレーズ復習")}
+    <main class="wrap stack">
+      ${phrases.length ? `
+        <p class="muted">復習するフレーズ：<b>${phrases.length} こ</b>（1回 ${PHRASE_REVIEW_SESSION} こまで、順番はばらばらに出ます）</p>
+        <a class="unit-card" href="#/phrase-review/go">
+          <b>復習をはじめる</b>
+          <span class="muted small">フレーズを見て意味を確かめたら、その場で瞬間英作文のテスト</span>
+        </a>
+        <section class="card stack">
+          <h3>フレーズ復習に入っているフレーズ</h3>
+          <ul class="review-list">${phrases.map((p) => `<li>
+            <div><b lang="en">${esc(p.en)}</b><span class="muted small">${esc(p.ja)}</span></div>
+            <span class="badge ${p.source === "test" ? "teacher" : ""}">${p.source === "test" ? "テスト" : "自分で"}</span>
+            <button type="button" class="btn ghost small-btn" data-remove="${esc(p.key)}">外す</button>
+          </li>`).join("")}</ul>
+        </section>`
+      : emptyState("まだフレーズ復習がありません。<br>フレーズカードの「復習タブに入れる」を押すか、<br>テストでまちがえたフレーズがここに入ります。")}
+    </main>`;
+  app.querySelectorAll("[data-remove]").forEach((button) =>
+    button.addEventListener("click", async () => {
+      await setPhraseReview(button.dataset.remove, false);
+      renderPhraseReview();
+    }),
+  );
+}
+
+function renderPhraseReviewRound() {
+  if (!state.phraseReviewRound) {
+    const phrases = shuffle(reviewPhrases()).slice(0, PHRASE_REVIEW_SESSION);
+    if (!phrases.length) {
+      location.hash = "#/phrase-review";
+      return;
+    }
+    state.phraseReviewRound = { phrases, steps: phraseSteps(phrases, { hintLater: true }), index: 0, revealed: {}, answers: {}, done: false };
+  }
+  const P = state.phraseReviewRound;
+  if (P.done) return renderPhraseReviewResult(P);
+  renderPhraseSteps(P, {
+    title: "フレーズ復習",
+    back: "#/phrase-review",
+    again: renderPhraseReviewRound,
+    finishLabel: "結果を見る",
+    finish: () => {
+      P.done = true;
+      renderPhraseReviewRound();
+      window.scrollTo(0, 0);
+    },
+  });
+}
+
+// How the round went, and which phrases to take out of the list: those whose
+// 瞬間英作文 were all right are ticked to begin with.
+function renderPhraseReviewResult(P) {
+  const drills = P.steps.map((s, i) => ({ s, answer: P.answers[i] })).filter(({ s }) => s.kind === "drill");
+  const right = drills.filter(({ answer }) => answer?.right).length;
+  const allRight = (phrase) => {
+    const own = drills.filter(({ s }) => s.phrase === phrase);
+    return own.length > 0 && own.every(({ answer }) => answer?.right);
+  };
+  app.innerHTML = `${topbar("フレーズ復習", "#/phrase-review")}
+    <main class="wrap stack">
+      <section class="card stack" style="text-align:center">
+        <p style="font-size:40px">${right === drills.length ? "🎉" : "👏"}</p>
+        ${drills.length ? `<p class="score">${right} / ${drills.length}<small> 問正解</small></p>` : ""}
+        <p>${P.phrases.length} フレーズを復習しました。</p>
+      </section>
+      <section class="card stack" id="known-box">
+        <h3>フレーズ復習から外す</h3>
+        <p class="muted small">もう大丈夫なフレーズにチェックを入れてください（瞬間英作文が全部正解だったものには、はじめからチェックが入っています）。チェックしないフレーズは、フレーズ復習に残ります。</p>
+        <ul class="pick-list">${P.phrases.map((p) => `<li><label>
+          <input type="checkbox" data-key="${esc(p.key)}" ${allRight(p) ? "checked" : ""}>
+          <span><b lang="en">${esc(p.en)}</b><span class="muted small">${esc(p.ja)}</span></span>
+        </label></li>`).join("")}</ul>
+        <button type="button" class="btn secondary block" id="remove-known">チェックしたフレーズを外す</button>
+      </section>
+      <button type="button" class="btn block" id="again">もう一度</button>
+      <a class="btn ghost block" href="#/phrase-review">フレーズ復習にもどる</a>
+    </main>`;
+
+  document.getElementById("remove-known").addEventListener("click", async (event) => {
+    event.target.disabled = true;
+    const box = document.getElementById("known-box");
+    const picked = [...box.querySelectorAll("input[data-key]:checked")].map((input) => input.dataset.key);
+    for (const key of picked) await setPhraseReview(key, false);
+    const kept = P.phrases.length - picked.length;
+    box.innerHTML = `<p>${picked.length ? `${picked.length} こをフレーズ復習から外しました。` : "外したフレーズはありません。"}${kept ? `${kept} こはフレーズ復習に残しました。` : ""}</p>`;
+  });
+  document.getElementById("again").addEventListener("click", () => {
+    state.phraseReviewRound = null;
+    renderPhraseReviewRound();
+    window.scrollTo(0, 0);
+  });
 }
 
 // ---------- pronunciation ----------
@@ -1479,17 +1878,7 @@ function renderLesson(unit, lessonId) {
     draw();
   }
 
-  if (step.type === "write") {
-    const form = document.getElementById("write");
-    form.answer.focus();
-    form.addEventListener("submit", (event) => {
-      event.preventDefault();
-      const given = form.answer.value.trim();
-      if (!given) return;
-      record(given, step.answers.some((a) => normalizeAnswer(a) === normalizeAnswer(given)));
-    });
-    document.getElementById("give-up").addEventListener("click", () => record("", false));
-  }
+  if (step.type === "write") bindWriteForm(step.answers, record);
 }
 
 // Words listed in a step's `highlight` (like am / is / are) are shown in red.
@@ -1645,6 +2034,7 @@ function questionStepHtml(step, answer) {
       <p class="verdict ${answer.right ? "right" : explained ? explained.tone : "wrong"}" id="verdict-head">${answer.right ? "⭕ 正解！" : explained ? explained.head : "❌ ざんねん"}</p>
       ${explained ? `<div id="mistakes" class="stack">${explained.list}</div>` : ""}
       ${answer.right ? "" : explained ? explained.right : `<p>正解は <b lang="en">${esc(correctAnswer(step))}</b></p>`}
+      ${step.say ? `<div>${sayButton(step.say, "正解を聞く")}</div>` : ""}
       ${step.why ? `<p class="muted">${fmt(step.why)}</p>` : ""}
     </section>` : "";
 
@@ -1675,11 +2065,15 @@ function questionStepHtml(step, answer) {
     </section>${verdict}`;
   }
 
-  // write
+  // write: label, hint and say (the answer read aloud) can be set by the step;
+  // with hintLater the hint waits behind a ヒントを見る button (tests).
+  const hint = step.hint && !answer && step.hintLater
+    ? `<details class="hint-box"><summary>ヒントを見る</summary><p>${esc(step.hint)}</p></details>`
+    : step.hint ? `<p class="muted small">ヒント：<span lang="en">${esc(step.hint)}</span></p>` : "";
   return `<section class="card stack">
-    <p class="label">英語にしてみよう</p>
+    <p class="label">${esc(step.label || "英語にしてみよう")}</p>
     <p class="question-ja">${esc(step.ja)}</p>
-    ${step.hint ? `<p class="muted small">ヒント：<span lang="en">${esc(step.hint)}</span></p>` : ""}
+    ${hint}
     ${answer
       ? explained ? `<div id="mine">${explained.mine}</div>` : `<p class="question" lang="en">${esc(answer.given || "（答えを見た）")}</p>`
       : `<form id="write" class="stack">
