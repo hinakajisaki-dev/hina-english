@@ -1,6 +1,7 @@
 // スモールトーク Week 1: 「はじめて会った人と話す」49 フレーズ、7 日分.
 // From smalltalk/week1.md (branch claude/fervent-clarke-wg3uno). Every student gets the same phrases.
 // Fields as in public/phrases/book.js. Keep the ids: students' フレーズ復習 lists use them.
+// Changed by the teacher after converting: #3's 塊 is "isn't it?".
 
 export const WEEK1 = {
   week: 1,
@@ -30,7 +31,7 @@ export const WEEK1 = {
       id: "03", day: 1, scene: "場面1：あいさつ（ホテルのプールで）",
       en: "Not bad! Beautiful day, isn't it?",
       ja: "悪くないよ！いい天気だね",
-      chunk: "主語 ＋ is ＋ 形容詞, isn't it?",
+      chunk: "isn't it?",
       note: "文の最後につけて『〜ですよね？』と相手に同意を求める形. 相手は Yes, it is! と答えやすいので、知らない人に話しかけるきっかけにぴったり.",
       drills: [
         { ja: "今日は暑いですよね", answers: ["It's hot today, isn't it?"] },

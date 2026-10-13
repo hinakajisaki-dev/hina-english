@@ -1095,14 +1095,13 @@ function renderPhraseWeek(week) {
 }
 
 // A 瞬間英作文 as a grammar write step, so it is checked and explained the same
-// way. Its hint waits behind a ヒントを見る button; in a test, where the card
-// isn't just before it, the hint also names the 塊.
-const drillStep = (phrase, drill, { withChunk = false, label = "瞬間英作文" } = {}) => ({
+// way. Its hint, the 塊 and the drill's own hint, waits behind a ヒントを見る button.
+const drillStep = (phrase, drill, { label = "瞬間英作文" } = {}) => ({
   type: "write",
   label,
   ja: drill.ja,
   answers: drill.answers,
-  hint: [withChunk ? (phrase.chunk ? `塊：${phrase.chunk}` : `フレーズ：${phrase.en}`) : "", drill.hint].filter(Boolean).join("\n"),
+  hint: [phrase.chunk ? `塊：${phrase.chunk}` : `フレーズ：${phrase.en}`, drill.hint].filter(Boolean).join("\n"),
   hintLater: true,
   say: drill.answers[0],
 });
@@ -1266,7 +1265,7 @@ function renderPhraseTest(week, number) {
   const id = phraseSetKey(week, number);
   if (state.phraseTest?.id !== id) {
     const questions = shuffle(setDrills(set)).slice(0, TEST_SIZE)
-      .map(({ phrase, drill }) => ({ phrase, drill, step: drillStep(phrase, drill, { withChunk: true, label: "テスト" }) }));
+      .map(({ phrase, drill }) => ({ phrase, drill, step: drillStep(phrase, drill, { label: "テスト" }) }));
     state.phraseTest = { id, questions, index: 0, answers: [], saved: false };
   }
   const T = state.phraseTest;
