@@ -3,14 +3,6 @@
 .hello { padding: 8px 2px 4px; }
 .hello h2 { font-size: 22px; font-weight: 900; }
 
-/* today's phrase on the home screen */
-.today {
-  background: var(--accent-soft); border-color: var(--line-warm);
-  display: flex; flex-direction: column; gap: 8px;
-}
-.today .phrase { font-family: var(--en); font-weight: 800; font-size: 24px; line-height: 1.35; }
-.today .meaning { font-weight: 700; }
-
 .tiles { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
 .tile {
   display: flex; flex-direction: column; gap: 4px; padding: 16px; border-radius: var(--radius);
@@ -77,11 +69,20 @@
 .speed button:last-child { font-family: var(--ja); }
 .speed button[aria-pressed="true"] { background: var(--ink); color: #fff; }
 
-/* phrase list */
-.phrase-card .phrase { font-family: var(--en); font-weight: 800; font-size: 20px; line-height: 1.4; }
-.phrase-card .note { font-size: 14px; color: var(--ink-2); }
-.phrase-card.is-today { border: 2px solid var(--accent); }
-.phrase-head { display: flex; gap: 10px; align-items: flex-start; justify-content: space-between; }
+/* フレーズ cards */
+.phrase-en { font-family: var(--en); font-weight: 800; font-size: clamp(22px, 6.4vw, 28px); line-height: 1.3; overflow-wrap: anywhere; }
+.word-front .phrase-en { text-align: center; }
+.scene { width: fit-content; font-size: 12px; font-weight: 700; padding: 2px 10px; border-radius: 99px; background: var(--sky-soft); color: var(--ink-2); }
+.word-front .scene { margin: 0 auto; }
+.chunk-box { border-radius: 14px; padding: 12px 14px; background: var(--sky-soft); }
+.chunk-box .chunk { font-family: var(--en); font-weight: 800; font-size: 17px; line-height: 1.5; overflow-wrap: anywhere; }
+.week-theme { font-size: 20px; }
+.phrase-note { border-radius: 14px; padding: 12px 14px; background: var(--cream); font-size: 15px; line-height: 1.7; }
+.phrase-note .label { margin-bottom: 2px; }
+.review-add { border: 2px dashed var(--line); }
+.btn.review-on { background: var(--good-soft); color: var(--good); border-color: transparent; }
+.hint-box summary { width: fit-content; cursor: pointer; font-size: 14px; font-weight: 700; color: var(--accent-text); padding: 4px 0; }
+.hint-box p { margin-top: 6px; font-size: 14px; color: var(--ink-2); }
 
 /* pronunciation */
 .sentence { font-family: var(--en); font-weight: 700; font-size: clamp(22px, 6.5vw, 28px); line-height: 1.45; }
@@ -135,6 +136,8 @@
 .mistakes .where { display: inline-block; }
 .mistakes .why { display: block; margin-top: 2px; color: var(--muted); font-size: 14px; line-height: 1.6; }
 .mtag.ok { background: var(--good-soft); color: var(--good); }
+.verdict.judging { display: flex; align-items: center; gap: 10px; color: var(--muted); font-size: 16px; }
+.ai-comment { font-size: 15px; line-height: 1.7; background: var(--sky-soft); border-radius: 12px; padding: 10px 12px; }
 .ai-note { display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: 12px; }
 .ai-note .spinner { width: 12px; height: 12px; border-width: 2px; }
 .mtag { flex: none; font-size: 12px; font-weight: 900; padding: 1px 8px; border-radius: 99px; background: var(--bad-soft); color: var(--bad); }

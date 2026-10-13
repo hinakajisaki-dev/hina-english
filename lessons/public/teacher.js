@@ -1,10 +1,11 @@
-// Teacher page: add students, give each one their own words, phrases,
+// Teacher page: add students, give each one their own words,
 // pronunciation sentences, grammar problems and journal topics, and read
 // their journals with the AI corrections.
 import { ApiError, api, diffHtml, esc, formatDateTime, icons, startOfJapanDay, toast } from "./common.js";
 import { UNITS } from "./grammar/lessons.js";
 import { bookWeeks, bookWords, setKey, weekWords, wordSets } from "./vocab/words.js";
 import { monthPhrases, pronMonths } from "./pron/phrases.js";
+import { phraseSetKey, phraseSets, phraseWeeks, testSize } from "./phrases/book.js";
 import { bindPanels, formatMinutes, monthPanel, monthStart, summary, today, weekDays, weekPanel, weekStart } from "./study.js";
 
 document.body.classList.add("teacher");
@@ -19,13 +20,6 @@ const KINDS = {
     required: 2,
     format: "単語 | 意味 | 例文（なくてもOK）",
     example: "borrow | 借りる | Can I borrow your pen?\nslip one's mind | うっかり忘れる",
-  },
-  phrase: {
-    tab: "フレーズ",
-    columns: ["phrase", "meaning", "note"],
-    required: 2,
-    format: "フレーズ | 意味 | メモ（なくてもOK）",
-    example: "It slipped my mind. | うっかり忘れてた | forgot よりやわらかい言い方",
   },
   pron: {
     tab: "発音",
@@ -50,7 +44,7 @@ const KINDS = {
   },
 };
 const COLUMN_NAMES = {
-  word: "単語", meaning: "意味", phrase: "フレーズ", text: "文", question: "問題", answer: "答え", prompt: "テーマ",
+  word: "単語", meaning: "意味", text: "文", question: "問題", answer: "答え", prompt: "テーマ",
 };
 
 // ---------- boot and routing ----------
@@ -215,11 +209,16 @@ async function renderStudent(id, tab) {
   const shared = pronMonths().flatMap((m) => monthPhrases(m));
   const pronFinished = shared.filter((p) => data.pronDone?.[p.key]).length;
   const studyWeek = summary(weekDays(data.study || [], weekStart(today())));
+  const phraseTestSets = phraseSetList();
+  const phraseTested = phraseTestSets.filter((s) => data.phraseTests?.[s.key]).length;
 
   const tabs = [
     ["journals", `日記${unread ? `（未読 ${unread}）` : ""}`],
     ["study", "勉強時間"],
-    ...Object.entries(KINDS).map(([kind, spec]) => [kind, `${spec.tab} ${byKind(kind).length}`]),
+    ...Object.entries(KINDS).flatMap(([kind, spec]) => [
+      [kind, `${spec.tab} ${byKind(kind).length}`],
+      ...(kind === "vocab" ? [["phrases", "フレーズ"]] : []),
+    ]),
     ["settings", "設定・コード"],
   ];
 
@@ -233,6 +232,7 @@ async function renderStudent(id, tab) {
       <div class="stats">
         <div class="stat"><b>${journals.length}</b><span>日記（この7日で ${thisWeek}）</span></div>
         <div class="stat"><b>${vocabTested} / ${vocabSets.length}</b><span>単語テスト（復習カード ${(data.review || []).length} 語）</span></div>
+        <div class="stat"><b>${phraseTested} / ${phraseTestSets.length}</b><span>フレーズテスト（復習 ${(data.phraseReview || []).length} こ）</span></div>
         <div class="stat"><b>${tries ? `${Math.round((grammarTries.right / tries) * 100)}%` : "—"}</b><span>文法の正解率</span></div>
         <div class="stat"><b>${pronFinished} / ${shared.length}</b><span>発音の完了</span></div>
         <div class="stat"><b>${formatMinutes(studyWeek.total)}</b><span>今週の勉強時間</span></div>
@@ -248,6 +248,7 @@ async function renderStudent(id, tab) {
   if (tab === "journals") renderJournals(panel);
   else if (tab === "study") renderStudyTab(panel);
   else if (tab === "settings") renderSettings(panel);
+  else if (tab === "phrases") panel.innerHTML = phraseResultsHtml();
   else if (KINDS[tab]) renderItems(panel, tab);
   else renderJournals(panel);
 }
@@ -355,8 +356,6 @@ function rowHtml(kind, item, progress) {
   if (kind === "vocab") {
     main = d.word; sub = [d.meaning, d.example].filter(Boolean).join(" ・ ");
     if ((state.current.review || []).some((r) => r.key === `item/${item.id}`)) pill = `<span class="pill">復習カード</span>`;
-  } else if (kind === "phrase") {
-    main = d.phrase; sub = [d.meaning, d.note].filter(Boolean).join(" ・ ");
   } else if (kind === "pron") {
     main = d.text; sub = d.tip;
     const key = `item/${item.id}`;
@@ -425,7 +424,6 @@ function renderItems(panel, kind) {
         <button class="btn" type="submit">追加</button>
       </form>
       ${kind === "grammar" ? `<p class="muted small">選択肢がない問題は、生徒が答えを入力します。正解が2つ以上あるときは、答えを <code>I'm / I am</code> のように / で区切ってください。</p>` : ""}
-      ${kind === "phrase" ? `<p class="muted small">「今日のフレーズ」は、毎日この中から順番に1つ表示されます。</p>` : ""}
       ${kind === "topic" ? `<p class="muted small">日記のページで、毎日この中から順番に1つが「今日のテーマ」になります。生徒は別のテーマや、テーマなしも選べます。</p>` : ""}
     </section>
     <section class="card">
@@ -551,6 +549,36 @@ function vocabResultsHtml() {
           : "まだやっていません"}</div>
       </div></li>`;
     }).join("")}</ul>
+  </section>`;
+}
+
+// Every フレーズ set that ends with a test, with its key.
+function phraseSetList() {
+  return phraseWeeks().flatMap((week) =>
+    phraseSets(week).filter(testSize).map((set) => ({ week, ...set, key: phraseSetKey(week, set.number) })),
+  );
+}
+
+// フレーズ is the same book for everyone (public/phrases/), so this tab only
+// shows how the student is doing.
+function phraseResultsHtml() {
+  const results = state.current.phraseTests || {};
+  const review = state.current.phraseReview || [];
+  const fromTests = review.filter((r) => r.source === "test").length;
+  const sets = phraseSetList();
+  return `<section class="card stack">
+    <h3>フレーズテストの結果</h3>
+    <p class="muted small">フレーズ復習：${review.length} こ（テストでまちがえた ${fromTests} こ、自分で入れた ${review.length - fromTests} こ）</p>
+    ${sets.length ? `<ul class="rows">${sets.map((set) => {
+      const r = results[set.key];
+      return `<li><div class="main">
+        <div><b>Week ${set.week} ・ ${esc(set.title)}</b></div>
+        <div class="sub">${r
+          ? `ベスト ${r.best} / ${r.total}　前回 ${r.last} / ${r.total}　${r.times} 回　（${esc(formatDateTime(r.updated_at))}）`
+          : "まだやっていません"}</div>
+      </div></li>`;
+    }).join("")}</ul>` : `<p class="muted">フレーズはまだ準備中です。</p>`}
+    <p class="muted small">フレーズの中身は全員共通です。足したり直したりしたいときは、Claude に頼んでください。</p>
   </section>`;
 }
 
