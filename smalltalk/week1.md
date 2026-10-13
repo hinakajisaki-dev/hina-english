@@ -1,0 +1,514 @@
+# スモールトーク Week 1（教材の中身）
+
+12週間でスモールトークができるようになるためのコースの Week 1。テーマは「はじめて会った人と話す」。場面はハワイのホテル、カフェ、パーティーなど。
+
+このファイルは教材の中身だけ. アプリへの入れ方は別に決める.
+
+## 概要
+
+- 49フレーズ（#1〜49）を 1日7フレーズ × 7日 に分ける
+- 問題数は合計141問（フレーズ49問 ＋ 瞬間英作文92問）
+- フレーズは会話の流れの順番に並んでいる（質問 → 答え → 聞き返す → もう一歩深く聞く）. 「場面」は会話のまとまり
+
+| Day | フレーズ | 問題数 |
+| --- | --- | --- |
+| Day 1 | #1〜7 | 17問 |
+| Day 2 | #8〜14 | 21問 |
+| Day 3 | #15〜21 | 21問 |
+| Day 4 | #22〜28 | 19問 |
+| Day 5 | #29〜35 | 21問 |
+| Day 6 | #36〜42 | 21問 |
+| Day 7 | #43〜49 | 21問 |
+
+## 1フレーズの流れ（カードの構成）
+
+1. **フレーズ**：英語の文が出る（実際の日常会話で出てくる文）
+2. **タップ**：和訳・塊・解説が出る
+3. **瞬間英作文**：その塊を使った問題が2問出る. 日本語を見て英語で言う. 答えを見られる
+   - **ヒント**：わからないときだけ表示する（ヒントがない問題もある）
+   - 瞬間英作文がないフレーズもある（#2、#5、#23. 基本的すぎるものと決まり文句）
+
+## 項目の説明
+
+| 項目 | 内容 |
+| --- | --- |
+| フレーズ | 最初に表示する英語の文 |
+| 和訳 | フレーズの日本語訳 |
+| 塊 | フレーズの中で覚える形. 「〇〇 ＋ 動詞」のように書く |
+| 解説 | 塊の意味と使い方 |
+| 瞬間英作文①② | 「日本語 → 英語（答え）」. （ ）の中は場面のヒント（主語や性別が日本語だけでは決まらないとき） |
+| ヒント | 瞬間英作文の下に書いてあるもの. わからないときに表示する |
+
+塊の書き方：動詞 ＝ 原形、動詞ing ＝ 〜ing の形、過去分詞 ＝ been, tried など. 名詞・形容詞・人・場所・期間 は、その種類の言葉が入る.
+
+## 書き方のルール（先生の指定）
+
+- 解説の文の終わりは「。」ではなく「.」. 文の途中で区切るところも「.」
+- 』や」のあとには「。」も「.」もつけない
+- 和訳と瞬間英作文の日本語は、文の最後に何もつけない（！と？はそのまま）. 2つの文に分かれるときは「.」で区切る
+- 解説には、瞬間英作文と同じ例を書かない（問題の答えになってしまうため）
+
+---
+
+## Day 1（#1〜7）
+
+### 場面1：あいさつ（ホテルのプールで）
+
+#### 1. Hi! How's it going?
+- 和訳：やあ！調子どう？
+- 塊：How's ＋ 名詞 ＋ going?
+- 解説：『〜はどう？うまくいってる？』と様子を聞く形. How's it going? は How are you? のカジュアル版で、あいさつとして使う.
+- 瞬間英作文①：仕事はどう？ → How's work going?
+  - ヒント：仕事 ＝ work（a や the はつけない）
+- 瞬間英作文②：旅行はどう？ → How's your trip going?
+  - ヒント：旅行 ＝ trip
+
+#### 2. Pretty good, thanks. How about you?
+- 和訳：けっこういいよ、ありがとう. あなたは？
+- 塊：自分の答え ＋ How about you?
+- 解説：自分が答えたあとに『あなたは？』と同じ質問を相手に返す形. これを言うと会話が一方通行にならず、キャッチボールが続く. What about you? も同じ意味.
+- 瞬間英作文：なし
+
+#### 3. Not bad! Beautiful day, isn't it?
+- 和訳：悪くないよ！いい天気だね
+- 塊：主語 ＋ is ＋ 形容詞, isn't it?
+- 解説：文の最後につけて『〜ですよね？』と相手に同意を求める形. 相手は Yes, it is! と答えやすいので、知らない人に話しかけるきっかけにぴったり.
+- 瞬間英作文①：今日は暑いですよね → It's hot today, isn't it?
+- 瞬間英作文②：ここ、いいですよね → This place is nice, isn't it?
+  - ヒント：ここ ＝ this place
+
+### 場面2：名前
+
+#### 4. I'm Yuki, by the way.
+- 和訳：ちなみに、私はユキです
+- 塊：By the way, ＋ 文
+- 解説：『ところで、ちなみに』話題を変えたり、言い忘れたことを足したりするときの言葉. 会話の途中で名前を言うときにも自然に使える. 文の最初にも最後にも置ける.
+- 瞬間英作文①：ところで、どこ出身？ → By the way, where are you from?
+- 瞬間英作文②：ちなみに、その帽子すてきですね → By the way, I love your hat.
+  - ヒント：「その〜すてき」は I love your 〜
+
+#### 5. Nice to meet you, Yuki. I'm Michael.
+- 和訳：よろしく、ユキ. マイケルです
+- 塊：Nice to ＋ meet / see ＋ you
+- 解説：meet は「初めて会う」なので、Nice to meet you は初対面のときだけ. 2回目からは see を使う.
+- 瞬間英作文：なし
+
+#### 6. Do people call you Mike?
+- 和訳：みんなからマイクって呼ばれてるの？
+- 塊：call ＋ 人 ＋ 呼び名
+- 解説：『（人）を〜と呼ぶ』英語では Michael → Mike のような短い呼び名（ニックネーム）がよくある. 自分の呼ばれ方を伝えるときにも使える.
+- 瞬間英作文①：みんなユウって呼びます → Everyone calls me Yu.
+  - ヒント：Everyone のあとの call には s がつく
+- 瞬間英作文②：なんて呼べばいい？ → What should I call you?
+  - ヒント：What should I 〜?
+
+### 場面3：仕事
+
+#### 7. So, what do you do?
+- 和訳：で、お仕事は何をしてるの？
+- 塊：What do/does ＋ 人 ＋ do?
+- 解説：『（人）の仕事は何？』と聞く定番の形. What's your job? より自然. What are you doing?（今何してる？）とはちがうので注意. 最初の So, は新しい話題に入る合図.
+- 瞬間英作文①：お兄さんは何の仕事をしてるの？ → What does your brother do?
+  - ヒント：1人のときは does
+- 瞬間英作文②：ご両親は何の仕事をしてるの？ → What do your parents do?
+  - ヒント：両親 ＝ parents
+
+---
+
+## Day 2（#8〜14）
+
+### 場面3：仕事（つづき）
+
+#### 8. I'm a nurse. What about you?
+- 和訳：看護師です. あなたは？
+- 塊：I'm ＋ a/an ＋ 職業
+- 解説：職業を言うときは a をつける. engineer のように母音（ア・イ・ウ・エ・オの音）で始まる職業は an. What about you? は How about you? と同じ.
+- 瞬間英作文①：教師です → I'm a teacher.
+- 瞬間英作文②：会社員です → I'm an office worker.
+  - ヒント：会社員 ＝ office worker
+
+#### 9. I work for a travel company.
+- 和訳：旅行会社で働いています
+- 塊：work for ＋ 会社 / work at ＋ 場所 / work in ＋ 分野
+- 解説：どこで働いているかは前置詞で使い分ける. for のうしろは会社、at のうしろは場所、in のうしろは業界や分野.
+- 瞬間英作文①：病院で働いています → I work at a hospital.
+- 瞬間英作文②：営業の仕事をしています → I work in sales.
+  - ヒント：営業 ＝ sales
+
+#### 10. How long have you been doing that?
+- 和訳：その仕事はどれくらい続けているの？
+- 塊：How long have you been ＋ 動詞ing?
+- 解説：『（過去から今まで）どれくらい〜しているの？』と期間を聞く形. 答えは For five years.（5年です）や Since 2020.（2020年からです）のように言う.
+- 瞬間英作文①：英語はどれくらい勉強してるの？ → How long have you been studying English?
+  - ヒント：How long have you been 〜ing?
+- 瞬間英作文②：ここにはどれくらい住んでるの？ → How long have you been living here?
+
+### 場面4：仕事についてもっと聞く
+
+#### 11. Do you enjoy it?
+- 和訳：仕事は楽しい？
+- 塊：enjoy ＋ 名詞 / 動詞ing
+- 解説：『〜を楽しむ』うしろには名詞か 〜ing が来る. enjoy to ＋ 動詞 とは言わないので注意.
+- 瞬間英作文①：料理するのが楽しい → I enjoy cooking.
+- 瞬間英作文②：映画は楽しかった？ → Did you enjoy the movie?
+  - ヒント：過去の質問は Did you 〜?
+
+#### 12. Yeah. It's busy, but it's fun.
+- 和訳：うん. 忙しいけど、楽しいよ
+- 塊：文 ＋ , but ＋ 文
+- 解説：『〜だけど〜』と、マイナスとプラスの両方を言う形. but のうしろに本当に言いたいことが来ることが多い.
+- 瞬間英作文①：狭いけど、居心地がいい → It's small, but it's cozy.
+  - ヒント：居心地がいい ＝ cozy
+- 瞬間英作文②：高いけど、その価値はある → It's expensive, but it's worth it.
+  - ヒント：その価値がある ＝ it's worth it
+
+#### 13. The best part is meeting new people.
+- 和訳：いちばんいいところは、新しい人に会えることです
+- 塊：The best part (of ＋ 名詞) is ＋ 名詞 / 動詞ing
+- 解説：『（〜の）いちばんいいところは〜』相手の仕事や住んでいる場所について、もう一歩深く話せる.
+- 瞬間英作文①：ここに住んでいていちばんいいところは？ → What's the best part of living here?
+  - ヒント：What's the best part of 〜ing?
+- 瞬間英作文②：仕事でいちばんいいのは、一緒に働く人たちです → The best part of my job is the people.
+  - ヒント：一緒に働く人たち ＝ the people
+
+### 場面5：出身
+
+#### 14. Where are you from?
+- 和訳：どこの出身？
+- 塊：Where is/are ＋ 人・物 ＋ from?
+- 解説：『〜はどこから来たの？どこ出身？』人にも物にも使える. 1人・1つなら is、複数なら are.
+- 瞬間英作文①：ご家族はどこの出身？ → Where is your family from?
+  - ヒント：family は is
+- 瞬間英作文②：このコーヒーはどこ産？ → Where is this coffee from?
+  - ヒント：「どこ産」も Where 〜 from? で聞ける
+
+---
+
+## Day 3（#15〜21）
+
+### 場面5：出身（つづき）
+
+#### 15. I'm from Japan. Osaka, actually.
+- 和訳：日本から来ました. 大阪です
+- 塊：文 ＋ , actually
+- 解説：actually は『実は』ざっくり答えたあとに「くわしく言うと〜」と情報を足したり、相手の思いちがいをやんわり直したりするときに使う.
+- 瞬間英作文①：東京に住んでいます. 実は渋谷の近くなんです → I live in Tokyo. Near Shibuya, actually.
+  - ヒント：近く ＝ near
+- 瞬間英作文②：実は教師じゃなくて、看護師なんです → I'm not a teacher, actually. I'm a nurse.
+
+#### 16. Oh, cool! I've always wanted to go to Japan.
+- 和訳：へえ、いいね！ずっと日本に行ってみたかったんだ
+- 塊：I've always wanted to ＋ 動詞
+- 解説：『ずっと〜したいと思っていた』昔から今まで続いている願いを言う形. 相手の出身地や趣味に興味を示すときによく使う.
+- 瞬間英作文①：ずっとサーフィンをやってみたかった → I've always wanted to try surfing.
+  - ヒント：やってみる ＝ try
+- 瞬間英作文②：ずっとニューヨークに行きたかった → I've always wanted to go to New York.
+
+#### 17. Have you ever been?
+- 和訳：行ったことはある？
+- 塊：Have you ever ＋ 過去分詞?
+- 解説：『今までに〜したことある？』と経験を聞く形. 「〜に行ったことある？」は Have you ever been to ＋ 場所? 答えは Yes, once.（1回ある）か No, never.（一度もない）で返せる.
+- 瞬間英作文①：沖縄に行ったことある？ → Have you ever been to Okinawa?
+  - ヒント：行ったことがある ＝ have been to
+- 瞬間英作文②：納豆を食べたことある？ → Have you ever tried natto?
+  - ヒント：食べてみる ＝ try → tried
+
+### 場面6：地元
+
+#### 18. What's Osaka like?
+- 和訳：大阪ってどんなところ？
+- 塊：What's ＋ 名詞 ＋ like?
+- 解説：『〜ってどんな感じ？』と説明してもらう質問. この like は「好き」ではなく「〜のような」という意味. 場所、人、食べ物などに使える.
+- 瞬間英作文①：地元はどんなところ？ → What's your hometown like?
+  - ヒント：地元 ＝ hometown
+- 瞬間英作文②：日本の天気はどんな感じ？ → What's the weather like in Japan?
+  - ヒント：in Japan は最後
+
+#### 19. There's a lot to do there.
+- 和訳：そこはやることがたくさんあるよ
+- 塊：There's a lot to ＋ 動詞
+- 解説：『〜するもの（こと）がたくさんある』街や観光地を紹介するときによく使う. There's は There is の短い形. a lot は『たくさん』
+- 瞬間英作文①：東京には見るものがたくさんある → There's a lot to see in Tokyo.
+  - ヒント：in Tokyo は最後
+- 瞬間英作文②：ここには食べるものがたくさんある → There's a lot to eat here.
+
+#### 20. It's famous for its food.
+- 和訳：食べ物で有名です
+- 塊：名詞 ＋ is famous for ＋ 名詞
+- 解説：『〜で有名』地元の自慢を言うときに便利. its は「その（街の）」
+- 瞬間英作文①：京都はお寺で有名です → Kyoto is famous for its temples.
+  - ヒント：お寺 ＝ temple
+- 瞬間英作文②：ハワイはビーチで有名です → Hawaii is famous for its beaches.
+
+### 場面7：住んでいるところ
+
+#### 21. Do you live around here?
+- 和訳：この辺りに住んでるの？
+- 塊：文 ＋ around here
+- 解説：『この辺り、この近く』お店や場所を聞くときにもよく使う.
+- 瞬間英作文①：この辺にいいカフェある？ → Is there a good café around here?
+  - ヒント：〜ある？ ＝ Is there 〜?
+- 瞬間英作文②：この辺で働いてるの？ → Do you work around here?
+
+---
+
+## Day 4（#22〜28）
+
+### 場面7：住んでいるところ（つづき）
+
+#### 22. Yeah, I've lived here since I was a kid.
+- 和訳：うん、子どものころからここに住んでるよ
+- 塊：since ＋ 始まった時 / for ＋ 期間
+- 解説：『〜から（ずっと）』は since ＋ 始まった時. 『〜の間』は for ＋ 期間. どちらも I've ＋ 過去分詞 の文でよく使う.
+- 瞬間英作文①：東京に10年住んでいます → I've lived in Tokyo for ten years.
+  - ヒント：I've lived 〜
+- 瞬間英作文②：2020年からそこで働いています → I've worked there since 2020.
+  - ヒント：I've worked 〜
+
+#### 23. Lucky you!
+- 和訳：いいなあ！
+- 塊：Lucky you!（決まり文句）
+- 解説：『いいなあ！うらやましい！』と、相手のいいことを明るくうらやむ言葉. 嫌味はなく、ほめ言葉に近い. このまま覚える.
+- 瞬間英作文：なし
+
+### 場面8：きょうだい
+
+#### 24. Do you have any brothers or sisters?
+- 和訳：きょうだいはいる？
+- 塊：Do you have any ＋ 名詞（複数）?
+- 解説：『〜はある？いる？』質問では some ではなく any を使う. うしろの名詞は複数形.
+- 瞬間英作文①：ペットは飼ってる？ → Do you have any pets?
+- 瞬間英作文②：今週末、何か予定ある？ → Do you have any plans this weekend?
+  - ヒント：予定 ＝ plans
+
+#### 25. Yes, I have an older brother and a younger sister.
+- 和訳：うん、兄と妹がいます
+- 塊：older / younger ＋ brother / sister
+- 解説：英語には「兄」「弟」のような別々の言葉がないので、older（年上の）／ younger（年下の）をつけて言う. ふだんは brother, sister だけで言うことも多い.
+- 瞬間英作文①：弟がいます → I have a younger brother.
+- 瞬間英作文②：姉は大阪に住んでいます → My older sister lives in Osaka.
+  - ヒント：sister のあとの live には s がつく
+
+#### 26. Are you close?
+- 和訳：仲はいいの？
+- 塊：be close (with ＋ 人)
+- 解説：close は「近い」だけでなく『仲がいい』という意味もある. この意味では「クロース」と発音する. close the door（ドアを閉める）の「クローズ」とはちがう.
+- 瞬間英作文①：ご両親とは仲がいい？ → Are you close with your parents?
+  - ヒント：Are you close with 〜?
+- 瞬間英作文②：私たち、すごく仲がいいです → We're very close.
+
+#### 27. Yeah, we get along really well.
+- 和訳：うん、すごく仲がいいよ
+- 塊：get along (with ＋ 人)
+- 解説：『（〜と）うまくやっている、仲よくしている』家族、同僚、友だちなど、人との関係を言うときに使う.
+- 瞬間英作文①：同僚とうまくやっています → I get along well with my coworkers.
+  - ヒント：同僚 ＝ coworkers
+- 瞬間英作文②：お兄さんとはうまくやってる？ → Do you get along with your brother?
+  - ヒント：Do you get along with 〜?
+
+### 場面9：子ども
+
+#### 28. Do you have kids?
+- 和訳：お子さんはいる？
+- 塊：kid / kids
+- 解説：kids は children（子どもたち）のカジュアルな言い方で、会話ではこちらが自然. 1人なら kid.
+- 瞬間英作文①：うちの子たちはビーチが大好き → My kids love the beach.
+- 瞬間英作文②：お子さんは学校に通ってる？ → Are your kids in school?
+  - ヒント：学校に通っている ＝ in school
+
+---
+
+## Day 5（#29〜35）
+
+### 場面9：子ども（つづき）
+
+#### 29. Yes, I have two. How many do you have?
+- 和訳：うん、2人. あなたは何人？
+- 塊：How many ＋ 名詞（複数）＋ do you have?
+- 解説：『〜は何人（いくつ）いる？』と数を聞く形. How many のうしろは複数形の名詞. 話の流れでわかるときは、I have two. / How many do you have? のように名詞を省ける.
+- 瞬間英作文①：きょうだいは何人？ → How many brothers and sisters do you have?
+  - ヒント：きょうだい ＝ brothers and sisters
+- 瞬間英作文②：ペットは何匹飼ってる？ → How many pets do you have?
+
+#### 30. Three! How old are yours?
+- 和訳：3人！お子さんはいくつ？
+- 塊：How old is ＋ 人? / How old are ＋ 人（複数）?
+- 解説：『〜は何歳？』1人なら is、複数なら are. yours は「あなたの（子どもたち）」で、同じ言葉のくり返しを避けている.
+- 瞬間英作文①：息子さんは何歳？ → How old is your son?
+- 瞬間英作文②：ご両親はおいくつ？ → How old are your parents?
+  - ヒント：2人なので are
+
+#### 31. My son is eight, and my daughter is five.
+- 和訳：息子は8歳で、娘は5歳です
+- 塊：人 ＋ is ＋ 年齢
+- 解説：年齢は「人 is 数字」だけで言える. years old はつけてもつけなくても OK. son は息子、daughter は娘.
+- 瞬間英作文①：兄は30歳です → My brother is thirty.
+- 瞬間英作文②：うちの犬は3歳です → My dog is three.
+
+### 場面10：ペット
+
+#### 32. Is that your dog? He's so cute!
+- 和訳：あれはあなたの犬？かわいい！
+- 塊：Is that your ＋ 名詞?
+- 解説：『あれ（それ）はあなたの〜？』話しかけるきっかけに便利. 名前や性別がわかっているペットは it ではなく he / she で呼ぶのがふつう.
+- 瞬間英作文①：（メスの猫を見て）あれはあなたの猫？きれい！ → Is that your cat? She's beautiful!
+  - ヒント：メスなので she
+- 瞬間英作文②：あれはあなたの車？かっこいい！ → Is that your car? It's so cool!
+
+#### 33. Thanks! His name is Kaia.
+- 和訳：ありがとう！カイアっていうの
+- 塊：His / Her name is ＋ 名前
+- 解説：『彼（彼女）の名前は〜』ペットや家族を紹介するときに使う.
+- 瞬間英作文①：（メスの犬を紹介して）モモっていいます → Her name is Momo.
+- 瞬間英作文②：（オスの犬を見て）名前は何ていうの？ → What's his name?
+
+#### 34. What kind of dog is he?
+- 和訳：何の犬種？
+- 塊：What kind of ＋ 名詞 ＋ do you ＋ 動詞?
+- 解説：『どんな種類の〜？』名詞を入れかえるだけで、いろいろなことが聞ける. be動詞なら What kind of dog is he? の形.
+- 瞬間英作文①：どんな食べ物が好き？ → What kind of food do you like?
+- 瞬間英作文②：どんなお仕事をしているの？ → What kind of work do you do?
+  - ヒント：What kind of work 〜?
+
+### 場面11：どれくらいの頻度？
+
+#### 35. How often do you come to Hawaii?
+- 和訳：ハワイにはどれくらい来るの？
+- 塊：How often do you ＋ 動詞?
+- 解説：『どれくらいの頻度で〜？』と回数を聞く質問. be動詞なら How often are you in ＋ 場所? 答えは once a year（年1回）、from time to time（ときどき）など. How long（期間）、How many（数）と区別する.
+- 瞬間英作文①：どれくらい外食する？ → How often do you eat out?
+  - ヒント：外食する ＝ eat out
+- 瞬間英作文②：家族とはどれくらい会う？ → How often do you see your family?
+  - ヒント：会う ＝ see
+
+---
+
+## Day 6（#36〜42）
+
+### 場面11：どれくらいの頻度？（つづき）
+
+#### 36. I'm here from time to time.
+- 和訳：ときどき来ています
+- 塊：文 ＋ from time to time
+- 解説：『ときどき』sometimes とほぼ同じ意味. 文の最後に置くことが多い.
+- 瞬間英作文①：ときどきお寿司を食べます → I eat sushi from time to time.
+  - ヒント：from time to time は最後
+- 瞬間英作文②：彼女とはときどき会います → I see her from time to time.
+
+#### 37. Maybe once or twice a year.
+- 和訳：年に1、2回かな
+- 塊：回数 ＋ a ＋ week / month / year
+- 解説：「週・月・年に何回」の言い方. 1回は once、2回は twice、3回からは 数字 ＋ times. 最初の Maybe は「〜かな」と数字をぼかす言い方.
+- 瞬間英作文①：ジムに週3回行きます → I go to the gym three times a week.
+  - ヒント：3回 ＝ three times
+- 瞬間英作文②：母には週1回電話します → I call my mom once a week.
+  - ヒント：電話する ＝ call
+
+#### 38. Wow, you must really love it here!
+- 和訳：へえ、ここが本当に好きなんだね！
+- 塊：主語 ＋ must ＋ 動詞
+- 解説：ここの must は「〜しなければならない」ではなく『きっと〜にちがいない』という推測. 相手の話を聞いて、気持ちを想像して返すときに便利.
+- 瞬間英作文①：（相手に）疲れてるでしょう！ → You must be tired!
+  - ヒント：must のあとは be
+- 瞬間英作文②：それは楽しいだろうね！ → That must be fun!
+  - ヒント：That must be 〜
+
+### 場面12：旅行中
+
+#### 39. Are you here on vacation?
+- 和訳：休暇で来てるの？
+- 塊：on vacation / on business
+- 解説：『休暇で（旅行中で）』は on vacation、『仕事で』は on business. 旅行先での定番の質問.
+- 瞬間英作文①：お仕事で来ているんですか？ → Are you here on business?
+- 瞬間英作文②：来週は休暇です → I'm on vacation next week.
+
+#### 40. Yes, I'm here with my family for a week.
+- 和訳：うん、家族と1週間来ています
+- 塊：with ＋ 人 / for ＋ 期間
+- 解説：with は『〜と一緒に』、for は『〜の間』という意味. この2つで「誰と、どれくらい」を一度に言える.
+- 瞬間英作文①：友だちと3日間来ています → I'm here with my friends for three days.
+  - ヒント：I'm here with 〜 for 〜
+- 瞬間英作文②：姉と1週間来ました → I came with my sister for a week.
+  - ヒント：来た ＝ came
+
+#### 41. How do you like it so far?
+- 和訳：ここまでどう？
+- 塊：How do you like ＋ 名詞?
+- 解説：『〜はどう？気に入った？』と感想を聞く形. so far は『今のところ』
+- 瞬間英作文①：新しい仕事はどう？ → How do you like your new job?
+- 瞬間英作文②：ここの食べ物はどう？ → How do you like the food here?
+  - ヒント：here は最後
+
+#### 42. I love it! Everyone is so friendly.
+- 和訳：大好き！みんなすごくフレンドリー
+- 塊：Everyone is ＋ 形容詞
+- 解説：everyone は『みんな』だけど、文法上は1人あつかいなので are ではなく is.
+- 瞬間英作文①：ここはみんなすごく優しい → Everyone is so nice here.
+  - ヒント：here は最後
+- 瞬間英作文②：みんな準備できた？ → Is everyone ready?
+  - ヒント：Is everyone 〜?
+
+---
+
+## Day 7（#43〜49）
+
+### 場面13：旅行の話
+
+#### 43. Have you been anywhere else?
+- 和訳：ほかにどこか行った？
+- 塊：動詞 ＋ anywhere else?
+- 解説：『ほかのどこか』質問の文で使う. else は『ほかの』
+- 瞬間英作文①：ほかにどこか行きたい？ → Do you want to go anywhere else?
+  - ヒント：Do you want to go 〜?
+- 瞬間英作文②：ほかにおすすめの場所はある？ → Is there anywhere else you recommend?
+  - ヒント：Is there anywhere else you 〜? ／ おすすめする ＝ recommend
+
+#### 44. I went to Bali last year.
+- 和訳：去年バリに行きました
+- 塊：動詞（過去形）＋ last ＋ 時
+- 解説：last をつけると『この前の〜』という意味になる. 去年は last year、先週は last week. 一緒に使う動詞は過去形. go の過去形は went.
+- 瞬間英作文①：去年の夏、沖縄に行きました → I went to Okinawa last summer.
+- 瞬間英作文②：先月ヨガを始めました → I started yoga last month.
+  - ヒント：始める ＝ start → started
+
+#### 45. I've heard it's beautiful there.
+- 和訳：そこはきれいだって聞いたことがある
+- 塊：I've heard (that) ＋ 文
+- 解説：『〜って聞いたことがある』自分は行ったことがなくても、話を広げられる.
+- 瞬間英作文①：そこは食べ物が最高だって聞いた → I've heard the food is amazing there.
+  - ヒント：最高 ＝ amazing
+- 瞬間英作文②：すごく物価が高いって聞いた → I've heard it's really expensive.
+  - ヒント：物価が高い ＝ expensive
+
+### 場面14：趣味
+
+#### 46. What do you do for fun?
+- 和訳：ひまなときは何してるの？
+- 塊：動詞 ＋ for fun
+- 解説：『楽しみで、趣味で』趣味を聞くときは What's your hobby? より What do you do for fun? のほうが自然.
+- 瞬間英作文①：趣味でテニスをしています → I play tennis for fun.
+- 瞬間英作文②：お子さんたちは何をして遊ぶの？ → What do your kids do for fun?
+  - ヒント：What do 〜 do for fun?
+
+#### 47. I like cooking and going to cafés.
+- 和訳：料理とカフェめぐりが好き
+- 塊：I like ＋ 動詞ing
+- 解説：『〜するのが好き』動詞に ing をつけると「〜すること」になる. and で2つ以上つなげられる.
+- 瞬間英作文①：読書が好き → I like reading.
+- 瞬間英作文②：ビーチに行くのが好き → I like going to the beach.
+
+#### 48. Oh, nice! What do you like to cook?
+- 和訳：いいね！何を作るのが好き？
+- 塊：What do you like to ＋ 動詞?
+- 解説：『何を〜するのが好き？』like to ＋ 動詞 も like ＋ 動詞ing と同じ意味. 相手の答えからもう一歩深く聞く質問.
+- 瞬間英作文①：週末は何をするのが好き？ → What do you like to do on weekends?
+  - ヒント：週末に ＝ on weekends
+- 瞬間英作文②：何を食べるのが好き？ → What do you like to eat?
+
+#### 49. Mostly Japanese food.
+- 和訳：たいてい和食かな
+- 塊：I mostly ＋ 動詞
+- 解説：『ほとんど、主に』全部ではないけれど大部分、という感じ.
+- 瞬間英作文①：たいてい家で料理します → I mostly cook at home.
+- 瞬間英作文②：友だちはほとんど職場の人です → My friends are mostly from work.
+  - ヒント：My friends are mostly from 〜
