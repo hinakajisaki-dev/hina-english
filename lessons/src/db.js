@@ -118,9 +118,10 @@ const SCHEMA = [
     updated_at TEXT NOT NULL,
     PRIMARY KEY (student_id, set_key)
   )`,
-  // The AI's explanations of wrong typed grammar answers, kept so the same wrong
-  // answer to the same question is only sent to the AI once. key is a hash of the
-  // question and the answer; points is JSON [{ n, kind, topic, why }].
+  // The AI's verdicts on typed answers that match none of the right answers, kept
+  // so the same answer to the same question is only sent to the AI once. key is a
+  // hash of the question and the answer; points is the verdict as JSON
+  // ({ acceptable, comment, points: [{ n, kind, topic, why }] }).
   // student_id is who asked first (for the daily limit).
   `CREATE TABLE IF NOT EXISTS explanations (
     key TEXT PRIMARY KEY,

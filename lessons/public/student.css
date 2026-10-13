@@ -131,6 +131,8 @@
 .mistakes .where { display: inline-block; }
 .mistakes .why { display: block; margin-top: 2px; color: var(--muted); font-size: 14px; line-height: 1.6; }
 .mtag.ok { background: var(--good-soft); color: var(--good); }
+.verdict.judging { display: flex; align-items: center; gap: 10px; color: var(--muted); font-size: 16px; }
+.ai-comment { font-size: 15px; line-height: 1.7; background: var(--sky-soft); border-radius: 12px; padding: 10px 12px; }
 .ai-note { display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: 12px; }
 .ai-note .spinner { width: 12px; height: 12px; border-width: 2px; }
 .mtag { flex: none; font-size: 12px; font-weight: 900; padding: 1px 8px; border-radius: 99px; background: var(--bad-soft); color: var(--bad); }

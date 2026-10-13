@@ -44,6 +44,7 @@ async function load() {
 function render() {
   if (!state.me) return renderLogin();
   const [, screen, ...rest] = location.hash.split("/");
+  shownAnswer = null;
   // Opening a pronunciation month goes to the first phrase that isn't 完了 yet.
   if (screen === "pron") state.pron = { which: null, index: 0 };
   const screens = {
@@ -1142,9 +1143,9 @@ function renderPhraseSteps(P, { title, back, again, finishLabel, finish }) {
   const phrases = [...new Set(P.steps.map((s) => s.phrase))];
   const answer = P.answers[P.index];
   const last = P.index === P.steps.length - 1;
-  if (step.kind === "drill" && answer) askAiWhy(answer, { phrase: phrase.key, drill: step.drill.n }, step.drill.answers);
+  if (step.kind === "card") shownAnswer = null;
   const body = step.kind === "card" ? phraseCardHtml(phrase, P.revealed[P.index]) : questionStepHtml(step.step, answer);
-  const showNext = step.kind === "card" || answer;
+  const showNext = step.kind === "card" || (answer && !answer.judging);
 
   app.innerHTML = `${topbar(title, back)}
     <main class="wrap stack">
@@ -1189,8 +1190,9 @@ function renderPhraseSteps(P, { title, back, again, finishLabel, finish }) {
     document.getElementById("next")?.focus();
     return;
   }
-  bindWriteForm(step.drill.answers, (given, right) => {
-    P.answers[P.index] = { given, right };
+  bindWriteForm((given) => {
+    const source = { phrase: phrase.key, drill: step.drill.n };
+    P.answers[P.index] = given ? checkTyped(given, step.drill.answers, source, { redraw: again }) : { given, right: false };
     again();
     document.getElementById("verdict")?.scrollIntoView({ block: "nearest" });
   });
@@ -1208,17 +1210,16 @@ function bindPhraseReviewButton(phrase) {
   });
 }
 
-// The typed-answer form of a write step: record(given, right).
-function bindWriteForm(answers, record) {
+// The typed-answer form of a write step: answered(given), with "" for 答えを見る.
+function bindWriteForm(answered) {
   const form = document.getElementById("write");
   form.answer.focus();
   form.addEventListener("submit", (event) => {
     event.preventDefault();
     const given = form.answer.value.trim();
-    if (!given) return;
-    record(given, answers.some((a) => normalizeAnswer(a) === normalizeAnswer(given)));
+    if (given) answered(given);
   });
-  document.getElementById("give-up").addEventListener("click", () => record("", false));
+  document.getElementById("give-up").addEventListener("click", () => answered(""));
 }
 
 function renderPhraseSet(week, number) {
@@ -1263,7 +1264,7 @@ function renderPhraseTest(week, number) {
 
   const { phrase, drill, step } = T.questions[T.index];
   const answer = T.answers[T.index];
-  if (answer) askAiWhy(answer, { phrase: phrase.key, drill: drill.n }, drill.answers);
+  const settled = answer && !answer.judging;
   app.innerHTML = `${topbar(title, `#/phrases/${week}`)}
     <main class="wrap stack">
       <div class="lesson-progress" role="progressbar" aria-valuemin="1" aria-valuemax="${T.questions.length}" aria-valuenow="${T.index + 1}">
@@ -1271,22 +1272,26 @@ function renderPhraseTest(week, number) {
         <span class="counter">${T.index + 1} / ${T.questions.length}</span>
       </div>
       ${questionStepHtml(step, answer)}
-      ${answer && !answer.right ? `<p class="muted small">「<span lang="en">${esc(phrase.en)}</span>」をフレーズ復習に入れました。</p>` : ""}
-      ${answer ? `<div class="lesson-nav"><span></span><button type="button" class="btn" id="next">${T.index === T.questions.length - 1 ? "結果を見る" : "次へ"}</button></div>` : ""}
+      ${settled && !answer.right ? `<p class="muted small">「<span lang="en">${esc(phrase.en)}</span>」をフレーズ復習に入れました。</p>` : ""}
+      ${settled ? `<div class="lesson-nav"><span></span><button type="button" class="btn" id="next">${T.index === T.questions.length - 1 ? "結果を見る" : "次へ"}</button></div>` : ""}
     </main>`;
 
   if (answer) {
-    document.getElementById("next").addEventListener("click", () => {
+    document.getElementById("next")?.addEventListener("click", () => {
       T.index += 1;
       again();
     });
-    document.getElementById("next").focus();
+    document.getElementById("next")?.focus();
     return;
   }
-  bindWriteForm(drill.answers, (given, right) => {
-    T.answers[T.index] = { given, right };
-    if (!right) setPhraseReview(phrase.key, true, "test");
-    renderPhraseTest(week, number);
+  // A miss (once the answer is final) puts the phrase in フレーズ復習.
+  const settle = (a) => !a.right && setPhraseReview(phrase.key, true, "test");
+  bindWriteForm((given) => {
+    const source = { phrase: phrase.key, drill: drill.n };
+    const redraw = () => renderPhraseTest(week, number);
+    T.answers[T.index] = given ? checkTyped(given, drill.answers, source, { settled: settle, redraw }) : { given, right: false };
+    if (!given) settle(T.answers[T.index]);
+    redraw();
     document.getElementById("verdict")?.scrollIntoView({ block: "nearest" });
   });
 }
@@ -1808,7 +1813,6 @@ function renderLesson(unit, lessonId) {
 
   const step = steps[L.index];
   const answer = L.answers[L.index];
-  if (answer && step.type === "write") askAiWhy(answer, { lesson: lessonId, step: L.index }, step.answers);
   const percent = Math.round((L.index / steps.length) * 100);
   let body;
   if (step.type === "explain") body = explainHtml(step);
@@ -1823,7 +1827,7 @@ function renderLesson(unit, lessonId) {
       ${body}
       <div class="lesson-nav">
         ${L.index > 0 ? `<button type="button" class="btn ghost" id="prev">← もどる</button>` : "<span></span>"}
-        ${step.type === "explain" || answer ? `<button type="button" class="btn" id="next">${L.index === steps.length - 1 ? "おわり" : "次へ"}</button>` : ""}
+        ${step.type === "explain" || (answer && !answer.judging) ? `<button type="button" class="btn" id="next">${L.index === steps.length - 1 ? "おわり" : "次へ"}</button>` : ""}
       </div>
     </main>`;
 
@@ -1878,7 +1882,16 @@ function renderLesson(unit, lessonId) {
     draw();
   }
 
-  if (step.type === "write") bindWriteForm(step.answers, record);
+  if (step.type === "write") {
+    bindWriteForm((given) => {
+      const source = { lesson: lessonId, step: L.index };
+      const redraw = () => renderLesson(unit, lessonId);
+      if (!given) return record("", false);
+      L.answers[L.index] = checkTyped(given, step.answers, source, { redraw });
+      redraw();
+      document.getElementById("verdict")?.scrollIntoView({ block: "nearest" });
+    });
+  }
 }
 
 // Words listed in a step's `highlight` (like am / is / are) are shown in red.
@@ -1937,10 +1950,9 @@ function explainHtml(step) {
 
 // A wrong typed answer, explained: the student's words with the mistakes marked,
 // one line per mistake (スペルミス, 文法 …), and the right answer with what
-// changed in green. `ai` is the AI's reasons, filled in after the answer shows:
-// { pending: true } while they're on the way, then { points } or { error }.
-// The AI can also name a mistake better (childs → children is 文法, 7 → seven
-// is OK). Returns null when there is nothing to explain.
+// changed in green. `ai` is the AI's verdict when there is one ({ comment,
+// points } or { error }): its points can name a mistake better (childs →
+// children is 文法) and say why. Returns null when there is nothing to explain.
 const MISTAKE_TAGS = {
   spelling: "スペルミス", grammar: "文法", word: "ちがう単語", extra: "いらない単語", missing: "たりない単語", order: "語順",
   ok: "OK",
@@ -1956,8 +1968,7 @@ function mistakesHtml(given, answers, ai) {
     return { ...m, kind: point?.kind || m.type, topic: point?.kind === "grammar" ? point.topic : "", why: point?.why || "" };
   });
   const kinds = mistakes.map((m) => m.kind);
-  const allOk = kinds.every((k) => k === "ok");
-  const head = allOk ? "💡 この答えも正しい英語です"
+  const head = kinds.every((k) => k === "ok") ? "🔺 おしい！"
     : kinds.every((k) => k === "spelling" || k === "ok") ? "🔺 おしい！スペルミスがあります"
     : kinds.some((k) => k === "grammar" || k === "order") ? "❌ 文法のまちがいがあります"
     : "❌ ざんねん";
@@ -1989,54 +2000,95 @@ function mistakesHtml(given, answers, ai) {
     const tag = `${MISTAKE_TAGS[m.kind]}${m.topic ? `・${esc(m.topic)}` : ""}`;
     return `<li><span class="mtag ${m.kind}">${tag}</span><span>${what}${m.why ? `<span class="why">${esc(m.why)}</span>` : ""}</span></li>`;
   });
-  const aiNote = ai?.pending ? `<p class="ai-note"><span class="spinner" aria-hidden="true"></span>AI が説明を書いています…</p>`
-    : ai?.error ? `<p class="ai-note">${esc(ai.error)}</p>`
-    : points.some((p) => p.why) ? `<p class="ai-note">説明は AI が書いています</p>`
+  const comment = ai?.comment ? `<p class="ai-comment">💡 ${esc(ai.comment)}</p>` : "";
+  const aiNote = ai?.error ? `<p class="ai-note">${esc(ai.error)}</p>`
+    : ai?.comment || points.some((p) => p.why) ? `<p class="ai-note">判定と説明は AI がしています</p>`
     : "";
   return {
     head,
-    tone: allOk ? "right" : "wrong",
     mine: `<p class="muted small">あなたの答え</p><p class="your-answer" lang="en">${mine}</p>`,
-    list: `<ul class="mistakes">${items.join("")}</ul>${aiNote}`,
+    list: `${comment}<ul class="mistakes">${items.join("")}</ul>${aiNote}`,
     right: `<p>正解は <b lang="en">${right}</b></p>`,
   };
 }
 
-// The wrong answer whose explanation is on screen, so the AI's reasons are only
-// drawn in while it still is.
-let explainedAnswer = null;
+// Checks a typed answer. It is right when it matches one of the answers.
+// Otherwise, with AI on, the AI decides: another good way to say it (the same
+// meaning, correct English, using the chunk or grammar being practised) is
+// right too, and for a wrong one it explains the mistakes. While the AI
+// thinks, the answer is { judging: true } and the screen says so; settled()
+// runs once the answer is final (at once, or when the AI answers), then
+// redraw() shows it if it is still on screen. source is { lesson, step },
+// { phrase, drill } or { item }.
+let shownAnswer = null;
 
-// Asks the AI why a wrong typed answer is wrong (once per answer). source is
-// { lesson, step } or { item }. The reasons are drawn into the open verdict.
-function askAiWhy(answer, source, answers) {
-  if (!state.me?.ai || answer.right || answer.ai || !answer.given?.trim()) return;
-  answer.ai = { pending: true };
-  api("/api/explain", { method: "POST", body: { ...source, given: answer.given } })
-    .then((r) => (answer.ai = { points: r.points }))
-    .catch((error) => (answer.ai = { error: error.status === 429 ? error.message : "AI の説明を出せませんでした。" }))
+function checkTyped(given, answers, source, { settled = () => {}, redraw }) {
+  const answer = { given, right: answers.some((a) => normalizeAnswer(a) === normalizeAnswer(given)) };
+  if (answer.right || !state.me?.ai) {
+    settled(answer);
+    return answer;
+  }
+  answer.judging = true;
+  api("/api/explain", { method: "POST", body: { ...source, given } })
+    .then((r) => {
+      answer.ai = r;
+      answer.right = !!r.acceptable;
+    })
+    .catch((error) => {
+      answer.ai = { error: error.status === 429 ? error.message : "AI に確認できなかったので、教材の答えで判定しました。" };
+    })
     .finally(() => {
-      if (explainedAnswer !== answer) return;
-      const explained = mistakesHtml(answer.given, answers, answer.ai);
-      const head = document.getElementById("verdict-head");
-      if (!explained || !head) return;
-      head.className = `verdict ${explained.tone}`;
-      head.innerHTML = explained.head;
-      document.getElementById("mine").innerHTML = explained.mine;
-      document.getElementById("mistakes").innerHTML = explained.list;
+      answer.judging = false;
+      settled(answer);
+      if (shownAnswer !== answer) return;
+      redraw();
+      document.getElementById("verdict")?.scrollIntoView({ block: "nearest" });
     });
+  return answer;
+}
+
+// The verdict of a typed answer: { tone, head, body, mine }. mine, when set,
+// is the student's answer with its mistakes marked.
+function typedVerdict(answer, answers) {
+  if (answer.judging) {
+    return { tone: "judging", head: `<span class="spinner" aria-hidden="true"></span>答えを判定中…`, body: "", mine: null };
+  }
+  if (answer.right) {
+    if (!answer.ai?.acceptable) return { tone: "right", head: "⭕ 正解！", body: "", mine: null };
+    return {
+      tone: "right",
+      head: "⭕ 正解！",
+      body: `<p class="ai-comment">💡 ${esc(answer.ai.comment || "この言い方も正解です。")}</p>
+        <p>教材の答え：<b lang="en">${esc(findMistakes(answer.given, answers).answer)}</b></p>
+        <p class="ai-note">判定は AI がしています</p>`,
+      mine: null,
+    };
+  }
+  const explained = mistakesHtml(answer.given, answers, answer.ai);
+  if (!explained) return { tone: "wrong", head: "❌ ざんねん", body: `<p>正解は <b lang="en">${esc(answers[0])}</b></p>`, mine: null };
+  return {
+    tone: "wrong",
+    head: explained.head,
+    body: `<div id="mistakes" class="stack">${explained.list}</div>${explained.right}`,
+    mine: `<div id="mine">${explained.mine}</div>`,
+  };
 }
 
 function questionStepHtml(step, answer) {
-  const explained = answer && !answer.right && step.type === "write" ? mistakesHtml(answer.given, step.answers, answer.ai) : null;
-  explainedAnswer = explained ? answer : null;
-  const verdict = answer ? `
+  const typed = answer && step.type === "write" ? typedVerdict(answer, step.answers) : null;
+  shownAnswer = typed ? answer : null;
+  const verdict = !answer ? "" : typed ? `
     <section class="card stack" id="verdict" aria-live="polite">
-      <p class="verdict ${answer.right ? "right" : explained ? explained.tone : "wrong"}" id="verdict-head">${answer.right ? "⭕ 正解！" : explained ? explained.head : "❌ ざんねん"}</p>
-      ${explained ? `<div id="mistakes" class="stack">${explained.list}</div>` : ""}
-      ${answer.right ? "" : explained ? explained.right : `<p>正解は <b lang="en">${esc(correctAnswer(step))}</b></p>`}
-      ${step.say ? `<div>${sayButton(step.say, "正解を聞く")}</div>` : ""}
+      <p class="verdict ${typed.tone}" id="verdict-head">${typed.head}</p>
+      ${typed.body}
+      ${answer.judging ? "" : `${step.say ? `<div>${sayButton(step.say, "正解を聞く")}</div>` : ""}
+        ${step.why ? `<p class="muted">${fmt(step.why)}</p>` : ""}`}
+    </section>` : `
+    <section class="card stack" id="verdict" aria-live="polite">
+      <p class="verdict ${answer.right ? "right" : "wrong"}">${answer.right ? "⭕ 正解！" : "❌ ざんねん"}</p>
+      ${answer.right ? "" : `<p>正解は <b lang="en">${esc(correctAnswer(step))}</b></p>`}
       ${step.why ? `<p class="muted">${fmt(step.why)}</p>` : ""}
-    </section>` : "";
+    </section>`;
 
   if (step.type === "choice") {
     return `<section class="card stack">
@@ -2075,7 +2127,7 @@ function questionStepHtml(step, answer) {
     <p class="question-ja">${esc(step.ja)}</p>
     ${hint}
     ${answer
-      ? explained ? `<div id="mine">${explained.mine}</div>` : `<p class="question" lang="en">${esc(answer.given || "（答えを見た）")}</p>`
+      ? typed.mine || `<p class="question" lang="en">${esc(answer.given || "（答えを見た）")}</p>`
       : `<form id="write" class="stack">
           <input type="text" name="answer" lang="en" autocomplete="off" autocapitalize="sentences" spellcheck="false" placeholder="英語で入力">
           <button class="btn block" type="submit">答え合わせ</button>
@@ -2171,11 +2223,11 @@ function renderTeacherProblems() {
     g.choiceOrder = { id: item.id, choices: shuffle(d.choices || []) };
   }
   const choices = g.choiceOrder.choices;
-  // Typed answers get their mistakes explained; picked ones just show the right choice.
+  // Typed answers are judged and explained like the lessons' (the AI may find
+  // another right way to say it); picked ones just show the right choice.
   const accepted = d.answer.split("/");
-  if (answered && !choices.length) askAiWhy(answered, { item: item.id }, accepted);
-  const explained = answered && !isRight && !choices.length ? mistakesHtml(answered.given, accepted, answered.ai) : null;
-  explainedAnswer = explained ? answered : null;
+  const verdict = answered && !choices.length ? typedVerdict(answered, accepted) : null;
+  shownAnswer = verdict ? answered : null;
   const done = g.total - g.queue.length;
 
   app.innerHTML = `${topbar("先生からの問題", "#/grammar")}
@@ -2197,22 +2249,35 @@ function renderTeacherProblems() {
               ${answered ? "" : `<button class="btn block" type="submit">答え合わせ</button>`}
             </form>`}
       </section>
-      ${answered ? `
-        <section class="card stack" aria-live="polite">
-          <p class="verdict ${isRight ? "right" : explained ? explained.tone : "wrong"}" id="verdict-head">${isRight ? "⭕ 正解！" : explained ? explained.head : "❌ ざんねん"}</p>
-          ${explained ? `<div id="mine">${explained.mine}</div><div id="mistakes" class="stack">${explained.list}</div>` : ""}
-          ${isRight ? "" : explained ? explained.right : `<p>正解は <b lang="en">${esc(d.answer)}</b></p>`}
+      ${verdict ? `
+        <section class="card stack" id="verdict" aria-live="polite">
+          <p class="verdict ${verdict.tone}" id="verdict-head">${verdict.head}</p>
+          ${verdict.mine || ""}
+          ${verdict.body}
+          ${answered.judging ? "" : `${d.explanation ? `<p class="muted">${esc(d.explanation)}</p>` : ""}
+            <button class="btn block" id="next">次へ</button>`}
+        </section>` : answered ? `
+        <section class="card stack" id="verdict" aria-live="polite">
+          <p class="verdict ${isRight ? "right" : "wrong"}">${isRight ? "⭕ 正解！" : "❌ ざんねん"}</p>
+          ${isRight ? "" : `<p>正解は <b lang="en">${esc(d.answer)}</b></p>`}
           ${d.explanation ? `<p class="muted">${esc(d.explanation)}</p>` : ""}
           <button class="btn block" id="next">次へ</button>
         </section>` : ""}
     </main>`;
 
-  const check = (given) => {
-    const right = (choices.length ? [d.answer] : accepted).some((a) => normalizeAnswer(a) === normalizeAnswer(given));
-    g.answer = { given, right };
-    if (right) g.right += 1;
+  // The score and progress count once the answer is final.
+  const settle = (answer) => {
+    if (answer.right) g.right += 1;
     else g.wrongIds.push(item.id);
-    saveProgress(item.id, { result: right ? "right" : "wrong" });
+    saveProgress(item.id, { result: answer.right ? "right" : "wrong" });
+  };
+  const check = (given) => {
+    if (choices.length) {
+      g.answer = { given, right: given === d.answer };
+      settle(g.answer);
+    } else {
+      g.answer = checkTyped(given.trim(), accepted, { item: item.id }, { settled: settle, redraw: renderTeacherProblems });
+    }
     renderTeacherProblems();
     document.getElementById("next")?.focus();
   };

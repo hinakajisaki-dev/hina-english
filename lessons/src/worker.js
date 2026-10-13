@@ -3,7 +3,7 @@
 //
 // Students sign in with a personal code (kept in an HttpOnly cookie).
 // The teacher signs in with TEACHER_PASSWORD; the cookie holds an HMAC of it.
-import { AiError, correctJournal, explainMistakes } from "./ai.js";
+import { AiError, correctJournal, judgeAnswer } from "./ai.js";
 import { SpeechError, speechFor } from "./speech.js";
 import { findLesson, lessonExampleSentences, plain, questionCount } from "../public/grammar/lessons.js";
 import { findMistakes } from "../public/mistakes.js";
@@ -86,7 +86,7 @@ async function route(request, env, url) {
     if (parts[0] === "phrases" && parts[1] === "tests" && parts.length === 4 && method === "POST") {
       return savePhraseTest(request, env, student, Number(parts[2]), Number(parts[3]));
     }
-    if (path === "/api/explain" && method === "POST") return explainAnswer(request, env, student);
+    if (path === "/api/explain" && method === "POST") return judgeTyped(request, env, student);
     if (path === "/api/journals" && method === "POST") return newJournal(request, env, student);
     if (parts[0] === "journals" && parts[2] === "correct" && parts.length === 3 && method === "POST") {
       return retryCorrection(env, student, id(1));
@@ -483,35 +483,38 @@ async function correctOnce(env, student, journalId) {
 // AI correction is optional: it switches on once ANTHROPIC_API_KEY is set.
 const aiEnabled = (env) => !!env.ANTHROPIC_API_KEY;
 
-// Why a wrong typed grammar answer is wrong, from the AI: one point per mistake
-// that mistakes.js finds ({ n, kind, topic, why }). The question is looked up
-// here (a lesson step, a フレーズ's 瞬間英作文, or one of the student's own
-// teacher problems), never
-// taken from the request, so this can't be used to ask the AI anything else.
-const EXPLAINS_PER_DAY = 100;
+// The AI's verdict on a typed answer that matches none of the right answers:
+// { acceptable (another good way to say it), comment, points } with one point
+// per mistake that mistakes.js finds ({ n, kind, topic, why }). The question is
+// looked up here (a lesson step, a フレーズ's 瞬間英作文, or one of the student's
+// own teacher problems), never taken from the request, so this can't be used to
+// ask the AI anything else. Verdicts are kept, so the same answer to the same
+// question goes to the AI only once.
+const JUDGED_PER_DAY = 100;
 
-async function explainAnswer(request, env, student) {
+async function judgeTyped(request, env, student) {
   if (!aiEnabled(env)) throw new HttpError(404, "見つかりません。");
   const input = await readJson(request);
   const given = String(input.given || "").trim();
   if (!given || given.length > 300) throw new HttpError(400, "答えが読めませんでした。");
   const question = await explainedQuestion(env, student, input);
   const found = findMistakes(given, question.answers);
-  if (!found.mistakes.length) return json({ points: [] });
+  if (!found.mistakes.length) return json({ acceptable: true, comment: "", points: [] });
 
-  const key = await sha256(JSON.stringify([question.source, question.answers, given.replace(/\s+/g, " ")]));
+  // "judge" keeps these apart from the explanations kept before answers were judged.
+  const key = await sha256(JSON.stringify(["judge", question.source, question.answers, given.replace(/\s+/g, " ")]));
   const kept = await first(env.DB, `SELECT points FROM explanations WHERE key = ?`, key);
-  if (kept) return json({ points: JSON.parse(kept.points) });
+  if (kept) return json(JSON.parse(kept.points));
 
   const since = new Date(Date.parse(`${japanDay()}T00:00:00+09:00`)).toISOString();
   const today = await first(
     env.DB, `SELECT COUNT(*) AS n FROM explanations WHERE student_id = ? AND created_at >= ?`, student.id, since,
   );
-  if (today.n >= EXPLAINS_PER_DAY) throw new HttpError(429, "今日の AI の説明は、ここまでです。");
+  if (today.n >= JUDGED_PER_DAY) throw new HttpError(429, "今日の AI の判定は、ここまでです。教材の答えで判定しました。");
 
-  let points;
+  let verdict;
   try {
-    points = await explainMistakes(env, { question, given, found });
+    verdict = await judgeAnswer(env, { question, given, found });
   } catch (error) {
     if (!(error instanceof AiError)) throw error;
     throw new HttpError(503, error.message);
@@ -519,9 +522,9 @@ async function explainAnswer(request, env, student) {
   await run(
     env.DB,
     `INSERT INTO explanations (key, student_id, points, created_at) VALUES (?, ?, ?, ?) ON CONFLICT (key) DO NOTHING`,
-    key, student.id, JSON.stringify(points), now(),
+    key, student.id, JSON.stringify(verdict), now(),
   );
-  return json({ points });
+  return json(verdict);
 }
 
 // The question a typed answer was for: { lesson, step }, { phrase, drill } or { item }.
