@@ -4,7 +4,8 @@
 import { ApiError, api, diffHtml, esc, formatDateTime, icons, startOfJapanDay, toast } from "./common.js";
 import { UNITS } from "./grammar/lessons.js";
 import { bookWeeks, bookWords, setKey, weekWords, wordSets } from "./vocab/words.js";
-import { monthPhrases, pronMonths } from "./pron/phrases.js";
+import { currentMonth, monthPhrases, pronMonths } from "./pron/phrases.js";
+import { CURRENT_WEEK } from "./course.js";
 import { phraseSetKey, phraseSets, phraseWeeks, testSize } from "./phrases/book.js";
 import { bindPanels, formatMinutes, monthPanel, monthStart, summary, today, weekDays, weekPanel, weekStart } from "./study.js";
 
@@ -196,7 +197,8 @@ async function renderStudent(id, tab) {
   state.current = data;
   const { student, items, progress, journals } = data;
   const byKind = (kind) => items.filter((item) => item.kind === kind);
-  const vocabSets = vocabSetList(data);
+  // Progress counts this week's 単語 and フレーズ (course.js) and this month's 発音.
+  const vocabSets = vocabSetList(data).filter((s) => s.week === CURRENT_WEEK);
   const vocabTested = vocabSets.filter((s) => data.vocabTests?.[s.key]).length;
   const grammarTries = byKind("grammar").reduce(
     (sum, q) => ({ right: sum.right + (progress[q.id]?.right || 0), wrong: sum.wrong + (progress[q.id]?.wrong || 0) }),
@@ -206,10 +208,11 @@ async function renderStudent(id, tab) {
   const unread = journals.filter((j) => !j.teacher_read).length;
   const weekAgo = new Date(startOfJapanDay().getTime() - 6 * 86400e3);
   const thisWeek = journals.filter((j) => new Date(j.created_at) >= weekAgo).length;
-  const shared = pronMonths().flatMap((m) => monthPhrases(m));
+  const pronMonth = currentMonth((key) => !!data.pronDone?.[key]);
+  const shared = monthPhrases(pronMonth);
   const pronFinished = shared.filter((p) => data.pronDone?.[p.key]).length;
   const studyWeek = summary(weekDays(data.study || [], weekStart(today())));
-  const phraseTestSets = phraseSetList();
+  const phraseTestSets = phraseSetList().filter((s) => s.week === CURRENT_WEEK);
   const phraseTested = phraseTestSets.filter((s) => data.phraseTests?.[s.key]).length;
 
   const tabs = [
@@ -231,10 +234,10 @@ async function renderStudent(id, tab) {
     <main class="wrap stack">
       <div class="stats">
         <div class="stat"><b>${journals.length}</b><span>日記（この7日で ${thisWeek}）</span></div>
-        <div class="stat"><b>${vocabTested} / ${vocabSets.length}</b><span>単語テスト（復習カード ${(data.review || []).length} 語）</span></div>
-        <div class="stat"><b>${phraseTested} / ${phraseTestSets.length}</b><span>フレーズテスト（復習 ${(data.phraseReview || []).length} こ）</span></div>
+        <div class="stat"><b>${vocabTested} / ${vocabSets.length}</b><span>単語テスト Week ${CURRENT_WEEK}（復習カード ${(data.review || []).length} 語）</span></div>
+        <div class="stat"><b>${phraseTested} / ${phraseTestSets.length}</b><span>フレーズテスト Week ${CURRENT_WEEK}（復習 ${(data.phraseReview || []).length} こ）</span></div>
         <div class="stat"><b>${tries ? `${Math.round((grammarTries.right / tries) * 100)}%` : "—"}</b><span>文法の正解率</span></div>
-        <div class="stat"><b>${pronFinished} / ${shared.length}</b><span>発音の完了</span></div>
+        <div class="stat"><b>${pronFinished} / ${shared.length}</b><span>発音 Month ${pronMonth} の完了</span></div>
         <div class="stat"><b>${formatMinutes(studyWeek.total)}</b><span>今週の勉強時間</span></div>
       </div>
       <nav class="tabs" aria-label="内容">
