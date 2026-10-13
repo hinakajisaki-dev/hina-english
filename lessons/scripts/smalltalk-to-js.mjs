@@ -1,5 +1,8 @@
 // Turns a スモールトーク week (smalltalk/weekN.md, the course material) into
-// public/phrases/weekN.js, checking that every phrase has its 和訳, 塊 and 解説.
+// public/phrases/weekN.js, checking that every phrase has its 和訳, 塊, 解説 and
+// 例文. 塊 and 解説 come one line per "  - " item under "- 塊：" / "- 解説："
+// (a one-line 塊 may follow "- 塊：" directly) and become "\n"-joined lines;
+// 例文 is "English（和訳）". The rules for writing them are in smalltalk/README.md.
 //
 //   node scripts/smalltalk-to-js.mjs path/to/week2.md 2 "smalltalk/week2.md" > public/phrases/week2.js
 //
@@ -15,25 +18,40 @@ const lines = fs.readFileSync(file, "utf8").split("\n");
 const title = lines[0].replace(/^#\s*/, "").replace(/（教材の中身）/, "").trim();
 const theme = (lines.find((l) => l.includes("テーマは")) || "").match(/テーマは「(.+?)」/)?.[1] || "";
 const phrases = [];
-let day = null, scene = "", cur = null, drill = null;
+let day = null, scene = "", cur = null, drill = null, section = null;
+// "English（和訳）": the 和訳 is in the last full-width brackets.
+const example = (text, n) => {
+  const m = text.match(/^(.*)（([^（）]+)）$/);
+  if (!m) throw new Error(`#${n}: 例文 should be "English（和訳）": ${text}`);
+  return { en: m[1].trim(), ja: m[2].trim() };
+};
 for (const raw of lines) {
   const line = raw.replace(/\s+$/, "");
   let m;
   if ((m = line.match(/^## Day (\d+)/))) { day = Number(m[1]); continue; }
   if ((m = line.match(/^### (.+)$/))) { scene = m[1].replace(/（つづき）$/, "").trim(); continue; }
   if ((m = line.match(/^#### (\d+)\. (.+)$/))) {
-    cur = { id: String(m[1]).padStart(2, "0"), n: Number(m[1]), day, scene, en: m[2].trim(), ja: "", chunk: "", note: "", drills: [] };
-    phrases.push(cur); drill = null; continue;
+    cur = { id: String(m[1]).padStart(2, "0"), n: Number(m[1]), day, scene, en: m[2].trim(), ja: "", chunk: [], note: [], example: null, drills: [] };
+    phrases.push(cur); drill = null; section = null; continue;
   }
   if (!cur) continue;
+  if ((m = line.match(/^ {2}- (.+)$/)) && (section === "chunk" || section === "note")) { cur[section].push(m[1].trim()); continue; }
+  if (line.startsWith("- ")) { section = null; drill = null; }
   if ((m = line.match(/^- 和訳：(.+)$/))) cur.ja = m[1].trim();
-  else if ((m = line.match(/^- 塊：(.+)$/))) cur.chunk = m[1].trim();
-  else if ((m = line.match(/^- 解説：(.+)$/))) cur.note = m[1].trim();
-  else if (/^- 瞬間英作文：なし/.test(line)) drill = null;
+  else if ((m = line.match(/^- 塊：(.*)$/))) { section = "chunk"; if (m[1].trim()) cur.chunk.push(m[1].trim()); }
+  else if ((m = line.match(/^- 解説：(.*)$/))) { section = "note"; if (m[1].trim()) cur.note.push(m[1].trim()); }
+  else if ((m = line.match(/^- 例文：(.+)$/))) cur.example = example(m[1].trim(), cur.n);
+  else if (/^- 瞬間英作文：なし/.test(line)) {}
   else if ((m = line.match(/^- 瞬間英作文[①②③]：(.+?) → (.+)$/))) { drill = { ja: m[1].trim(), answers: [m[2].trim()] }; cur.drills.push(drill); }
   else if ((m = line.match(/^ {2}- ヒント：(.+)$/))) { if (!drill) throw new Error(`hint without drill at #${cur.n}`); drill.hint = m[1].trim(); }
-  else if (line.startsWith("- ")) throw new Error(`unknown line at #${cur.n}: ${line}`);
+  else if (line.startsWith("- ") || line.startsWith("  - ")) throw new Error(`unknown line at #${cur.n}: ${line}`);
 }
+// 塊 and 解説 lines become one text each.
+for (const p of phrases) {
+  p.chunk = p.chunk.join("\n");
+  p.note = p.note.join("\n");
+}
+
 // the teacher's changes
 const overridesFile = path.join(path.dirname(fileURLToPath(import.meta.url)), "smalltalk-overrides.json");
 const overrides = JSON.parse(fs.readFileSync(overridesFile, "utf8"))[week] || {};
@@ -47,7 +65,7 @@ for (const [n, to] of Object.entries(overrides.replies || {})) need(n, "replies"
 // Numbers run on from week to week (Week 2 starts at #50); they must not skip.
 phrases.forEach((p, i) => {
   if (p.n !== phrases[0].n + i) throw new Error(`numbering at ${p.n}`);
-  for (const k of ["day", "scene", "en", "ja", "chunk", "note"]) if (!p[k]) throw new Error(`#${p.n} has no ${k}`);
+  for (const k of ["day", "scene", "en", "ja", "chunk", "note", "example"]) if (!p[k]) throw new Error(`#${p.n} has no ${k}`);
 });
 const q = (v) => JSON.stringify(v);
 const out = [];
@@ -70,6 +88,7 @@ for (const p of phrases) {
   out.push(`      ja: ${q(p.ja)},`);
   out.push(`      chunk: ${q(p.chunk)},`);
   out.push(`      note: ${q(p.note)},`);
+  out.push(`      example: { en: ${q(p.example.en)}, ja: ${q(p.example.ja)} },`);
   if (p.drills.length) {
     out.push(`      drills: [`);
     for (const d of p.drills) out.push(`        { ja: ${q(d.ja)}, answers: ${q(d.answers)}${d.hint ? `, hint: ${q(d.hint)}` : ""} },`);

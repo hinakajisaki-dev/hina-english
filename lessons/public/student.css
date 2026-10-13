@@ -81,11 +81,10 @@
 .reply-to { font-size: 13px; color: var(--muted); line-height: 1.5; }
 .word-front .reply-to { text-align: center; }
 .phrase-card .meaning.one-line { white-space: nowrap; font-size: min(20px, calc(100cqi / (var(--chars) + 0.5))); }
-.phrase-examples { border-radius: 14px; padding: 12px 14px; border: 2px solid var(--line); }
-.phrase-examples ul { list-style: none; margin: 6px 0 0; padding: 0; display: grid; gap: 10px; }
-.phrase-examples li { display: flex; gap: 10px; align-items: flex-start; }
-.phrase-examples .en { font-family: var(--en); font-weight: 700; line-height: 1.4; }
-.phrase-examples .ja { font-size: 13px; color: var(--ink-2); }
+.phrase-example { border-radius: 14px; padding: 12px 14px; border: 2px solid var(--line); }
+.phrase-example .example-row { display: flex; gap: 10px; align-items: center; justify-content: space-between; margin-top: 4px; }
+.phrase-example .en { font-family: var(--en); font-weight: 700; font-size: 16px; line-height: 1.4; overflow-wrap: anywhere; }
+.phrase-example .ja { font-size: 13px; color: var(--ink-2); margin-top: 2px; }
 .chunk-box { border-radius: 14px; padding: 12px 14px; background: var(--sky-soft); }
 .chunk-box .chunk { font-family: var(--en); font-weight: 800; font-size: 17px; line-height: 1.5; overflow-wrap: anywhere; }
 .week-theme { font-size: 20px; }
