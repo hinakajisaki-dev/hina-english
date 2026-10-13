@@ -98,6 +98,17 @@ const SCHEMA = [
     updated_at TEXT NOT NULL,
     PRIMARY KEY (student_id, day)
   )`,
+  // The AI's explanations of wrong typed grammar answers, kept so the same wrong
+  // answer to the same question is only sent to the AI once. key is a hash of the
+  // question and the answer; points is JSON [{ n, kind, topic, why }].
+  // student_id is who asked first (for the daily limit).
+  `CREATE TABLE IF NOT EXISTS explanations (
+    key TEXT PRIMARY KEY,
+    student_id INTEGER NOT NULL REFERENCES students(id) ON DELETE CASCADE,
+    points TEXT NOT NULL,
+    created_at TEXT NOT NULL
+  )`,
+  `CREATE INDEX IF NOT EXISTS explanations_student ON explanations(student_id, created_at)`,
 ];
 
 let ready = false;

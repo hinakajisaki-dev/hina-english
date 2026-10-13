@@ -120,6 +120,26 @@
 .verdict.right { color: var(--good); }
 .verdict.wrong { color: var(--bad); }
 
+/* a wrong typed answer, explained */
+.your-answer { font-family: var(--en); font-weight: 700; font-size: 20px; line-height: 1.7; }
+.m-spell { color: var(--bad); text-decoration: underline wavy; text-decoration-thickness: 1.5px; text-underline-offset: 5px; }
+.m-wrong { color: var(--bad); text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 5px; }
+.m-extra { color: var(--bad); text-decoration: line-through; text-decoration-thickness: 2px; }
+.m-missing { color: var(--bad); font-weight: 900; }
+.m-fix { color: var(--good); background: var(--good-soft); border-radius: 4px; padding: 0 3px; }
+.mistakes { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.mistakes li { display: flex; gap: 8px; align-items: baseline; font-size: 15px; }
+.mistakes li > span:last-child { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.mistakes s { color: var(--bad); }
+.mistakes b { color: var(--good); }
+.mistakes .where { display: inline-block; }
+.mistakes .why { display: block; margin-top: 2px; color: var(--muted); font-size: 14px; line-height: 1.6; }
+.mtag.ok { background: var(--good-soft); color: var(--good); }
+.ai-note { display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: 12px; }
+.ai-note .spinner { width: 12px; height: 12px; border-width: 2px; }
+.mtag { flex: none; font-size: 12px; font-weight: 900; padding: 1px 8px; border-radius: 99px; background: var(--bad-soft); color: var(--bad); }
+.mtag.spelling { background: var(--cream); color: var(--ink); }
+
 /* journal */
 .topic-box { background: var(--cream); border-radius: 14px; padding: 12px 14px; }
 .topic-box .label { color: var(--ink-2); }
