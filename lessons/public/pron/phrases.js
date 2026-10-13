@@ -19,3 +19,11 @@ export function findPhrase(key) {
   const month = Number(String(key).match(/^m(\d+)\//)?.[1]);
   return monthPhrases(month).find((p) => p.key === key) || null;
 }
+
+// The month a student is on: the first with a phrase not 完了 yet (the last
+// month once every one is done). isDone(key) says whether a phrase is 完了.
+// Progress is counted one month at a time.
+export function currentMonth(isDone) {
+  const months = pronMonths();
+  return months.find((month) => monthPhrases(month).some((p) => !isDone(p.key))) ?? months[months.length - 1];
+}

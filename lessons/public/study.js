@@ -92,8 +92,8 @@ export function chartHtml(days, { labelEvery = 1, wide = false } = {}) {
   const pct = (m) => `${(m / top) * 100}%`;
   return `<figure class="study-chart${wide ? " wide" : ""}">
     <div class="chart-legend" aria-hidden="true">
-      <span><i class="key app"></i>アプリで勉強</span>
-      <span><i class="key other"></i>アプリ以外の勉強</span>
+      <span><i class="swatch app"></i>アプリで勉強</span>
+      <span><i class="swatch other"></i>アプリ以外の勉強</span>
     </div>
     <div class="chart-plot">
       <div class="chart-grid" aria-hidden="true">

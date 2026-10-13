@@ -3,11 +3,13 @@
 //
 // Students sign in with a personal code (kept in an HttpOnly cookie).
 // The teacher signs in with TEACHER_PASSWORD; the cookie holds an HMAC of it.
-import { AiError, correctJournal } from "./ai.js";
+import { AiError, correctJournal, judgeAnswer } from "./ai.js";
 import { SpeechError, speechFor } from "./speech.js";
-import { findLesson, lessonExampleSentences, questionCount } from "../public/grammar/lessons.js";
+import { findLesson, lessonExampleSentences, plain, questionCount } from "../public/grammar/lessons.js";
+import { findMistakes } from "../public/mistakes.js";
 import { bookSentences, bookWords, setKey, weekWords, wordSets } from "../public/vocab/words.js";
 import { findPhrase } from "../public/pron/phrases.js";
+import { phraseByKey, phraseSentences, phraseSetKey, phraseSets, testSize } from "../public/phrases/book.js";
 import {
   all, ensureSchema, first, itemRow, japanDay, journalRow, now, run, studentBundle,
 } from "./db.js";
@@ -19,14 +21,13 @@ const YEAR = 365 * 24 * 3600;
 // Fields each kind of item keeps; the first `required` of them must be filled.
 const KINDS = {
   vocab: { fields: ["word", "meaning", "example"], required: 2 },
-  phrase: { fields: ["phrase", "meaning", "note"], required: 2 },
   pron: { fields: ["text", "tip"], required: 1 },
   grammar: { fields: ["question", "answer", "choices", "explanation"], required: 2 },
   topic: { fields: ["prompt"], required: 1 },
 };
 const WEEKS = 24;
 const FIELD_NAMES = {
-  word: "単語", meaning: "意味", phrase: "フレーズ", text: "文", question: "問題", answer: "答え", prompt: "テーマ",
+  word: "単語", meaning: "意味", text: "文", question: "問題", answer: "答え", prompt: "テーマ",
 };
 
 class HttpError extends Error {
@@ -81,6 +82,11 @@ async function route(request, env, url) {
     if (parts[0] === "vocab" && parts[1] === "tests" && parts.length === 4 && method === "POST") {
       return saveVocabTest(request, env, student, parts[2], Number(parts[3]));
     }
+    if (path === "/api/phrases/review" && method === "POST") return savePhraseReview(request, env, student);
+    if (parts[0] === "phrases" && parts[1] === "tests" && parts.length === 4 && method === "POST") {
+      return savePhraseTest(request, env, student, Number(parts[2]), Number(parts[3]));
+    }
+    if (path === "/api/explain" && method === "POST") return judgeTyped(request, env, student);
     if (path === "/api/journals" && method === "POST") return newJournal(request, env, student);
     if (parts[0] === "journals" && parts[2] === "correct" && parts.length === 3 && method === "POST") {
       return retryCorrection(env, student, id(1));
@@ -219,19 +225,21 @@ async function newJournal(request, env, student) {
   return correctOnce(env, student, meta.last_row_id);
 }
 
-// Audio is only made for text in the student's own content, the 単語帳 or the
-// grammar lessons' examples, so the endpoint can't be used to voice anything else.
+// Audio is only made for text in the student's own content, the 単語帳, the
+// フレーズ or the grammar lessons' examples, so the endpoint can't be used to
+// voice anything else.
 // (The pronunciation months play the teacher's own recordings instead.)
-const SPOKEN_FIELDS = { vocab: ["word", "example"], phrase: ["phrase"], pron: ["text"] };
+const SPOKEN_FIELDS = { vocab: ["word", "example"], pron: ["text"] };
 const LESSON_SENTENCES = lessonExampleSentences();
 const BOOK_SENTENCES = bookSentences();
+const PHRASE_SENTENCES = phraseSentences();
 
 async function speech(env, student, text) {
-  let allowed = LESSON_SENTENCES.has(text) || BOOK_SENTENCES.has(text);
+  let allowed = LESSON_SENTENCES.has(text) || BOOK_SENTENCES.has(text) || PHRASE_SENTENCES.has(text);
   if (!allowed) {
     const rows = await all(
       env.DB,
-      `SELECT kind, data FROM items WHERE student_id = ? AND kind IN ('vocab', 'phrase', 'pron')`,
+      `SELECT kind, data FROM items WHERE student_id = ? AND kind IN ('vocab', 'pron')`,
       student.id,
     );
     allowed = rows.some((row) => {
@@ -409,6 +417,41 @@ async function saveVocabTest(request, env, student, weekParam, number) {
   return json({ ok: true });
 }
 
+// The フレーズ復習 list, like the words' 復習 list: on adds a phrase (source
+// "check" from its card, "test" when missed in a set test), off takes it out.
+async function savePhraseReview(request, env, student) {
+  const { key, on, source } = await readJson(request);
+  if (!phraseByKey(key)) throw new HttpError(404, "見つかりません。");
+  if (on) {
+    await run(
+      env.DB,
+      `INSERT OR IGNORE INTO phrase_review (student_id, phrase_key, source, added_at) VALUES (?, ?, ?, ?)`,
+      student.id, key, source === "test" ? "test" : "check", now(),
+    );
+  } else {
+    await run(env.DB, `DELETE FROM phrase_review WHERE student_id = ? AND phrase_key = ?`, student.id, key);
+  }
+  return json({ ok: true });
+}
+
+// The score of a phrase set's test. The number of questions is worked out here.
+async function savePhraseTest(request, env, student, week, number) {
+  const set = phraseSets(week).find((s) => s.number === number);
+  if (!set || !testSize(set)) throw new HttpError(404, "見つかりません。");
+  const total = testSize(set);
+  const { score } = await readJson(request);
+  const clean = Math.max(0, Math.min(total, Math.round(Number(score)) || 0));
+  await run(
+    env.DB,
+    `INSERT INTO phrase_tests (student_id, set_key, best_score, last_score, total, times, updated_at)
+     VALUES (?1, ?2, ?3, ?3, ?4, 1, ?5)
+     ON CONFLICT (student_id, set_key) DO UPDATE SET
+       best_score = MAX(best_score, ?3), last_score = ?3, total = ?4, times = times + 1, updated_at = ?5`,
+    student.id, phraseSetKey(week, number), clean, total, now(),
+  );
+  return json({ ok: true });
+}
+
 // Only an entry with no correction yet (its first try failed) can be sent again.
 async function retryCorrection(env, student, journalId) {
   const row = await first(env.DB, `SELECT * FROM journals WHERE id = ? AND student_id = ?`, journalId, student.id);
@@ -439,6 +482,85 @@ async function correctOnce(env, student, journalId) {
 
 // AI correction is optional: it switches on once ANTHROPIC_API_KEY is set.
 const aiEnabled = (env) => !!env.ANTHROPIC_API_KEY;
+
+// The AI's verdict on a typed answer that matches none of the right answers:
+// { acceptable (another good way to say it), comment, points } with one point
+// per mistake that mistakes.js finds ({ n, kind, topic, why }). The question is
+// looked up here (a lesson step, a フレーズ's 瞬間英作文, or one of the student's
+// own teacher problems), never taken from the request, so this can't be used to
+// ask the AI anything else. Verdicts are kept, so the same answer to the same
+// question goes to the AI only once.
+const JUDGED_PER_DAY = 100;
+
+async function judgeTyped(request, env, student) {
+  if (!aiEnabled(env)) throw new HttpError(404, "見つかりません。");
+  const input = await readJson(request);
+  const given = String(input.given || "").trim();
+  if (!given || given.length > 300) throw new HttpError(400, "答えが読めませんでした。");
+  const question = await explainedQuestion(env, student, input);
+  const found = findMistakes(given, question.answers);
+  if (!found.mistakes.length) return json({ acceptable: true, comment: "", points: [] });
+
+  // "judge" keeps these apart from the explanations kept before answers were judged.
+  const key = await sha256(JSON.stringify(["judge", question.source, question.answers, given.replace(/\s+/g, " ")]));
+  const kept = await first(env.DB, `SELECT points FROM explanations WHERE key = ?`, key);
+  if (kept) return json(JSON.parse(kept.points));
+
+  const since = new Date(Date.parse(`${japanDay()}T00:00:00+09:00`)).toISOString();
+  const today = await first(
+    env.DB, `SELECT COUNT(*) AS n FROM explanations WHERE student_id = ? AND created_at >= ?`, student.id, since,
+  );
+  if (today.n >= JUDGED_PER_DAY) throw new HttpError(429, "今日の AI の判定は、ここまでです。教材の答えで判定しました。");
+
+  let verdict;
+  try {
+    verdict = await judgeAnswer(env, { question, given, found });
+  } catch (error) {
+    if (!(error instanceof AiError)) throw error;
+    throw new HttpError(503, error.message);
+  }
+  await run(
+    env.DB,
+    `INSERT INTO explanations (key, student_id, points, created_at) VALUES (?, ?, ?, ?) ON CONFLICT (key) DO NOTHING`,
+    key, student.id, JSON.stringify(verdict), now(),
+  );
+  return json(verdict);
+}
+
+// The question a typed answer was for: { lesson, step }, { phrase, drill } or { item }.
+async function explainedQuestion(env, student, input) {
+  if (input.phrase) {
+    const phrase = phraseByKey(input.phrase);
+    const drill = phrase?.drills[Number(input.drill)];
+    if (!drill) throw new HttpError(404, "見つかりません。");
+    return {
+      source: `phrase/${phrase.key}/${drill.n}`,
+      japanese: drill.ja,
+      hint: [phrase.chunk ? `塊：${phrase.chunk}` : phrase.en, drill.hint].filter(Boolean).join(" / "),
+      note: phrase.note,
+      answers: drill.answers,
+    };
+  }
+  if (input.lesson) {
+    const index = Number(input.step);
+    const step = findLesson(String(input.lesson))?.lesson.steps?.[index];
+    if (step?.type !== "write") throw new HttpError(404, "見つかりません。");
+    const text = (s) => plain(s).replace(/\*\*/g, "");
+    return {
+      source: `lesson/${input.lesson}/${index}`,
+      japanese: step.ja,
+      hint: step.hint || "",
+      note: text(step.why),
+      answers: step.answers,
+    };
+  }
+  const item = await first(
+    env.DB, `SELECT * FROM items WHERE id = ? AND student_id = ? AND kind = 'grammar'`, Number(input.item), student.id,
+  );
+  const data = item && JSON.parse(item.data);
+  if (!data || data.choices?.length) throw new HttpError(404, "見つかりません。");
+  return { source: `item/${item.id}`, question: data.question, note: data.explanation, answers: data.answer.split("/") };
+}
 
 // ---------- teacher handlers ----------
 
@@ -611,6 +733,11 @@ async function teacherToken(password) {
   );
   const sig = await crypto.subtle.sign("HMAC", key, new TextEncoder().encode("hina-lessons-teacher"));
   return [...new Uint8Array(sig)].map((b) => b.toString(16).padStart(2, "0")).join("");
+}
+
+async function sha256(text) {
+  const hash = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(text));
+  return [...new Uint8Array(hash)].map((b) => b.toString(16).padStart(2, "0")).join("");
 }
 
 function sameBytes(a, b) {

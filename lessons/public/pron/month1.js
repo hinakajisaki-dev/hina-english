@@ -1,4 +1,6 @@
 // 発音 Month 1, from the teacher's 8月_発音課題 sheet. Every student gets the same phrases.
+// 30 phrases, one month's worth: the sheet's 31st (It was really nice talking with
+// you. Take care.) was taken out so every month has 30.
 //
 // Each phrase: id (never change it: students' 完了 and recordings use it), en, ja,
 // usage (使う場面・解説), tip (発音のコツ: only where the words link; \n starts
@@ -39,6 +41,5 @@ export const MONTH1 = {
     {"id": "28", "en": "Do you have any recommendations for a good place to eat?", "ja": "おいしいお店のおすすめはありますか？", "usage": "現地の人におすすめを聞くとき。", "tip": "have any →「ハヴェニ」\nfor a →「フォラ」\nplace to eat →「プレイストゥイート」", "audio": "pron/audio/m1-28.m4a", "recording": {"name": "028 - Do you have any recommendations for a good place to eat?.m4a", "drive": "1Kn4slqeimdvYaqOPwb26WoBoK7YLwnHC"}},
     {"id": "29", "en": "Thank you so much for your help. I really appreciate it.", "ja": "助けてくれて本当にありがとう。感謝します。", "usage": "丁寧なお礼。\nI appreciate it =「感謝します」。", "tip": "Thank you →「サンキュー」\nappreciate it →「アプリーシエイティッ」", "audio": "pron/audio/m1-29.m4a", "recording": {"name": "029 - Thank you so much for your help. I really appreciate it..m4a", "drive": "1RWWNknUxQte6fBRx_QliDcCXaOu3wniv"}},
     {"id": "30", "en": "Would you mind taking a picture of us?", "ja": "私たちの写真を撮ってもらえますか？", "usage": "観光地で頼むとき。\nWould you mind -ing? =「〜してもらえますか」。", "tip": "Would you →「ウッジュ」\ntaking a →「テイキンガ」\npicture of us →「ピクチャロヴァス」", "audio": "pron/audio/m1-30.m4a", "recording": {"name": "030 - Would you mind taking a picture of us?.m4a", "drive": "1XABufJEuaboJSTMqLCtW6PIXlx_4dMPE"}},
-    {"id": "31", "en": "It was really nice talking with you. Take care.", "ja": "お話しできて楽しかったです。お元気で。", "usage": "別れ際の締めの一言。次につながる好印象。", "tip": "Take care →「テイッケア」", "audio": "pron/audio/m1-31.m4a", "recording": {"name": "031 - It was really nice talking with you. Take care..m4a", "drive": "1t2571JIb3OOSHQ6b35mgzLKiG_NJo0w8"}},
   ],
 };
