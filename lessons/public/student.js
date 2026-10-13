@@ -1064,6 +1064,13 @@ function renderPhrases(week, setNumber, mode) {
     </main>`;
 }
 
+// "7" when every day has seven phrases, "7〜8" when some have more.
+function dayRange(sets) {
+  const sizes = sets.map((set) => set.phrases.length);
+  const [low, high] = [Math.min(...sizes), Math.max(...sizes)];
+  return low === high ? `${low}` : `${low}〜${high}`;
+}
+
 function renderPhraseWeek(week) {
   state.phraseSet = null;
   state.phraseTest = null;
@@ -1072,7 +1079,7 @@ function renderPhraseWeek(week) {
   app.innerHTML = `${topbar(`フレーズ ・ Week ${week}`, "#/phrases")}
     <main class="wrap stack">
       ${weekTitle(week) ? `<h2 class="week-theme">${esc(weekTitle(week))}</h2>` : ""}
-      <p class="muted">${byDay ? `1日${sets[0].phrases.length}フレーズずつ` : "10フレーズずつ"}、意味と使い方を見て、瞬間英作文をします。最後にテスト（${TEST_SIZE}問）。まちがえたフレーズは「フレーズ復習」に入ります。</p>
+      <p class="muted">${byDay ? `1日${dayRange(sets)}フレーズずつ` : "10フレーズずつ"}、意味と使い方を見て、瞬間英作文をします。最後にテスト（${TEST_SIZE}問）。まちがえたフレーズは「フレーズ復習」に入ります。</p>
       ${sets.length ? "" : emptyState("この週のフレーズは、まだありません。")}
       ${sets.map((set) => {
         const result = phraseTestResult(week, set.number);

@@ -20,8 +20,9 @@
 // Every phrase gets a key ("p1/05") and every day or set one ("p1/s2"); the
 // フレーズ復習 list and the test results are stored by these keys.
 import { WEEK1 } from "./week1.js";
+import { WEEK2 } from "./week2.js";
 
-const BOOKS = { 1: WEEK1 };
+const BOOKS = { 1: WEEK1, 2: WEEK2 };
 export const SET_SIZE = 10;
 export const TEST_SIZE = 5;
 

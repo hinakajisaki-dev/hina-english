@@ -31,8 +31,9 @@ for (const raw of lines) {
   else if (line.startsWith("- ")) throw new Error(`unknown line at #${cur.n}: ${line}`);
 }
 // checks
+// Numbers run on from week to week (Week 2 starts at #50); they must not skip.
 phrases.forEach((p, i) => {
-  if (p.n !== i + 1) throw new Error(`numbering at ${p.n}`);
+  if (p.n !== phrases[0].n + i) throw new Error(`numbering at ${p.n}`);
   for (const k of ["day", "scene", "en", "ja", "chunk", "note"]) if (!p[k]) throw new Error(`#${p.n} has no ${k}`);
 });
 const q = (v) => JSON.stringify(v);
