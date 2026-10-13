@@ -8,6 +8,7 @@ import { UNITS, findLesson, plain, questionCount } from "./grammar/lessons.js";
 import { bookWeeks, setKey, speakable, splitOnForm, weekWords, wordSets } from "./vocab/words.js";
 import { MONTHS, monthPhrases, pronMonths } from "./pron/phrases.js";
 import { TOPICS } from "./journal/topics.js";
+import { findMistakes } from "./mistakes.js";
 import {
   appMinutes, bindPanels, formatMinutes, monthPanel, monthStart, startStudyClock, studySplit, summary, today,
   totalMinutes, weekDays, weekPanel, weekStart,
@@ -1544,11 +1545,53 @@ function explainHtml(step) {
   </section>`;
 }
 
+// A wrong typed answer, explained: the student's words with the mistakes marked,
+// one line per mistake (スペルミス, 文法 …), and the right answer with what
+// changed in green. Returns null when there is nothing to explain.
+const MISTAKE_TAGS = {
+  spelling: "スペルミス", grammar: "文法", word: "ちがう単語", extra: "いらない単語", missing: "たりない単語", order: "語順",
+};
+
+function mistakesHtml(given, answers) {
+  if (!given?.trim()) return null;
+  const found = findMistakes(given, answers);
+  if (!found.mistakes.length) return null;
+  const head = found.onlySpelling ? "🔺 おしい！スペルミスがあります"
+    : found.grammar ? "❌ 文法のまちがいがあります"
+    : "❌ ざんねん";
+  const mark = { spelling: "m-spell", grammar: "m-wrong", word: "m-wrong", extra: "m-extra" };
+  const mine = found.order
+    ? esc(given)
+    : found.steps.map((s) => {
+      if (s.type === "missing") return `<span class="m-missing" aria-label="たりない単語">‸</span>`;
+      return mark[s.type] ? `<span class="${mark[s.type]}">${esc(s.given.raw)}</span>` : esc(s.given.raw);
+    }).join(" ");
+  const right = found.order
+    ? esc(found.answer)
+    : found.steps.filter((s) => s.right).map((s) => (s.type === "same" ? esc(s.right.raw) : `<span class="m-fix">${esc(s.right.raw)}</span>`)).join(" ");
+  const items = found.mistakes.map((m) => {
+    let what;
+    if (m.type === "order") what = "単語の順番がちがいます";
+    else if (m.type === "extra") what = `<span lang="en"><s>${esc(m.given)}</s></span> はいりません`;
+    else if (m.type === "missing") what = `<span lang="en"><b>${esc(m.right)}</b></span> が入ります<span class="where">${m.after ? `（<span lang="en">${esc(m.after)}</span> のあと）` : "（文のはじめ）"}</span>`;
+    else what = `<span lang="en"><s>${esc(m.given)}</s> → <b>${esc(m.right)}</b></span>${m.note ? `<span class="where">（${esc(m.note)}）</span>` : ""}`;
+    return `<li><span class="mtag ${m.type}">${MISTAKE_TAGS[m.type]}</span><span>${what}</span></li>`;
+  });
+  return {
+    head,
+    mine: `<p class="muted small">あなたの答え</p><p class="your-answer" lang="en">${mine}</p>`,
+    list: `<ul class="mistakes">${items.join("")}</ul>`,
+    right: `<p>正解は <b lang="en">${right}</b></p>`,
+  };
+}
+
 function questionStepHtml(step, answer) {
+  const explained = answer && !answer.right && step.type === "write" ? mistakesHtml(answer.given, step.answers) : null;
   const verdict = answer ? `
     <section class="card stack" id="verdict" aria-live="polite">
-      <p class="verdict ${answer.right ? "right" : "wrong"}">${answer.right ? "⭕ 正解！" : "❌ ざんねん"}</p>
-      ${answer.right ? "" : `<p>正解は <b lang="en">${esc(correctAnswer(step))}</b></p>`}
+      <p class="verdict ${answer.right ? "right" : "wrong"}">${answer.right ? "⭕ 正解！" : explained ? explained.head : "❌ ざんねん"}</p>
+      ${explained ? explained.list : ""}
+      ${answer.right ? "" : explained ? explained.right : `<p>正解は <b lang="en">${esc(correctAnswer(step))}</b></p>`}
       ${step.why ? `<p class="muted">${fmt(step.why)}</p>` : ""}
     </section>` : "";
 
@@ -1585,7 +1628,7 @@ function questionStepHtml(step, answer) {
     <p class="question-ja">${esc(step.ja)}</p>
     ${step.hint ? `<p class="muted small">ヒント：<span lang="en">${esc(step.hint)}</span></p>` : ""}
     ${answer
-      ? `<p class="question" lang="en">${esc(answer.given || "（答えを見た）")}</p>`
+      ? explained ? explained.mine : `<p class="question" lang="en">${esc(answer.given || "（答えを見た）")}</p>`
       : `<form id="write" class="stack">
           <input type="text" name="answer" lang="en" autocomplete="off" autocapitalize="sentences" spellcheck="false" placeholder="英語で入力">
           <button class="btn block" type="submit">答え合わせ</button>
@@ -1681,6 +1724,8 @@ function renderTeacherProblems() {
     g.choiceOrder = { id: item.id, choices: shuffle(d.choices || []) };
   }
   const choices = g.choiceOrder.choices;
+  // Typed answers get their mistakes explained; picked ones just show the right choice.
+  const explained = answered && !isRight && !choices.length ? mistakesHtml(answered.given, d.answer.split("/")) : null;
   const done = g.total - g.queue.length;
 
   app.innerHTML = `${topbar("先生からの問題", "#/grammar")}
@@ -1704,8 +1749,9 @@ function renderTeacherProblems() {
       </section>
       ${answered ? `
         <section class="card stack" aria-live="polite">
-          <p class="verdict ${isRight ? "right" : "wrong"}">${isRight ? "⭕ 正解！" : "❌ ざんねん"}</p>
-          ${isRight ? "" : `<p>正解は <b lang="en">${esc(d.answer)}</b></p>`}
+          <p class="verdict ${isRight ? "right" : "wrong"}">${isRight ? "⭕ 正解！" : explained ? explained.head : "❌ ざんねん"}</p>
+          ${explained ? explained.mine + explained.list : ""}
+          ${isRight ? "" : explained ? explained.right : `<p>正解は <b lang="en">${esc(d.answer)}</b></p>`}
           ${d.explanation ? `<p class="muted">${esc(d.explanation)}</p>` : ""}
           <button class="btn block" id="next">次へ</button>
         </section>` : ""}
