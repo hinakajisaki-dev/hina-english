@@ -117,9 +117,9 @@ export async function correctJournal(env, { body, topic, note }) {
 const JUDGE_SYSTEM = `You help an English teacher in Japan whose private students are Japanese adults learning beginner English.
 In a grammar or phrase exercise (瞬間英作文: put the Japanese sentence into English), a student typed an English answer that matches none of the model answers. Decide whether it is right anyway, and explain it to the student.
 
-"acceptable": true when the student's answer is also a right answer: natural, correct English that says what the Japanese sentence says (for a fill-in-the-blank, the words fit the blank) and, when a <hint> names a chunk (a set phrase) or the <lesson_note> names the grammar being practised, uses that chunk or grammar. There are many good ways to say one thing: other correct wording, word order, synonyms, or a small added word that keeps the meaning (just, really …) are fine. Capital letters and punctuation never matter. It is not acceptable when it has a spelling or grammar mistake, changes or leaves out part of the meaning, or doesn't use the chunk or grammar being practised.
+"acceptable": true when the student's answer is also a right answer: grammatically correct English with no spelling mistakes that says what the Japanese sentence says (for a fill-in-the-blank, the words fit the blank) and, when a <chunk> names the set phrase being practised (its slots, like 名詞 or 文, take any fitting words) or the <lesson_note> names the grammar being practised, uses that chunk or grammar. A <hint> is only a help shown to the student (a word, or one way to say part of it): the answer doesn't have to follow it. Be generous: there are many good ways to say one thing. Other correct wording, word order, synonyms, or a small added word that keeps the meaning (just, really …) are fine, and so is an answer that is grammatically correct and understandable but a little stiff, wordy or not quite what a native speaker would say. Capital letters and punctuation never matter. It is not acceptable only when it has a spelling or grammar mistake, changes or leaves out part of the meaning, or doesn't use the chunk or grammar being practised.
 
-"comment": one short, friendly sentence in Japanese about the answer as a whole. When acceptable, say this way of saying it is right too, and mention a difference in nuance from the model answer if there is one (for example 「just を入れると『ちょうど今』の感じが出ます。」). When not acceptable, say the main thing to fix (for example 「意味は合っていますが、be about to を使って言ってみましょう。」).
+"comment": one short, friendly sentence in Japanese about the answer as a whole. When acceptable, the student already sees 「これもOK！」 above it, so don't repeat that: say what is good about it, and when the model answer is more natural, show it gently (for example 「ネイティブは How's work going? のように言うことが多いです。」 or 「just を入れると『ちょうど今』の感じが出ます。」). When not acceptable, say the main thing to fix (for example 「意味は合っていますが、be about to を使って言ってみましょう。」).
 
 "points": one for every numbered difference between the student's answer and the closest model answer (found word by word, each with a first guess at its kind):
 - "n": its number.
@@ -178,7 +178,7 @@ const difference = (m) => {
   return `${m.type}: "${m.given}" → "${m.right}"${m.note ? ` (${m.note})` : ""}`;
 };
 
-// question: { japanese, question, hint, note, answers } (a lesson or a
+// question: { japanese, question, chunk, hint, note, answers } (a lesson or a
 // フレーズ has the Japanese sentence, a teacher problem the English question
 // with a blank); found is findMistakes() for the student's answer, against the
 // closest answer. Returns { acceptable, comment, points: [{ n, kind, topic, why }] },
@@ -189,6 +189,7 @@ export async function judgeAnswer(env, { question, given, found }) {
   const parts = [];
   if (question.japanese) parts.push(`<japanese>${question.japanese}</japanese>`);
   if (question.question) parts.push(`<question>${question.question}</question>`);
+  if (question.chunk) parts.push(`<chunk>${question.chunk}</chunk>`);
   if (question.hint) parts.push(`<hint>${question.hint}</hint>`);
   if (question.note) parts.push(`<lesson_note>${question.note}</lesson_note>`);
   parts.push(`<model_answer>${found.answer}</model_answer>`);

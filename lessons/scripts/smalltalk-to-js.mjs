@@ -3,8 +3,12 @@
 //
 //   node scripts/smalltalk-to-js.mjs path/to/week2.md 2 "smalltalk/week2.md" > public/phrases/week2.js
 //
-// then add the week to BOOKS in public/phrases/book.js.
+// then add the week to BOOKS in public/phrases/book.js. The teacher's changes on
+// top of the md (scene names, 塊, which phrases are 返答例) are kept in
+// smalltalk-overrides.json and applied here, so converting again keeps them.
 import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 const [file, weekArg, sourceNote] = process.argv.slice(2);
 const week = Number(weekArg);
 const lines = fs.readFileSync(file, "utf8").split("\n");
@@ -30,6 +34,15 @@ for (const raw of lines) {
   else if ((m = line.match(/^ {2}- ヒント：(.+)$/))) { if (!drill) throw new Error(`hint without drill at #${cur.n}`); drill.hint = m[1].trim(); }
   else if (line.startsWith("- ")) throw new Error(`unknown line at #${cur.n}: ${line}`);
 }
+// the teacher's changes
+const overridesFile = path.join(path.dirname(fileURLToPath(import.meta.url)), "smalltalk-overrides.json");
+const overrides = JSON.parse(fs.readFileSync(overridesFile, "utf8"))[week] || {};
+const byNumber = new Map(phrases.map((p) => [p.n, p]));
+const need = (n, what) => byNumber.get(Number(n)) || (() => { throw new Error(`${what}: no phrase #${n} in week ${week}`); })();
+for (const p of phrases) if (overrides.scenes?.[p.scene]) p.scene = overrides.scenes[p.scene];
+for (const [n, chunk] of Object.entries(overrides.chunks || {})) need(n, "chunks").chunk = chunk;
+for (const [n, to] of Object.entries(overrides.replies || {})) need(n, "replies").replyTo = need(to, "replies").id;
+
 // checks
 // Numbers run on from week to week (Week 2 starts at #50); they must not skip.
 phrases.forEach((p, i) => {
@@ -42,6 +55,7 @@ const dayCount = new Set(phrases.map((p) => p.day)).size;
 out.push(`// ${title}: ${theme ? `「${theme}」` : ""}${phrases.length} フレーズ、${dayCount} 日分.`);
 out.push(`// From ${sourceNote}. Every student gets the same phrases.`);
 out.push(`// Fields as in public/phrases/book.js. Keep the ids: students' フレーズ復習 lists use them.`);
+out.push(`// Made by scripts/smalltalk-to-js.mjs (with the teacher's changes in smalltalk-overrides.json): don't edit by hand.`);
 out.push("");
 out.push(`export const WEEK${week} = {`);
 out.push(`  week: ${week},`);
@@ -51,7 +65,7 @@ let lastDay = null;
 for (const p of phrases) {
   if (p.day !== lastDay) { out.push(`    // ---------- Day ${p.day} ----------`); lastDay = p.day; }
   out.push(`    {`);
-  out.push(`      id: ${q(p.id)}, day: ${p.day}, scene: ${q(p.scene)},`);
+  out.push(`      id: ${q(p.id)}, day: ${p.day}, scene: ${q(p.scene)},${p.replyTo ? ` replyTo: ${q(p.replyTo)},` : ""}`);
   out.push(`      en: ${q(p.en)},`);
   out.push(`      ja: ${q(p.ja)},`);
   out.push(`      chunk: ${q(p.chunk)},`);

@@ -1,7 +1,7 @@
 // スモールトーク Week 1: 「はじめて会った人と話す」49 フレーズ、7 日分.
 // From smalltalk/week1.md (branch claude/fervent-clarke-wg3uno). Every student gets the same phrases.
 // Fields as in public/phrases/book.js. Keep the ids: students' フレーズ復習 lists use them.
-// Changed by the teacher after converting: #3's 塊 is "isn't it?".
+// Made by scripts/smalltalk-to-js.mjs (with the teacher's changes in smalltalk-overrides.json): don't edit by hand.
 
 export const WEEK1 = {
   week: 1,
@@ -9,7 +9,7 @@ export const WEEK1 = {
   phrases: [
     // ---------- Day 1 ----------
     {
-      id: "01", day: 1, scene: "場面1：あいさつ（ホテルのプールで）",
+      id: "01", day: 1, scene: "場面1：あいさつ",
       en: "Hi! How's it going?",
       ja: "やあ！調子どう？",
       chunk: "How's ＋ 名詞 ＋ going?",
@@ -20,7 +20,7 @@ export const WEEK1 = {
       ],
     },
     {
-      id: "02", day: 1, scene: "場面1：あいさつ（ホテルのプールで）",
+      id: "02", day: 1, scene: "場面1：あいさつ", replyTo: "01",
       en: "Pretty good, thanks. How about you?",
       ja: "けっこういいよ、ありがとう. あなたは？",
       chunk: "自分の答え ＋ How about you?",
@@ -28,7 +28,7 @@ export const WEEK1 = {
       drills: [],
     },
     {
-      id: "03", day: 1, scene: "場面1：あいさつ（ホテルのプールで）",
+      id: "03", day: 1, scene: "場面1：あいさつ", replyTo: "02",
       en: "Not bad! Beautiful day, isn't it?",
       ja: "悪くないよ！いい天気だね",
       chunk: "isn't it?",
@@ -50,7 +50,7 @@ export const WEEK1 = {
       ],
     },
     {
-      id: "05", day: 1, scene: "場面2：名前",
+      id: "05", day: 1, scene: "場面2：名前", replyTo: "04",
       en: "Nice to meet you, Yuki. I'm Michael.",
       ja: "よろしく、ユキ. マイケルです",
       chunk: "Nice to ＋ meet / see ＋ you",
@@ -81,7 +81,7 @@ export const WEEK1 = {
     },
     // ---------- Day 2 ----------
     {
-      id: "08", day: 2, scene: "場面3：仕事",
+      id: "08", day: 2, scene: "場面3：仕事", replyTo: "07",
       en: "I'm a nurse. What about you?",
       ja: "看護師です. あなたは？",
       chunk: "I'm ＋ a/an ＋ 職業",
@@ -92,7 +92,7 @@ export const WEEK1 = {
       ],
     },
     {
-      id: "09", day: 2, scene: "場面3：仕事",
+      id: "09", day: 2, scene: "場面3：仕事", replyTo: "08",
       en: "I work for a travel company.",
       ja: "旅行会社で働いています",
       chunk: "work for ＋ 会社 / work at ＋ 場所 / work in ＋ 分野",
@@ -125,7 +125,7 @@ export const WEEK1 = {
       ],
     },
     {
-      id: "12", day: 2, scene: "場面4：仕事についてもっと聞く",
+      id: "12", day: 2, scene: "場面4：仕事についてもっと聞く", replyTo: "11",
       en: "Yeah. It's busy, but it's fun.",
       ja: "うん. 忙しいけど、楽しいよ",
       chunk: "文 ＋ , but ＋ 文",
@@ -136,7 +136,7 @@ export const WEEK1 = {
       ],
     },
     {
-      id: "13", day: 2, scene: "場面4：仕事についてもっと聞く",
+      id: "13", day: 2, scene: "場面4：仕事についてもっと聞く", replyTo: "11",
       en: "The best part is meeting new people.",
       ja: "いちばんいいところは、新しい人に会えることです",
       chunk: "The best part (of ＋ 名詞) is ＋ 名詞 / 動詞ing",
@@ -159,7 +159,7 @@ export const WEEK1 = {
     },
     // ---------- Day 3 ----------
     {
-      id: "15", day: 3, scene: "場面5：出身",
+      id: "15", day: 3, scene: "場面5：出身", replyTo: "14",
       en: "I'm from Japan. Osaka, actually.",
       ja: "日本から来ました. 大阪です",
       chunk: "文 ＋ , actually",
@@ -203,7 +203,7 @@ export const WEEK1 = {
       ],
     },
     {
-      id: "19", day: 3, scene: "場面6：地元",
+      id: "19", day: 3, scene: "場面6：地元", replyTo: "18",
       en: "There's a lot to do there.",
       ja: "そこはやることがたくさんあるよ",
       chunk: "There's a lot to ＋ 動詞",
@@ -214,7 +214,7 @@ export const WEEK1 = {
       ],
     },
     {
-      id: "20", day: 3, scene: "場面6：地元",
+      id: "20", day: 3, scene: "場面6：地元", replyTo: "18",
       en: "It's famous for its food.",
       ja: "食べ物で有名です",
       chunk: "名詞 ＋ is famous for ＋ 名詞",
@@ -237,7 +237,7 @@ export const WEEK1 = {
     },
     // ---------- Day 4 ----------
     {
-      id: "22", day: 4, scene: "場面7：住んでいるところ",
+      id: "22", day: 4, scene: "場面7：住んでいるところ", replyTo: "21",
       en: "Yeah, I've lived here since I was a kid.",
       ja: "うん、子どものころからここに住んでるよ",
       chunk: "since ＋ 始まった時 / for ＋ 期間",
@@ -267,7 +267,7 @@ export const WEEK1 = {
       ],
     },
     {
-      id: "25", day: 4, scene: "場面8：きょうだい",
+      id: "25", day: 4, scene: "場面8：きょうだい", replyTo: "24",
       en: "Yes, I have an older brother and a younger sister.",
       ja: "うん、兄と妹がいます",
       chunk: "older / younger ＋ brother / sister",
@@ -289,7 +289,7 @@ export const WEEK1 = {
       ],
     },
     {
-      id: "27", day: 4, scene: "場面8：きょうだい",
+      id: "27", day: 4, scene: "場面8：きょうだい", replyTo: "26",
       en: "Yeah, we get along really well.",
       ja: "うん、すごく仲がいいよ",
       chunk: "get along (with ＋ 人)",
@@ -312,7 +312,7 @@ export const WEEK1 = {
     },
     // ---------- Day 5 ----------
     {
-      id: "29", day: 5, scene: "場面9：子ども",
+      id: "29", day: 5, scene: "場面9：子ども", replyTo: "28",
       en: "Yes, I have two. How many do you have?",
       ja: "うん、2人. あなたは何人？",
       chunk: "How many ＋ 名詞（複数）＋ do you have?",
@@ -323,7 +323,7 @@ export const WEEK1 = {
       ],
     },
     {
-      id: "30", day: 5, scene: "場面9：子ども",
+      id: "30", day: 5, scene: "場面9：子ども", replyTo: "29",
       en: "Three! How old are yours?",
       ja: "3人！お子さんはいくつ？",
       chunk: "How old is ＋ 人? / How old are ＋ 人（複数）?",
@@ -334,7 +334,7 @@ export const WEEK1 = {
       ],
     },
     {
-      id: "31", day: 5, scene: "場面9：子ども",
+      id: "31", day: 5, scene: "場面9：子ども", replyTo: "30",
       en: "My son is eight, and my daughter is five.",
       ja: "息子は8歳で、娘は5歳です",
       chunk: "人 ＋ is ＋ 年齢",
@@ -356,7 +356,7 @@ export const WEEK1 = {
       ],
     },
     {
-      id: "33", day: 5, scene: "場面10：ペット",
+      id: "33", day: 5, scene: "場面10：ペット", replyTo: "32",
       en: "Thanks! His name is Kaia.",
       ja: "ありがとう！カイアっていうの",
       chunk: "His / Her name is ＋ 名前",
@@ -390,7 +390,7 @@ export const WEEK1 = {
     },
     // ---------- Day 6 ----------
     {
-      id: "36", day: 6, scene: "場面11：どれくらいの頻度？",
+      id: "36", day: 6, scene: "場面11：どれくらいの頻度？", replyTo: "35",
       en: "I'm here from time to time.",
       ja: "ときどき来ています",
       chunk: "文 ＋ from time to time",
@@ -401,7 +401,7 @@ export const WEEK1 = {
       ],
     },
     {
-      id: "37", day: 6, scene: "場面11：どれくらいの頻度？",
+      id: "37", day: 6, scene: "場面11：どれくらいの頻度？", replyTo: "35",
       en: "Maybe once or twice a year.",
       ja: "年に1、2回かな",
       chunk: "回数 ＋ a ＋ week / month / year",
@@ -434,7 +434,7 @@ export const WEEK1 = {
       ],
     },
     {
-      id: "40", day: 6, scene: "場面12：旅行中",
+      id: "40", day: 6, scene: "場面12：旅行中", replyTo: "39",
       en: "Yes, I'm here with my family for a week.",
       ja: "うん、家族と1週間来ています",
       chunk: "with ＋ 人 / for ＋ 期間",
@@ -456,7 +456,7 @@ export const WEEK1 = {
       ],
     },
     {
-      id: "42", day: 6, scene: "場面12：旅行中",
+      id: "42", day: 6, scene: "場面12：旅行中", replyTo: "41",
       en: "I love it! Everyone is so friendly.",
       ja: "大好き！みんなすごくフレンドリー",
       chunk: "Everyone is ＋ 形容詞",
@@ -479,7 +479,7 @@ export const WEEK1 = {
       ],
     },
     {
-      id: "44", day: 7, scene: "場面13：旅行の話",
+      id: "44", day: 7, scene: "場面13：旅行の話", replyTo: "43",
       en: "I went to Bali last year.",
       ja: "去年バリに行きました",
       chunk: "動詞（過去形）＋ last ＋ 時",
@@ -512,7 +512,7 @@ export const WEEK1 = {
       ],
     },
     {
-      id: "47", day: 7, scene: "場面14：趣味",
+      id: "47", day: 7, scene: "場面14：趣味", replyTo: "46",
       en: "I like cooking and going to cafés.",
       ja: "料理とカフェめぐりが好き",
       chunk: "I like ＋ 動詞ing",
@@ -534,7 +534,7 @@ export const WEEK1 = {
       ],
     },
     {
-      id: "49", day: 7, scene: "場面14：趣味",
+      id: "49", day: 7, scene: "場面14：趣味", replyTo: "48",
       en: "Mostly Japanese food.",
       ja: "たいてい和食かな",
       chunk: "I mostly ＋ 動詞",

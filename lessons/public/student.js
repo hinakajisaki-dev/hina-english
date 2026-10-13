@@ -10,7 +10,8 @@ import { MONTHS, currentMonth, monthPhrases, pronMonths } from "./pron/phrases.j
 import { CURRENT_WEEK } from "./course.js";
 import { TOPICS } from "./journal/topics.js";
 import {
-  TEST_SIZE, phraseByKey, phraseSetKey, phraseSets, phraseWeeks, setDrills, setScenes, testSize, weekPhrases, weekTitle,
+  TEST_SIZE, phraseByKey, phraseSetKey, phraseSets, phraseWeeks, setDrills, setNumbers, setScenes, testSize, weekPhrases,
+  weekTitle,
 } from "./phrases/book.js";
 import { findMistakes, normalizeWords } from "./mistakes.js";
 import {
@@ -294,8 +295,6 @@ function renderHome() {
   const review = reviewWords().length;
   const phraseTests = phraseTestCount(phraseWeeks().includes(CURRENT_WEEK) ? [CURRENT_WEEK] : []);
   const phraseReviewCount = reviewPhrases().length;
-  const lessonTotal = UNITS.reduce((n, u) => n + u.lessons.filter((l) => l.steps).length, 0);
-  const lessonsDone = UNITS.reduce((n, u) => n + u.lessons.filter((l) => state.me.lessons[l.id]).length, 0);
   const pronMonth = currentMonth(pronDone);
   const shared = monthPhrases(pronMonth);
   const pronFinished = shared.filter((p) => pronDone(p.key)).length;
@@ -350,8 +349,7 @@ function renderHome() {
         </a>
         <a class="tile" href="#/grammar">
           <span class="emoji" aria-hidden="true">✏️</span><b>文法</b>
-          <span class="muted">レッスン ${lessonsDone} / ${lessonTotal}${grammar.length ? ` ＋ 先生からの問題 ${grammar.length} 問` : ""}</span>
-          <div class="bar"><i style="width:${Math.round((lessonsDone / (lessonTotal || 1)) * 100)}%"></i></div>
+          <span class="muted">${UNITS.map((u) => esc(u.title)).join("・")}${grammar.length ? ` ＋ 先生からの問題` : ""}</span>
         </a>
         <a class="tile" href="#/pron">
           <span class="emoji" aria-hidden="true">🎤</span><b>発音課題</b>
@@ -1085,7 +1083,7 @@ function renderPhraseWeek(week) {
       ${sets.length ? "" : emptyState("この週のフレーズは、まだありません。")}
       ${sets.map((set) => {
         const result = phraseTestResult(week, set.number);
-        const sub = byDay ? esc(setScenes(set)) : `<span lang="en">${set.phrases.map((p) => esc(p.en)).join(" ・ ")}</span>`;
+        const sub = byDay ? `${setNumbers(set)} ・ ${esc(setScenes(set))}` : `<span lang="en">${set.phrases.map((p) => esc(p.en)).join(" ・ ")}</span>`;
         return `<a class="lesson-card" href="#/phrases/${week}/${set.number}">
           <div><b>${esc(set.title)}</b><span class="muted small">${sub}</span></div>
           ${result ? `<span class="badge">✓ ${result.best} / ${result.total}</span>` : `<span class="badge start">はじめる</span>`}
@@ -1113,27 +1111,45 @@ function reviewButtonHtml(phrase) {
     : `<button type="button" class="btn ghost block review-add" id="phrase-review" aria-pressed="false">＋ 復習タブに入れる</button>`;
 }
 
+// The 和訳 always on one line: its size follows its length and the card's
+// width (wide letters count 1, narrow ones about half).
+function oneLine(text) {
+  const width = [...text].reduce((n, ch) => n + (/[\x00-\x7f]/.test(ch) ? 0.55 : 1), 0);
+  return `class="meaning one-line" style="--chars:${width.toFixed(1)}"`;
+}
+
+// A phrase card: its number (#12) and, for a 返答例, the line it answers, so
+// it can't be taken for a question; the English first, and a tap (or 次へ)
+// shows the 和訳, 塊, 解説 and 例文.
 function phraseCardHtml(phrase, revealed) {
-  const scene = phrase.scene ? `<p class="scene">${esc(phrase.scene)}</p>` : "";
+  const head = `<div class="phrase-head">
+      <span class="phrase-no">#${phrase.no}</span>
+      ${phrase.replyTo ? `<span class="reply-tag">💬 返答例</span>` : ""}
+      ${phrase.scene ? `<span class="scene">${esc(phrase.scene)}</span>` : ""}
+    </div>
+    ${phrase.replyTo ? `<p class="reply-to">「<span lang="en">${esc(phrase.replyTo.en)}</span>」（#${phrase.replyTo.no}）への返答例</p>` : ""}`;
   if (!revealed) {
-    return `<section class="card word-card word-front" id="phrase-front" role="button" tabindex="0" aria-label="日本語訳と解説を見る">
-      ${scene}
+    return `<section class="card stack word-card phrase-card word-front" id="phrase-front" role="button" tabindex="0" aria-label="日本語訳と解説を見る">
+      ${head}
       <div class="word-row center-row">
         <p class="phrase-en" lang="en">${esc(phrase.en)}</p>
         ${sayIcon(phrase.say)}
       </div>
-      <p class="hint">タップして、日本語訳と解説を見る</p>
+      <p class="hint">タップするか「次へ」で、日本語訳と解説を見る</p>
     </section>`;
   }
-  return `<section class="card stack word-card">
-    ${scene}
+  return `<section class="card stack word-card phrase-card">
+    ${head}
     <div class="word-row">
       <p class="phrase-en" lang="en">${esc(phrase.en)}</p>
       ${sayIcon(phrase.say)}
     </div>
-    <p class="meaning">${esc(phrase.ja)}</p>
+    <p ${oneLine(phrase.ja)}>${esc(phrase.ja)}</p>
     ${phrase.chunk ? `<div class="chunk-box"><p class="label">塊</p><p class="chunk">${esc(phrase.chunk)}</p></div>` : ""}
     ${phrase.note ? `<div class="phrase-note"><p class="label">解説</p><p>${noteHtml(phrase.note)}</p></div>` : ""}
+    ${phrase.examples.length ? `<div class="phrase-examples"><p class="label">例文</p>
+      <ul>${phrase.examples.map((ex) => `<li>${sayIcon(ex.en)}<div><p class="en" lang="en">${esc(ex.en)}</p>${ex.ja ? `<p class="ja">${esc(ex.ja)}</p>` : ""}</div></li>`).join("")}</ul>
+    </div>` : ""}
     <div>${speedControl()}</div>
     ${reviewButtonHtml(phrase)}
   </section>`;
@@ -1143,23 +1159,33 @@ function phraseCardHtml(phrase, revealed) {
 const phraseSteps = (phrases) =>
   phrases.flatMap((phrase) => [
     { kind: "card", phrase },
-    ...phrase.drills.map((drill) => ({
-      kind: "drill", phrase, drill,
-      step: drillStep(phrase, drill, { label: `瞬間英作文${phrase.drills.length > 1 ? ` ${drill.n + 1} / ${phrase.drills.length}` : ""}` }),
-    })),
+    ...phrase.drills.map((drill) => ({ kind: "drill", phrase, drill, step: drillStep(phrase, drill, { label: "英語にしてみよう" }) })),
   ]);
 
 // Plays a run of phrase steps (a set, or a フレーズ復習 round): P is
 // { steps, index, revealed, answers }. finish() runs after the last step.
-function renderPhraseSteps(P, { title, back, again, finishLabel, finish }) {
+// drillName ("瞬間英作文", or "復習テスト" in the review) heads the drills: a
+// banner says which part the student is in, and the button on a card says
+// where it goes next, so the switch from a card to its drills is plain.
+function renderPhraseSteps(P, { title, back, again, finishLabel, finish, drillName = "瞬間英作文" }) {
   const step = P.steps[P.index];
   const { phrase } = step;
   const phrases = [...new Set(P.steps.map((s) => s.phrase))];
   const answer = P.answers[P.index];
   const last = P.index === P.steps.length - 1;
+  const following = P.steps[P.index + 1];
   if (step.kind === "card") shownAnswer = null;
+  const banner = step.kind === "card"
+    ? `<p class="mode-banner learn">📖 フレーズを覚えよう</p>`
+    : `<div class="mode-banner drill"><b>✏️ ${esc(drillName)}${phrase.drills.length > 1 ? ` ${step.drill.n + 1} / ${phrase.drills.length}` : ""}</b>
+        <span>いま見たフレーズの塊を使って、英語で書こう</span></div>`;
   const body = step.kind === "card" ? phraseCardHtml(phrase, P.revealed[P.index]) : questionStepHtml(step.step, answer);
   const showNext = step.kind === "card" || (answer && !answer.judging);
+  const nextLabel = step.kind === "card" && !P.revealed[P.index] ? "次へ"
+    : last ? finishLabel
+    : following.kind === "drill" && step.kind === "card" ? `${drillName}へ →`
+    : following.kind === "card" ? "次のフレーズへ"
+    : "次へ";
 
   app.innerHTML = `${topbar(title, back)}
     <main class="wrap stack">
@@ -1167,10 +1193,11 @@ function renderPhraseSteps(P, { title, back, again, finishLabel, finish }) {
         <div class="bar"><i style="width:${Math.round(((P.index + 1) / P.steps.length) * 100)}%"></i></div>
         <span class="counter">${phrases.indexOf(phrase) + 1} / ${phrases.length}</span>
       </div>
+      ${banner}
       ${body}
       <div class="lesson-nav">
         ${P.index > 0 ? `<button type="button" class="btn ghost" id="prev">← もどる</button>` : "<span></span>"}
-        ${showNext ? `<button type="button" class="btn" id="next">${last ? finishLabel : "次へ"}</button>` : ""}
+        ${showNext ? `<button type="button" class="btn" id="next">${nextLabel}</button>` : ""}
       </div>
     </main>`;
 
@@ -1180,7 +1207,16 @@ function renderPhraseSteps(P, { title, back, again, finishLabel, finish }) {
     window.scrollTo(0, 0);
   };
   document.getElementById("prev")?.addEventListener("click", () => go(P.index - 1));
-  document.getElementById("next")?.addEventListener("click", () => (last ? finish() : go(P.index + 1)));
+  document.getElementById("next")?.addEventListener("click", () => {
+    // On a card, 次へ first shows its 和訳 and 解説; the next 次へ moves on.
+    if (step.kind === "card" && !P.revealed[P.index]) {
+      P.revealed[P.index] = true;
+      again();
+      return;
+    }
+    if (last) finish();
+    else go(P.index + 1);
+  });
 
   if (step.kind === "card") {
     const front = document.getElementById("phrase-front");
@@ -1369,7 +1405,7 @@ function renderPhraseReview(mode) {
         <p class="muted">復習するフレーズ：<b>${phrases.length} こ</b>（1回 ${PHRASE_REVIEW_SESSION} こまで、順番はばらばらに出ます）</p>
         <a class="unit-card" href="#/phrase-review/go">
           <b>復習をはじめる</b>
-          <span class="muted small">フレーズを見て意味を確かめたら、その場で瞬間英作文のテスト</span>
+          <span class="muted small">フレーズを見て意味を確かめたら、その場で同じ塊の復習テスト（英語で書く）</span>
         </a>
         <section class="card stack">
           <h3>フレーズ復習に入っているフレーズ</h3>
@@ -1404,6 +1440,7 @@ function renderPhraseReviewRound() {
     title: "フレーズ復習",
     back: "#/phrase-review",
     again: renderPhraseReviewRound,
+    drillName: "復習テスト",
     finishLabel: "結果を見る",
     finish: () => {
       P.done = true;
@@ -2080,7 +2117,7 @@ function typedVerdict(answer, answers) {
     if (!answer.ai?.acceptable) return { tone: "right", head: "⭕ 正解！", body: "", mine: null };
     return {
       tone: "right",
-      head: "⭕ 正解！",
+      head: "⭕ これもOK！",
       body: `<p class="ai-comment">💡 ${esc(answer.ai.comment || "この言い方も正解です。")}</p>
         <p>教材の答え：<b lang="en">${esc(findMistakes(answer.given, answers).answer)}</b></p>
         <p class="ai-note">判定は AI がしています</p>`,
@@ -2144,7 +2181,7 @@ function questionStepHtml(step, answer) {
   // with hintLater the hint waits behind a ヒントを見る button (tests).
   const hint = step.hint && !answer && step.hintLater
     ? `<details class="hint-box"><summary>ヒントを見る</summary><p>${noteHtml(step.hint)}</p></details>`
-    : step.hint ? `<p class="muted small">ヒント：<span lang="en">${esc(step.hint)}</span></p>` : "";
+    : step.hint ? `<p class="muted small">ヒント：${noteHtml(step.hint)}</p>` : "";
   return `<section class="card stack">
     <p class="label">${esc(step.label || "英語にしてみよう")}</p>
     <p class="question-ja">${esc(step.ja)}</p>
