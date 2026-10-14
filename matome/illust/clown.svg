@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="400" height="400">
+<ellipse cx="200" cy="356" rx="110" ry="12" fill="#1C2340" opacity=".08"/>
+<path d="M200 30 L250 120 H150 Z" fill="#2F86CF"/><circle cx="200" cy="30" r="14" fill="#FFC233"/>
+<circle cx="200" cy="74" r="7" fill="#fff"/><circle cx="192" cy="100" r="7" fill="#fff"/>
+<circle cx="110" cy="190" r="44" fill="#F25A2E"/><circle cx="290" cy="190" r="44" fill="#F25A2E"/>
+<circle cx="200" cy="204" r="92" fill="#FFF3EA"/>
+<path d="M150 182 L170 168 L190 182 L170 196 Z" fill="#7CC7F4"/><path d="M210 182 L230 168 L250 182 L230 196 Z" fill="#7CC7F4"/>
+<circle cx="170" cy="182" r="7" fill="#2A2F4F"/><circle cx="230" cy="182" r="7" fill="#2A2F4F"/>
+<circle cx="200" cy="216" r="20" fill="#E8461E"/><ellipse cx="194" cy="210" rx="6" ry="4" fill="#fff" opacity=".6"/>
+<path d="M150 246 Q200 290 250 246" stroke="#E8461E" stroke-width="12" fill="none" stroke-linecap="round"/>
+<path d="M120 296 L160 278 L200 300 L240 278 L280 296 L240 318 L200 300 L160 318 Z" fill="#FFC233"/>
+</svg>

@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="400" height="400">
+<defs><linearGradient id="s" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#F2F5FA"/><stop offset="1" stop-color="#A9B4C6"/></linearGradient></defs>
+<ellipse cx="200" cy="320" rx="170" ry="12" fill="#1C2340" opacity=".08"/>
+<g transform="rotate(-24 200 200)">
+<rect x="20" y="180" width="360" height="34" rx="17" fill="url(#s)" stroke="#9AA6B9" stroke-width="4"/>
+<ellipse cx="72" cy="196" rx="10" ry="7" fill="#5E6780"/>
+<g fill="#C7CFDC" stroke="#8A94A6" stroke-width="3"><circle cx="160" cy="197" r="9"/><circle cx="196" cy="197" r="9"/><circle cx="232" cy="197" r="9"/><circle cx="276" cy="197" r="9"/><circle cx="312" cy="197" r="9"/></g>
+<rect x="110" y="178" width="8" height="38" fill="#9AA6B9"/><rect x="340" y="178" width="8" height="38" fill="#9AA6B9"/>
+<rect x="30" y="184" width="340" height="7" rx="3.5" fill="#fff" opacity=".7"/>
+</g>
+<g fill="#2F86CF"><path d="M300 76 V132 a16 12 0 1 1 -8 -10 V90 L340 80 V120 a16 12 0 1 1 -8 -10 V70 Z"/></g>
+</svg>

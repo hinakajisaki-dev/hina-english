@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="400" height="400">
+<defs><radialGradient id="o" cx=".4" cy=".35" r=".75"><stop offset="0" stop-color="#9AD6FA"/><stop offset="1" stop-color="#3D86C2"/></radialGradient><clipPath id="c"><circle cx="200" cy="190" r="124"/></clipPath></defs>
+<ellipse cx="200" cy="350" rx="110" ry="12" fill="#1C2340" opacity=".08"/>
+<circle cx="200" cy="190" r="124" fill="url(#o)"/>
+<g clip-path="url(#c)" fill="#7FCB6A">
+<path d="M96 110 C130 92 170 100 176 126 C182 150 156 162 160 186 C164 212 136 230 112 214 C90 200 70 170 80 140 Z"/>
+<path d="M214 84 C246 78 284 96 292 122 C300 146 270 150 262 170 C254 192 278 214 266 240 C252 270 220 290 206 270 C194 252 214 228 204 208 C194 188 210 172 202 150 C194 128 190 92 214 84 Z"/>
+<path d="M140 262 C166 252 186 270 182 292 C178 312 150 318 136 300 C126 288 128 268 140 262 Z"/>
+</g>
+<ellipse cx="150" cy="130" rx="26" ry="44" fill="#fff" opacity=".25" transform="rotate(35 150 130)"/>
+<path d="M200 314 V338 M150 344 H250" stroke="#9AA6B9" stroke-width="12" stroke-linecap="round"/>
+</svg>
