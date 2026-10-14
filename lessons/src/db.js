@@ -130,6 +130,19 @@ const SCHEMA = [
     created_at TEXT NOT NULL
   )`,
   `CREATE INDEX IF NOT EXISTS explanations_student ON explanations(student_id, created_at)`,
+  // 授業メモ: the teacher's organized memo of one lesson (public/notes/format.js).
+  // day is the lesson's date ("2026-10-12"); the student sees it once published_at is set.
+  `CREATE TABLE IF NOT EXISTS lesson_notes (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    student_id INTEGER NOT NULL REFERENCES students(id) ON DELETE CASCADE,
+    day TEXT NOT NULL,
+    title TEXT NOT NULL DEFAULT '',
+    body TEXT NOT NULL,
+    published_at TEXT,
+    created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL
+  )`,
+  `CREATE INDEX IF NOT EXISTS lesson_notes_student ON lesson_notes(student_id, day)`,
 ];
 
 let ready = false;
@@ -172,6 +185,17 @@ export function journalRow(row) {
     teacher_comment: row.teacher_comment,
     teacher_read: !!row.teacher_read,
     created_at: row.created_at,
+  };
+}
+
+export function noteRow(row) {
+  return {
+    id: row.id,
+    day: row.day,
+    title: row.title,
+    body: row.body,
+    published_at: row.published_at,
+    updated_at: row.updated_at,
   };
 }
 

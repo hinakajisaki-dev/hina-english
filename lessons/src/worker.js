@@ -10,8 +10,9 @@ import { findMistakes } from "../public/mistakes.js";
 import { bookSentences, bookWords, setKey, weekWords, wordSets } from "../public/vocab/words.js";
 import { findPhrase } from "../public/pron/phrases.js";
 import { phraseByKey, phraseSentences, phraseSetKey, phraseSets, testSize } from "../public/phrases/book.js";
+import { noteProblems } from "../public/notes/format.js";
 import {
-  all, ensureSchema, first, itemRow, japanDay, journalRow, now, run, studentBundle,
+  all, ensureSchema, first, itemRow, japanDay, journalRow, noteRow, now, run, studentBundle,
 } from "./db.js";
 
 const STUDENT_COOKIE = "hl_student";
@@ -87,6 +88,7 @@ async function route(request, env, url) {
       return savePhraseTest(request, env, student, Number(parts[2]), Number(parts[3]));
     }
     if (path === "/api/explain" && method === "POST") return judgeTyped(request, env, student);
+    if (parts[0] === "notes" && parts.length === 2 && method === "GET") return studentNote(env, student, id(1));
     if (path === "/api/journals" && method === "POST") return newJournal(request, env, student);
     if (parts[0] === "journals" && parts[2] === "correct" && parts.length === 3 && method === "POST") {
       return retryCorrection(env, student, id(1));
@@ -108,7 +110,11 @@ async function route(request, env, url) {
   }
   if (parts[1] === "students" && parts.length === 3) {
     const student = await findStudent(db, id(2));
-    if (method === "GET") return json({ student, ...(await studentBundle(db, student.id)), ai: aiEnabled(env) });
+    if (method === "GET") {
+      const notes = (await all(db, `SELECT * FROM lesson_notes WHERE student_id = ? ORDER BY day DESC, id DESC`, student.id))
+        .map((row) => noteRow(row));
+      return json({ student, ...(await studentBundle(db, student.id)), notes, ai: aiEnabled(env) });
+    }
     if (method === "PATCH") return updateStudent(request, db, student);
     if (method === "DELETE") {
       await run(db, `DELETE FROM students WHERE id = ?`, student.id);
@@ -128,6 +134,18 @@ async function route(request, env, url) {
   }
   if (parts[1] === "students" && parts[3] === "items" && parts.length === 4 && method === "POST") {
     return addItems(request, db, await findStudent(db, id(2)));
+  }
+  if (parts[1] === "students" && parts[3] === "notes" && parts.length === 4 && method === "POST") {
+    return saveNote(request, db, await findStudent(db, id(2)), null);
+  }
+  if (parts[1] === "notes" && parts.length === 3) {
+    const row = await first(db, `SELECT * FROM lesson_notes WHERE id = ?`, id(2));
+    if (!row) throw new HttpError(404, "見つかりません。");
+    if (method === "PUT") return saveNote(request, db, { id: row.student_id }, row);
+    if (method === "DELETE") {
+      await run(db, `DELETE FROM lesson_notes WHERE id = ?`, row.id);
+      return json({ ok: true });
+    }
   }
   if (parts[1] === "items" && parts.length === 3) {
     const row = await first(db, `SELECT * FROM items WHERE id = ?`, id(2));
@@ -177,8 +195,25 @@ async function requireStudent(request, env) {
 }
 
 async function studentHome(env, student) {
-  const bundle = await studentBundle(env.DB, student.id);
-  return json({ student: { name: student.name }, ...bundle, ai: aiEnabled(env) });
+  const [bundle, notes] = await Promise.all([
+    studentBundle(env.DB, student.id),
+    all(env.DB, `SELECT * FROM lesson_notes WHERE student_id = ? AND published_at IS NOT NULL ORDER BY day DESC, id DESC`, student.id),
+  ]);
+  // The list leaves the memos out; one is fetched when it is opened.
+  const list = notes.map((row) => {
+    const { body, ...note } = noteRow(row);
+    return { ...note, problems: noteProblems(body).length };
+  });
+  return json({ student: { name: student.name }, ...bundle, notes: list, ai: aiEnabled(env) });
+}
+
+// One published 授業メモ.
+async function studentNote(env, student, noteId) {
+  const row = await first(
+    env.DB, `SELECT * FROM lesson_notes WHERE id = ? AND student_id = ? AND published_at IS NOT NULL`, noteId, student.id,
+  );
+  if (!row) throw new HttpError(404, "見つかりません。");
+  return json({ note: noteRow(row) });
 }
 
 async function saveProgress(request, env, student) {
@@ -225,9 +260,9 @@ async function newJournal(request, env, student) {
   return correctOnce(env, student, meta.last_row_id);
 }
 
-// Audio is only made for text in the student's own content, the 単語帳, the
-// フレーズ or the grammar lessons' examples, so the endpoint can't be used to
-// voice anything else.
+// Audio is only made for text in the student's own content (their words,
+// sentences and 授業メモ), the 単語帳, the フレーズ or the grammar lessons'
+// examples, so the endpoint can't be used to voice anything else.
 // (The pronunciation months play the teacher's own recordings instead.)
 const SPOKEN_FIELDS = { vocab: ["word", "example"], pron: ["text"] };
 const LESSON_SENTENCES = lessonExampleSentences();
@@ -246,6 +281,15 @@ async function speech(env, student, text) {
       const data = JSON.parse(row.data);
       return SPOKEN_FIELDS[row.kind].some((field) => data[field] === text);
     });
+  }
+  // The answers of the 復習問題 in the student's published 授業メモ.
+  if (!allowed && text) {
+    const notes = await all(
+      env.DB,
+      `SELECT body FROM lesson_notes WHERE student_id = ? AND published_at IS NOT NULL AND instr(body, ?) > 0`,
+      student.id, text,
+    );
+    allowed = notes.some((row) => noteProblems(row.body).some((p) => p.en === text));
   }
   if (!text || !allowed) throw new HttpError(404, "見つかりません。");
   try {
@@ -675,6 +719,34 @@ async function updateJournal(request, db, journalId) {
   const read = input.teacher_read === undefined ? row.teacher_read : input.teacher_read ? 1 : 0;
   await run(db, `UPDATE journals SET teacher_comment = ?, teacher_read = ? WHERE id = ?`, comment, read, journalId);
   return json({ journal: journalRow({ ...row, teacher_comment: comment, teacher_read: read }) });
+}
+
+// A new 授業メモ (row null) or an edit of one. publish true shows it to the
+// student (an already published memo keeps its first date), false hides it
+// again, and leaving it out keeps it as it is.
+async function saveNote(request, db, student, row) {
+  const input = await readJson(request);
+  const day = String(input.day ?? row?.day ?? "");
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(day) || Number.isNaN(Date.parse(day))) throw new HttpError(400, "授業の日を入れてください。");
+  const title = String(input.title ?? row?.title ?? "").trim().slice(0, 100);
+  const body = String(input.body ?? row?.body ?? "").replace(/\r\n?/g, "\n").trim();
+  if (!body) throw new HttpError(400, "メモの本文を入れてください。");
+  if (body.length > 30000) throw new HttpError(400, "長すぎます。30,000文字以内にしてください。");
+  const stamp = now();
+  const published = input.publish === undefined ? row?.published_at ?? null : input.publish ? row?.published_at || stamp : null;
+  if (row) {
+    await run(
+      db, `UPDATE lesson_notes SET day = ?, title = ?, body = ?, published_at = ?, updated_at = ? WHERE id = ?`,
+      day, title, body, published, stamp, row.id,
+    );
+    return json({ note: noteRow({ ...row, day, title, body, published_at: published, updated_at: stamp }) });
+  }
+  const { meta } = await run(
+    db,
+    `INSERT INTO lesson_notes (student_id, day, title, body, published_at, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)`,
+    student.id, day, title, body, published, stamp, stamp,
+  );
+  return json({ note: noteRow(await first(db, `SELECT * FROM lesson_notes WHERE id = ?`, meta.last_row_id)) });
 }
 
 // One recording, for the teacher's <audio> player. Safari asks for byte ranges.
