@@ -51,4 +51,5 @@ node scripts/teacher.mjs publish なおみ 5
 - 入れる前に、入れる内容を先生に見せて OK をもらう. 公開（`publish`、`--publish`）と削除は、先生が「公開して」「消して」と言ったときだけ
 - 単語は Week を先生に確かめる（全員共通の単語帳のあとに、その生徒の単語として加わる）
 - 授業メモの整理のルールと本文の書き方は `docs/lesson-notes.md`
+- いまは生徒の画面に授業メモを出していない（`lessons/public/course.js` の `NOTES_FOR_STUDENTS`）. 公開しても生徒にはまだ見えないことを、先生に伝える
 - 入れたあとは、何を入れたか（番号）を先生に短く伝える

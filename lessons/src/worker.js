@@ -11,6 +11,7 @@ import { bookSentences, bookWords, setKey, weekWords, wordSets } from "../public
 import { findPhrase } from "../public/pron/phrases.js";
 import { phraseByKey, phraseSentences, phraseSetKey, phraseSets, testSize } from "../public/phrases/book.js";
 import { noteProblems } from "../public/notes/format.js";
+import { NOTES_FOR_STUDENTS } from "../public/course.js";
 import {
   all, ensureSchema, first, itemRow, japanDay, journalRow, noteRow, now, run, studentBundle,
 } from "./db.js";
@@ -88,7 +89,9 @@ async function route(request, env, url) {
       return savePhraseTest(request, env, student, Number(parts[2]), Number(parts[3]));
     }
     if (path === "/api/explain" && method === "POST") return judgeTyped(request, env, student);
-    if (parts[0] === "notes" && parts.length === 2 && method === "GET") return studentNote(env, student, id(1));
+    if (NOTES_FOR_STUDENTS && parts[0] === "notes" && parts.length === 2 && method === "GET") {
+      return studentNote(env, student, id(1));
+    }
     if (path === "/api/journals" && method === "POST") return newJournal(request, env, student);
     if (parts[0] === "journals" && parts[2] === "correct" && parts.length === 3 && method === "POST") {
       return retryCorrection(env, student, id(1));
@@ -197,7 +200,9 @@ async function requireStudent(request, env) {
 async function studentHome(env, student) {
   const [bundle, notes] = await Promise.all([
     studentBundle(env.DB, student.id),
-    all(env.DB, `SELECT * FROM lesson_notes WHERE student_id = ? AND published_at IS NOT NULL ORDER BY day DESC, id DESC`, student.id),
+    NOTES_FOR_STUDENTS
+      ? all(env.DB, `SELECT * FROM lesson_notes WHERE student_id = ? AND published_at IS NOT NULL ORDER BY day DESC, id DESC`, student.id)
+      : [],
   ]);
   // The list leaves the memos out; one is fetched when it is opened.
   const list = notes.map((row) => {
@@ -283,7 +288,7 @@ async function speech(env, student, text) {
     });
   }
   // The answers of the 復習問題 in the student's published 授業メモ.
-  if (!allowed && text) {
+  if (!allowed && text && NOTES_FOR_STUDENTS) {
     const notes = await all(
       env.DB,
       `SELECT body FROM lesson_notes WHERE student_id = ? AND published_at IS NOT NULL AND instr(body, ?) > 0`,

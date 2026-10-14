@@ -5,7 +5,7 @@ import { ApiError, api, diffHtml, esc, formatDateTime, icons, startOfJapanDay, t
 import { UNITS } from "./grammar/lessons.js";
 import { bookWeeks, bookWords, setKey, weekWords, wordSets } from "./vocab/words.js";
 import { currentMonth, monthPhrases, pronMonths } from "./pron/phrases.js";
-import { CURRENT_WEEK } from "./course.js";
+import { CURRENT_WEEK, NOTES_FOR_STUDENTS } from "./course.js";
 import { phraseSetKey, phraseSets, phraseWeeks, testSize } from "./phrases/book.js";
 import { noteDayLabel, noteHtml, noteProblems } from "./notes/format.js";
 import { bindPanels, formatMinutes, monthPanel, monthStart, summary, today, weekDays, weekPanel, weekStart } from "./study.js";
@@ -365,6 +365,7 @@ function renderNotes(panel) {
     <form class="card stack" id="note-form">
       <h3>${editing ? `メモを直す（${esc(noteDayLabel(editing.day))}）` : "新しい授業メモ"}</h3>
       <p class="muted small">${esc(student.name)}さんのチャットで整理したメモを、そのまま貼りつけてください。「公開する」を押すまで、生徒には見えません。</p>
+      ${NOTES_FOR_STUDENTS ? "" : `<p class="notice small">いまは、生徒の画面に授業メモを出していません。公開しても、生徒にはまだ見えません（出すときは Claude に頼んでください）。</p>`}
       <div class="note-meta">
         <label class="field"><span>授業の日</span>
           <input type="date" name="day" required value="${esc(editing?.day || today())}">

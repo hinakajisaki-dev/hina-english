@@ -7,7 +7,7 @@ import {
 import { UNITS, findLesson, plain, questionCount } from "./grammar/lessons.js";
 import { bookWeeks, setKey, speakable, splitOnForm, weekWords, wordSets } from "./vocab/words.js";
 import { MONTHS, currentMonth, monthPhrases, pronMonths } from "./pron/phrases.js";
-import { CURRENT_WEEK } from "./course.js";
+import { CURRENT_WEEK, NOTES_FOR_STUDENTS } from "./course.js";
 import { TOPICS } from "./journal/topics.js";
 import {
   TEST_SIZE, phraseByKey, phraseSetKey, phraseSets, phraseWeeks, setDrills, setNumbers, setScenes, testSize, weekPhrases,
@@ -53,7 +53,7 @@ function render() {
   if (screen === "pron") state.pron = { which: null, index: 0 };
   const screens = {
     vocab: renderVocab, review: renderReview, phrases: renderPhrases, "phrase-review": renderPhraseReview, pron: renderPron,
-    grammar: renderGrammar, journal: renderJournal, study: renderStudy, notes: renderNotes,
+    grammar: renderGrammar, journal: renderJournal, study: renderStudy, ...(NOTES_FOR_STUDENTS ? { notes: renderNotes } : {}),
   };
   (screens[screen] || renderHome)(...rest.map(decodeURIComponent));
 }
@@ -332,10 +332,10 @@ function renderHome() {
           <span class="emoji" aria-hidden="true">${done ? "✅" : "✍️"}</span>
           <div><b>日記を書く</b><p class="muted">${done ? "今日の日記は書けました！" : "今日のお題で、英語の日記を書こう"}</p></div>
         </a>
-        <a class="tile wide" href="#/notes">
+        ${NOTES_FOR_STUDENTS ? `<a class="tile wide" href="#/notes">
           <span class="emoji" aria-hidden="true">📝</span>
           <div><b>授業メモ</b><p class="muted">${latestNote ? `${esc(noteDayLabel(latestNote.day))}${latestNote.title ? ` ・ ${esc(latestNote.title)}` : ""}` : "授業のあとに、先生のメモがとどきます"}</p></div>
-        </a>
+        </a>` : ""}
         <a class="tile" href="#/vocab">
           <span class="emoji" aria-hidden="true">🃏</span><b>単語カード</b>
           <span class="muted">${sets.length ? `Week ${CURRENT_WEEK} ・ テスト ${tested} / ${sets.length}` : "まだありません"}</span>
