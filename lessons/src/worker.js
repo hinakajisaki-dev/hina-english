@@ -141,6 +141,9 @@ async function route(request, env, url) {
   if (parts[1] === "students" && parts[3] === "notes" && parts.length === 4 && method === "POST") {
     return saveNote(request, db, await findStudent(db, id(2)), null);
   }
+  if (parts[1] === "students" && parts[3] === "plan" && parts.length === 4 && method === "PUT") {
+    return savePlan(request, db, await findStudent(db, id(2)));
+  }
   if (parts[1] === "notes" && parts.length === 3) {
     const row = await first(db, `SELECT * FROM lesson_notes WHERE id = ?`, id(2));
     if (!row) throw new HttpError(404, "見つかりません。");
@@ -209,7 +212,33 @@ async function studentHome(env, student) {
     const { body, ...note } = noteRow(row);
     return { ...note, problems: noteProblems(body).length };
   });
-  return json({ student: { name: student.name }, ...bundle, notes: list, ai: aiEnabled(env) });
+  // Memo cards in the フレーズ復習 list ("n12/3"), so it can show them.
+  const noteCards = {};
+  for (const { key } of bundle.phraseReview) {
+    const card = noteCardIn(notes, key);
+    if (card) noteCards[key] = card;
+  }
+  return json({ student: { name: student.name }, ...bundle, notes: list, noteCards, ai: aiEnabled(env) });
+}
+
+// A card of a 授業メモ's 復習問題 by its key: "n12/3" is the fourth card of memo
+// 12. rows are the student's published memos. The card is { en, ja, note, day }.
+const NOTE_CARD_KEY = /^n(\d+)\/(\d+)$/;
+
+function noteCardIn(rows, key) {
+  const m = String(key).match(NOTE_CARD_KEY);
+  const row = m && rows.find((r) => r.id === Number(m[1]));
+  const card = row && noteProblems(row.body)[Number(m[2])];
+  return card ? { ...card, day: row.day } : null;
+}
+
+async function findNoteCard(db, student, key) {
+  const m = NOTES_FOR_STUDENTS && String(key).match(NOTE_CARD_KEY);
+  if (!m) return null;
+  const rows = await all(
+    db, `SELECT * FROM lesson_notes WHERE id = ? AND student_id = ? AND published_at IS NOT NULL`, Number(m[1]), student.id,
+  );
+  return noteCardIn(rows, key);
 }
 
 // One published 授業メモ.
@@ -468,9 +497,12 @@ async function saveVocabTest(request, env, student, weekParam, number) {
 
 // The フレーズ復習 list, like the words' 復習 list: on adds a phrase (source
 // "check" from its card, "test" when missed in a set test), off takes it out.
+// Cards of the student's 授業メモ ("n12/3") go in the same list; one whose memo
+// has changed or gone can still be taken out.
 async function savePhraseReview(request, env, student) {
   const { key, on, source } = await readJson(request);
-  if (!phraseByKey(key)) throw new HttpError(404, "見つかりません。");
+  const known = phraseByKey(key) || (on ? await findNoteCard(env.DB, student, key) : NOTE_CARD_KEY.test(String(key)));
+  if (!known) throw new HttpError(404, "見つかりません。");
   if (on) {
     await run(
       env.DB,
@@ -770,6 +802,25 @@ async function saveNote(request, db, student, row) {
     student.id, day, title, body, published, stamp, stamp,
   );
   return json({ note: noteRow(await first(db, `SELECT * FROM lesson_notes WHERE id = ?`, meta.last_row_id)) });
+}
+
+// 今週の勉強範囲. An empty body takes it away.
+async function savePlan(request, db, student) {
+  const input = await readJson(request);
+  const body = String(input.body ?? "").replace(/\r\n?/g, "\n").trim();
+  if (body.length > 5000) throw new HttpError(400, "長すぎます。5,000文字以内にしてください。");
+  if (!body) {
+    await run(db, `DELETE FROM study_plans WHERE student_id = ?`, student.id);
+    return json({ plan: null });
+  }
+  const stamp = now();
+  await run(
+    db,
+    `INSERT INTO study_plans (student_id, body, updated_at) VALUES (?1, ?2, ?3)
+     ON CONFLICT (student_id) DO UPDATE SET body = ?2, updated_at = ?3`,
+    student.id, body, stamp,
+  );
+  return json({ plan: { body, updated_at: stamp } });
 }
 
 // One recording, for the teacher's <audio> player. Safari asks for byte ranges.

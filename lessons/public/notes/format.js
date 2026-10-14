@@ -7,8 +7,9 @@
 //   | 表 | 表 | with | --- | --- | as its second row
 //   ---                            a line
 //   a blank line between paragraphs
-// ✗ and ○ are coloured. The last section, "## 復習問題", holds a | 日本語 | 英語 |
-// table; it is not shown as a table but becomes the 復習問題にチャレンジ button.
+// ✗ and ○ are coloured. The last section, "## 復習問題", holds a | 英語 | 意味 | 解説 |
+// table; it is not shown as a table but becomes cards like 単語カード (the
+// English, then a tap shows the meaning and the 解説), behind a button.
 
 const ESCAPES = { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" };
 const esc = (value) => String(value ?? "").replace(/[&<>"']/g, (c) => ESCAPES[c]);
@@ -37,27 +38,36 @@ function split(body) {
 const cells = (line) => line.trim().replace(/^\|/, "").replace(/\|$/, "").split("|").map((c) => c.trim());
 const unbold = (text) => text.replace(/\*\*(.+?)\*\*/g, "$1").trim();
 
-// The 復習問題: [{ ja, en }]. The table's 日本語 and 英語 columns (else its first
-// two), or lines like "- 日本語 → English".
+const JAPANESE = /[\u3040-\u30ff\u3400-\u9fff]/;
+
+// The 復習問題 as cards: [{ en, ja, note }]. The table's 英語, 意味 (or 日本語)
+// and 解説 columns; a table without those headings is read as 日本語 | 英語,
+// as memos were first written. Lines like "- English → 意味" work too.
 export function noteProblems(body) {
   const { review } = split(body);
   const rows = review.filter((line) => TABLE.test(line));
   const problems = [];
   if (rows.length) {
-    let ja = 0;
-    let en = 1;
+    let col = { ja: 0, en: 1, note: -1 };
     let start = 0;
     if (rows[1] && TABLE_RULE.test(rows[1])) {
       const head = cells(rows[0]);
-      const find = (word) => head.findIndex((h) => h.includes(word));
-      if (find("日本語") !== -1) ja = find("日本語");
-      if (find("英語") !== -1) en = find("英語");
+      const find = (...words) => head.findIndex((h) => words.some((w) => h.includes(w)));
+      col = {
+        en: find("英語", "English", "フレーズ"),
+        ja: find("意味", "日本語", "和訳"),
+        note: find("解説", "ポイント"),
+      };
+      if (col.en === -1) col.en = col.ja === 0 ? 1 : 0;
+      if (col.ja === -1) col.ja = col.en === 0 ? 1 : 0;
       start = 2;
     }
     for (const row of rows.slice(start)) {
       if (TABLE_RULE.test(row)) continue;
       const c = cells(row);
-      if (unbold(c[ja] || "") && unbold(c[en] || "")) problems.push({ ja: unbold(c[ja]), en: unbold(c[en]) });
+      const en = unbold(c[col.en] || "");
+      const ja = unbold(c[col.ja] || "");
+      if (en && ja) problems.push({ en, ja, note: col.note === -1 ? "" : unbold(c[col.note] || "") });
     }
     return problems;
   }
@@ -65,8 +75,10 @@ export function noteProblems(body) {
     const m = line.match(LIST);
     const text = m ? m[3] : line.trim();
     const arrow = text.lastIndexOf("→");
-    if (arrow > 0 && unbold(text.slice(0, arrow)) && unbold(text.slice(arrow + 1))) {
-      problems.push({ ja: unbold(text.slice(0, arrow)), en: unbold(text.slice(arrow + 1)) });
+    const left = unbold(text.slice(0, arrow));
+    const right = unbold(text.slice(arrow + 1));
+    if (arrow > 0 && left && right) {
+      problems.push(JAPANESE.test(left) ? { en: right, ja: left, note: "" } : { en: left, ja: right, note: "" });
     }
   }
   return problems;

@@ -308,6 +308,7 @@ function renderHome() {
   const week = summary(weekDays(state.me.study, weekStart(now)));
   const todayRow = state.me.study.find((r) => r.day === now);
   const latestNote = state.me.notes[0];
+  const plan = state.me.plan;
 
   app.innerHTML = `
     <header class="topbar"><div class="topbar-in">
@@ -319,6 +320,10 @@ function renderHome() {
         <h2>こんにちは、${esc(state.me.student.name)}さん</h2>
       </div>
       ${installCard()}
+      <section class="card plan" aria-label="今週の勉強範囲">
+        <p class="label">今週の勉強範囲</p>
+        ${plan ? `<div class="note-body plan-body">${memoHtml(plan.body)}</div>` : `<p class="muted small">先生が、今週の勉強範囲をここに書きます。</p>`}
+      </section>
       <section class="card tasks ${left ? "" : "all-done"}" aria-label="今日のやること">
         <p class="label">${left ? `今日のやること（あと ${left} つ）` : "今日のやることは全部できました！🎉"}</p>
         ${tasks.map((t) => `<a class="task ${t.done ? "done" : ""}" href="${t.href}">
@@ -332,10 +337,6 @@ function renderHome() {
           <span class="emoji" aria-hidden="true">${done ? "✅" : "✍️"}</span>
           <div><b>日記を書く</b><p class="muted">${done ? "今日の日記は書けました！" : "今日のお題で、英語の日記を書こう"}</p></div>
         </a>
-        ${NOTES_FOR_STUDENTS ? `<a class="tile wide" href="#/notes">
-          <span class="emoji" aria-hidden="true">📝</span>
-          <div><b>授業メモ</b><p class="muted">${latestNote ? `${esc(noteDayLabel(latestNote.day))}${latestNote.title ? ` ・ ${esc(latestNote.title)}` : ""}` : "授業のあとに、先生のメモがとどきます"}</p></div>
-        </a>` : ""}
         <a class="tile" href="#/vocab">
           <span class="emoji" aria-hidden="true">🃏</span><b>単語カード</b>
           <span class="muted">${sets.length ? `Week ${CURRENT_WEEK} ・ テスト ${tested} / ${sets.length}` : "まだありません"}</span>
@@ -363,6 +364,10 @@ function renderHome() {
           <span class="muted">${shared.length ? `Month ${pronMonth} ・ 完了 ${pronFinished} / ${shared.length}` : "まだありません"}</span>
           ${shared.length ? `<div class="bar"><i style="width:${Math.round((pronFinished / shared.length) * 100)}%"></i></div>` : ""}
         </a>
+        ${NOTES_FOR_STUDENTS ? `<a class="tile wide" href="#/notes">
+          <span class="emoji" aria-hidden="true">📝</span>
+          <div><b>授業メモ</b><p class="muted">${latestNote ? `${esc(noteDayLabel(latestNote.day))}${latestNote.title ? ` ・ ${esc(latestNote.title)}` : ""}` : "授業のあとに、先生のメモがとどきます"}</p></div>
+        </a>` : ""}
         <a class="tile wide" href="#/study">
           <span class="emoji" aria-hidden="true">⏱️</span>
           <div><b>勉強時間</b><p class="muted">今日 ${formatMinutes(totalMinutes(todayRow))} ・ 今週 ${formatMinutes(week.total)}</p></div>
@@ -385,18 +390,20 @@ function renderHome() {
 }
 
 // ---------- 授業メモ ----------
-// The teacher's memo of each lesson, newest first. A memo's 復習問題 open in a
-// panel at the bottom of the screen, so the memo can still be read above it.
+// The teacher's memo of each lesson, newest first. A memo's 復習問題 are cards
+// like 単語カード (the English; a tap shows the meaning and 解説), in a panel at
+// the bottom of the screen so the memo can still be read above it. Each card
+// can go into フレーズ復習 ("n12/3": memo 12's fourth card).
 
 function renderNotes(id) {
   if (id) return renderNote(Number(id));
   const notes = state.me.notes;
   app.innerHTML = `${topbar("授業メモ")}
     <main class="wrap stack">
-      ${notes.length ? `<p class="muted">授業で習ったことのまとめです。復習問題で、いつでも復習できます。</p>` : ""}
+      ${notes.length ? `<p class="muted">授業で習ったことのまとめです。メモの内容で、いつでも復習できます。</p>` : ""}
       ${notes.length ? notes.map((note) => `<a class="lesson-card" href="#/notes/${note.id}">
           <div><b>${esc(noteDayLabel(note.day))}</b>${note.title ? `<span class="muted small">${esc(note.title)}</span>` : ""}</div>
-          ${note.problems ? `<span class="badge">復習問題 ${note.problems}問</span>` : ""}
+          ${note.problems ? `<span class="badge">復習 ${note.problems}こ</span>` : ""}
         </a>`).join("") : emptyState("まだ授業メモはありません。<br>授業のあとに、先生のメモがここにとどきます。")}
     </main>`;
 }
@@ -416,7 +423,7 @@ async function renderNote(id) {
   }
   const problems = noteProblems(note.body);
   const quizButton = problems.length
-    ? `<button type="button" class="btn block quiz-start" data-quiz>復習問題にチャレンジ（${problems.length}問）</button>`
+    ? `<button type="button" class="btn block quiz-start" data-quiz>内容を元に復習する（${problems.length}こ）</button>`
     : "";
   app.innerHTML = `${topbar(noteDayLabel(note.day), "#/notes")}
     <main class="wrap stack note-page">
@@ -425,11 +432,11 @@ async function renderNote(id) {
       <article class="card note-body">${memoHtml(note.body)}</article>
       ${quizButton}
     </main>`;
-  app.querySelectorAll("[data-quiz]").forEach((button) => button.addEventListener("click", () => openQuiz(problems)));
+  app.querySelectorAll("[data-quiz]").forEach((button) => button.addEventListener("click", () => openQuiz(note, problems)));
 }
 
-function openQuiz(problems) {
-  state.quiz = { problems, index: 0, shown: false };
+function openQuiz(note, problems) {
+  state.quiz = { note, problems, index: 0, shown: false };
   let sheet = document.getElementById("note-quiz");
   if (!sheet) {
     sheet = document.createElement("section");
@@ -448,43 +455,70 @@ function closeQuiz() {
   document.body.classList.remove("quiz-open");
 }
 
+const noteCardKey = (note, index) => `n${note.id}/${index}`;
+
 function drawQuiz() {
   const sheet = document.getElementById("note-quiz");
   const quiz = state.quiz;
   if (!sheet || !quiz) return;
-  const { problems, index, shown } = quiz;
+  const { note, problems, index, shown } = quiz;
   const finished = index >= problems.length;
   const p = problems[index];
+  const key = p && noteCardKey(note, index);
+  const inReviewHere = problems.filter((_, i) => inPhraseReview(noteCardKey(note, i))).length;
   sheet.innerHTML = `<div class="quiz-in">
     <div class="quiz-head">
-      <b>${finished ? "復習問題" : `復習問題 ${index + 1} / ${problems.length}`}</b>
+      <b>${finished ? "復習" : `復習 ${index + 1} / ${problems.length}`}</b>
       <button type="button" class="icon-btn" data-close aria-label="とじる">✕</button>
     </div>
     ${finished ? `
-      <p class="quiz-done">全部できました！おつかれさまでした 🎉</p>
+      <p class="quiz-done">おわり！おつかれさまでした 🎉</p>
+      ${inReviewHere ? `<p class="muted small center">このメモから ${inReviewHere} こがフレーズ復習に入っています</p>` : ""}
       <div class="btn-row">
         <button type="button" class="btn secondary" data-again>もう一度</button>
         <button type="button" class="btn" data-close>とじる</button>
       </div>` : `
-      <p class="quiz-ja">${esc(p.ja)}</p>
-      <p class="muted small">英語で言ってみよう</p>
-      ${shown ? `<div class="quiz-answer">
-        <p lang="en">${esc(p.en)}</p>
-        ${sayButton(p.en)}
-      </div>` : ""}
+      <div class="quiz-card ${shown ? "" : "front"}" ${shown ? "" : 'role="button" tabindex="0" aria-label="意味と解説を見る" data-show'}>
+        <div class="quiz-en-row">
+          <p class="quiz-en" lang="en">${esc(p.en)}</p>
+          <button type="button" class="speak icon-only" data-say="${esc(p.en)}" aria-label="聞く">${icons.speaker}</button>
+        </div>
+        ${shown
+          ? `<p class="quiz-meaning">${esc(p.ja)}</p>${p.note ? `<p class="quiz-note">${noteHtml(p.note)}</p>` : ""}`
+          : `<p class="hint">タップして意味を見る</p>`}
+      </div>
+      ${shown ? (inPhraseReview(key)
+        ? `<button type="button" class="btn secondary block review-on" data-review aria-pressed="true">✓ 復習タブに入っています</button>`
+        : `<button type="button" class="btn ghost block review-add" data-review aria-pressed="false">＋ 復習タブに入れる</button>`) : ""}
       <div class="btn-row">
         ${index ? `<button type="button" class="btn secondary" data-back>前へ</button>` : ""}
         ${shown
           ? `<button type="button" class="btn" data-next>${index + 1 < problems.length ? "次へ" : "おわる"}</button>`
-          : `<button type="button" class="btn" data-show>答えを見る</button>`}
+          : `<button type="button" class="btn" data-show>意味を見る</button>`}
       </div>`}
   </div>`;
-  const on = (selector, action) => sheet.querySelectorAll(selector).forEach((b) => b.addEventListener("click", action));
+  const on = (selector, action) => sheet.querySelectorAll(selector).forEach((b) => b.addEventListener("click", (event) => {
+    if (event.target.closest("[data-say]") && !b.matches("[data-say]")) return;
+    action();
+  }));
   on("[data-close]", closeQuiz);
   on("[data-again]", () => { Object.assign(quiz, { index: 0, shown: false }); drawQuiz(); });
   on("[data-show]", () => { quiz.shown = true; drawQuiz(); });
   on("[data-next]", () => { Object.assign(quiz, { index: index + 1, shown: false }); drawQuiz(); });
   on("[data-back]", () => { Object.assign(quiz, { index: index - 1, shown: false }); drawQuiz(); });
+  on("[data-review]", () => {
+    const add = !inPhraseReview(key);
+    if (add) (state.me.noteCards ||= {})[key] = { ...p, day: note.day };
+    setPhraseReview(key, add);
+    toast(add ? "フレーズ復習に入れました" : "フレーズ復習から外しました");
+    drawQuiz();
+  });
+  sheet.querySelector(".quiz-card.front")?.addEventListener("keydown", (event) => {
+    if (event.key !== "Enter" && event.key !== " ") return;
+    event.preventDefault();
+    quiz.shown = true;
+    drawQuiz();
+  });
 }
 
 // ---------- study time ----------
@@ -1235,7 +1269,7 @@ function oneLine(text) {
 // shows the 和訳, 塊, 解説 and 例文.
 function phraseCardHtml(phrase, revealed) {
   const head = `<div class="phrase-head">
-      <span class="phrase-no">#${phrase.no}</span>
+      ${phrase.no ? `<span class="phrase-no">#${phrase.no}</span>` : ""}
       ${phrase.replyTo ? `<span class="reply-tag">💬 返答例</span>` : ""}
       ${phrase.scene ? `<span class="scene">${esc(phrase.scene)}</span>` : ""}
     </div>
@@ -1504,9 +1538,18 @@ function renderPhraseTestResult(week, set, title, again) {
 
 const PHRASE_REVIEW_SESSION = 10;
 
+// A 授業メモ card in the フレーズ復習 list, shaped like a phrase with no 瞬間英作文.
+function memoPhrase(key) {
+  const card = state.me.noteCards?.[key];
+  return card && {
+    key, no: null, scene: `📝 ${noteDayLabel(card.day)}`, replyTo: null, en: card.en, say: card.en, ja: card.ja,
+    chunk: "", chunkJa: "", note: card.note || "", example: null, drills: [],
+  };
+}
+
 function reviewPhrases() {
   return state.me.phraseReview.map((r) => {
-    const phrase = phraseByKey(r.key);
+    const phrase = phraseByKey(r.key) || memoPhrase(r.key);
     return phrase && { ...phrase, source: r.source };
   }).filter(Boolean);
 }

@@ -331,7 +331,8 @@ function renderJournals(panel) {
 // ---------- 授業メモ ----------
 // The memo is organized in the student's own chat with Claude and pasted here
 // (docs/lesson-notes.md has the format). The student sees it once it is
-// published; its 復習問題 become the 復習問題にチャレンジ button.
+// published; its 復習問題 become cards (the English, then the meaning and 解説)
+// behind the 内容を元に復習する button.
 
 const NOTE_PLACEHOLDER = `## 1. 英作文：日曜日のこと（日本語 → 英語）
 **問題**：日曜日に家族と海へ行きました。
@@ -342,19 +343,19 @@ const NOTE_PLACEHOLDER = `## 1. 英作文：日曜日のこと（日本語 → �
   - ✗ … → ○ …
 
 ## 復習問題
-| 日本語 | 英語 |
-| --- | --- |
-| 日曜日に家族と海へ行きました | I went to the beach on Sunday with my family. |`;
+| 英語 | 意味 | 解説 |
+| --- | --- | --- |
+| When I want to relax, I go to Osaka. | リラックスしたい時は大阪に行きます | When I want to 〜 ＝ 〜したい時 |`;
 
 // The memo as the student will see it, with its 復習問題 listed for checking.
 function notePreviewHtml(body) {
   const problems = noteProblems(body);
   return `<div class="note-body">${noteHtml(body)}</div>
     <div class="note-problems stack">
-      <p><b>復習問題 ${problems.length} 問</b><span class="muted small">（生徒には「復習問題にチャレンジ」ボタンで、1問ずつ出ます）</span></p>
+      <p><b>復習 ${problems.length} こ</b><span class="muted small">（生徒には「内容を元に復習する」ボタンで、カードが1枚ずつ出ます。英語 → タップで意味と解説）</span></p>
       ${problems.length
-        ? `<ol>${problems.map((p) => `<li>${esc(p.ja)}<br><span lang="en">${esc(p.en)}</span></li>`).join("")}</ol>`
-        : `<p class="notice small">復習問題がありません。いちばん最後に「## 復習問題」と「| 日本語 | 英語 |」の表を入れると、ボタンになります。</p>`}
+        ? `<ol>${problems.map((p) => `<li><span lang="en"><b>${esc(p.en)}</b></span><br>${esc(p.ja)}${p.note ? `<br><span class="muted small">${esc(p.note)}</span>` : ""}</li>`).join("")}</ol>`
+        : `<p class="notice small">復習のカードがありません。いちばん最後に「## 復習問題」と「| 英語 | 意味 | 解説 |」の表を入れると、ボタンになります。</p>`}
     </div>`;
 }
 
@@ -795,6 +796,13 @@ function renderSettings(panel) {
         <button class="btn secondary" id="new-code" style="flex:none">新しいコードにする</button>
       </div>
     </section>
+    <form class="card stack" id="plan">
+      <h3>今週の勉強範囲</h3>
+      <p class="muted small">生徒のホームのいちばん上に出ます。空にして保存すると消えます。生徒ごとのチャットからも変えられます。</p>
+      <textarea name="body" rows="5" maxlength="5000" placeholder="- フレーズ Week 1 の Day 1〜3&#10;- 単語 Week 1 のセット 1〜5&#10;- 発音 Month 1 を毎日1文">${esc(state.current.plan?.body || "")}</textarea>
+      ${state.current.plan ? `<p class="muted small">${esc(formatDateTime(state.current.plan.updated_at))} に更新</p>` : ""}
+      <button class="btn" type="submit" style="align-self:flex-start">保存</button>
+    </form>
     <form class="card stack" id="profile">
       <h3>生徒の情報</h3>
       <label class="field"><span>名前（アプリで「〇〇さん」と表示）</span>
@@ -822,6 +830,20 @@ function renderSettings(panel) {
       toast("新しいコードにしました");
     } catch (error) {
       toast(error.message);
+    }
+  });
+  const planForm = document.getElementById("plan");
+  planForm.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const button = planForm.querySelector("button");
+    busy(button, "保存中…");
+    try {
+      const { plan } = await api(`/api/teacher/students/${student.id}/plan`, { method: "PUT", body: { body: planForm.body.value } });
+      await renderStudent(student.id, "settings");
+      toast(plan ? "今週の勉強範囲を保存しました" : "今週の勉強範囲を消しました");
+    } catch (error) {
+      toast(error.message);
+      done(button);
     }
   });
   const profile = document.getElementById("profile");
