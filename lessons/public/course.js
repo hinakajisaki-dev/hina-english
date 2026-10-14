@@ -6,4 +6,4 @@ export const CURRENT_WEEK = 1;
 // Whether students see 授業メモ. While it is false the teacher (and the
 // student chats) can still write and publish memos; students see nothing
 // until it is turned on.
-export const NOTES_FOR_STUDENTS = false;
+export const NOTES_FOR_STUDENTS = true;
