@@ -275,7 +275,7 @@ function renderJournals(panel) {
         <div class="badges">
           <span class="muted small">${esc(formatDateTime(j.created_at))}</span>
           ${j.teacher_read ? "" : `<span class="unread">未読</span>`}
-          ${c || !state.current.ai ? "" : `<span class="badge waiting">AI 添削なし</span>`}
+          ${j.imported ? `<span class="badge">過去の日記</span>` : c || !state.current.ai ? "" : `<span class="badge waiting">AI 添削なし</span>`}
           ${j.teacher_comment ? `<span class="badge teacher">コメントずみ</span>` : ""}
         </div>
         ${j.topic ? `<span class="muted small">テーマ：${esc(j.topic)}</span>` : ""}

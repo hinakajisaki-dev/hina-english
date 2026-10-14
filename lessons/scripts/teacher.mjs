@@ -20,6 +20,7 @@
 // node scripts/teacher.mjs publish なおみ 5 | unpublish なおみ 5 | delete-note なおみ 5
 // node scripts/teacher.mjs plan なおみ [plan.md | --clear]      (今週の勉強範囲: see, set or clear)
 // node scripts/teacher.mjs menu なおみ [--only 日記,発音課題,勉強時間 | --all]   (what the home screen shows)
+// node scripts/teacher.mjs journals なおみ diaries.md [--dry]   (past diaries, no AI correction)
 //
 // A file of "-" is read from stdin.
 import { spawnSync } from "node:child_process";
@@ -83,6 +84,7 @@ function parseArgs(args) {
     if (arg === "--publish") options.publish = true;
     else if (arg === "--clear") options.clear = true;
     else if (arg === "--all") options.all = true;
+    else if (arg === "--dry") options.dry = true;
     else if (arg.startsWith("--")) options[arg.slice(2)] = args[++i];
     else rest.push(arg);
   }
@@ -125,6 +127,32 @@ function noteOf(data, id) {
   const note = data.notes.find((n) => n.id === Number(id));
   if (!note) stop(`${data.student.name}さんに、番号 ${id} の授業メモはありません。`);
   return note;
+}
+
+// Past diaries, one after another:
+//   ## 2026-08-03          (also 2026/8/3 or 2026年8月3日)
+//   お題：週末にしたこと   (optional, right under the date)
+//   I went to the beach…
+function parseJournals(text) {
+  const entries = [];
+  let current = null;
+  for (const line of text.replace(/\r\n?/g, "\n").split("\n")) {
+    const head = line.match(/^#{1,3}\s*(\d{4})\s*[-/.年]\s*(\d{1,2})\s*[-/.月]\s*(\d{1,2})\s*日?\s*$/);
+    if (head) {
+      const [, y, m, d] = head;
+      current = { day: `${y}-${m.padStart(2, "0")}-${d.padStart(2, "0")}`, topic: "", lines: [] };
+      entries.push(current);
+      continue;
+    }
+    if (!current) {
+      if (line.trim()) stop(`最初に「## 2026-08-03」のような日付の見出しが必要です（「${line.trim().slice(0, 30)}」の前）。`);
+      continue;
+    }
+    const topic = !current.topic && !current.lines.some((l) => l.trim()) && line.match(/^\s*(お題|テーマ)\s*[：:]\s*(.+)$/);
+    if (topic) current.topic = topic[2].trim();
+    else current.lines.push(line);
+  }
+  return entries.map((e) => ({ day: e.day, topic: e.topic, body: e.lines.join("\n").trim() }));
 }
 
 const menuLine = (hidden = []) =>
@@ -270,6 +298,22 @@ const commands = {
     }
     const result = await api(`/api/teacher/students/${student.id}/menus`, { method: "PUT", body: { hidden } });
     console.log(`${student.name}さんの画面を変えました（○ 出す・× 出さない）：\n${menuLine(result.hidden)}`);
+  },
+
+  async journals([name, file], options) {
+    if (!file) stop("過去の日記のファイルを指定してください（- で標準入力）。");
+    const entries = parseJournals(readText(file));
+    if (!entries.length) stop("日記がありません。「## 2026-08-03」のような日付の見出しのあとに本文を書いてください。");
+    const empty = entries.filter((e) => !e.body);
+    if (empty.length) stop(`本文がない日があります：${empty.map((e) => e.day).join("、")}`);
+    const student = await findStudent(name);
+    const list = entries.map((e) => `${e.day}${e.topic ? `（お題：${e.topic}）` : ""} ${e.body.split("\n")[0].slice(0, 50)}`).join("\n");
+    if (options.dry) {
+      console.log(`${student.name}さんに入れる過去の日記 ${entries.length} 日分（${entries[0].day} 〜 ${entries[entries.length - 1].day}）。まだ入れていません：\n${list}`);
+      return;
+    }
+    const { added, skipped } = await api(`/api/teacher/students/${student.id}/journals`, { method: "POST", body: { entries } });
+    console.log(`${student.name}さんに過去の日記を ${added} 日分入れました（添削なし）${skipped ? `。同じものがすでにあった ${skipped} 日分は、とばしました` : ""}。`);
   },
 
   async "delete-note"([name, id]) {

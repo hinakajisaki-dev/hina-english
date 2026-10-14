@@ -148,6 +148,9 @@ async function route(request, env, url) {
   if (parts[1] === "students" && parts[3] === "menus" && parts.length === 4 && method === "PUT") {
     return saveMenus(request, db, await findStudent(db, id(2)));
   }
+  if (parts[1] === "students" && parts[3] === "journals" && parts.length === 4 && method === "POST") {
+    return importJournals(request, db, await findStudent(db, id(2)));
+  }
   if (parts[1] === "notes" && parts.length === 3) {
     const row = await first(db, `SELECT * FROM lesson_notes WHERE id = ?`, id(2));
     if (!row) throw new HttpError(404, "見つかりません。");
@@ -541,7 +544,7 @@ async function savePhraseTest(request, env, student, week, number) {
 async function retryCorrection(env, student, journalId) {
   const row = await first(env.DB, `SELECT * FROM journals WHERE id = ? AND student_id = ?`, journalId, student.id);
   if (!row) throw new HttpError(404, "見つかりません。");
-  if (row.correction) return json({ journal: journalRow(row) });
+  if (row.correction || row.imported) return json({ journal: journalRow(row) });
   return correctOnce(env, student, journalId);
 }
 
@@ -806,6 +809,44 @@ async function saveNote(request, db, student, row) {
     student.id, day, title, body, published, stamp, stamp,
   );
   return json({ note: noteRow(await first(db, `SELECT * FROM lesson_notes WHERE id = ?`, meta.last_row_id)) });
+}
+
+// Past diaries from before the app: { entries: [{ day: "2026-08-03", body, topic }] }.
+// Each keeps its own date (noon in Japan), has no AI correction and never gets
+// one, and counts as read. An entry already there (same day and text) is skipped,
+// so sending the same file twice adds nothing.
+const MAX_IMPORT = 200;
+
+async function importJournals(request, db, student) {
+  const { entries } = await readJson(request);
+  if (!Array.isArray(entries) || !entries.length) throw new HttpError(400, "入れる日記がありません。");
+  if (entries.length > MAX_IMPORT) throw new HttpError(400, `一度に入れられるのは ${MAX_IMPORT} 日分までです。`);
+  const clean = entries.map((entry, i) => {
+    const day = String(entry?.day || "");
+    const body = String(entry?.body || "").replace(/\r\n?/g, "\n").trim();
+    const topic = String(entry?.topic || "").trim().slice(0, 300);
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(day) || Number.isNaN(Date.parse(day)) || day > japanDay()) {
+      throw new HttpError(400, `${i + 1}つめの日付が正しくありません（${day || "なし"}）。`);
+    }
+    if (!body) throw new HttpError(400, `${i + 1}つめ（${day}）の本文がありません。`);
+    if (body.length > 5000) throw new HttpError(400, `${i + 1}つめ（${day}）が長すぎます。5,000文字以内にしてください。`);
+    return { day, body, topic, created_at: new Date(`${day}T12:00:00+09:00`).toISOString() };
+  });
+  const existing = await all(db, `SELECT created_at, body FROM journals WHERE student_id = ?`, student.id);
+  const seen = new Set(existing.map((row) => `${row.created_at.slice(0, 10)}|${row.body.trim()}`));
+  const fresh = clean.filter((entry) => {
+    const key = `${entry.created_at.slice(0, 10)}|${entry.body}`;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+  if (fresh.length) {
+    await db.batch(fresh.map((entry) =>
+      db.prepare(
+        `INSERT INTO journals (student_id, topic, body, teacher_read, imported, created_at) VALUES (?, ?, ?, 1, 1, ?)`,
+      ).bind(student.id, entry.topic, entry.body, entry.created_at)));
+  }
+  return json({ added: fresh.length, skipped: clean.length - fresh.length });
 }
 
 // The parts of the home screen hidden from this student: { hidden: ["vocab", …] }.

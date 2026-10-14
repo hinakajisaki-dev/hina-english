@@ -38,6 +38,7 @@ const SCHEMA = [
     corrected_at TEXT,
     teacher_comment TEXT NOT NULL DEFAULT '',
     teacher_read INTEGER NOT NULL DEFAULT 0,
+    imported INTEGER NOT NULL DEFAULT 0,
     created_at TEXT NOT NULL
   )`,
   `CREATE INDEX IF NOT EXISTS journals_student ON journals(student_id, created_at)`,
@@ -159,11 +160,26 @@ const SCHEMA = [
   )`,
 ];
 
+// Columns added to a table after it was first made. On a database that has
+// them already, SQLite says "duplicate column name", which is fine.
+// journals.imported: an entry the teacher put in from before the app (past
+// diaries, written elsewhere); it is never sent to the AI.
+const ADDED_COLUMNS = [
+  `ALTER TABLE journals ADD COLUMN imported INTEGER NOT NULL DEFAULT 0`,
+];
+
 let ready = false;
 
 export async function ensureSchema(db) {
   if (ready) return;
   await db.batch(SCHEMA.map((sql) => db.prepare(sql)));
+  for (const sql of ADDED_COLUMNS) {
+    try {
+      await db.prepare(sql).run();
+    } catch (error) {
+      if (!/duplicate column/i.test(String(error?.message))) throw error;
+    }
+  }
   ready = true;
 }
 
@@ -198,6 +214,7 @@ export function journalRow(row) {
     corrected_at: row.corrected_at,
     teacher_comment: row.teacher_comment,
     teacher_read: !!row.teacher_read,
+    imported: !!row.imported,
     created_at: row.created_at,
   };
 }
@@ -230,7 +247,7 @@ export async function studentBundle(db, studentId) {
     all(db, `SELECT * FROM phrase_tests WHERE student_id = ?`, studentId),
     all(db, `SELECT * FROM pron_progress WHERE student_id = ?`, studentId),
     all(db, `SELECT * FROM study_days WHERE student_id = ? AND day >= ? ORDER BY day`, studentId, japanDay(-400)),
-    all(db, `SELECT * FROM journals WHERE student_id = ? ORDER BY id DESC LIMIT 60`, studentId),
+    all(db, `SELECT * FROM journals WHERE student_id = ? ORDER BY created_at DESC, id DESC LIMIT 60`, studentId),
     first(db, `SELECT body, updated_at FROM study_plans WHERE student_id = ?`, studentId),
     first(db, `SELECT hidden FROM student_menus WHERE student_id = ?`, studentId),
   ]);

@@ -2686,7 +2686,7 @@ function historyHtml() {
       ${journals.map((j) => `<li><a href="#/journal/${j.id}">
         <div class="badges">
           <span class="muted small">${esc(formatDate(j.created_at))}</span>
-          ${j.correction ? `<span class="badge">添削ずみ</span>` : state.me.ai ? `<span class="badge waiting">添削なし</span>` : ""}
+          ${j.correction ? `<span class="badge">添削ずみ</span>` : state.me.ai && !j.imported ? `<span class="badge waiting">添削なし</span>` : ""}
           ${j.teacher_comment ? `<span class="badge teacher">先生のコメント</span>` : ""}
         </div>
         <p class="first-line" lang="en">${esc(j.body.split("\n")[0])}</p>
@@ -2724,12 +2724,12 @@ function renderJournalEntry(id) {
           </section>` : `<p class="notice good">まちがいはありませんでした！すばらしい！</p>`}
         <details class="card"><summary>はじめに書いた文を見る</summary><p class="journal-text" lang="en" style="margin-top:10px">${esc(j.body)}</p></details>
       ` : `
-        ${state.me.ai ? `<p class="notice ${aiError ? "bad" : ""}">${esc(aiError || "この日記は、まだ添削がありません。")}</p>` : ""}
+        ${state.me.ai && !j.imported ? `<p class="notice ${aiError ? "bad" : ""}">${esc(aiError || "この日記は、まだ添削がありません。")}</p>` : ""}
         <section class="card stack">
           ${j.topic ? `<p class="muted small">お題：${esc(j.topic)}</p>` : ""}
           <p class="journal-text" lang="en">${esc(j.body)}</p>
         </section>
-        ${state.me.ai
+        ${j.imported ? "" : state.me.ai
           ? `<button class="btn block" id="retry">${aiError ? "もう一度ためす" : "添削してもらう"}</button>`
           : j.teacher_comment ? "" : `<p class="muted" style="text-align:center">先生が読んで、コメントをくれます。</p>`}
       `}
