@@ -1,0 +1,163 @@
+/* Scott先生コラボ LIVE のスライド。live/slides.css に足す分だけを書いています。
+   前置詞の色分け：場所＝青、時間＝黄、だれと＝ピンク。 */
+:root {
+  --kp: #2C6496; --kp-soft: #DCEEFB; /* 場所 */
+  --kt: #8A5A00; --kt-soft: #FFF0C4; /* 時間 */
+  --kw: #B0284F; --kw-soft: #FFE3EA; /* だれと */
+}
+.en { font-family: var(--en); }
+.muted { color: var(--muted); }
+.kp { color: var(--kp); }
+.kt { color: var(--kt); }
+.kw { color: var(--kw); }
+.c { font-size: 18px; padding: 6px 16px 7px; border-radius: 999px; white-space: nowrap; }
+.c.p { background: var(--kp-soft); color: var(--kp); }
+.c.t { background: var(--kt-soft); color: var(--kt); }
+.c.w { background: var(--kw-soft); color: var(--kw); }
+.plus { font-size: 26px; color: var(--muted); }
+
+.slide > .lab { margin-top: 28px; }
+.slide > .script { margin-top: 22px; font-size: 40px; }
+.h2 { font-size: 44px; font-weight: 900; line-height: 1.3; margin-top: 6px; }
+.lead2 { font-size: 20px; color: var(--ink-2); margin-top: 8px; }
+.note { display: flex; align-items: center; gap: 14px; font-size: 20px; margin-top: 20px; }
+
+/* ---------- 今日のテーマ ---------- */
+.guest { display: flex; align-items: center; gap: 14px; margin-top: auto; }
+.guest b { font-size: 26px; font-weight: 900; }
+.theme-t { font-size: 56px; font-weight: 900; line-height: 1.35; margin-top: 18px; }
+.steps4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; margin-top: 40px; margin-bottom: auto; }
+.steps4 li { background: var(--card); border-radius: 22px; box-shadow: var(--shadow); padding: 22px 24px 24px; display: flex; flex-direction: column; align-items: flex-start; gap: 6px; }
+.sn { width: 40px; height: 40px; border-radius: 50%; background: var(--accent); color: #FFFFFF; font-family: var(--en); font-size: 20px; display: grid; place-items: center; }
+.sk { font-size: 24px; font-weight: 900; margin-top: 8px; }
+.sd { font-size: 16px; color: var(--muted); }
+
+/* ---------- 文法（will / can） ---------- */
+.formula { display: flex; align-items: center; gap: 18px; margin-top: 24px; }
+.grammar .formula { margin-top: auto; }
+.grammar .notes, .grammar .note { margin-bottom: auto; }
+.fbox { min-width: 230px; background: var(--card); border-radius: 22px; box-shadow: var(--shadow); padding: 16px 30px 18px; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.fbox.key { background: var(--accent); }
+.fb { font-size: 34px; font-weight: 900; }
+.fb.en { font-size: 38px; font-weight: 700; }
+.fc { font-size: 15px; color: var(--muted); }
+.fbox.key .fb, .fbox.key .fc { color: #FFFFFF; }
+.fex { display: flex; align-items: center; gap: 16px; margin-top: 22px; }
+.fe { font-family: var(--en); font-size: 34px; }
+.fj { font-size: 18px; color: var(--ink-2); }
+.notes { margin-top: 22px; background: rgba(255, 255, 255, .6); border-radius: 20px; padding: 6px 28px; }
+.nt { font-size: 20px; padding: 11px 0; }
+.nt + .nt { border-top: 2px dashed var(--line); }
+.ok, .ng { display: inline-block; width: 44px; height: 28px; border-radius: 14px; margin-right: 12px; font-family: var(--en); font-size: 14px; line-height: 28px; text-align: center; vertical-align: 2px; }
+.ok { background: var(--accent-soft); color: var(--accent-text); }
+.ng { background: #E6EAF2; color: var(--ink-2); }
+
+.mcards { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 22px; }
+.mcard2 { background: var(--card); border-radius: 24px; box-shadow: var(--shadow); padding: 28px 32px; display: flex; flex-direction: column; justify-content: center; }
+.mt2 { font-size: 20px; font-weight: 900; }
+.mn { display: inline-block; width: 30px; height: 30px; border-radius: 50%; margin-right: 10px; background: var(--accent); color: #FFFFFF; font-family: var(--en); font-size: 16px; line-height: 30px; text-align: center; vertical-align: 1px; }
+.me { font-family: var(--en); font-size: 34px; margin-top: 14px; }
+.mj { font-size: 17px; color: var(--muted); margin-top: 4px; }
+
+/* ---------- What will you do tomorrow? の答え ---------- */
+.qhead2 { display: flex; align-items: baseline; gap: 22px; margin-top: 34px; }
+.qen { font-family: var(--en); font-size: 50px; letter-spacing: -.8px; }
+.qja { font-size: 22px; color: var(--ink-2); }
+.alist { flex: 1; display: flex; flex-direction: column; margin-top: 24px; background: var(--card); border-radius: 26px; box-shadow: var(--shadow); padding: 8px 36px; }
+.alist li { flex: 1; display: grid; grid-template-columns: 36px 1fr auto; align-items: center; gap: 22px; }
+.alist li + li { border-top: 2px solid var(--line-warm); }
+.an, .gn { width: 36px; height: 36px; border-radius: 50%; background: var(--ink); color: #FFFFFF; font-family: var(--en); font-size: 18px; display: grid; place-items: center; }
+.ae2 { font-family: var(--en); font-size: 32px; letter-spacing: -.3px; }
+.aj2 { font-size: 18px; color: var(--muted); }
+
+/* ---------- チャレンジ（1分間） ---------- */
+.ch-body { flex: 1; display: grid; grid-template-columns: 1fr 330px; gap: 40px; align-items: center; }
+.ch-left .script { font-size: 44px; }
+.qbox { margin-top: 22px; background: var(--card); border-radius: 26px; box-shadow: var(--shadow); padding: 24px 34px 26px; }
+.qbox .qen { font-size: 40px; }
+.blank { font-family: var(--en); font-size: 34px; color: var(--muted); margin-top: 10px; }
+.timer { display: grid; place-items: center; }
+.ring { width: 300px; height: 300px; border-radius: 50%; background: var(--accent); border: 16px solid #FFD3C2; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.tm { font-family: var(--en); font-size: 96px; line-height: 1; letter-spacing: -2px; color: #FFFFFF; }
+.tl { font-family: var(--en); font-size: 15px; letter-spacing: .2em; color: #FFFFFF; margin-top: 10px; }
+.qbig { font-family: var(--en); font-size: 64px; line-height: 1.15; letter-spacing: -1px; margin-top: 10px; }
+.cround .qja { font-size: 24px; margin-top: 14px; }
+.hints { display: flex; gap: 10px; margin-top: 24px; }
+
+/* ---------- LESSON 1 ---------- */
+.talkrow { flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 26px; }
+.bubble { border-radius: 28px; padding: 22px 36px 26px; box-shadow: var(--shadow); }
+.bubble.hina { align-self: flex-start; background: var(--card); }
+.bubble.scott { align-self: flex-end; background: var(--accent); }
+.who { font-size: 16px; letter-spacing: .12em; color: var(--accent-text); }
+.scott .who { color: #FFE6DC; }
+.say { font-size: 30px; font-weight: 900; line-height: 1.5; margin-top: 4px; }
+.say.big { font-size: 52px; color: #FFFFFF; }
+
+.pcards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin: auto 0; }
+.pcard { background: var(--card); border-radius: 24px; box-shadow: var(--shadow); padding: 28px 30px 20px; display: flex; flex-direction: column; align-items: flex-start; }
+.pk { font-size: 38px; font-weight: 900; margin-top: 14px; }
+.pcard ul { align-self: stretch; margin-top: 10px; }
+.pcard li { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; padding: 14px 0; }
+.pcard li + li { border-top: 2px solid var(--line-warm); }
+.pe { font-family: var(--en); font-size: 27px; }
+.pj { font-size: 17px; color: var(--muted); }
+
+.grow { flex: 1; display: flex; flex-direction: column; justify-content: space-between; margin-top: 22px; }
+.grow li { background: var(--card); border-radius: 20px; box-shadow: var(--shadow); padding: 12px 26px; display: flex; align-items: center; gap: 20px; }
+.gs { display: flex; flex-direction: column; gap: 4px; }
+.sent { display: flex; align-items: center; gap: 10px; }
+.sent .base, .recipe .base { font-family: var(--en); font-size: 32px; }
+.sent .c { font-family: var(--en); font-size: 25px; padding: 4px 16px 6px; }
+.sent .plus { font-size: 22px; }
+.gj { font-size: 16px; color: var(--muted); }
+
+/* ---------- チャレンジ（ネイティブ版）・瞬間英作文の紹介 ---------- */
+.recipe { align-self: flex-start; display: flex; align-items: center; gap: 12px; margin-top: 20px; background: var(--card); border-radius: 22px; padding: 16px 26px; }
+.recipe .base { font-size: 30px; }
+.recipe .c { font-size: 20px; }
+.rounds3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin: auto 0; }
+.rcard { min-height: 240px; background: var(--card); border-radius: 24px; box-shadow: var(--shadow); padding: 32px 34px; display: flex; flex-direction: column; justify-content: center; }
+.rl { font-family: var(--en); font-size: 15px; letter-spacing: .15em; color: var(--accent-text); }
+.rq { font-family: var(--en); font-size: 30px; line-height: 1.3; margin-top: 10px; }
+.rk { font-size: 76px; line-height: 1.1; color: var(--accent); margin-top: 6px; }
+.rj { font-size: 19px; color: var(--muted); margin-top: 10px; }
+
+/* ---------- クリスマスの雑談 ---------- */
+.tcards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; margin: auto 0; }
+.tcard { min-height: 280px; background: var(--card); border-radius: 26px; box-shadow: var(--shadow); padding: 36px 34px; display: flex; flex-direction: column; justify-content: center; align-items: flex-start; }
+.tbar { width: 56px; height: 8px; border-radius: 4px; background: #FF9DB4; }
+.tcard:nth-child(2) .tbar { background: #FF8A57; }
+.tcard:nth-child(3) .tbar { background: #FFC94A; }
+.tk { font-size: 32px; font-weight: 900; line-height: 1.45; margin-top: 18px; }
+.te { font-family: var(--en); font-size: 19px; color: var(--muted); margin-top: 14px; }
+
+/* ---------- will と can ---------- */
+.vsrow { flex: 1; display: grid; grid-template-columns: 1fr 72px 1fr; align-items: center; gap: 18px; margin-top: 16px; }
+.vcard { background: var(--card); border: 3px solid var(--accent); border-radius: 26px; box-shadow: var(--shadow); padding: 24px 32px; }
+.vcard.can { border-color: #7DBDEB; }
+.vk { display: flex; align-items: center; gap: 12px; }
+.vk .en { font-size: 44px; color: var(--accent); }
+.vcard.can .vk .en { color: var(--kp); }
+.vn { font-size: 17px; padding: 4px 14px 5px; border-radius: 999px; background: var(--accent-soft); color: var(--accent-text); }
+.vcard.can .vn { background: var(--kp-soft); color: var(--kp); }
+.vf { font-size: 30px; font-weight: 900; margin-top: 10px; }
+.vline { height: 2px; background: var(--line-warm); margin: 16px 0; }
+.ve { font-family: var(--en); font-size: 30px; }
+.vj { font-size: 17px; color: var(--muted); margin-top: 4px; }
+.vsmark { justify-self: center; width: 72px; height: 72px; border-radius: 50%; background: var(--ink); color: #FFFFFF; font-family: var(--en); font-size: 22px; display: grid; place-items: center; }
+.banner { margin-top: 18px; background: var(--accent); color: #FFFFFF; font-size: 26px; font-weight: 900; text-align: center; padding: 14px; border-radius: 20px; }
+
+/* ---------- 瞬間英作文 ---------- */
+.sc-body { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+.sc-body .lab { font-size: 18px; }
+.sk-big { font-size: 150px; line-height: 1; letter-spacing: -3px; color: var(--accent); margin-top: 12px; }
+.sc-t { font-size: 44px; font-weight: 900; margin-top: 18px; }
+.sc-sub { font-size: 20px; color: var(--muted); margin-top: 12px; }
+
+.scard { flex: 1; margin-top: 26px; background: var(--card); border: 3px solid var(--card); border-radius: 32px; box-shadow: var(--shadow); display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 30px 40px; }
+.scard.answer { border-color: var(--accent); }
+.scard .script { font-size: 40px; }
+.sja { font-size: 60px; font-weight: 900; line-height: 1.4; margin-top: 18px; }
+.sja-s { font-size: 22px; color: var(--muted); margin-top: 14px; }
+.sen { font-family: var(--en); font-size: 48px; line-height: 1.3; letter-spacing: -.6px; margin-top: 12px; }

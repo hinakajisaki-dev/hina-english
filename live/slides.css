@@ -145,6 +145,8 @@ ol, ul { list-style: none; }
 .ttl { position: relative; padding: 0 14px; }
 .ttl .mk { position: absolute; left: 0; right: 0; bottom: 8px; height: 40px; border-radius: 12px; background: #FFD966; } /* marker under the title */
 .ttl h1 { position: relative; font-size: 120px; font-weight: 900; line-height: 1.2; letter-spacing: .04em; }
+.ttl.two h1 { font-size: 76px; line-height: 1.3; letter-spacing: .03em; text-align: center; } /* a title on two lines */
+.ttl.two .mk { bottom: 6px; height: 30px; }
 .sub { margin-top: 22px; background: var(--accent); color: #FFFFFF; font-size: 40px; font-weight: 900; letter-spacing: .08em; padding: 12px 44px 14px; border-radius: 999px; }
 h1 .en { font-family: var(--en); font-weight: 700; color: var(--accent); letter-spacing: -1px; }
 
