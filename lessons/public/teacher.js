@@ -6,6 +6,7 @@ import { UNITS } from "./grammar/lessons.js";
 import { bookWeeks, bookWords, setKey, weekWords, wordSets } from "./vocab/words.js";
 import { currentMonth, monthPhrases, pronMonths } from "./pron/phrases.js";
 import { CURRENT_WEEK, NOTES_FOR_STUDENTS } from "./course.js";
+import { MENUS } from "./menus.js";
 import { phraseSetKey, phraseSets, phraseWeeks, testSize } from "./phrases/book.js";
 import { noteDayLabel, noteHtml, noteProblems } from "./notes/format.js";
 import { bindPanels, formatMinutes, monthPanel, monthStart, summary, today, weekDays, weekPanel, weekStart } from "./study.js";
@@ -796,6 +797,12 @@ function renderSettings(panel) {
         <button class="btn secondary" id="new-code" style="flex:none">新しいコードにする</button>
       </div>
     </section>
+    <form class="card stack" id="menus">
+      <h3>生徒の画面に出すもの</h3>
+      <p class="muted small">チェックを外したものは、この生徒のホームに出ません（ほかの生徒は変わりません）。生徒ごとのチャットからも変えられます。</p>
+      <div class="menu-picks">${MENUS.map((m) => `<label><input type="checkbox" name="${esc(m.key)}" ${(state.current.hidden || []).includes(m.key) ? "" : "checked"}> ${esc(m.name)}</label>`).join("")}</div>
+      <button class="btn" type="submit" style="align-self:flex-start">保存</button>
+    </form>
     <form class="card stack" id="plan">
       <h3>今週の勉強範囲</h3>
       <p class="muted small">生徒のホームのいちばん上に出ます。空にして保存すると消えます。生徒ごとのチャットからも変えられます。</p>
@@ -830,6 +837,21 @@ function renderSettings(panel) {
       toast("新しいコードにしました");
     } catch (error) {
       toast(error.message);
+    }
+  });
+  const menuForm = document.getElementById("menus");
+  menuForm.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const button = menuForm.querySelector("button");
+    busy(button, "保存中…");
+    const hidden = MENUS.map((m) => m.key).filter((key) => !menuForm.elements[key].checked);
+    try {
+      await api(`/api/teacher/students/${student.id}/menus`, { method: "PUT", body: { hidden } });
+      await renderStudent(student.id, "settings");
+      toast("生徒の画面に出すものを保存しました");
+    } catch (error) {
+      toast(error.message);
+      done(button);
     }
   });
   const planForm = document.getElementById("plan");

@@ -12,6 +12,7 @@ import { findPhrase } from "../public/pron/phrases.js";
 import { phraseByKey, phraseSentences, phraseSetKey, phraseSets, testSize } from "../public/phrases/book.js";
 import { noteProblems } from "../public/notes/format.js";
 import { NOTES_FOR_STUDENTS } from "../public/course.js";
+import { MENUS } from "../public/menus.js";
 import {
   all, ensureSchema, first, itemRow, japanDay, journalRow, noteRow, now, run, studentBundle,
 } from "./db.js";
@@ -143,6 +144,9 @@ async function route(request, env, url) {
   }
   if (parts[1] === "students" && parts[3] === "plan" && parts.length === 4 && method === "PUT") {
     return savePlan(request, db, await findStudent(db, id(2)));
+  }
+  if (parts[1] === "students" && parts[3] === "menus" && parts.length === 4 && method === "PUT") {
+    return saveMenus(request, db, await findStudent(db, id(2)));
   }
   if (parts[1] === "notes" && parts.length === 3) {
     const row = await first(db, `SELECT * FROM lesson_notes WHERE id = ?`, id(2));
@@ -802,6 +806,27 @@ async function saveNote(request, db, student, row) {
     student.id, day, title, body, published, stamp, stamp,
   );
   return json({ note: noteRow(await first(db, `SELECT * FROM lesson_notes WHERE id = ?`, meta.last_row_id)) });
+}
+
+// The parts of the home screen hidden from this student: { hidden: ["vocab", …] }.
+// An empty list shows everything again.
+async function saveMenus(request, db, student) {
+  const { hidden } = await readJson(request);
+  if (!Array.isArray(hidden)) throw new HttpError(400, "内容が正しくありません。");
+  const unknown = hidden.filter((key) => !MENUS.some((m) => m.key === key));
+  if (unknown.length) throw new HttpError(400, `知らない項目です：${unknown.join("、")}`);
+  const clean = MENUS.map((m) => m.key).filter((key) => hidden.includes(key));
+  if (!clean.length) {
+    await run(db, `DELETE FROM student_menus WHERE student_id = ?`, student.id);
+  } else {
+    await run(
+      db,
+      `INSERT INTO student_menus (student_id, hidden, updated_at) VALUES (?1, ?2, ?3)
+       ON CONFLICT (student_id) DO UPDATE SET hidden = ?2, updated_at = ?3`,
+      student.id, JSON.stringify(clean), now(),
+    );
+  }
+  return json({ hidden: clean });
 }
 
 // 今週の勉強範囲. An empty body takes it away.
