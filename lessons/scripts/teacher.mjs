@@ -34,7 +34,7 @@ if ((process.env.HTTPS_PROXY || process.env.https_proxy) && !process.env.NODE_US
 }
 
 const BASE = (process.env.HINA_APP_URL || "https://hina-coaching.hinakajisaki.workers.dev").replace(/\/+$/, "");
-const TOKEN = process.env.HINA_TEACHER_TOKEN || "";
+const TOKEN = (process.env.HINA_TEACHER_TOKEN || "").trim();
 
 // What each kind of line holds; the first `required` columns must be filled
 // (the same as the teacher page).
@@ -63,7 +63,10 @@ async function api(path, { method = "GET", body } = {}) {
     stop(`アプリにつながりません（${BASE}）。環境の設定で、このドメインへのネットワークが許可されているか確認してください。\n${error.cause?.message || error.message}`);
   }
   const data = await response.json().catch(() => ({}));
-  if (response.status === 401) stop(`アプリに入れません：${data.error || ""} HINA_TEACHER_TOKEN が Worker の TEACHER_API_TOKEN と同じか確認してください。`);
+  if (response.status === 401) {
+    const mismatch = !data.error || data.error === "トークンがちがいます。";
+    stop(`アプリに入れません：${data.error || ""}${mismatch ? ` HINA_TEACHER_TOKEN（${TOKEN.length}文字）が Worker の TEACHER_API_TOKEN と同じか確認してください。` : ""}`);
+  }
   if (!response.ok) stop(data.error || `エラー ${response.status}`);
   return data;
 }
