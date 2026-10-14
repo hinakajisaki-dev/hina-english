@@ -636,10 +636,15 @@ const MIN_API_TOKEN = 32;
 async function requireTeacher(request, env) {
   const bearer = (request.headers.get("Authorization") || "").match(/^Bearer\s+(\S+)$/);
   if (bearer) {
-    const expected = env.TEACHER_API_TOKEN || "";
-    if (expected.length < MIN_API_TOKEN || !sameBytes(await sha256(bearer[1]), await sha256(expected))) {
+    // Spaces or a line break pasted around the secret are not part of it.
+    const expected = (env.TEACHER_API_TOKEN || "").trim();
+    let problem = null;
+    if (!expected) problem = "アプリ側に TEACHER_API_TOKEN がありません（Worker の Variables and Secrets に入れて、Deploy してください）。";
+    else if (expected.length < MIN_API_TOKEN) problem = `アプリ側の TEACHER_API_TOKEN が短すぎます（${MIN_API_TOKEN}文字以上にしてください）。`;
+    else if (!sameBytes(await sha256(bearer[1]), await sha256(expected))) problem = "トークンがちがいます。";
+    if (problem) {
       await sleep(600);
-      throw new HttpError(401, "トークンがちがいます。");
+      throw new HttpError(401, problem);
     }
     return;
   }

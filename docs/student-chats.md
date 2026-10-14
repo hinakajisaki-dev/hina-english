@@ -13,6 +13,16 @@
    - ネットワークの「Allowed domains」に `hina-coaching.hinakajisaki.workers.dev` を足す
 4. 設定のあとに作ったチャットから使える
 
+つながらないときにチャットに出るメッセージ：
+
+| メッセージ | 直すところ |
+| --- | --- |
+| HINA_TEACHER_TOKEN がありません | 3 の環境変数. 直したら新しいチャットを作る |
+| アプリにつながりません | 3 のネットワーク（Allowed domains）. 直したら新しいチャットを作る |
+| アプリ側に TEACHER_API_TOKEN がありません | 2. Build のほうではなく、Settings の Variables and Secrets に入れて Deploy |
+| アプリ側の TEACHER_API_TOKEN が短すぎます | 2 の値（32文字以上） |
+| トークンがちがいます | 2 と 3 が同じ文字列か（前後のスペースや改行は気にしなくていい） |
+
 文字列を知られたときは、2 と 3 の値を新しいものに変える. `TEACHER_API_TOKEN` を消すと、チャットからはアプリを変えられなくなる（先生ページはそのまま使える）.
 
 ## チャットがすること
