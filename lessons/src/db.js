@@ -150,6 +150,13 @@ const SCHEMA = [
     body TEXT NOT NULL,
     updated_at TEXT NOT NULL
   )`,
+  // The parts of the home screen this student doesn't see (public/menus.js),
+  // as a JSON list of keys. No row: the student sees everything.
+  `CREATE TABLE IF NOT EXISTS student_menus (
+    student_id INTEGER PRIMARY KEY REFERENCES students(id) ON DELETE CASCADE,
+    hidden TEXT NOT NULL,
+    updated_at TEXT NOT NULL
+  )`,
 ];
 
 let ready = false;
@@ -207,11 +214,12 @@ export function noteRow(row) {
 }
 
 // Everything one student's screen needs: items, progress, lesson results, the 復習 list,
-// set test results, finished pronunciation phrases, study time, recent journals and
-// this week's 勉強範囲.
+// set test results, finished pronunciation phrases, study time, recent journals,
+// this week's 勉強範囲 and the parts of the home screen hidden from them.
 export async function studentBundle(db, studentId) {
   const [
     items, progress, lessonRows, reviewRows, testRows, phraseReviewRows, phraseTestRows, pronRows, studyRows, journals, plan,
+    menus,
   ] = await Promise.all([
     all(db, `SELECT * FROM items WHERE student_id = ? ORDER BY id`, studentId),
     all(db, `SELECT * FROM progress WHERE student_id = ?`, studentId),
@@ -224,6 +232,7 @@ export async function studentBundle(db, studentId) {
     all(db, `SELECT * FROM study_days WHERE student_id = ? AND day >= ? ORDER BY day`, studentId, japanDay(-400)),
     all(db, `SELECT * FROM journals WHERE student_id = ? ORDER BY id DESC LIMIT 60`, studentId),
     first(db, `SELECT body, updated_at FROM study_plans WHERE student_id = ?`, studentId),
+    first(db, `SELECT hidden FROM student_menus WHERE student_id = ?`, studentId),
   ]);
   const progressById = {};
   for (const p of progress) {
@@ -259,5 +268,6 @@ export async function studentBundle(db, studentId) {
     phraseReview, phraseTests: scores(phraseTestRows), pronDone, study,
     journals: journals.map(journalRow),
     plan: plan ? { body: plan.body, updated_at: plan.updated_at } : null,
+    hidden: menus ? JSON.parse(menus.hidden) : [],
   };
 }

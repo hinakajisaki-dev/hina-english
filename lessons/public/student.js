@@ -8,6 +8,7 @@ import { UNITS, findLesson, plain, questionCount } from "./grammar/lessons.js";
 import { bookWeeks, setKey, speakable, splitOnForm, weekWords, wordSets } from "./vocab/words.js";
 import { MONTHS, currentMonth, monthPhrases, pronMonths } from "./pron/phrases.js";
 import { CURRENT_WEEK, NOTES_FOR_STUDENTS } from "./course.js";
+import { MENUS } from "./menus.js";
 import { TOPICS } from "./journal/topics.js";
 import {
   TEST_SIZE, phraseByKey, phraseSetKey, phraseSets, phraseWeeks, setDrills, setNumbers, setScenes, testSize, weekPhrases,
@@ -46,7 +47,9 @@ async function load() {
 
 function render() {
   if (!state.me) return renderLogin();
-  const [, screen, ...rest] = location.hash.split("/");
+  let [, screen, ...rest] = location.hash.split("/");
+  // A part the teacher hid from this student (menus.js) opens the home screen.
+  if (MENUS.some((m) => m.key === screen) && !shows(screen)) [screen, rest] = ["", []];
   shownAnswer = null;
   closeQuiz();
   // Opening a pronunciation month goes to the first phrase that isn't 完了 yet.
@@ -105,6 +108,9 @@ function startClock() {
 }
 
 // ---------- shared bits ----------
+
+// Whether this student sees a part of the home screen (menus.js).
+const shows = (key) => !(state.me?.hidden || []).includes(key);
 
 const items = (kind) => state.me.items.filter((item) => item.kind === kind);
 const progress = (id) => state.me.progress[id] || {};
@@ -280,14 +286,15 @@ function todaysTasks() {
   const next = nextPhrase();
   const pron = pronDoneToday() || !next;
   return [
-    { done: journal, href: "#/journal", title: "日記を書く", sub: journal ? "今日の日記は書けました" : "今日のお題で、英語の日記を1つ" },
+    { key: "journal", done: journal, href: "#/journal", title: "日記を書く", sub: journal ? "今日の日記は書けました" : "今日のお題で、英語の日記を1つ" },
     {
+      key: "pron",
       done: pron,
       href: next ? `#/pron/${next.month}` : "#/pron",
       title: "発音を1文 完了する",
       sub: pronDoneToday() ? "今日の発音はできました" : next ? `Month ${next.month} ・ ${next.index + 1}文目（${next.index + 1} / ${next.count}）` : "全部の Month が完了しています",
     },
-  ];
+  ].filter((task) => shows(task.key));
 }
 
 function renderHome() {
@@ -320,58 +327,51 @@ function renderHome() {
         <h2>こんにちは、${esc(state.me.student.name)}さん</h2>
       </div>
       ${installCard()}
-      <section class="card plan" aria-label="今週の勉強範囲">
+      ${shows("plan") ? `<section class="card plan" aria-label="今週の勉強範囲">
         <p class="label">今週の勉強範囲</p>
         ${plan ? `<div class="note-body plan-body">${memoHtml(plan.body)}</div>` : `<p class="muted small">先生が、今週の勉強範囲をここに書きます。</p>`}
-      </section>
-      <section class="card tasks ${left ? "" : "all-done"}" aria-label="今日のやること">
+      </section>` : ""}
+      ${tasks.length ? `<section class="card tasks ${left ? "" : "all-done"}" aria-label="今日のやること">
         <p class="label">${left ? `今日のやること（あと ${left} つ）` : "今日のやることは全部できました！🎉"}</p>
         ${tasks.map((t) => `<a class="task ${t.done ? "done" : ""}" href="${t.href}">
           <span class="check" aria-hidden="true">${t.done ? "✓" : ""}</span>
           <div><b>${esc(t.title)}</b><span class="muted small">${esc(t.sub)}</span></div>
           <span class="go" aria-hidden="true">›</span>
         </a>`).join("")}
-      </section>
+      </section>` : ""}
       <nav class="tiles" aria-label="メニュー">
-        <a class="tile wide ${done ? "done" : ""}" href="#/journal">
-          <span class="emoji" aria-hidden="true">${done ? "✅" : "✍️"}</span>
-          <div><b>日記を書く</b><p class="muted">${done ? "今日の日記は書けました！" : "今日のお題で、英語の日記を書こう"}</p></div>
-        </a>
-        <a class="tile" href="#/vocab">
-          <span class="emoji" aria-hidden="true">🃏</span><b>単語カード</b>
-          <span class="muted">${sets.length ? `Week ${CURRENT_WEEK} ・ テスト ${tested} / ${sets.length}` : "まだありません"}</span>
-          ${sets.length ? `<div class="bar"><i style="width:${Math.round((tested / sets.length) * 100)}%"></i></div>` : ""}
-        </a>
-        <a class="tile" href="#/review">
-          <span class="emoji" aria-hidden="true">🔁</span><b>単語復習</b>
-          <span class="muted">${review ? `復習カード ${review} 語` : "まだありません"}</span>
-        </a>
-        <a class="tile" href="#/phrases">
-          <span class="emoji" aria-hidden="true">💬</span><b>フレーズ</b>
-          <span class="muted">${phraseTests.total ? `Week ${CURRENT_WEEK} ・ テスト ${phraseTests.done} / ${phraseTests.total}` : phraseWeeks().length ? "はじめよう" : "準備中"}</span>
-          ${phraseTests.total ? `<div class="bar"><i style="width:${Math.round((phraseTests.done / phraseTests.total) * 100)}%"></i></div>` : ""}
-        </a>
-        <a class="tile" href="#/phrase-review">
-          <span class="emoji" aria-hidden="true">🔄</span><b>フレーズ復習</b>
-          <span class="muted">${phraseReviewCount ? `${phraseReviewCount} フレーズ` : "まだありません"}</span>
-        </a>
-        <a class="tile" href="#/grammar">
-          <span class="emoji" aria-hidden="true">✏️</span><b>文法</b>
-          <span class="muted">${UNITS.map((u) => esc(u.title)).join("・")}${grammar.length ? ` ＋ 先生からの問題` : ""}</span>
-        </a>
-        <a class="tile" href="#/pron">
-          <span class="emoji" aria-hidden="true">🎤</span><b>発音課題</b>
-          <span class="muted">${shared.length ? `Month ${pronMonth} ・ 完了 ${pronFinished} / ${shared.length}` : "まだありません"}</span>
-          ${shared.length ? `<div class="bar"><i style="width:${Math.round((pronFinished / shared.length) * 100)}%"></i></div>` : ""}
-        </a>
-        ${NOTES_FOR_STUDENTS ? `<a class="tile wide" href="#/notes">
-          <span class="emoji" aria-hidden="true">📝</span>
-          <div><b>授業メモ</b><p class="muted">${latestNote ? `${esc(noteDayLabel(latestNote.day))}${latestNote.title ? ` ・ ${esc(latestNote.title)}` : ""}` : "授業のあとに、先生のメモがとどきます"}</p></div>
-        </a>` : ""}
-        <a class="tile wide" href="#/study">
-          <span class="emoji" aria-hidden="true">⏱️</span>
-          <div><b>勉強時間</b><p class="muted">今日 ${formatMinutes(totalMinutes(todayRow))} ・ 今週 ${formatMinutes(week.total)}</p></div>
-        </a>
+        ${homeTiles([
+          { key: "journal", wide: true, cls: done ? "done" : "", html: `
+            <span class="emoji" aria-hidden="true">${done ? "✅" : "✍️"}</span>
+            <div><b>日記を書く</b><p class="muted">${done ? "今日の日記は書けました！" : "今日のお題で、英語の日記を書こう"}</p></div>` },
+          { key: "vocab", html: `
+            <span class="emoji" aria-hidden="true">🃏</span><b>単語カード</b>
+            <span class="muted">${sets.length ? `Week ${CURRENT_WEEK} ・ テスト ${tested} / ${sets.length}` : "まだありません"}</span>
+            ${sets.length ? `<div class="bar"><i style="width:${Math.round((tested / sets.length) * 100)}%"></i></div>` : ""}` },
+          { key: "review", html: `
+            <span class="emoji" aria-hidden="true">🔁</span><b>単語復習</b>
+            <span class="muted">${review ? `復習カード ${review} 語` : "まだありません"}</span>` },
+          { key: "phrases", html: `
+            <span class="emoji" aria-hidden="true">💬</span><b>フレーズ</b>
+            <span class="muted">${phraseTests.total ? `Week ${CURRENT_WEEK} ・ テスト ${phraseTests.done} / ${phraseTests.total}` : phraseWeeks().length ? "はじめよう" : "準備中"}</span>
+            ${phraseTests.total ? `<div class="bar"><i style="width:${Math.round((phraseTests.done / phraseTests.total) * 100)}%"></i></div>` : ""}` },
+          { key: "phrase-review", html: `
+            <span class="emoji" aria-hidden="true">🔄</span><b>フレーズ復習</b>
+            <span class="muted">${phraseReviewCount ? `${phraseReviewCount} フレーズ` : "まだありません"}</span>` },
+          { key: "grammar", html: `
+            <span class="emoji" aria-hidden="true">✏️</span><b>文法</b>
+            <span class="muted">${UNITS.map((u) => esc(u.title)).join("・")}${grammar.length ? ` ＋ 先生からの問題` : ""}</span>` },
+          { key: "pron", html: `
+            <span class="emoji" aria-hidden="true">🎤</span><b>発音課題</b>
+            <span class="muted">${shared.length ? `Month ${pronMonth} ・ 完了 ${pronFinished} / ${shared.length}` : "まだありません"}</span>
+            ${shared.length ? `<div class="bar"><i style="width:${Math.round((pronFinished / shared.length) * 100)}%"></i></div>` : ""}` },
+          NOTES_FOR_STUDENTS && { key: "notes", wide: true, html: `
+            <span class="emoji" aria-hidden="true">📝</span>
+            <div><b>授業メモ</b><p class="muted">${latestNote ? `${esc(noteDayLabel(latestNote.day))}${latestNote.title ? ` ・ ${esc(latestNote.title)}` : ""}` : "授業のあとに、先生のメモがとどきます"}</p></div>` },
+          { key: "study", wide: true, html: `
+            <span class="emoji" aria-hidden="true">⏱️</span>
+            <div><b>勉強時間</b><p class="muted">今日 ${formatMinutes(totalMinutes(todayRow))} ・ 今週 ${formatMinutes(week.total)}</p></div>` },
+        ])}
       </nav>
       <p class="footer-links">
         ${canInstall() && installHidden() ? `<button type="button" class="btn ghost small-btn" id="install-show">ホーム画面に追加する方法</button>` : ""}
@@ -519,6 +519,19 @@ function drawQuiz() {
     quiz.shown = true;
     drawQuiz();
   });
+}
+
+// The home tiles this student sees. Half-width tiles go two to a row; one left
+// without a partner (when the one next to it is hidden) takes the whole row.
+function homeTiles(tiles) {
+  const seen = tiles.filter((tile) => tile && shows(tile.key));
+  let run = 0;
+  return seen.map((tile, i) => {
+    run = tile.wide ? 0 : run + 1;
+    const alone = !tile.wide && run % 2 === 1 && (!seen[i + 1] || seen[i + 1].wide);
+    const cls = ["tile", tile.wide && "wide", alone && "solo", tile.cls].filter(Boolean).join(" ");
+    return `<a class="${cls}" href="#/${tile.key}">${tile.html}</a>`;
+  }).join("");
 }
 
 // ---------- study time ----------

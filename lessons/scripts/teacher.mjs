@@ -19,11 +19,13 @@
 // node scripts/teacher.mjs note-update なおみ 5 [--day …] [--title …] [memo.md]
 // node scripts/teacher.mjs publish なおみ 5 | unpublish なおみ 5 | delete-note なおみ 5
 // node scripts/teacher.mjs plan なおみ [plan.md | --clear]      (今週の勉強範囲: see, set or clear)
+// node scripts/teacher.mjs menu なおみ [--only 日記,発音課題,勉強時間 | --all]   (what the home screen shows)
 //
 // A file of "-" is read from stdin.
 import { spawnSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 import { noteDayLabel, noteProblems } from "../public/notes/format.js";
+import { MENUS, menuKey } from "../public/menus.js";
 
 // Node's fetch only goes through the environment's proxy when asked to.
 if ((process.env.HTTPS_PROXY || process.env.https_proxy) && !process.env.NODE_USE_ENV_PROXY) {
@@ -80,6 +82,7 @@ function parseArgs(args) {
     const arg = args[i];
     if (arg === "--publish") options.publish = true;
     else if (arg === "--clear") options.clear = true;
+    else if (arg === "--all") options.all = true;
     else if (arg.startsWith("--")) options[arg.slice(2)] = args[++i];
     else rest.push(arg);
   }
@@ -124,6 +127,9 @@ function noteOf(data, id) {
   return note;
 }
 
+const menuLine = (hidden = []) =>
+  MENUS.map((m) => `${hidden.includes(m.key) ? "×" : "○"} ${m.name}`).join("　");
+
 function noteSummary(note) {
   const status = note.published_at ? "公開中" : "下書き";
   return `[メモ ${note.id}] ${noteDayLabel(note.day)}（${note.day}）${note.title ? ` ${note.title}` : ""} ・ ${status} ・ 復習カード ${noteProblems(note.body).length}こ`;
@@ -139,6 +145,7 @@ const commands = {
   async show([name]) {
     const data = await studentData(await findStudent(name));
     console.log(`# ${data.student.name}さん`);
+    console.log(`\n## 生徒の画面に出すもの\n${menuLine(data.hidden)}`);
     console.log(`\n## 今週の勉強範囲\n${data.plan ? data.plan.body : "（まだありません）"}`);
     for (const [kind, spec] of Object.entries(KINDS)) {
       const items = data.items.filter((i) => i.kind === kind);
@@ -244,6 +251,25 @@ const commands = {
     const body = options.clear ? "" : readText(file);
     const { plan } = await api(`/api/teacher/students/${student.id}/plan`, { method: "PUT", body: { body } });
     console.log(plan ? `${student.name}さんの今週の勉強範囲を更新しました：\n${plan.body}` : `${student.name}さんの今週の勉強範囲を消しました。`);
+  },
+
+  async menu([name], options) {
+    const student = await findStudent(name);
+    if (!options.only && !options.all) {
+      const { hidden } = await studentData(student);
+      console.log(`${student.name}さんの画面（○ 出す・× 出さない）：\n${menuLine(hidden)}`);
+      return;
+    }
+    let hidden = [];
+    if (options.only) {
+      const words = String(options.only).split(/[,、，]/).map((w) => w.trim()).filter(Boolean);
+      const unknown = words.filter((w) => !menuKey(w));
+      if (unknown.length) stop(`知らない項目です：${unknown.join("、")}（使えるのは ${MENUS.map((m) => m.name).join("、")}）`);
+      const keep = words.map(menuKey);
+      hidden = MENUS.map((m) => m.key).filter((key) => !keep.includes(key));
+    }
+    const result = await api(`/api/teacher/students/${student.id}/menus`, { method: "PUT", body: { hidden } });
+    console.log(`${student.name}さんの画面を変えました（○ 出す・× 出さない）：\n${menuLine(result.hidden)}`);
   },
 
   async "delete-note"([name, id]) {

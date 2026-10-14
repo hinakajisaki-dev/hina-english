@@ -363,3 +363,5 @@ body.quiz-open .wrap { padding-bottom: 62vh; }
 /* 今週の勉強範囲, at the top of the home screen */
 .plan { background: var(--paper); border-color: var(--line-warm); }
 .plan-body { margin-top: 6px; font-size: 15px; }
+
+.tile.solo { grid-column: 1 / -1; }
