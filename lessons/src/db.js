@@ -143,6 +143,13 @@ const SCHEMA = [
     updated_at TEXT NOT NULL
   )`,
   `CREATE INDEX IF NOT EXISTS lesson_notes_student ON lesson_notes(student_id, day)`,
+  // 今週の勉強範囲: what the teacher wants the student to study this week, shown at
+  // the top of the student's home (the same small Markdown as 授業メモ).
+  `CREATE TABLE IF NOT EXISTS study_plans (
+    student_id INTEGER PRIMARY KEY REFERENCES students(id) ON DELETE CASCADE,
+    body TEXT NOT NULL,
+    updated_at TEXT NOT NULL
+  )`,
 ];
 
 let ready = false;
@@ -200,10 +207,11 @@ export function noteRow(row) {
 }
 
 // Everything one student's screen needs: items, progress, lesson results, the 復習 list,
-// set test results, finished pronunciation phrases, study time and recent journals.
+// set test results, finished pronunciation phrases, study time, recent journals and
+// this week's 勉強範囲.
 export async function studentBundle(db, studentId) {
   const [
-    items, progress, lessonRows, reviewRows, testRows, phraseReviewRows, phraseTestRows, pronRows, studyRows, journals,
+    items, progress, lessonRows, reviewRows, testRows, phraseReviewRows, phraseTestRows, pronRows, studyRows, journals, plan,
   ] = await Promise.all([
     all(db, `SELECT * FROM items WHERE student_id = ? ORDER BY id`, studentId),
     all(db, `SELECT * FROM progress WHERE student_id = ?`, studentId),
@@ -215,6 +223,7 @@ export async function studentBundle(db, studentId) {
     all(db, `SELECT * FROM pron_progress WHERE student_id = ?`, studentId),
     all(db, `SELECT * FROM study_days WHERE student_id = ? AND day >= ? ORDER BY day`, studentId, japanDay(-400)),
     all(db, `SELECT * FROM journals WHERE student_id = ? ORDER BY id DESC LIMIT 60`, studentId),
+    first(db, `SELECT body, updated_at FROM study_plans WHERE student_id = ?`, studentId),
   ]);
   const progressById = {};
   for (const p of progress) {
@@ -249,5 +258,6 @@ export async function studentBundle(db, studentId) {
     items: items.map(itemRow), progress: progressById, lessons, review, vocabTests: scores(testRows),
     phraseReview, phraseTests: scores(phraseTestRows), pronDone, study,
     journals: journals.map(journalRow),
+    plan: plan ? { body: plan.body, updated_at: plan.updated_at } : null,
   };
 }

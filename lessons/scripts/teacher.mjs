@@ -18,6 +18,7 @@
 // node scripts/teacher.mjs note-show なおみ 5
 // node scripts/teacher.mjs note-update なおみ 5 [--day …] [--title …] [memo.md]
 // node scripts/teacher.mjs publish なおみ 5 | unpublish なおみ 5 | delete-note なおみ 5
+// node scripts/teacher.mjs plan なおみ [plan.md | --clear]      (今週の勉強範囲: see, set or clear)
 //
 // A file of "-" is read from stdin.
 import { spawnSync } from "node:child_process";
@@ -78,6 +79,7 @@ function parseArgs(args) {
   for (let i = 0; i < args.length; i++) {
     const arg = args[i];
     if (arg === "--publish") options.publish = true;
+    else if (arg === "--clear") options.clear = true;
     else if (arg.startsWith("--")) options[arg.slice(2)] = args[++i];
     else rest.push(arg);
   }
@@ -124,7 +126,7 @@ function noteOf(data, id) {
 
 function noteSummary(note) {
   const status = note.published_at ? "公開中" : "下書き";
-  return `[メモ ${note.id}] ${noteDayLabel(note.day)}（${note.day}）${note.title ? ` ${note.title}` : ""} ・ ${status} ・ 復習問題 ${noteProblems(note.body).length}問`;
+  return `[メモ ${note.id}] ${noteDayLabel(note.day)}（${note.day}）${note.title ? ` ${note.title}` : ""} ・ ${status} ・ 復習カード ${noteProblems(note.body).length}こ`;
 }
 
 const commands = {
@@ -137,6 +139,7 @@ const commands = {
   async show([name]) {
     const data = await studentData(await findStudent(name));
     console.log(`# ${data.student.name}さん`);
+    console.log(`\n## 今週の勉強範囲\n${data.plan ? data.plan.body : "（まだありません）"}`);
     for (const [kind, spec] of Object.entries(KINDS)) {
       const items = data.items.filter((i) => i.kind === kind);
       console.log(`\n## ${spec.name}（${items.length}）`);
@@ -229,6 +232,18 @@ const commands = {
     noteOf(await studentData(await findStudent(name)), id);
     const { note } = await api(`/api/teacher/notes/${Number(id)}`, { method: "PUT", body: { publish: false } });
     console.log(`公開をやめました：${noteSummary(note)}`);
+  },
+
+  async plan([name, file], options) {
+    const student = await findStudent(name);
+    if (!file && !options.clear) {
+      const { plan } = await studentData(student);
+      console.log(plan ? `${student.name}さんの今週の勉強範囲：\n${plan.body}` : `${student.name}さんの今週の勉強範囲は、まだありません。`);
+      return;
+    }
+    const body = options.clear ? "" : readText(file);
+    const { plan } = await api(`/api/teacher/students/${student.id}/plan`, { method: "PUT", body: { body } });
+    console.log(plan ? `${student.name}さんの今週の勉強範囲を更新しました：\n${plan.body}` : `${student.name}さんの今週の勉強範囲を消しました。`);
   },
 
   async "delete-note"([name, id]) {
