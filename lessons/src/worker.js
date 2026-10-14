@@ -8,7 +8,7 @@ import { SpeechError, speechFor } from "./speech.js";
 import { findLesson, lessonExampleSentences, plain, questionCount } from "../public/grammar/lessons.js";
 import { findMistakes } from "../public/mistakes.js";
 import { bookSentences, bookWords, setKey, weekWords, wordSets } from "../public/vocab/words.js";
-import { findPhrase } from "../public/pron/phrases.js";
+import { findPhrase, pronMonths } from "../public/pron/phrases.js";
 import { phraseByKey, phraseSentences, phraseSetKey, phraseSets, testSize } from "../public/phrases/book.js";
 import { noteProblems } from "../public/notes/format.js";
 import { NOTES_FOR_STUDENTS } from "../public/course.js";
@@ -147,6 +147,9 @@ async function route(request, env, url) {
   }
   if (parts[1] === "students" && parts[3] === "menus" && parts.length === 4 && method === "PUT") {
     return saveMenus(request, db, await findStudent(db, id(2)));
+  }
+  if (parts[1] === "students" && parts[3] === "pron-months" && parts.length === 4 && method === "PUT") {
+    return savePronMonths(request, db, await findStudent(db, id(2)));
   }
   if (parts[1] === "students" && parts[3] === "journals" && parts.length === 4 && method === "POST") {
     return importJournals(request, db, await findStudent(db, id(2)));
@@ -809,6 +812,31 @@ async function saveNote(request, db, student, row) {
     student.id, day, title, body, published, stamp, stamp,
   );
   return json({ note: noteRow(await first(db, `SELECT * FROM lesson_notes WHERE id = ?`, meta.last_row_id)) });
+}
+
+// The 発音 months this student sees, in order, and their names:
+// { months: [{ month: 1, label: "Month 2" }] }. An empty list is the usual
+// (every month under its own name).
+async function savePronMonths(request, db, student) {
+  const { months } = await readJson(request);
+  if (!Array.isArray(months)) throw new HttpError(400, "内容が正しくありません。");
+  const have = pronMonths();
+  const clean = months.map((m) => ({ month: Number(m?.month), label: String(m?.label ?? "").trim().slice(0, 30) }));
+  const bad = clean.find((m) => !have.includes(m.month));
+  if (bad) throw new HttpError(400, `Month ${Number.isFinite(bad.month) ? bad.month : "?"} の発音課題はありません（あるのは Month ${have.join("・")}）。`);
+  if (new Set(clean.map((m) => m.month)).size !== clean.length) throw new HttpError(400, "同じ Month が2回あります。");
+  for (const m of clean) if (!m.label) m.label = `Month ${m.month}`;
+  if (!clean.length) {
+    await run(db, `DELETE FROM student_settings WHERE student_id = ? AND name = 'pron_months'`, student.id);
+    return json({ months: null });
+  }
+  await run(
+    db,
+    `INSERT INTO student_settings (student_id, name, value, updated_at) VALUES (?1, 'pron_months', ?2, ?3)
+     ON CONFLICT (student_id, name) DO UPDATE SET value = ?2, updated_at = ?3`,
+    student.id, JSON.stringify(clean), now(),
+  );
+  return json({ months: clean });
 }
 
 // Past diaries from before the app: { entries: [{ day: "2026-08-03", body, topic }] }.

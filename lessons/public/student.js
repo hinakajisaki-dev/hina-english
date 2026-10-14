@@ -6,7 +6,7 @@ import {
 } from "./common.js";
 import { UNITS, findLesson, plain, questionCount } from "./grammar/lessons.js";
 import { bookWeeks, setKey, speakable, splitOnForm, weekWords, wordSets } from "./vocab/words.js";
-import { MONTHS, currentMonth, monthPhrases, pronMonths } from "./pron/phrases.js";
+import { MONTHS, currentMonth, monthLabel, monthPhrases, studentMonths } from "./pron/phrases.js";
 import { CURRENT_WEEK, NOTES_FOR_STUDENTS } from "./course.js";
 import { MENUS } from "./menus.js";
 import { TOPICS } from "./journal/topics.js";
@@ -292,7 +292,7 @@ function todaysTasks() {
       done: pron,
       href: next ? `#/pron/${next.month}` : "#/pron",
       title: "発音を1文 完了する",
-      sub: pronDoneToday() ? "今日の発音はできました" : next ? `Month ${next.month} ・ ${next.index + 1}文目（${next.index + 1} / ${next.count}）` : "全部の Month が完了しています",
+      sub: pronDoneToday() ? "今日の発音はできました" : next ? `${monthLabel(myMonths(), next.month)} ・ ${next.index + 1}文目（${next.index + 1} / ${next.count}）` : "全部の Month が完了しています",
     },
   ].filter((task) => shows(task.key));
 }
@@ -304,7 +304,7 @@ function renderHome() {
   const review = reviewWords().length;
   const phraseTests = phraseTestCount(phraseWeeks().includes(CURRENT_WEEK) ? [CURRENT_WEEK] : []);
   const phraseReviewCount = reviewPhrases().length;
-  const pronMonth = currentMonth(pronDone);
+  const pronMonth = currentMonth(pronDone, myMonths().map((m) => m.month));
   const shared = monthPhrases(pronMonth);
   const pronFinished = shared.filter((p) => pronDone(p.key)).length;
   const grammar = items("grammar");
@@ -363,7 +363,7 @@ function renderHome() {
             <span class="muted">${UNITS.map((u) => esc(u.title)).join("・")}${grammar.length ? ` ＋ 先生からの問題` : ""}</span>` },
           { key: "pron", html: `
             <span class="emoji" aria-hidden="true">🎤</span><b>発音課題</b>
-            <span class="muted">${shared.length ? `Month ${pronMonth} ・ 完了 ${pronFinished} / ${shared.length}` : "まだありません"}</span>
+            <span class="muted">${shared.length ? `${esc(monthLabel(myMonths(), pronMonth))} ・ 完了 ${pronFinished} / ${shared.length}` : "まだありません"}</span>
             ${shared.length ? `<div class="bar"><i style="width:${Math.round((pronFinished / shared.length) * 100)}%"></i></div>` : ""}` },
           NOTES_FOR_STUDENTS && { key: "notes", wide: true, html: `
             <span class="emoji" aria-hidden="true">📝</span>
@@ -1674,9 +1674,14 @@ function renderPhraseReviewResult(P) {
 
 const pronDone = (key) => state.me.pronDone[key];
 
-// The phrase to do next: the first one not 完了 in Month 1, then Month 2 …
+// The months this student sees and their names (the teacher can give a
+// student other ones: phrases.js studentMonths), and whether that was changed.
+const myMonths = () => studentMonths(state.me.pronMonths);
+const ownMonths = () => !!state.me.pronMonths?.length;
+
+// The phrase to do next: the first one not 完了 in the student's first month, then the next …
 function nextPhrase() {
-  for (const month of pronMonths()) {
+  for (const { month } of myMonths()) {
     const phrases = monthPhrases(month);
     const index = phrases.findIndex((p) => !pronDone(p.key));
     if (index >= 0) return { month, index, count: phrases.length, phrase: phrases[index] };
@@ -1691,24 +1696,28 @@ const pronDoneToday = () => {
 
 function renderPron(month) {
   if (month === "own") return renderPronPractice("own");
-  if (month) return renderPronPractice(Number(month));
+  // A month this student doesn't have opens the list instead.
+  if (month && myMonths().some((m) => m.month === Number(month))) return renderPronPractice(Number(month));
 
   const own = items("pron");
   const ownDone = own.filter((item) => pronDone(`item/${item.id}`)).length;
-  const months = Array.from({ length: MONTHS }, (_, i) => i + 1);
+  // Month 1〜6, those still to come greyed out; a student given months of their
+  // own sees just those.
+  const months = ownMonths() ? myMonths().map((m) => m.month) : Array.from({ length: MONTHS }, (_, i) => i + 1);
   const next = nextPhrase();
   app.innerHTML = `${topbar("発音")}
     <main class="wrap stack">
       <p class="muted">1日1文。お手本を聞いて、自分の声を録音しよう。「完了」を押すと、録音が先生に届きます。授業でいっしょに確認します。</p>
       ${months.map((m) => {
         const phrases = monthPhrases(m);
-        if (!phrases.length) return `<div class="lesson-card soon"><div><b>Month ${m}</b><span class="muted small">まだありません</span></div></div>`;
+        const label = esc(monthLabel(myMonths(), m));
+        if (!phrases.length) return `<div class="lesson-card soon"><div><b>${label}</b><span class="muted small">まだありません</span></div></div>`;
         const done = phrases.filter((p) => pronDone(p.key)).length;
         const badge = done === phrases.length ? `<span class="badge done">✅ 完了</span>`
           : next?.month === m ? `<span class="badge start">${done ? "つづきから" : "はじめる"}</span>`
           : `<span class="badge">${done} / ${phrases.length}</span>`;
         return `<a class="lesson-card" href="#/pron/${m}">
-          <div><b>Month ${m}</b><span class="muted small">${phrases.length} 文 ・ 完了 ${done} / ${phrases.length}</span></div>
+          <div><b>${label}</b><span class="muted small">${phrases.length} 文 ・ 完了 ${done} / ${phrases.length}</span></div>
           ${badge}
         </a>`;
       }).join("")}
@@ -1786,7 +1795,7 @@ const shortDate = (iso) => new Date(iso).toLocaleDateString("ja-JP", { month: "n
 
 function renderPronPractice(which) {
   const list = pronList(which);
-  const title = which === "own" ? "発音 ・ 先生が追加した文" : `発音 ・ Month ${which}`;
+  const title = which === "own" ? "発音 ・ 先生が追加した文" : `発音 ・ ${monthLabel(myMonths(), which)}`;
   if (!list.length) {
     app.innerHTML = `${topbar(title, "#/pron")}<main class="wrap stack">${emptyState("まだ練習する文がありません。")}</main>`;
     return;

@@ -158,6 +158,16 @@ const SCHEMA = [
     hidden TEXT NOT NULL,
     updated_at TEXT NOT NULL
   )`,
+  // Other settings for one student, as JSON by name. pron_months: the 発音
+  // months this student sees and their names, [{ month: 1, label: "Month 2" }]
+  // (public/pron/phrases.js studentMonths). No row: the usual.
+  `CREATE TABLE IF NOT EXISTS student_settings (
+    student_id INTEGER NOT NULL REFERENCES students(id) ON DELETE CASCADE,
+    name TEXT NOT NULL,
+    value TEXT NOT NULL,
+    updated_at TEXT NOT NULL,
+    PRIMARY KEY (student_id, name)
+  )`,
 ];
 
 // Columns added to a table after it was first made. On a database that has
@@ -236,7 +246,7 @@ export function noteRow(row) {
 export async function studentBundle(db, studentId) {
   const [
     items, progress, lessonRows, reviewRows, testRows, phraseReviewRows, phraseTestRows, pronRows, studyRows, journals, plan,
-    menus,
+    menus, settings,
   ] = await Promise.all([
     all(db, `SELECT * FROM items WHERE student_id = ? ORDER BY id`, studentId),
     all(db, `SELECT * FROM progress WHERE student_id = ?`, studentId),
@@ -250,7 +260,12 @@ export async function studentBundle(db, studentId) {
     all(db, `SELECT * FROM journals WHERE student_id = ? ORDER BY created_at DESC, id DESC LIMIT 60`, studentId),
     first(db, `SELECT body, updated_at FROM study_plans WHERE student_id = ?`, studentId),
     first(db, `SELECT hidden FROM student_menus WHERE student_id = ?`, studentId),
+    all(db, `SELECT name, value FROM student_settings WHERE student_id = ?`, studentId),
   ]);
+  const setting = (name) => {
+    const row = settings.find((r) => r.name === name);
+    return row ? JSON.parse(row.value) : null;
+  };
   const progressById = {};
   for (const p of progress) {
     progressById[p.item_id] = {
@@ -286,5 +301,6 @@ export async function studentBundle(db, studentId) {
     journals: journals.map(journalRow),
     plan: plan ? { body: plan.body, updated_at: plan.updated_at } : null,
     hidden: menus ? JSON.parse(menus.hidden) : [],
+    pronMonths: setting("pron_months"),
   };
 }
