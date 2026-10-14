@@ -624,7 +624,20 @@ async function teacherLogin(request, env, url) {
   return json({ ok: true }, 200, { "Set-Cookie": cookie(TEACHER_COOKIE, expected, YEAR, url) });
 }
 
+// The teacher's per-student Claude chats (scripts/teacher.mjs) send
+// TEACHER_API_TOKEN as "Authorization: Bearer …" instead of signing in.
+const MIN_API_TOKEN = 32;
+
 async function requireTeacher(request, env) {
+  const bearer = (request.headers.get("Authorization") || "").match(/^Bearer\s+(\S+)$/);
+  if (bearer) {
+    const expected = env.TEACHER_API_TOKEN || "";
+    if (expected.length < MIN_API_TOKEN || !sameBytes(await sha256(bearer[1]), await sha256(expected))) {
+      await sleep(600);
+      throw new HttpError(401, "トークンがちがいます。");
+    }
+    return;
+  }
   const token = readCookie(request, TEACHER_COOKIE);
   if (!env.TEACHER_PASSWORD || !token || !sameBytes(token, await teacherToken(env.TEACHER_PASSWORD))) {
     throw new HttpError(401, "ログインしてください。");

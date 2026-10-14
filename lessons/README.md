@@ -97,6 +97,10 @@ iPhone は Safari の共有ボタン →「ホーム画面に追加」で、ア�
 - 単語は、タブの上の「Week をえらぶ」で週（Week 1〜24）を選んでから追加します。一覧も、選んだ週の単語だけが出ます。生徒の画面では、単語がある週だけ開けます
 - Week 1 には全員共通の単語帳（100 語）が入っています（下の「単語帳と復習」）。先生ページで足した単語は、その生徒の週の最後に加わります
 
+## 生徒ごとのチャット
+
+先生は、生徒1人に1つ Claude のチャットを持ち、その生徒だけの授業メモ・単語・発音・文法の問題・日記のテーマを、チャットからアプリに直接入れられます（`scripts/teacher.mjs`）。はじめの設定（Worker のシークレット `TEACHER_API_TOKEN` と、Claude の環境の `HINA_TEACHER_TOKEN`・ネットワーク）と使い方は `docs/student-chats.md`。
+
 ## 授業メモ
 
 くわしくは `docs/lesson-notes.md`。
@@ -270,6 +274,7 @@ API キーを入れると、そのあとに送られた日記から、AI が 1 �
 | `public/pron/month1.js`、`month2.js`、`phrases.js`、`audio/` | 発音 Month 1（先生のシート「8月_発音課題」から 30 文）、Month 2（「7月_発音課題」から 30 文）と先生の録音 |
 | `public/notes/format.js` | 授業メモの書き方を読んで表示する（復習問題も取り出す。サーバーも同じものを使う） |
 | `../docs/lesson-notes.md` | 授業メモの流れ・整理のルール・本文の書き方 |
+| `scripts/teacher.mjs`、`../docs/student-chats.md` | 生徒ごとのチャットが、その生徒の内容をアプリに入れる道具と、その使い方 |
 | `public/study.js` | 勉強時間（自動で数える時計と、週・月のグラフ） |
 | `public/manifest.webmanifest`、`icons/` | ホーム画面に追加したときの名前・アイコン・色 |
 | `public/journal/topics.js` | 日記の初心者向けお題（45 個） |
