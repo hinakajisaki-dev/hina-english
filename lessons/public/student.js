@@ -1707,7 +1707,7 @@ function renderPron(month) {
   const next = nextPhrase();
   app.innerHTML = `${topbar("発音")}
     <main class="wrap stack">
-      <p class="muted">1日1文。お手本を聞いて、自分の声を録音しよう。「完了」を押すと、録音が先生に届きます。授業でいっしょに確認します。</p>
+      <p class="muted">お手本を聞いて、自分の声を録音してください。<br>「完了」を押すと録音が先生に届きます。</p>
       ${months.map((m) => {
         const phrases = monthPhrases(m);
         const label = esc(monthLabel(myMonths(), m));
@@ -2628,7 +2628,6 @@ function renderJournal(id) {
           <textarea name="body" lang="en" rows="9" spellcheck="false" placeholder="${esc(!topic.free && current.start ? current.start : "Today I ...")}">${esc(draft.body || "")}</textarea>
         </label>
         <p class="wordcount" id="wordcount" aria-live="polite">${countWords(draft.body || "")} words</p>
-        <p class="muted small">${state.me.ai ? "送ると、添削が届きます。書き終わってから送ってね。" : "送ると、先生に届きます。"}</p>
         <p class="notice bad" id="journal-error" role="alert" hidden></p>
         <button class="btn block" type="submit">日記を送る</button>
       </form>
