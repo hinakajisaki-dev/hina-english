@@ -20,12 +20,15 @@
 // node scripts/teacher.mjs publish なおみ 5 | unpublish なおみ 5 | delete-note なおみ 5
 // node scripts/teacher.mjs plan なおみ [plan.md | --clear]      (今週の勉強範囲: see, set or clear)
 // node scripts/teacher.mjs menu なおみ [--only 日記,発音課題,勉強時間 | --all]   (what the home screen shows)
+// node scripts/teacher.mjs journals なおみ diaries.md [--dry]   (past diaries, no AI correction)
+// node scripts/teacher.mjs pron-months なおみ [--set "1=Month 2" | --default]   (発音 months and their names)
 //
 // A file of "-" is read from stdin.
 import { spawnSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 import { noteDayLabel, noteProblems } from "../public/notes/format.js";
 import { MENUS, menuKey } from "../public/menus.js";
+import { monthPhrases, pronMonths, studentMonths } from "../public/pron/phrases.js";
 
 // Node's fetch only goes through the environment's proxy when asked to.
 if ((process.env.HTTPS_PROXY || process.env.https_proxy) && !process.env.NODE_USE_ENV_PROXY) {
@@ -83,6 +86,8 @@ function parseArgs(args) {
     if (arg === "--publish") options.publish = true;
     else if (arg === "--clear") options.clear = true;
     else if (arg === "--all") options.all = true;
+    else if (arg === "--dry") options.dry = true;
+    else if (arg === "--default") options.default = true;
     else if (arg.startsWith("--")) options[arg.slice(2)] = args[++i];
     else rest.push(arg);
   }
@@ -127,6 +132,40 @@ function noteOf(data, id) {
   return note;
 }
 
+// Past diaries, one after another:
+//   ## 2026-08-03          (also 2026/8/3 or 2026年8月3日)
+//   お題：週末にしたこと   (optional, right under the date)
+//   I went to the beach…
+function parseJournals(text) {
+  const entries = [];
+  let current = null;
+  for (const line of text.replace(/\r\n?/g, "\n").split("\n")) {
+    const head = line.match(/^#{1,3}\s*(\d{4})\s*[-/.年]\s*(\d{1,2})\s*[-/.月]\s*(\d{1,2})\s*日?\s*$/);
+    if (head) {
+      const [, y, m, d] = head;
+      current = { day: `${y}-${m.padStart(2, "0")}-${d.padStart(2, "0")}`, topic: "", lines: [] };
+      entries.push(current);
+      continue;
+    }
+    if (!current) {
+      if (line.trim()) stop(`最初に「## 2026-08-03」のような日付の見出しが必要です（「${line.trim().slice(0, 30)}」の前）。`);
+      continue;
+    }
+    const topic = !current.topic && !current.lines.some((l) => l.trim()) && line.match(/^\s*(お題|テーマ)\s*[：:]\s*(.+)$/);
+    if (topic) current.topic = topic[2].trim();
+    else current.lines.push(line);
+  }
+  return entries.map((e) => ({ day: e.day, topic: e.topic, body: e.lines.join("\n").trim() }));
+}
+
+// "Month 2（もとの Month 1）" for each month the student sees, then the ones they don't.
+function pronLine(setting) {
+  const mine = studentMonths(setting);
+  const shown = mine.map((m) => `○ ${m.label}${m.label === `Month ${m.month}` ? "" : `（もとの Month ${m.month}）`}`);
+  const hidden = pronMonths().filter((m) => !mine.some((x) => x.month === m)).map((m) => `× もとの Month ${m}`);
+  return [...shown, ...hidden].join("　");
+}
+
 const menuLine = (hidden = []) =>
   MENUS.map((m) => `${hidden.includes(m.key) ? "×" : "○"} ${m.name}`).join("　");
 
@@ -146,6 +185,7 @@ const commands = {
     const data = await studentData(await findStudent(name));
     console.log(`# ${data.student.name}さん`);
     console.log(`\n## 生徒の画面に出すもの\n${menuLine(data.hidden)}`);
+    console.log(`\n## 発音課題の Month\n${pronLine(data.pronMonths)}`);
     console.log(`\n## 今週の勉強範囲\n${data.plan ? data.plan.body : "（まだありません）"}`);
     for (const [kind, spec] of Object.entries(KINDS)) {
       const items = data.items.filter((i) => i.kind === kind);
@@ -270,6 +310,42 @@ const commands = {
     }
     const result = await api(`/api/teacher/students/${student.id}/menus`, { method: "PUT", body: { hidden } });
     console.log(`${student.name}さんの画面を変えました（○ 出す・× 出さない）：\n${menuLine(result.hidden)}`);
+  },
+
+  async journals([name, file], options) {
+    if (!file) stop("過去の日記のファイルを指定してください（- で標準入力）。");
+    const entries = parseJournals(readText(file));
+    if (!entries.length) stop("日記がありません。「## 2026-08-03」のような日付の見出しのあとに本文を書いてください。");
+    const empty = entries.filter((e) => !e.body);
+    if (empty.length) stop(`本文がない日があります：${empty.map((e) => e.day).join("、")}`);
+    const student = await findStudent(name);
+    const list = entries.map((e) => `${e.day}${e.topic ? `（お題：${e.topic}）` : ""} ${e.body.split("\n")[0].slice(0, 50)}`).join("\n");
+    if (options.dry) {
+      console.log(`${student.name}さんに入れる過去の日記 ${entries.length} 日分（${entries[0].day} 〜 ${entries[entries.length - 1].day}）。まだ入れていません：\n${list}`);
+      return;
+    }
+    const { added, skipped } = await api(`/api/teacher/students/${student.id}/journals`, { method: "POST", body: { entries } });
+    console.log(`${student.name}さんに過去の日記を ${added} 日分入れました（添削なし）${skipped ? `。同じものがすでにあった ${skipped} 日分は、とばしました` : ""}。`);
+  },
+
+  async "pron-months"([name], options) {
+    const student = await findStudent(name);
+    if (!options.set && !options.default) {
+      const { pronMonths: setting } = await studentData(student);
+      const list = pronMonths().map((m) => `もとの Month ${m}（${monthPhrases(m).length} 文：${monthPhrases(m)[0]?.en || ""} …）`).join("\n");
+      console.log(`${student.name}さんの発音課題（○ 出す・× 出さない）：\n${pronLine(setting)}\n\nアプリにある Month：\n${list}`);
+      return;
+    }
+    let months = [];
+    if (options.set) {
+      months = String(options.set).split(/[,、，]/).map((part) => part.trim()).filter(Boolean).map((part) => {
+        const m = part.match(/^(\d+)\s*[=＝:：]\s*(.+)$/);
+        if (!m) stop(`「${part}」が読めません。「1=Month 2」のように、もとの Month の番号と名前を書いてください。`);
+        return { month: Number(m[1]), label: m[2].trim() };
+      });
+    }
+    const result = await api(`/api/teacher/students/${student.id}/pron-months`, { method: "PUT", body: { months } });
+    console.log(`${student.name}さんの発音課題を変えました（○ 出す・× 出さない）：\n${pronLine(result.months)}`);
   },
 
   async "delete-note"([name, id]) {

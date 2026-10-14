@@ -20,10 +20,24 @@ export function findPhrase(key) {
   return monthPhrases(month).find((p) => p.key === key) || null;
 }
 
-// The month a student is on: the first with a phrase not 完了 yet (the last
-// month once every one is done). isDone(key) says whether a phrase is 完了.
-// Progress is counted one month at a time.
-export function currentMonth(isDone) {
+// The months one student sees, in order: [{ month, label }]. setting is the
+// teacher's list for this student ([{ month, label }], see the server's
+// pron_months setting), or null for every month under its own name. month is
+// whose phrases they are (their keys, 完了 and recordings stay "m1/05"); label
+// is the name the student sees ("Month 2").
+export function studentMonths(setting) {
   const months = pronMonths();
+  if (!Array.isArray(setting) || !setting.length) return months.map((month) => ({ month, label: `Month ${month}` }));
+  return setting
+    .filter((s) => months.includes(s.month))
+    .map((s) => ({ month: s.month, label: s.label || `Month ${s.month}` }));
+}
+
+export const monthLabel = (months, month) => months.find((m) => m.month === month)?.label || `Month ${month}`;
+
+// The month a student is on: the first with a phrase not 完了 yet (the last
+// month once every one is done). isDone(key) says whether a phrase is 完了;
+// months are the months this student has. Progress is counted one month at a time.
+export function currentMonth(isDone, months = pronMonths()) {
   return months.find((month) => monthPhrases(month).some((p) => !isDone(p.key))) ?? months[months.length - 1];
 }

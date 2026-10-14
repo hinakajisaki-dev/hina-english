@@ -73,3 +73,6 @@ textarea.bulk { font-family: var(--en); min-height: 140px; }
 .menu-picks { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 6px 14px; }
 .menu-picks label { display: flex; align-items: center; gap: 8px; cursor: pointer; }
 .menu-picks input { width: 20px; height: 20px; margin: 0; accent-color: var(--accent); }
+.pron-month-row { display: grid; gap: 4px; }
+.pron-month-row label:first-child { display: flex; align-items: center; gap: 8px; cursor: pointer; }
+.pron-month-row input[type=checkbox] { width: 20px; height: 20px; margin: 0; accent-color: var(--accent); }

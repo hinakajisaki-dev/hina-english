@@ -4,7 +4,7 @@
 import { ApiError, api, diffHtml, esc, formatDateTime, icons, startOfJapanDay, toast } from "./common.js";
 import { UNITS } from "./grammar/lessons.js";
 import { bookWeeks, bookWords, setKey, weekWords, wordSets } from "./vocab/words.js";
-import { currentMonth, monthPhrases, pronMonths } from "./pron/phrases.js";
+import { currentMonth, monthLabel, monthPhrases, pronMonths, studentMonths } from "./pron/phrases.js";
 import { CURRENT_WEEK, NOTES_FOR_STUDENTS } from "./course.js";
 import { MENUS } from "./menus.js";
 import { phraseSetKey, phraseSets, phraseWeeks, testSize } from "./phrases/book.js";
@@ -210,7 +210,8 @@ async function renderStudent(id, tab) {
   const unread = journals.filter((j) => !j.teacher_read).length;
   const weekAgo = new Date(startOfJapanDay().getTime() - 6 * 86400e3);
   const thisWeek = journals.filter((j) => new Date(j.created_at) >= weekAgo).length;
-  const pronMonth = currentMonth((key) => !!data.pronDone?.[key]);
+  const myMonths = studentMonths(data.pronMonths);
+  const pronMonth = currentMonth((key) => !!data.pronDone?.[key], myMonths.map((m) => m.month));
   const shared = monthPhrases(pronMonth);
   const pronFinished = shared.filter((p) => data.pronDone?.[p.key]).length;
   const studyWeek = summary(weekDays(data.study || [], weekStart(today())));
@@ -240,7 +241,7 @@ async function renderStudent(id, tab) {
         <div class="stat"><b>${vocabTested} / ${vocabSets.length}</b><span>単語テスト Week ${CURRENT_WEEK}（復習カード ${(data.review || []).length} 語）</span></div>
         <div class="stat"><b>${phraseTested} / ${phraseTestSets.length}</b><span>フレーズテスト Week ${CURRENT_WEEK}（復習 ${(data.phraseReview || []).length} こ）</span></div>
         <div class="stat"><b>${tries ? `${Math.round((grammarTries.right / tries) * 100)}%` : "—"}</b><span>文法の正解率</span></div>
-        <div class="stat"><b>${pronFinished} / ${shared.length}</b><span>発音 Month ${pronMonth} の完了</span></div>
+        <div class="stat"><b>${pronFinished} / ${shared.length}</b><span>発音 ${esc(monthLabel(myMonths, pronMonth))} の完了</span></div>
         <div class="stat"><b>${formatMinutes(studyWeek.total)}</b><span>今週の勉強時間</span></div>
       </div>
       <nav class="tabs" aria-label="内容">
@@ -275,7 +276,7 @@ function renderJournals(panel) {
         <div class="badges">
           <span class="muted small">${esc(formatDateTime(j.created_at))}</span>
           ${j.teacher_read ? "" : `<span class="unread">未読</span>`}
-          ${c || !state.current.ai ? "" : `<span class="badge waiting">AI 添削なし</span>`}
+          ${j.imported ? `<span class="badge">過去の日記</span>` : c || !state.current.ai ? "" : `<span class="badge waiting">AI 添削なし</span>`}
           ${j.teacher_comment ? `<span class="badge teacher">コメントずみ</span>` : ""}
         </div>
         ${j.topic ? `<span class="muted small">テーマ：${esc(j.topic)}</span>` : ""}
@@ -749,15 +750,21 @@ function recordingPlayer(key) {
 
 // The shared pronunciation months: how far the student is, and the recordings
 // they sent with 完了, newest first, to go over in class.
+// The months this student sees (under the names they see), then any other
+// month they have finished phrases in.
 function pronRecordingsHtml() {
   const done = state.current.pronDone || {};
-  return pronMonths().map((month) => {
+  const mine = studentMonths(state.current.pronMonths);
+  const others = pronMonths().filter((m) => !mine.some((x) => x.month === m) && monthPhrases(m).some((p) => done[p.key]));
+  return [...mine.map((m) => m.month), ...others].map((month) => {
     const phrases = monthPhrases(month);
     const finished = phrases.filter((p) => done[p.key]).length;
     const sent = phrases.filter((p) => done[p.key]?.sent_at)
       .sort((a, b) => (done[a.key].sent_at < done[b.key].sent_at ? 1 : -1));
+    const label = monthLabel(mine, month);
+    const note = others.includes(month) ? "この生徒には出していない Month" : label === `Month ${month}` ? `全員共通 ${phrases.length} 文` : `もとの Month ${month}・${phrases.length} 文`;
     return `<section class="card stack">
-      <h3>発音 Month ${month}（全員共通 ${phrases.length} 文）</h3>
+      <h3>発音 ${esc(label)}（${note}）</h3>
       <p class="muted small">完了 ${finished} / ${phrases.length}　録音 ${sent.length} 件${sent.length > 1 ? "（新しい順）" : ""}</p>
       ${sent.length ? `<ul class="rows">${sent.map((p) => `<li><div class="main">
         <div class="en-main" lang="en">${Number(p.id)}. ${esc(p.en)}</div>
@@ -801,6 +808,20 @@ function renderSettings(panel) {
       <h3>生徒の画面に出すもの</h3>
       <p class="muted small">チェックを外したものは、この生徒のホームに出ません（ほかの生徒は変わりません）。生徒ごとのチャットからも変えられます。</p>
       <div class="menu-picks">${MENUS.map((m) => `<label><input type="checkbox" name="${esc(m.key)}" ${(state.current.hidden || []).includes(m.key) ? "" : "checked"}> ${esc(m.name)}</label>`).join("")}</div>
+      <button class="btn" type="submit" style="align-self:flex-start">保存</button>
+    </form>
+    <form class="card stack" id="pron-months">
+      <h3>発音課題の Month</h3>
+      <p class="muted small">この生徒に出す Month と、生徒の画面での名前です。チェックを外した Month は出ません。完了と録音は、もとの Month のまま残ります。</p>
+      <ul class="rows">${pronMonths().map((m) => {
+        const mine = studentMonths(state.current.pronMonths).find((x) => x.month === m);
+        const first = monthPhrases(m)[0];
+        return `<li><div class="main pron-month-row">
+          <label><input type="checkbox" name="show-${m}" ${mine ? "checked" : ""}> <b>もとの Month ${m}</b></label>
+          <span class="muted small" lang="en">${monthPhrases(m).length} 文：${esc(first?.en || "")} …</span>
+          <label class="field"><span>生徒の画面での名前</span><input type="text" name="label-${m}" maxlength="30" value="${esc(mine?.label || `Month ${m}`)}"></label>
+        </div></li>`;
+      }).join("")}</ul>
       <button class="btn" type="submit" style="align-self:flex-start">保存</button>
     </form>
     <form class="card stack" id="plan">
@@ -849,6 +870,26 @@ function renderSettings(panel) {
       await api(`/api/teacher/students/${student.id}/menus`, { method: "PUT", body: { hidden } });
       await renderStudent(student.id, "settings");
       toast("生徒の画面に出すものを保存しました");
+    } catch (error) {
+      toast(error.message);
+      done(button);
+    }
+  });
+  const pronForm = document.getElementById("pron-months");
+  pronForm.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const button = pronForm.querySelector("button");
+    const months = pronMonths()
+      .filter((m) => pronForm.elements[`show-${m}`].checked)
+      .map((m) => ({ month: m, label: pronForm.elements[`label-${m}`].value.trim() || `Month ${m}` }));
+    if (!months.length) return toast("Month を1つ以上えらんでください");
+    // Every month under its own name is the usual, so nothing is kept.
+    const usual = months.length === pronMonths().length && months.every((m) => m.label === `Month ${m.month}`);
+    busy(button, "保存中…");
+    try {
+      await api(`/api/teacher/students/${student.id}/pron-months`, { method: "PUT", body: { months: usual ? [] : months } });
+      await renderStudent(student.id, "settings");
+      toast("発音課題の Month を保存しました");
     } catch (error) {
       toast(error.message);
       done(button);
