@@ -7,13 +7,14 @@ import {
 import { UNITS, findLesson, plain, questionCount } from "./grammar/lessons.js";
 import { bookWeeks, setKey, speakable, splitOnForm, weekWords, wordSets } from "./vocab/words.js";
 import { MONTHS, currentMonth, monthPhrases, pronMonths } from "./pron/phrases.js";
-import { CURRENT_WEEK } from "./course.js";
+import { CURRENT_WEEK, NOTES_FOR_STUDENTS } from "./course.js";
 import { TOPICS } from "./journal/topics.js";
 import {
   TEST_SIZE, phraseByKey, phraseSetKey, phraseSets, phraseWeeks, setDrills, setNumbers, setScenes, testSize, weekPhrases,
   weekTitle,
 } from "./phrases/book.js";
 import { findMistakes, normalizeWords } from "./mistakes.js";
+import { noteDayLabel, noteHtml as memoHtml, noteProblems } from "./notes/format.js";
 import {
   appMinutes, bindPanels, formatMinutes, monthPanel, monthStart, startStudyClock, studySplit, summary, today,
   totalMinutes, weekDays, weekPanel, weekStart,
@@ -22,7 +23,7 @@ import {
 const app = document.getElementById("app");
 const state = {
   me: null, vocab: null, vocabTest: null, review: null, pron: { which: null, index: 0 }, grammar: null, lesson: null, aiError: {},
-  study: null,
+  study: null, notes: {}, quiz: null,
 };
 
 const asterisk = `<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><g stroke="currentColor" stroke-width="3.2" stroke-linecap="round"><path d="M12 3v18"/><path d="M4.2 7.5l15.6 9"/><path d="M4.2 16.5l15.6-9"/></g></svg>`;
@@ -47,11 +48,12 @@ function render() {
   if (!state.me) return renderLogin();
   const [, screen, ...rest] = location.hash.split("/");
   shownAnswer = null;
+  closeQuiz();
   // Opening a pronunciation month goes to the first phrase that isn't 完了 yet.
   if (screen === "pron") state.pron = { which: null, index: 0 };
   const screens = {
     vocab: renderVocab, review: renderReview, phrases: renderPhrases, "phrase-review": renderPhraseReview, pron: renderPron,
-    grammar: renderGrammar, journal: renderJournal, study: renderStudy,
+    grammar: renderGrammar, journal: renderJournal, study: renderStudy, ...(NOTES_FOR_STUDENTS ? { notes: renderNotes } : {}),
   };
   (screens[screen] || renderHome)(...rest.map(decodeURIComponent));
 }
@@ -305,6 +307,7 @@ function renderHome() {
   const now = today();
   const week = summary(weekDays(state.me.study, weekStart(now)));
   const todayRow = state.me.study.find((r) => r.day === now);
+  const latestNote = state.me.notes[0];
 
   app.innerHTML = `
     <header class="topbar"><div class="topbar-in">
@@ -329,6 +332,10 @@ function renderHome() {
           <span class="emoji" aria-hidden="true">${done ? "✅" : "✍️"}</span>
           <div><b>日記を書く</b><p class="muted">${done ? "今日の日記は書けました！" : "今日のお題で、英語の日記を書こう"}</p></div>
         </a>
+        ${NOTES_FOR_STUDENTS ? `<a class="tile wide" href="#/notes">
+          <span class="emoji" aria-hidden="true">📝</span>
+          <div><b>授業メモ</b><p class="muted">${latestNote ? `${esc(noteDayLabel(latestNote.day))}${latestNote.title ? ` ・ ${esc(latestNote.title)}` : ""}` : "授業のあとに、先生のメモがとどきます"}</p></div>
+        </a>` : ""}
         <a class="tile" href="#/vocab">
           <span class="emoji" aria-hidden="true">🃏</span><b>単語カード</b>
           <span class="muted">${sets.length ? `Week ${CURRENT_WEEK} ・ テスト ${tested} / ${sets.length}` : "まだありません"}</span>
@@ -375,6 +382,109 @@ function renderHome() {
     location.hash = "";
     render();
   });
+}
+
+// ---------- 授業メモ ----------
+// The teacher's memo of each lesson, newest first. A memo's 復習問題 open in a
+// panel at the bottom of the screen, so the memo can still be read above it.
+
+function renderNotes(id) {
+  if (id) return renderNote(Number(id));
+  const notes = state.me.notes;
+  app.innerHTML = `${topbar("授業メモ")}
+    <main class="wrap stack">
+      ${notes.length ? `<p class="muted">授業で習ったことのまとめです。復習問題で、いつでも復習できます。</p>` : ""}
+      ${notes.length ? notes.map((note) => `<a class="lesson-card" href="#/notes/${note.id}">
+          <div><b>${esc(noteDayLabel(note.day))}</b>${note.title ? `<span class="muted small">${esc(note.title)}</span>` : ""}</div>
+          ${note.problems ? `<span class="badge">復習問題 ${note.problems}問</span>` : ""}
+        </a>`).join("") : emptyState("まだ授業メモはありません。<br>授業のあとに、先生のメモがここにとどきます。")}
+    </main>`;
+}
+
+async function renderNote(id) {
+  let note = state.notes[id];
+  if (!note) {
+    app.innerHTML = `${topbar("授業メモ", "#/notes")}<main class="wrap stack"><div class="card empty"><span class="spinner" aria-hidden="true"></span>読みこみ中…</div></main>`;
+    try {
+      note = state.notes[id] = (await api(`/api/notes/${id}`)).note;
+    } catch (error) {
+      if (location.hash !== `#/notes/${id}`) return;
+      app.innerHTML = `${topbar("授業メモ", "#/notes")}<main class="wrap stack">${emptyState(esc(error.message))}</main>`;
+      return;
+    }
+    if (location.hash !== `#/notes/${id}`) return;
+  }
+  const problems = noteProblems(note.body);
+  const quizButton = problems.length
+    ? `<button type="button" class="btn block quiz-start" data-quiz>復習問題にチャレンジ（${problems.length}問）</button>`
+    : "";
+  app.innerHTML = `${topbar(noteDayLabel(note.day), "#/notes")}
+    <main class="wrap stack note-page">
+      ${note.title ? `<h2 class="week-theme">${esc(note.title)}</h2>` : ""}
+      ${quizButton}
+      <article class="card note-body">${memoHtml(note.body)}</article>
+      ${quizButton}
+    </main>`;
+  app.querySelectorAll("[data-quiz]").forEach((button) => button.addEventListener("click", () => openQuiz(problems)));
+}
+
+function openQuiz(problems) {
+  state.quiz = { problems, index: 0, shown: false };
+  let sheet = document.getElementById("note-quiz");
+  if (!sheet) {
+    sheet = document.createElement("section");
+    sheet.id = "note-quiz";
+    sheet.className = "note-quiz";
+    sheet.setAttribute("aria-label", "復習問題");
+    document.body.append(sheet);
+  }
+  document.body.classList.add("quiz-open");
+  drawQuiz();
+}
+
+function closeQuiz() {
+  state.quiz = null;
+  document.getElementById("note-quiz")?.remove();
+  document.body.classList.remove("quiz-open");
+}
+
+function drawQuiz() {
+  const sheet = document.getElementById("note-quiz");
+  const quiz = state.quiz;
+  if (!sheet || !quiz) return;
+  const { problems, index, shown } = quiz;
+  const finished = index >= problems.length;
+  const p = problems[index];
+  sheet.innerHTML = `<div class="quiz-in">
+    <div class="quiz-head">
+      <b>${finished ? "復習問題" : `復習問題 ${index + 1} / ${problems.length}`}</b>
+      <button type="button" class="icon-btn" data-close aria-label="とじる">✕</button>
+    </div>
+    ${finished ? `
+      <p class="quiz-done">全部できました！おつかれさまでした 🎉</p>
+      <div class="btn-row">
+        <button type="button" class="btn secondary" data-again>もう一度</button>
+        <button type="button" class="btn" data-close>とじる</button>
+      </div>` : `
+      <p class="quiz-ja">${esc(p.ja)}</p>
+      <p class="muted small">英語で言ってみよう</p>
+      ${shown ? `<div class="quiz-answer">
+        <p lang="en">${esc(p.en)}</p>
+        ${sayButton(p.en)}
+      </div>` : ""}
+      <div class="btn-row">
+        ${index ? `<button type="button" class="btn secondary" data-back>前へ</button>` : ""}
+        ${shown
+          ? `<button type="button" class="btn" data-next>${index + 1 < problems.length ? "次へ" : "おわる"}</button>`
+          : `<button type="button" class="btn" data-show>答えを見る</button>`}
+      </div>`}
+  </div>`;
+  const on = (selector, action) => sheet.querySelectorAll(selector).forEach((b) => b.addEventListener("click", action));
+  on("[data-close]", closeQuiz);
+  on("[data-again]", () => { Object.assign(quiz, { index: 0, shown: false }); drawQuiz(); });
+  on("[data-show]", () => { quiz.shown = true; drawQuiz(); });
+  on("[data-next]", () => { Object.assign(quiz, { index: index + 1, shown: false }); drawQuiz(); });
+  on("[data-back]", () => { Object.assign(quiz, { index: index - 1, shown: false }); drawQuiz(); });
 }
 
 // ---------- study time ----------
@@ -1147,7 +1257,8 @@ function phraseCardHtml(phrase, revealed) {
       ${sayIcon(phrase.say)}
     </div>
     <p ${oneLine(phrase.ja)}>${esc(phrase.ja)}</p>
-    ${phrase.chunk ? `<div class="chunk-box"><p class="label">塊</p><p class="chunk" lang="en">${noteHtml(phrase.chunk)}</p></div>` : ""}
+    ${phrase.chunk ? `<div class="chunk-box"><p class="label">塊</p><p class="chunk" lang="en">${noteHtml(phrase.chunk)}</p>
+      ${phrase.chunkJa ? `<p class="chunk-ja">${noteHtml(phrase.chunkJa)}</p>` : ""}</div>` : ""}
     ${phrase.note ? `<div class="phrase-note"><p class="label">解説</p><p>${noteHtml(phrase.note)}</p></div>` : ""}
     ${phrase.example ? `<div class="phrase-example"><p class="label">例文</p>
       <div class="example-row">

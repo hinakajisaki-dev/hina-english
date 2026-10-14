@@ -54,3 +54,17 @@ textarea.bulk { font-family: var(--en); min-height: 140px; }
 
 .recording { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; margin-top: 6px; }
 .recording audio { height: 36px; max-width: 100%; }
+
+/* 授業メモ */
+.note-meta { display: grid; gap: 12px; grid-template-columns: minmax(0, 180px) minmax(0, 1fr); }
+@media (max-width: 520px) { .note-meta { grid-template-columns: minmax(0, 1fr); } }
+#note-form textarea { min-height: 260px; font-size: 14px; line-height: 1.6; }
+.note-preview { background: var(--paper); box-shadow: none; }
+.note-entry { padding: 0; overflow: hidden; }
+.note-entry > summary { list-style: none; cursor: pointer; padding: 14px 18px; display: flex; flex-direction: column; gap: 2px; }
+.note-entry > summary::-webkit-details-marker { display: none; }
+.note-entry[open] > summary { border-bottom: 1px solid var(--line); }
+.note-open { padding: 16px 18px 18px; }
+.note-problems { border-radius: 14px; padding: 12px 14px; background: var(--sky-soft); font-size: 14px; }
+.note-problems ol { margin: 0; padding-left: 1.4em; }
+.note-problems li + li { margin-top: 6px; }

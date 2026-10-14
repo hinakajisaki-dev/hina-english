@@ -1,7 +1,8 @@
 // Turns a スモールトーク week (smalltalk/weekN.md, the course material) into
-// public/phrases/weekN.js, checking that every phrase has its 和訳, 塊, 解説 and
-// 例文. 塊 and 解説 come one line per "  - " item under "- 塊：" / "- 解説："
-// (a one-line 塊 may follow "- 塊：" directly) and become "\n"-joined lines;
+// public/phrases/weekN.js, checking that every phrase has its 和訳, 塊, 塊の意味
+// and 例文 (解説 is optional). 塊, 塊の意味 and 解説 come one line per "  - " item
+// under "- 塊：" / "- 塊の意味：" / "- 解説：" (a one-line one may follow the
+// colon directly) and become "\n"-joined lines;
 // 例文 is "English（和訳）". The rules for writing them are in smalltalk/README.md.
 //
 //   node scripts/smalltalk-to-js.mjs path/to/week2.md 2 "smalltalk/week2.md" > public/phrases/week2.js
@@ -31,14 +32,15 @@ for (const raw of lines) {
   if ((m = line.match(/^## Day (\d+)/))) { day = Number(m[1]); continue; }
   if ((m = line.match(/^### (.+)$/))) { scene = m[1].replace(/（つづき）$/, "").trim(); continue; }
   if ((m = line.match(/^#### (\d+)\. (.+)$/))) {
-    cur = { id: String(m[1]).padStart(2, "0"), n: Number(m[1]), day, scene, en: m[2].trim(), ja: "", chunk: [], note: [], example: null, drills: [] };
+    cur = { id: String(m[1]).padStart(2, "0"), n: Number(m[1]), day, scene, en: m[2].trim(), ja: "", chunk: [], chunkJa: [], note: [], example: null, drills: [] };
     phrases.push(cur); drill = null; section = null; continue;
   }
   if (!cur) continue;
-  if ((m = line.match(/^ {2}- (.+)$/)) && (section === "chunk" || section === "note")) { cur[section].push(m[1].trim()); continue; }
+  if ((m = line.match(/^ {2}- (.+)$/)) && ["chunk", "chunkJa", "note"].includes(section)) { cur[section].push(m[1].trim()); continue; }
   if (line.startsWith("- ")) { section = null; drill = null; }
   if ((m = line.match(/^- 和訳：(.+)$/))) cur.ja = m[1].trim();
   else if ((m = line.match(/^- 塊：(.*)$/))) { section = "chunk"; if (m[1].trim()) cur.chunk.push(m[1].trim()); }
+  else if ((m = line.match(/^- 塊の意味：(.*)$/))) { section = "chunkJa"; if (m[1].trim()) cur.chunkJa.push(m[1].trim()); }
   else if ((m = line.match(/^- 解説：(.*)$/))) { section = "note"; if (m[1].trim()) cur.note.push(m[1].trim()); }
   else if ((m = line.match(/^- 例文：(.+)$/))) cur.example = example(m[1].trim(), cur.n);
   else if (/^- 瞬間英作文：なし/.test(line)) {}
@@ -49,6 +51,7 @@ for (const raw of lines) {
 // 塊 and 解説 lines become one text each.
 for (const p of phrases) {
   p.chunk = p.chunk.join("\n");
+  p.chunkJa = p.chunkJa.join("\n");
   p.note = p.note.join("\n");
 }
 
@@ -65,7 +68,7 @@ for (const [n, to] of Object.entries(overrides.replies || {})) need(n, "replies"
 // Numbers run on from week to week (Week 2 starts at #50); they must not skip.
 phrases.forEach((p, i) => {
   if (p.n !== phrases[0].n + i) throw new Error(`numbering at ${p.n}`);
-  for (const k of ["day", "scene", "en", "ja", "chunk", "note", "example"]) if (!p[k]) throw new Error(`#${p.n} has no ${k}`);
+  for (const k of ["day", "scene", "en", "ja", "chunk", "chunkJa", "example"]) if (!p[k]) throw new Error(`#${p.n} has no ${k}`);
 });
 const q = (v) => JSON.stringify(v);
 const out = [];
@@ -87,6 +90,7 @@ for (const p of phrases) {
   out.push(`      en: ${q(p.en)},`);
   out.push(`      ja: ${q(p.ja)},`);
   out.push(`      chunk: ${q(p.chunk)},`);
+  out.push(`      chunkJa: ${q(p.chunkJa)},`);
   out.push(`      note: ${q(p.note)},`);
   out.push(`      example: { en: ${q(p.example.en)}, ja: ${q(p.example.ja)} },`);
   if (p.drills.length) {

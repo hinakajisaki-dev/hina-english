@@ -13,7 +13,9 @@
 //   ja      和訳
 //   chunk   塊: the form to learn ("How is 名詞?", optional; \n starts a
 //           new line, one form per line)
-//   note    解説: how the chunk works (optional; \n starts a new line)
+//   chunkJa 塊の意味: what the chunk means, and other forms that mean the same
+//           ("What about you? も同じ意味"), shown with the 塊 (optional; \n new line)
+//   note    解説: how to use it (optional; \n starts a new line)
 //   example 例文: one more sentence with the chunk, { en, ja }, shown under the
 //           解説 with its own 🔊 (optional)
 //   drills  瞬間英作文 with the chunk, up to two (none is fine):
@@ -55,6 +57,7 @@ export function weekPhrases(week) {
     say: p.say || speakable(p.en),
     ja: p.ja,
     chunk: p.chunk || "",
+    chunkJa: p.chunkJa || "",
     note: p.note || "",
     example: p.example || null,
     drills: (p.drills || []).map((drill, n) => ({ ja: drill.ja, answers: drill.answers, hint: drill.hint || "", n })),

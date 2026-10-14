@@ -5,13 +5,14 @@ import { ApiError, api, diffHtml, esc, formatDateTime, icons, startOfJapanDay, t
 import { UNITS } from "./grammar/lessons.js";
 import { bookWeeks, bookWords, setKey, weekWords, wordSets } from "./vocab/words.js";
 import { currentMonth, monthPhrases, pronMonths } from "./pron/phrases.js";
-import { CURRENT_WEEK } from "./course.js";
+import { CURRENT_WEEK, NOTES_FOR_STUDENTS } from "./course.js";
 import { phraseSetKey, phraseSets, phraseWeeks, testSize } from "./phrases/book.js";
+import { noteDayLabel, noteHtml, noteProblems } from "./notes/format.js";
 import { bindPanels, formatMinutes, monthPanel, monthStart, summary, today, weekDays, weekPanel, weekStart } from "./study.js";
 
 document.body.classList.add("teacher");
 const app = document.getElementById("app");
-const state = { students: [], current: null, vocabWeek: null, studyView: null };
+const state = { students: [], current: null, vocabWeek: null, studyView: null, noteEdit: null };
 const WEEKS = 24;
 
 const KINDS = {
@@ -217,6 +218,7 @@ async function renderStudent(id, tab) {
 
   const tabs = [
     ["journals", `日記${unread ? `（未読 ${unread}）` : ""}`],
+    ["notes", `授業メモ ${data.notes.length}`],
     ["study", "勉強時間"],
     ...Object.entries(KINDS).flatMap(([kind, spec]) => [
       [kind, `${spec.tab} ${byKind(kind).length}`],
@@ -251,6 +253,7 @@ async function renderStudent(id, tab) {
   if (tab === "journals") renderJournals(panel);
   else if (tab === "study") renderStudyTab(panel);
   else if (tab === "settings") renderSettings(panel);
+  else if (tab === "notes") renderNotes(panel);
   else if (tab === "phrases") panel.innerHTML = phraseResultsHtml();
   else if (KINDS[tab]) renderItems(panel, tab);
   else renderJournals(panel);
@@ -321,6 +324,151 @@ function renderJournals(panel) {
         toast(error.message);
       }
       done(button);
+    });
+  });
+}
+
+// ---------- 授業メモ ----------
+// The memo is organized in the student's own chat with Claude and pasted here
+// (docs/lesson-notes.md has the format). The student sees it once it is
+// published; its 復習問題 become the 復習問題にチャレンジ button.
+
+const NOTE_PLACEHOLDER = `## 1. 英作文：日曜日のこと（日本語 → 英語）
+**問題**：日曜日に家族と海へ行きました。
+**答え**：I went to the beach on Sunday with my family.
+
+## 2. When 〜（〜な時）
+- When I want to 〇〇 ＝ 〇〇したい時
+  - ✗ … → ○ …
+
+## 復習問題
+| 日本語 | 英語 |
+| --- | --- |
+| 日曜日に家族と海へ行きました | I went to the beach on Sunday with my family. |`;
+
+// The memo as the student will see it, with its 復習問題 listed for checking.
+function notePreviewHtml(body) {
+  const problems = noteProblems(body);
+  return `<div class="note-body">${noteHtml(body)}</div>
+    <div class="note-problems stack">
+      <p><b>復習問題 ${problems.length} 問</b><span class="muted small">（生徒には「復習問題にチャレンジ」ボタンで、1問ずつ出ます）</span></p>
+      ${problems.length
+        ? `<ol>${problems.map((p) => `<li>${esc(p.ja)}<br><span lang="en">${esc(p.en)}</span></li>`).join("")}</ol>`
+        : `<p class="notice small">復習問題がありません。いちばん最後に「## 復習問題」と「| 日本語 | 英語 |」の表を入れると、ボタンになります。</p>`}
+    </div>`;
+}
+
+function renderNotes(panel) {
+  const { student, notes } = state.current;
+  const editing = notes.find((n) => n.id === state.noteEdit?.id && state.noteEdit.student === student.id) || null;
+  panel.innerHTML = `<div class="stack">
+    <form class="card stack" id="note-form">
+      <h3>${editing ? `メモを直す（${esc(noteDayLabel(editing.day))}）` : "新しい授業メモ"}</h3>
+      <p class="muted small">${esc(student.name)}さんのチャットで整理したメモを、そのまま貼りつけてください。「公開する」を押すまで、生徒には見えません。</p>
+      ${NOTES_FOR_STUDENTS ? "" : `<p class="notice small">いまは、生徒の画面に授業メモを出していません。公開しても、生徒にはまだ見えません（出すときは Claude に頼んでください）。</p>`}
+      <div class="note-meta">
+        <label class="field"><span>授業の日</span>
+          <input type="date" name="day" required value="${esc(editing?.day || today())}">
+        </label>
+        <label class="field"><span>タイトル（なくてもOK）</span>
+          <input type="text" name="title" maxlength="100" placeholder="例：When I 〜 ／ will と be going to" value="${esc(editing?.title || "")}">
+        </label>
+      </div>
+      <label class="field"><span>メモの本文</span>
+        <textarea name="body" rows="14" placeholder="${esc(NOTE_PLACEHOLDER)}">${esc(editing?.body || "")}</textarea>
+      </label>
+      <p class="notice bad" id="note-error" role="alert" hidden></p>
+      <div class="btn-row" style="justify-content:flex-start">
+        <button class="btn secondary" type="button" data-preview style="flex:none">プレビュー</button>
+        <button class="btn secondary" type="submit" data-publish="${editing?.published_at ? "keep" : "no"}" style="flex:none">${editing?.published_at ? "保存（公開中）" : "下書き保存"}</button>
+        ${editing?.published_at ? "" : `<button class="btn" type="submit" data-publish="yes" style="flex:none">保存して公開する</button>`}
+        ${editing ? `<button class="btn ghost" type="button" data-cancel style="flex:none">やめる</button>` : ""}
+      </div>
+      <div class="note-preview card" id="note-preview" hidden></div>
+    </form>
+    ${notes.length ? notes.map((note) => `
+      <details class="card note-entry" data-id="${note.id}">
+        <summary>
+          <div class="badges">
+            <b>${esc(noteDayLabel(note.day))}</b>
+            ${note.published_at ? `<span class="badge teacher">公開中</span>` : `<span class="badge waiting">下書き</span>`}
+          </div>
+          ${note.title ? `<span class="muted small">${esc(note.title)}</span>` : ""}
+        </summary>
+        <div class="stack note-open">
+          <div class="btn-row" style="justify-content:flex-start">
+            <button class="btn secondary small-btn" type="button" data-edit style="flex:none">直す</button>
+            <button class="btn ${note.published_at ? "secondary" : ""} small-btn" type="button" data-toggle style="flex:none">${note.published_at ? "公開をやめる" : "公開する"}</button>
+            <button class="btn ghost small-btn" type="button" data-delete style="flex:none">削除</button>
+          </div>
+          ${note.published_at ? `<p class="muted small">${esc(formatDateTime(note.published_at))} に公開</p>` : ""}
+          ${notePreviewHtml(note.body)}
+        </div>
+      </details>`).join("") : `<div class="card empty">まだ授業メモはありません。</div>`}
+  </div>`;
+
+  const form = document.getElementById("note-form");
+  const preview = document.getElementById("note-preview");
+  const error = document.getElementById("note-error");
+  form.querySelector("[data-preview]").addEventListener("click", () => {
+    preview.innerHTML = form.body.value.trim() ? notePreviewHtml(form.body.value) : `<p class="muted">本文がまだありません。</p>`;
+    preview.hidden = false;
+    preview.scrollIntoView({ behavior: "smooth", block: "start" });
+  });
+  form.querySelector("[data-cancel]")?.addEventListener("click", () => {
+    state.noteEdit = null;
+    renderNotes(panel);
+  });
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const button = event.submitter;
+    const publish = { yes: true, no: false }[button?.dataset.publish];
+    if (publish && !confirm(`${student.name}さんに公開しますか？`)) return;
+    error.hidden = true;
+    busy(button, "保存中…");
+    try {
+      const body = { day: form.day.value, title: form.title.value, body: form.body.value, publish };
+      const { note } = editing
+        ? await api(`/api/teacher/notes/${editing.id}`, { method: "PUT", body })
+        : await api(`/api/teacher/students/${student.id}/notes`, { method: "POST", body });
+      state.noteEdit = null;
+      toast(note.published_at ? (editing?.published_at ? "保存しました（公開中）" : "公開しました") : "下書きを保存しました");
+      await renderStudent(student.id, "notes");
+    } catch (err) {
+      error.textContent = err.message;
+      error.hidden = false;
+      done(button);
+    }
+  });
+
+  panel.querySelectorAll(".note-entry").forEach((entry) => {
+    const note = notes.find((n) => n.id === Number(entry.dataset.id));
+    entry.querySelector("[data-edit]").addEventListener("click", () => {
+      state.noteEdit = { student: student.id, id: note.id };
+      renderNotes(panel);
+      window.scrollTo(0, 0);
+    });
+    entry.querySelector("[data-toggle]").addEventListener("click", async () => {
+      const publish = !note.published_at;
+      if (!confirm(publish ? `${student.name}さんに公開しますか？` : "公開をやめますか？ 生徒の画面から見えなくなります。")) return;
+      try {
+        await api(`/api/teacher/notes/${note.id}`, { method: "PUT", body: { publish } });
+        toast(publish ? "公開しました" : "公開をやめました");
+        await renderStudent(student.id, "notes");
+      } catch (err) {
+        toast(err.message);
+      }
+    });
+    entry.querySelector("[data-delete]").addEventListener("click", async () => {
+      if (!confirm(`${noteDayLabel(note.day)}のメモを削除しますか？ 元にもどせません。`)) return;
+      try {
+        await api(`/api/teacher/notes/${note.id}`, { method: "DELETE" });
+        if (state.noteEdit?.id === note.id) state.noteEdit = null;
+        toast("削除しました");
+        await renderStudent(student.id, "notes");
+      } catch (err) {
+        toast(err.message);
+      }
     });
   });
 }
@@ -660,7 +808,7 @@ function renderSettings(panel) {
     </form>
     <section class="card stack danger">
       <h3>生徒を削除</h3>
-      <p class="muted small">この生徒の単語・フレーズ・問題・日記が、すべて消えます。元にもどせません。</p>
+      <p class="muted small">この生徒の単語・フレーズ・問題・日記・授業メモが、すべて消えます。元にもどせません。</p>
       <button class="btn bad" id="delete" style="align-self:flex-start">${esc(student.name)}さんを削除</button>
     </section>
   </div>`;

@@ -28,5 +28,6 @@
   "observability": {
     "logs": { "enabled": true }
   }
-  // ANTHROPIC_API_KEY and TEACHER_PASSWORD are secrets set in the dashboard (see README.md).
+  // ANTHROPIC_API_KEY, TEACHER_PASSWORD and TEACHER_API_TOKEN are secrets set in the dashboard
+  // (see README.md and docs/student-chats.md).
 }
