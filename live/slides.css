@@ -130,6 +130,8 @@ ol, ul { list-style: none; }
 
 /* ---------- cover ---------- */
 .cover { justify-content: center; align-items: center; background: #E3F4FA; } /* Okinawa sky */
+.cover.pop { background: #FFEFF4; }
+.bub { position: absolute; height: 72px; font-family: var(--hand); font-size: 36px; line-height: 72px; text-align: center; color: var(--accent-text); }
 .cover-card {
   position: relative;
   width: 820px;

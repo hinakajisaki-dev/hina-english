@@ -5,11 +5,21 @@
 //
 // 英文の書き方：[will] はオレンジ、{p:at the park} は場所（青）、{t:at 8pm} は時間（黄）、
 // {w:with my friends} はだれと（ピンク）。1行に収まらないところは <br> で改行します。
-const { esc, two, LOGO, deco, header, cover, ending, page } = require("../parts.cjs");
+const { esc, two, LOGO, deco, header, cover, ending, page, shapes, rays, star, sparkle } = require("../parts.cjs");
 
 // ---------- 中身 ----------
 
-const TITLE = { title: "ネイティブっぽく<br>長い文章で話す方法", subtitle: "Scott先生 × ひな コラボLIVE" };
+const TITLE = { title: "ネイティブっぽく<br>長い文章で話す方法", subtitle: "Scott先生 × ひな コラボLIVE", look: "pop" };
+
+// Scott先生の紹介。写真が届いたら PHOTO にファイル名（このフォルダに置く）を入れます。
+const SCOTT = {
+  photo: "",
+  profile: [
+    ["出身", "（あとで入れます）"],
+    ["経歴", "（あとで入れます）"],
+    ["ひとこと", "（あとで入れます）"],
+  ],
+};
 
 const WILL_ANSWERS = [
   ["[I will] study English.", "英語を勉強する"],
@@ -97,7 +107,6 @@ const slide = (cls, right, body) => `
 ${body}
   ${deco(LOGO)}
 </section>`;
-const timer = () => `<div class="timer"><div class="ring"><p class="tm">1:00</p><p class="tl">1 MINUTE</p></div></div>`;
 const hints = () => `<div class="hints"><span class="c p">at ＋ 場所</span><span class="c t">at ＋ 時間</span><span class="c w">with ＋ 人</span></div>`;
 
 function theme() {
@@ -108,11 +117,60 @@ function theme() {
     ["瞬間英作文", "will と can で練習"],
   ];
   return slide("theme r3", tag("TODAY'S THEME", "今日のテーマ"), `
-  <div class="guest"><span class="chip">SPECIAL GUEST</span><b>Scott先生</b></div>
   <h2 class="theme-t">ネイティブっぽく<br><span class="v">長い文章</span>で話せるようになる方法</h2>
   <ol class="steps4">
     ${steps.map(([k, d], i) => `<li><span class="sn">${i + 1}</span><p class="sk">${esc(k)}</p><p class="sd">${esc(d)}</p></li>`).join("\n    ")}
   </ol>`);
+}
+
+function scottIntro() {
+  const photo = SCOTT.photo
+    ? `<img class="photo" src="${esc(SCOTT.photo)}" alt="Scott先生">`
+    : `<div class="photo"><div class="ph-head"></div><div class="ph-body"></div><p class="ph-t">写真が入ります</p></div>`;
+  return slide("intro r2", tag("SPECIAL GUEST", "Scott先生"), `
+  <div class="in-body">
+    ${photo}
+    <div class="in-right">
+      <span class="chip">SPECIAL GUEST</span>
+      <p class="script">Hi, I'm Scott!</p>
+      <h2 class="in-name"><span class="en">Scott</span>先生</h2>
+      <dl class="prof">
+        ${SCOTT.profile.map(([k, v]) => `<div><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join("\n        ")}
+      </dl>
+    </div>
+  </div>`);
+}
+
+// The 1-minute chat challenges: an orange "stage" with a sunburst, the question, a big timer
+// and the three steps along the bottom.
+function stage({ rn, text, badge, title, question, ja, under, steps }) {
+  const [a, b] = title;
+  const logo = shapes(LOGO.map((d) => [d, "#F0521E"]));
+  const sparkles = shapes([
+    [star(1150, 170, 26), "#FFD966"],
+    [star(858, 262, 13), "#FFD966"],
+    [sparkle(884, 148, 17), "#FFFFFF"],
+    [sparkle(1240, 280, 12), "#FFFFFF"],
+    [sparkle(770, 560, 12), "#FFD966"],
+  ]);
+  return `
+<section class="slide stage r4">
+  ${shapes([[rays(1066, 415, 36), "#F36B3D"]])}${header(tag(rn, text))}
+  <div class="st-head"><span class="st-badge">${esc(badge)}</span><h2 class="st-title">${a} <span class="y">${b}</span></h2></div>
+  <div class="st-body">
+    <div class="st-q">
+      <p class="lab">QUESTION</p>
+      <p class="st-qen">What <span class="v">will</span> you do ${esc(question)}</p>
+      <p class="st-qja">${esc(ja)}</p>
+      ${under}
+    </div>
+    <div class="st-timer"><div class="st-ring"><p class="tm">1:00</p><p class="tl">1 MINUTE</p></div></div>
+  </div>
+  <ol class="st-steps">
+    ${steps.map((t, i) => `<li><span class="st-n">${i + 1}</span><span>${esc(t)}</span></li>`).join("\n    ")}
+  </ol>
+  ${logo}${sparkles}
+</section>`;
 }
 
 function willGrammar() {
@@ -143,16 +201,16 @@ function willAnswers() {
 }
 
 function challengeStage() {
-  return slide("challenge r4", tag("CHALLENGE STAGE", "1分間チャレンジ"), `
-  <div class="ch-body">
-    <div class="ch-left">
-      <p class="script">Challenge Stage!</p>
-      <h2 class="h2">1分間で、いくつ書ける？</h2>
-      <div class="qbox"><p class="qen">What <span class="v">will</span> you do tomorrow?</p><p class="blank">I will ＿＿＿＿＿.</p></div>
-      <p class="note"><span class="chip">チャットで参加</span>英語で、どんどん書き込んでね！</p>
-    </div>
-    ${timer()}
-  </div>`);
+  return stage({
+    rn: "CHALLENGE STAGE",
+    text: "1分間チャレンジ",
+    badge: "1分間で、いくつ書ける？",
+    title: ["CHALLENGE", "STAGE"],
+    question: "tomorrow?",
+    ja: "明日なにするの？",
+    under: `<p class="st-blank">I will ＿＿＿＿＿.</p>`,
+    steps: ["チャットを開く", "I will 〜 をどんどん書く", "1分で何個書けるかな？"],
+  });
 }
 
 function lessonTalk() {
@@ -193,7 +251,7 @@ function grow() {
 
 function challengeNative() {
   return slide("challenge2 r4", tag("CHALLENGE TIME", "ネイティブ版"), `
-  <p class="script">Native version!</p>
+  <p class="lab">CHALLENGE TIME</p>
   <h2 class="h2">前置詞 ＋ 名詞をつけて、もう一回！</h2>
   <div class="recipe"><span class="base"><span class="v">I will</span> ＿＿</span><span class="plus">＋</span><span class="c p">at ＋ 場所</span><span class="plus">＋</span><span class="c t">at ＋ 時間</span><span class="plus">＋</span><span class="c w">with ＋ 人</span></div>
   <div class="rounds3">
@@ -202,17 +260,16 @@ function challengeNative() {
 }
 
 function challengeRound([q, ja], i) {
-  return slide("cround r4", tag("CHALLENGE TIME", `ROUND ${i + 1}`), `
-  <div class="ch-body">
-    <div class="ch-left">
-      <p class="lab">ROUND ${i + 1}</p>
-      <p class="qbig">What <span class="v">will</span> you do<br>${esc(q)}</p>
-      <p class="qja">${esc(ja)}</p>
-      ${hints()}
-      <p class="note"><span class="chip">チャットで参加</span>1分間で、どんどん書き込んでね！</p>
-    </div>
-    ${timer()}
-  </div>`);
+  return stage({
+    rn: "CHALLENGE TIME",
+    text: `ROUND ${i + 1}`,
+    badge: `ROUND ${i + 1}　前置詞＋名詞で長く！`,
+    title: ["CHALLENGE", "TIME"],
+    question: q,
+    ja,
+    under: hints(),
+    steps: ["チャットを開く", "前置詞＋名詞で長く書く", "1分で何個書けるかな？"],
+  });
 }
 
 function talkTime() {
@@ -286,6 +343,7 @@ function shunkanQ(r, i, [ja, en], k, answer) {
 module.exports = () => {
   const slides = [
     cover(TITLE),
+    scottIntro(),
     theme(),
     willGrammar(),
     willAnswers(),

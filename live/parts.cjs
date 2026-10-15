@@ -71,9 +71,70 @@ function minsa(y, size, gap) {
 }
 const shapes = (list) => `<svg class="deco" viewBox="0 0 1280 720" aria-hidden="true">${list.map(([d, c]) => `<path d="${d}" style="fill: ${c}"/>`).join("")}</svg>`;
 
-// The title in a white card over an Okinawa beach: sky, sun, sea, white sand, a palm tree
-// and hibiscus, with a ミンサー織り band along the top.
-function cover({ title, subtitle }) {
+function roundRect(x, y, w, h, r) {
+  const k = r * 0.5523;
+  return `M ${x + r} ${y} L ${x + w - r} ${y} C ${f(x + w - r + k)} ${y} ${x + w} ${f(y + r - k)} ${x + w} ${y + r} L ${x + w} ${y + h - r} C ${x + w} ${f(y + h - r + k)} ${f(x + w - r + k)} ${y + h} ${x + w - r} ${y + h} L ${x + r} ${y + h} C ${f(x + r - k)} ${y + h} ${x} ${f(y + h - r + k)} ${x} ${y + h - r} L ${x} ${y + r} C ${x} ${f(y + r - k)} ${f(x + r - k)} ${y} ${x + r} ${y} Z`;
+}
+// A five-pointed star centred on (cx, cy).
+function star(cx, cy, r) {
+  const pts = Array.from({ length: 10 }, (_, k) => {
+    const a = ((-90 + k * 36) * Math.PI) / 180;
+    const rr = k % 2 ? r * 0.45 : r;
+    return [cx + Math.cos(a) * rr, cy + Math.sin(a) * rr];
+  });
+  return `M ${pts.map(pt).join(" L ")} Z`;
+}
+// A heart centred on (cx, cy), s wide.
+function heart(cx, cy, s) {
+  const at = (x, y) => pt([cx + x * s, cy + (y - 0.45) * s]);
+  return `M ${at(0, 0.3)} C ${at(0, 0)} ${at(-0.5, 0)} ${at(-0.5, 0.3)} C ${at(-0.5, 0.55)} ${at(-0.15, 0.7)} ${at(0, 0.9)} C ${at(0.15, 0.7)} ${at(0.5, 0.55)} ${at(0.5, 0.3)} C ${at(0.5, 0)} ${at(0, 0)} ${at(0, 0.3)} Z`;
+}
+// Polka dots over the whole slide, as one path.
+function polka(step, r) {
+  const dots = [];
+  for (let y = step / 2, row = 0; y < 720; y += step, row++) {
+    for (let x = row % 2 ? step : step / 2; x < 1280; x += step) dots.push(circle(x, y, r));
+  }
+  return dots.join(" ");
+}
+// Clips a polygon to the slide (Sutherland–Hodgman), so shapes never hang off the edge in the .pptx.
+function clipToSlide(points) {
+  const edges = [
+    [(p) => p[0] >= 0, (a, b) => [0, a[1] + ((b[1] - a[1]) * (0 - a[0])) / (b[0] - a[0])]],
+    [(p) => p[0] <= 1280, (a, b) => [1280, a[1] + ((b[1] - a[1]) * (1280 - a[0])) / (b[0] - a[0])]],
+    [(p) => p[1] >= 0, (a, b) => [a[0] + ((b[0] - a[0]) * (0 - a[1])) / (b[1] - a[1]), 0]],
+    [(p) => p[1] <= 720, (a, b) => [a[0] + ((b[0] - a[0]) * (720 - a[1])) / (b[1] - a[1]), 720]],
+  ];
+  let out = points;
+  for (const [inside, cross] of edges) {
+    const input = out;
+    out = [];
+    input.forEach((cur, i) => {
+      const prev = input[(i + input.length - 1) % input.length];
+      if (inside(cur)) {
+        if (!inside(prev)) out.push(cross(prev, cur));
+        out.push(cur);
+      } else if (inside(prev)) out.push(cross(prev, cur));
+    });
+  }
+  return out;
+}
+// Sunburst rays from (cx, cy): every other wedge of `count`, clipped to the slide.
+function rays(cx, cy, count) {
+  const wedges = [];
+  for (let k = 0; k < count; k += 2) {
+    const a1 = (k * 2 * Math.PI) / count;
+    const a2 = ((k + 1) * 2 * Math.PI) / count;
+    const poly = clipToSlide([[cx, cy], [cx + Math.cos(a1) * 2000, cy + Math.sin(a1) * 2000], [cx + Math.cos(a2) * 2000, cy + Math.sin(a2) * 2000]]);
+    if (poly.length > 2) wedges.push(`M ${poly.map(pt).join(" L ")} Z`);
+  }
+  return wedges.join(" ");
+}
+
+// Title slide decorations. "okinawa": sky, sun, sea, white sand, a palm tree and hibiscus,
+// with a ミンサー織り band along the top. "pop": polka dots, bright shapes, stars, hearts and
+// two speech bubbles.
+function okinawaScene() {
   const wave = (y, amp) =>
     `M 0 ${y} C 160 ${y - amp} 320 ${y + amp} 480 ${y} C 640 ${y - amp} 800 ${y + amp} 960 ${y} C 1120 ${y - amp} 1200 ${y + amp} 1280 ${y} L 1280 720 L 0 720 Z`;
   const fronds = [200, 225, 255, 290, 320, 350, 20].map((deg, k) => [leaf(1176, 424, 106, 21, deg), k % 2 ? "#23824F" : "#2E9E64"]);
@@ -101,9 +162,46 @@ function cover({ title, subtitle }) {
     [leaf(1052, 170, 64, 18, 200), "#2E9E64"],
     ...hibiscus(1052, 170, 40, "#FF6F91", "#D63A6A", -14),
   ]);
+  return { behind, front, extra: "" };
+}
+
+function popScene() {
+  const behind = shapes([
+    [polka(48, 4), "#FFFFFF"],
+    [circle(214, 176, 112), "#A9D3F3"],
+    [circle(1112, 128, 66), "#FFD966"],
+    [roundRect(972, 446, 184, 184, 46), "#FFB8C9"],
+    [circle(168, 566, 50), "#FF9C6E"],
+    [circle(640, 84, 9), "#FF9DB4"],
+    [circle(470, 640, 11), "#7DBDEB"],
+    [circle(860, 652, 9), "#FFC94A"],
+    [circle(1220, 330, 10), "#FF8A57"],
+    // speech bubbles (their words are in the HTML)
+    [roundRect(58, 300, 160, 72, 36), "#FFFFFF"],
+    ["M 176 366 L 214 394 L 196 362 Z", "#FFFFFF"],
+    [roundRect(1076, 258, 136, 72, 36), "#FFFFFF"],
+    ["M 1098 324 L 1074 352 L 1124 326 Z", "#FFFFFF"],
+  ]);
+  const front = shapes([
+    [star(1050, 176, 34), "#FFC94A"],
+    [star(262, 552, 22), "#F0521E"],
+    [heart(1190, 540, 46), "#FF6F91"],
+    [heart(118, 232, 28), "#FF9DB4"],
+    [sparkle(900, 620, 16), "#7DBDEB"],
+    [sparkle(380, 96, 14), "#FFC94A"],
+    [sparkle(1236, 430, 12), "#FF9DB4"],
+  ]);
+  const extra = `<p class="bub" style="left: 58px; top: 300px; width: 160px;">Hello!</p>
+  <p class="bub" style="left: 1076px; top: 258px; width: 136px;">Hi!</p>`;
+  return { behind, front, extra };
+}
+
+function cover({ title, subtitle, look = "okinawa" }) {
+  const { behind, front, extra } = look === "pop" ? popScene() : okinawaScene();
   return `
-<section class="slide cover">
+<section class="slide cover ${look}">
   ${behind}
+  ${extra}
   <div class="cover-card">
     <div class="ttl${title.includes("<br>") ? " two" : ""}"><div class="mk"></div><h1>${latin(title)}</h1></div>
     ${subtitle ? `<p class="sub">${esc(subtitle)}</p>` : ""}
@@ -148,4 +246,4 @@ ${slides.join("\n")}
 `;
 }
 
-module.exports = { esc, slot, hi, latin, two, asterisk, LOGO, deco, header, circle, rect, sparkle, leaf, hibiscus, minsa, shapes, cover, ending, page };
+module.exports = { esc, slot, hi, latin, two, asterisk, LOGO, deco, header, circle, rect, roundRect, sparkle, star, heart, leaf, hibiscus, minsa, polka, rays, shapes, cover, ending, page };
