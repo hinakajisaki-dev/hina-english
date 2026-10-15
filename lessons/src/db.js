@@ -160,7 +160,9 @@ const SCHEMA = [
   )`,
   // Other settings for one student, as JSON by name. pron_months: the 発音
   // months this student sees and their names, [{ month: 1, label: "Month 2" }]
-  // (public/pron/phrases.js studentMonths). No row: the usual.
+  // (public/pron/phrases.js studentMonths). vocab_books: the 単語帳 this student
+  // has instead of the shared one, by week, { "1": "ielts1" } (public/vocab/words.js).
+  // No row: the usual.
   `CREATE TABLE IF NOT EXISTS student_settings (
     student_id INTEGER NOT NULL REFERENCES students(id) ON DELETE CASCADE,
     name TEXT NOT NULL,
@@ -307,5 +309,6 @@ export async function studentBundle(db, studentId) {
     plan: plan ? { body: plan.body, updated_at: plan.updated_at } : null,
     hidden: menus ? JSON.parse(menus.hidden) : [],
     pronMonths: setting("pron_months"),
+    vocabBooks: setting("vocab_books"),
   };
 }

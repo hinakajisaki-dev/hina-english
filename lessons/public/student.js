@@ -299,7 +299,7 @@ function todaysTasks() {
 
 function renderHome() {
   // Progress counts this week's 単語 and フレーズ (course.js) and this month's 発音.
-  const sets = wordSets(studentWeekWords(CURRENT_WEEK)).map((s) => setKey(CURRENT_WEEK, s.number));
+  const sets = wordSets(studentWeekWords(CURRENT_WEEK)).map((s) => studentSetKey(CURRENT_WEEK, s.number));
   const tested = sets.filter((key) => state.me.vocabTests[key]).length;
   const review = reviewWords().length;
   const phraseTests = phraseTestCount(phraseWeeks().includes(CURRENT_WEEK) ? [CURRENT_WEEK] : []);
@@ -639,19 +639,21 @@ function renderStudyEdit(day) {
 }
 
 // ---------- vocab cards ----------
-// A week is the shared 単語帳 plus the teacher's words for this student, in
-// sets of ten. Each set: one card per word (with a 復習 checkbox), then a test.
+// A week is the student's 単語帳 (the shared one, or another the teacher gave
+// them: vocab/words.js) plus the teacher's words for this student, in sets of
+// ten. Each set: one card per word (with a 復習 checkbox), then a test.
 // Missed words and ticked words make the 復習 list.
 
 const WEEKS = 24;
 const weekLabel = (week) => (week === "other" ? "そのほか" : `Week ${week}`);
-const studentWeekWords = (week) => weekWords(week, state.me.items);
+const studentWeekWords = (week) => weekWords(week, state.me.items, state.me.vocabBooks);
+const studentSetKey = (week, number) => setKey(week, number, state.me.vocabBooks);
 const inReview = (key) => state.me.review.some((r) => r.key === key);
-const testResult = (week, number) => state.me.vocabTests[setKey(week, number)];
+const testResult = (week, number) => state.me.vocabTests[studentSetKey(week, number)];
 
 // Every word this student has, by key, so the 復習 list can find its words.
 function wordsByKey() {
-  const weeks = new Set([...bookWeeks(), ...items("vocab").map((v) => v.data.week || "other")]);
+  const weeks = new Set([...bookWeeks(state.me.vocabBooks), ...items("vocab").map((v) => v.data.week || "other")]);
   const map = new Map();
   for (const week of weeks) for (const w of studentWeekWords(week)) map.set(w.key, { ...w, week });
   return map;
@@ -728,7 +730,7 @@ function findSet(week, number) {
 function renderVocabSet(week, number) {
   const set = findSet(week, number);
   if (!set) return renderWeek(week);
-  const id = setKey(week, number);
+  const id = studentSetKey(week, number);
   if (state.vocab?.id !== id) state.vocab = { id, index: 0 };
   const V = state.vocab;
   const word = set.words[V.index];
@@ -833,7 +835,7 @@ function meaningChoices(word, pool) {
 function renderVocabTest(week, number) {
   const set = findSet(week, number);
   if (!set) return renderWeek(week);
-  const id = setKey(week, number);
+  const id = studentSetKey(week, number);
   if (state.vocabTest?.id !== id) {
     const pool = studentWeekWords(week);
     state.vocabTest = {
@@ -906,7 +908,7 @@ function renderVocabTestResult(week, set, rerender) {
   const missed = T.questions.filter((_, i) => !T.answers[i].right).map((q) => q.word);
   if (!T.saved) {
     T.saved = true;
-    const key = setKey(week, set.number);
+    const key = studentSetKey(week, set.number);
     const old = state.me.vocabTests[key];
     state.me.vocabTests[key] = {
       best: Math.max(old?.best ?? 0, score), last: score, total: T.questions.length, times: (old?.times ?? 0) + 1,

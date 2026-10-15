@@ -1,4 +1,5 @@
-// 単語帳 Week 1, from the teacher's slides. Every student gets the same words.
+// 単語帳 Week 1, from the teacher's slides: the shared book every student gets
+// for Week 1 (unless the teacher gives them another, see words.js).
 //
 // Each word: id (unique in the week, never change it: students' review lists
 // use it), word, meaning, examples, and pos when it differs from its group's.
@@ -8,6 +9,7 @@
 // 名詞 / 動詞 when one word's examples use it in different ways.
 
 export const WEEK1 = {
+  id: "w1",
   week: 1,
   title: "単語帳 Week 1",
   groups: [

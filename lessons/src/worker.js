@@ -7,7 +7,7 @@ import { AiError, correctJournal, judgeAnswer } from "./ai.js";
 import { SpeechError, speechFor } from "./speech.js";
 import { findLesson, lessonExampleSentences, plain, questionCount } from "../public/grammar/lessons.js";
 import { findMistakes } from "../public/mistakes.js";
-import { bookSentences, bookWords, setKey, weekWords, wordSets } from "../public/vocab/words.js";
+import { bookSentences, bookWord, setKey, vocabBooks, weekWords, wordSets } from "../public/vocab/words.js";
 import { findPhrase, pronMonths } from "../public/pron/phrases.js";
 import { phraseByKey, phraseSentences, phraseSetKey, phraseSets, testSize } from "../public/phrases/book.js";
 import { noteProblems } from "../public/notes/format.js";
@@ -153,6 +153,9 @@ async function route(request, env, url) {
   }
   if (parts[1] === "students" && parts[3] === "pron-months" && parts.length === 4 && method === "PUT") {
     return savePronMonths(request, db, await findStudent(db, id(2)));
+  }
+  if (parts[1] === "students" && parts[3] === "vocab-books" && parts.length === 4 && method === "PUT") {
+    return saveVocabBooks(request, db, await findStudent(db, id(2)));
   }
   if (parts[1] === "students" && parts[3] === "journals" && parts.length === 4 && method === "POST") {
     return importJournals(request, db, await findStudent(db, id(2)));
@@ -478,10 +481,9 @@ async function saveStudyDay(request, env, student, day) {
   return json({ day: { day, app_seconds: appSeconds, other_minutes: other, note } });
 }
 
-// A word key must be a 単語帳 word ("w1/go") or one of this student's own words ("item/12").
+// A word key must be a 単語帳 word ("w1/go", "ielts1/increase") or one of this student's own words ("item/12").
 async function requireWordKey(db, student, key) {
-  const book = key.match(/^w(\d+)\/(.+)$/);
-  if (book && bookWords(Number(book[1])).some((w) => w.key === key)) return;
+  if (!key.startsWith("item/") && bookWord(key)) return;
   const item = key.match(/^item\/(\d+)$/);
   if (item && (await first(db, `SELECT id FROM items WHERE id = ? AND student_id = ? AND kind = 'vocab'`, Number(item[1]), student.id))) {
     return;
@@ -493,7 +495,8 @@ async function requireWordKey(db, student, key) {
 async function saveVocabTest(request, env, student, weekParam, number) {
   const week = weekParam === "other" ? "other" : Number(weekParam);
   const items = (await all(env.DB, `SELECT * FROM items WHERE student_id = ? AND kind = 'vocab'`, student.id)).map(itemRow);
-  const set = wordSets(weekWords(week, items)).find((s) => s.number === number);
+  const books = await studentSetting(env.DB, student, "vocab_books");
+  const set = wordSets(weekWords(week, items, books)).find((s) => s.number === number);
   if (!set) throw new HttpError(404, "見つかりません。");
   const total = set.words.length;
   const { score } = await readJson(request);
@@ -504,7 +507,7 @@ async function saveVocabTest(request, env, student, weekParam, number) {
      VALUES (?1, ?2, ?3, ?3, ?4, 1, ?5)
      ON CONFLICT (student_id, set_key) DO UPDATE SET
        best_score = MAX(best_score, ?3), last_score = ?3, total = ?4, times = times + 1, updated_at = ?5`,
-    student.id, setKey(week, number), clean, total, now(),
+    student.id, setKey(week, number, books), clean, total, now(),
   );
   return json({ ok: true });
 }
@@ -879,6 +882,38 @@ async function savePronMonths(request, db, student) {
     student.id, JSON.stringify(clean), now(),
   );
   return json({ months: clean });
+}
+
+// The 単語帳 this student has instead of the shared one, by week:
+// { books: { "1": "ielts1" } }. An empty object is the usual (every week's
+// shared book). Words, 復習 and test results of the other book stay, unseen.
+async function saveVocabBooks(request, db, student) {
+  const { books } = await readJson(request);
+  if (!books || typeof books !== "object" || Array.isArray(books)) throw new HttpError(400, "内容が正しくありません。");
+  const have = vocabBooks();
+  const clean = {};
+  for (const [week, id] of Object.entries(books)) {
+    const book = have.find((b) => b.id === id);
+    if (!book) throw new HttpError(400, `「${id}」という単語帳はありません（あるのは ${have.map((b) => b.id).join("・")}）。`);
+    if (String(book.week) !== String(week)) throw new HttpError(400, `${book.title} は Week ${book.week} の単語帳です。`);
+    if (!book.shared) clean[book.week] = book.id;
+  }
+  if (!Object.keys(clean).length) {
+    await run(db, `DELETE FROM student_settings WHERE student_id = ? AND name = 'vocab_books'`, student.id);
+    return json({ books: null });
+  }
+  await run(
+    db,
+    `INSERT INTO student_settings (student_id, name, value, updated_at) VALUES (?1, 'vocab_books', ?2, ?3)
+     ON CONFLICT (student_id, name) DO UPDATE SET value = ?2, updated_at = ?3`,
+    student.id, JSON.stringify(clean), now(),
+  );
+  return json({ books: clean });
+}
+
+async function studentSetting(db, student, name) {
+  const row = await first(db, `SELECT value FROM student_settings WHERE student_id = ? AND name = ?`, student.id, name);
+  return row ? JSON.parse(row.value) : null;
 }
 
 // Past diaries from before the app: { entries: [{ day: "2026-08-03", body, topic }] }.

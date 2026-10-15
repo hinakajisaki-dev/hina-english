@@ -3,7 +3,7 @@
 // their journals with the AI corrections.
 import { ApiError, api, diffHtml, esc, formatDateTime, icons, startOfJapanDay, toast } from "./common.js";
 import { UNITS } from "./grammar/lessons.js";
-import { bookWeeks, bookWords, setKey, weekWords, wordSets } from "./vocab/words.js";
+import { bookWeeks, setKey, vocabBooks, weekBook, weekWords, wordSets } from "./vocab/words.js";
 import { USUAL_MONTHS, currentMonth, monthLabel, monthPhrases, pronMonths, studentMonths } from "./pron/phrases.js";
 import { CURRENT_WEEK, NOTES_FOR_STUDENTS } from "./course.js";
 import { MENUS } from "./menus.js";
@@ -562,14 +562,15 @@ function renderItems(panel, kind) {
   }
   const weekName = week === "other" ? "そのほか" : `Week ${week}`;
 
-  const book = kind === "vocab" && week !== "other" ? bookWords(week).length : 0;
+  const bookId = kind === "vocab" && week !== "other" ? weekBook(week, state.current.vocabBooks) : null;
+  const bookInfo = bookId && vocabBooks().find((b) => b.id === bookId);
   panel.innerHTML = `<div class="stack">
     ${kind === "grammar" ? lessonResultsHtml() : ""}
     ${kind === "vocab" ? vocabResultsHtml() : ""}
     ${kind === "pron" ? pronRecordingsHtml() : ""}
     <section class="card stack">
       ${weekPicker}
-      ${book ? `<p class="notice">${weekName} には、全員共通の単語帳（${book} 語）が入っています。ここで足した単語は、この生徒の ${weekName} の最後に加わります。</p>` : ""}
+      ${bookInfo ? `<p class="notice">${weekName} には、${bookInfo.shared ? "全員共通の単語帳" : `この生徒の単語帳「${esc(bookInfo.title)}」`}（${bookInfo.count} 語）が入っています。ここで足した単語は、この生徒の ${weekName} の最後に加わります。</p>` : ""}
       <h3>${week ? `${weekName} に` : ""}${kind === "grammar" ? "先生からの問題（この生徒だけ）" : esc(spec.tab)}を追加</h3>
       <p class="format">1行に1つ。区切りは <code>|</code>（またはスプレッドシートからそのまま貼りつけ）<br>${esc(spec.format)}</p>
       <form id="bulk" class="stack">
@@ -679,11 +680,31 @@ function lessonResultsHtml() {
   </section>`;
 }
 
-// Every ten-word set this student has (単語帳 and their own words), with its key.
+// Weeks with more than one 単語帳 to choose from.
+const choiceWeeks = () => [...new Set(vocabBooks().map((b) => b.week))]
+  .filter((week) => vocabBooks().filter((b) => b.week === week).length > 1);
+
+// The 単語帳 this student has for each week that has a choice.
+function vocabBooksForm() {
+  const weeks = choiceWeeks();
+  if (!weeks.length) return "";
+  return `<form class="card stack" id="vocab-books">
+    <h3>単語帳</h3>
+    <p class="muted small">Week ごとに、この生徒に出す単語帳です。ほかの単語帳にすると、全員共通の単語帳はこの生徒には出ません（覚えた記録は残ります）。生徒ごとのチャットからも変えられます。</p>
+    ${weeks.map((week) => `<label class="field"><span>Week ${week}</span>
+      <select name="week-${week}">${vocabBooks().filter((b) => b.week === week).map((b) =>
+        `<option value="${esc(b.id)}" ${weekBook(week, state.current.vocabBooks) === b.id ? "selected" : ""}>${esc(b.title)}（${b.count} 語${b.shared ? "・全員共通" : ""}）</option>`).join("")}</select>
+    </label>`).join("")}
+    <button class="btn" type="submit" style="align-self:flex-start">保存</button>
+  </form>`;
+}
+
+// Every ten-word set this student has (their 単語帳 and own words), with its key.
 function vocabSetList(data) {
-  const weeks = [...new Set([...bookWeeks(), ...data.items.filter((i) => i.kind === "vocab").map((i) => i.data.week || "other")])];
+  const books = data.vocabBooks;
+  const weeks = [...new Set([...bookWeeks(books), ...data.items.filter((i) => i.kind === "vocab").map((i) => i.data.week || "other")])];
   return weeks.flatMap((week) =>
-    wordSets(weekWords(week, data.items)).map((set) => ({ week, ...set, key: setKey(week, set.number) })),
+    wordSets(weekWords(week, data.items, books)).map((set) => ({ week, ...set, key: setKey(week, set.number, books) })),
   );
 }
 
@@ -825,6 +846,7 @@ function renderSettings(panel) {
       }).join("")}</ul>
       <button class="btn" type="submit" style="align-self:flex-start">保存</button>
     </form>
+    ${vocabBooksForm()}
     <form class="card stack" id="plan">
       <h3>今週の勉強範囲</h3>
       <p class="muted small">生徒のホームのいちばん上に出ます。空にして保存すると消えます。生徒ごとのチャットからも変えられます。</p>
@@ -892,6 +914,22 @@ function renderSettings(panel) {
       await api(`/api/teacher/students/${student.id}/pron-months`, { method: "PUT", body: { months: usual ? [] : months } });
       await renderStudent(student.id, "settings");
       toast("発音課題の Month を保存しました");
+    } catch (error) {
+      toast(error.message);
+      done(button);
+    }
+  });
+  const booksForm = document.getElementById("vocab-books");
+  booksForm?.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const button = booksForm.querySelector("button");
+    const books = {};
+    for (const week of choiceWeeks()) books[week] = booksForm.elements[`week-${week}`].value;
+    busy(button, "保存中…");
+    try {
+      await api(`/api/teacher/students/${student.id}/vocab-books`, { method: "PUT", body: { books } });
+      await renderStudent(student.id, "settings");
+      toast("単語帳を保存しました");
     } catch (error) {
       toast(error.message);
       done(button);

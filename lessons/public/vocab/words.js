@@ -1,21 +1,40 @@
 // Vocabulary shared by the student app and the server.
 //
-// A week's words are the shared 単語帳 for that week (same for every student)
-// followed by any words the teacher added for this one student. Every word
-// gets a key: "w1/go" for a 単語帳 word, "item/12" for a teacher's word. The
-// review list and test results are stored by these keys.
+// A week's words are that week's 単語帳 followed by any words the teacher
+// added for this one student. Every week has one shared 単語帳 ("w1") that
+// students get; the teacher can give a student another book for a week instead
+// (vocab_books, like { "1": "ielts1" }), and that student sees only it. Every
+// word gets a key: "w1/go" or "ielts1/increase" for a 単語帳 word (its book's id,
+// then the word's), "item/12" for a teacher's word. The review list and test
+// results are stored by these keys.
 import { WEEK1 } from "./week1.js";
+import { IELTS1 } from "./ielts1.js";
 
-const BOOKS = { 1: WEEK1 };
+const BOOKS = [WEEK1, IELTS1];
 export const SET_SIZE = 10;
 
-// The 単語帳 words of one week, in slide order.
-export function bookWords(week) {
-  const book = BOOKS[week];
+const findBook = (id) => BOOKS.find((b) => b.id === id) || null;
+const sharedBook = (week) => `w${week}`;
+
+// Every 単語帳: { id, week, title, count, shared } (shared: the one everyone gets that week).
+export const vocabBooks = () =>
+  BOOKS.map((b) => ({ id: b.id, week: b.week, title: b.title, count: bookWords(b.id).length, shared: b.id === sharedBook(b.week) }));
+
+// The 単語帳 a student has for a week: the one the teacher gave them (books is
+// the vocab_books setting, or null), else the shared one; null when there is none.
+export function weekBook(week, books) {
+  const picked = books?.[week];
+  if (picked && findBook(picked)) return picked;
+  return findBook(sharedBook(week)) ? sharedBook(week) : null;
+}
+
+// The words of one 単語帳, in its order.
+export function bookWords(id) {
+  const book = findBook(id);
   if (!book) return [];
   return book.groups.flatMap((group) =>
     group.words.map((w) => ({
-      key: `w${week}/${w.id}`,
+      key: `${book.id}/${w.id}`,
       word: w.word,
       meaning: w.meaning,
       pos: w.pos || group.pos,
@@ -23,6 +42,12 @@ export function bookWords(week) {
       examples: w.examples,
     })),
   );
+}
+
+// A 単語帳 word by its key ("ielts1/increase"), from any book.
+export function bookWord(key) {
+  const id = String(key).split("/")[0];
+  return bookWords(id).find((w) => w.key === key) || null;
 }
 
 // A word the teacher added for one student (kind "vocab"): one example at most.
@@ -39,14 +64,16 @@ export function itemWord(item) {
   };
 }
 
-// All words of a week for one student: the 単語帳 first, then the teacher's.
-export function weekWords(week, items = []) {
+// All words of a week for one student: their 単語帳 first, then the teacher's.
+export function weekWords(week, items = [], books = null) {
   const own = items.filter((item) => item.kind === "vocab" && (item.data.week || "other") === week).map(itemWord);
-  return [...bookWords(week), ...own];
+  const book = week === "other" ? null : weekBook(week, books);
+  return [...(book ? bookWords(book) : []), ...own];
 }
 
-// Weeks that have a 単語帳.
-export const bookWeeks = () => Object.keys(BOOKS).map(Number);
+// Weeks that have a 単語帳 for this student.
+export const bookWeeks = (books = null) =>
+  [...new Set(BOOKS.map((b) => b.week))].filter((week) => weekBook(week, books)).sort((a, b) => a - b);
 
 // Words in sets of ten; each set ends with a test. Titles name the slide
 // groups it covers (動詞 ①・②).
@@ -69,13 +96,16 @@ function setTitle(groups) {
   return groups.join("・");
 }
 
-export const setKey = (week, number) => `w${week}/s${number}`;
+// A set's test results are kept under its book ("w1/s3", "ielts1/s3"); a week
+// with only the teacher's words uses "w{week}".
+export const setKey = (week, number, books = null) =>
+  `${(week !== "other" && weekBook(week, books)) || `w${week}`}/s${number}`;
 
 // Every 単語帳 text the app may voice: the words and their example sentences.
 export function bookSentences() {
   const texts = new Set();
-  for (const week of bookWeeks()) {
-    for (const w of bookWords(week)) {
+  for (const book of BOOKS) {
+    for (const w of bookWords(book.id)) {
       texts.add(speakable(w.word));
       for (const ex of w.examples) texts.add(ex.en);
     }
