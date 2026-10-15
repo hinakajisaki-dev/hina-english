@@ -22,6 +22,8 @@
 // node scripts/teacher.mjs menu なおみ [--only 日記,発音課題,勉強時間 | --all]   (what the home screen shows)
 // node scripts/teacher.mjs journals なおみ diaries.md [--dry]   (past diaries, no AI correction)
 // node scripts/teacher.mjs pron-months なおみ [--set "1=Month 2" | --default]   (発音 months and their names)
+// node scripts/teacher.mjs pron-done なおみ (--month 1 | --keys m1/01,m1/02) [--day 2026-09-30] [--dry | --undo]
+//                                                                 (発音 finished before the app, as 完了 with no recording)
 //
 // A file of "-" is read from stdin.
 import { spawnSync } from "node:child_process";
@@ -88,6 +90,7 @@ function parseArgs(args) {
     else if (arg === "--all") options.all = true;
     else if (arg === "--dry") options.dry = true;
     else if (arg === "--default") options.default = true;
+    else if (arg === "--undo") options.undo = true;
     else if (arg.startsWith("--")) options[arg.slice(2)] = args[++i];
     else rest.push(arg);
   }
@@ -166,6 +169,19 @@ function pronLine(setting) {
   return [...shown, ...hidden].join("　");
 }
 
+// "もとの Month 1：完了 30 / 30（録音 0）" for each month.
+function pronProgress(done = {}) {
+  return pronMonths().map((m) => {
+    const phrases = monthPhrases(m);
+    const finished = phrases.filter((p) => done[p.key]).length;
+    const sent = phrases.filter((p) => done[p.key]?.sent_at).length;
+    return `もとの Month ${m}：完了 ${finished} / ${phrases.length}（録音 ${sent}）`;
+  }).join("\n");
+}
+
+// Japan's date, offset by whole days ("2026-10-14").
+const japanDay = (offset = 0) => new Date(Date.now() + 9 * 3600e3 + offset * 86400e3).toISOString().slice(0, 10);
+
 const menuLine = (hidden = []) =>
   MENUS.map((m) => `${hidden.includes(m.key) ? "×" : "○"} ${m.name}`).join("　");
 
@@ -186,6 +202,7 @@ const commands = {
     console.log(`# ${data.student.name}さん`);
     console.log(`\n## 生徒の画面に出すもの\n${menuLine(data.hidden)}`);
     console.log(`\n## 発音課題の Month\n${pronLine(data.pronMonths)}`);
+    console.log(`\n## 発音課題の完了\n${pronProgress(data.pronDone)}`);
     console.log(`\n## 今週の勉強範囲\n${data.plan ? data.plan.body : "（まだありません）"}`);
     for (const [kind, spec] of Object.entries(KINDS)) {
       const items = data.items.filter((i) => i.kind === kind);
@@ -326,6 +343,34 @@ const commands = {
     }
     const { added, skipped } = await api(`/api/teacher/students/${student.id}/journals`, { method: "POST", body: { entries } });
     console.log(`${student.name}さんに過去の日記を ${added} 日分入れました（添削なし）${skipped ? `。同じものがすでにあった ${skipped} 日分は、とばしました` : ""}。`);
+  },
+
+  async "pron-done"([name], options) {
+    let keys;
+    if (options.month) {
+      keys = monthPhrases(Number(options.month)).map((p) => p.key);
+      if (!keys.length) stop(`Month ${options.month} の発音課題はありません（あるのは Month ${pronMonths().join("・")}）。`);
+    } else if (options.keys) {
+      keys = String(options.keys).split(/[,、，\s]+/).filter(Boolean);
+    } else {
+      stop("--month 1（その Month の全部の文）か、--keys m1/01,m1/02（文ごと）で、完了にする文を書いてください。");
+    }
+    const student = await findStudent(name);
+    const day = options.day || japanDay(-1);
+    const label = options.month ? `もとの Month ${options.month} の ${keys.length} 文` : `${keys.length} 文（${keys.join("、")}）`;
+    if (options.dry) {
+      const { pronDone } = await studentData(student);
+      const already = keys.filter((k) => pronDone[k]).length;
+      console.log(`${student.name}さんの発音 ${label} を、${day} 付けで完了にします（録音なし）。そのうち ${already} 文は、もう完了しています。まだ変えていません。`);
+      return;
+    }
+    if (options.undo) {
+      const { removed, kept } = await api(`/api/teacher/students/${student.id}/pron-done`, { method: "POST", body: { keys, undo: true } });
+      console.log(`${student.name}さんの発音 ${label} のうち、${removed} 文の完了をもどしました${kept ? `（録音があるか、もともと完了していない ${kept} 文は、そのまま）` : ""}。`);
+      return;
+    }
+    const { added, already } = await api(`/api/teacher/students/${student.id}/pron-done`, { method: "POST", body: { keys, day } });
+    console.log(`${student.name}さんの発音 ${label} を完了にしました：新しく ${added} 文（${day} 付け、録音なし）${already ? `、もう完了していた ${already} 文はそのまま` : ""}。`);
   },
 
   async "pron-months"([name], options) {

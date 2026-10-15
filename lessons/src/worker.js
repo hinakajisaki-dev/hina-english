@@ -148,6 +148,9 @@ async function route(request, env, url) {
   if (parts[1] === "students" && parts[3] === "menus" && parts.length === 4 && method === "PUT") {
     return saveMenus(request, db, await findStudent(db, id(2)));
   }
+  if (parts[1] === "students" && parts[3] === "pron-done" && parts.length === 4 && method === "POST") {
+    return markPronDone(request, db, await findStudent(db, id(2)));
+  }
   if (parts[1] === "students" && parts[3] === "pron-months" && parts.length === 4 && method === "PUT") {
     return savePronMonths(request, db, await findStudent(db, id(2)));
   }
@@ -812,6 +815,42 @@ async function saveNote(request, db, student, row) {
     student.id, day, title, body, published, stamp, stamp,
   );
   return json({ note: noteRow(await first(db, `SELECT * FROM lesson_notes WHERE id = ?`, meta.last_row_id)) });
+}
+
+// 発音 phrases the student finished before the app, put in as 完了 without a
+// recording: { keys: ["m1/01", …], day: "2026-09-30" }. The day must be before
+// today, so they don't count as today's 発音. A phrase already 完了 keeps its
+// own record. { keys, undo: true } takes such marks back (only those with no
+// recording, so a phrase the student did in the app stays).
+async function markPronDone(request, db, student) {
+  const { keys, day, undo } = await readJson(request);
+  if (!Array.isArray(keys) || !keys.length) throw new HttpError(400, "完了にする文がありません。");
+  if (keys.length > 200) throw new HttpError(400, "一度にできるのは 200 文までです。");
+  const unknown = keys.filter((key) => !findPhrase(String(key)));
+  if (unknown.length) throw new HttpError(400, `発音課題にない文です：${unknown.join("、")}`);
+  const done = new Map(
+    (await all(db, `SELECT phrase_key, rec_type FROM pron_progress WHERE student_id = ?`, student.id))
+      .map((row) => [row.phrase_key, row]),
+  );
+  if (undo) {
+    const remove = keys.filter((key) => done.has(key) && !done.get(key).rec_type);
+    if (remove.length) {
+      await db.batch(remove.map((key) =>
+        db.prepare(`DELETE FROM pron_progress WHERE student_id = ? AND phrase_key = ? AND rec_type IS NULL`).bind(student.id, key)));
+    }
+    return json({ removed: remove.length, kept: keys.length - remove.length });
+  }
+  const when = String(day || "");
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(when) || Number.isNaN(Date.parse(when)) || when >= japanDay()) {
+    throw new HttpError(400, "日付は、きのうまでの日にしてください（今日の発音に数えないため）。");
+  }
+  const doneAt = new Date(`${when}T12:00:00+09:00`).toISOString();
+  const add = keys.filter((key) => !done.has(key));
+  if (add.length) {
+    await db.batch(add.map((key) =>
+      db.prepare(`INSERT OR IGNORE INTO pron_progress (student_id, phrase_key, done_at) VALUES (?, ?, ?)`).bind(student.id, key, doneAt)));
+  }
+  return json({ added: add.length, already: keys.length - add.length });
 }
 
 // The 発音 months this student sees, in order, and their names:
