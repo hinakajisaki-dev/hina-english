@@ -1709,7 +1709,8 @@ function renderPron(month) {
     <main class="wrap stack">
       <p class="muted">お手本を聞いて、自分の声を録音してください。<br>「完了」を押すと録音が先生に届きます。</p>
       ${months.map((m) => {
-        const phrases = monthPhrases(m);
+        // A month this student doesn't have shows as still to come.
+        const phrases = myMonths().some((x) => x.month === m) ? monthPhrases(m) : [];
         const label = esc(monthLabel(myMonths(), m));
         if (!phrases.length) return `<div class="lesson-card soon"><div><b>${label}</b><span class="muted small">まだありません</span></div></div>`;
         const done = phrases.filter((p) => pronDone(p.key)).length;

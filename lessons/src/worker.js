@@ -858,7 +858,7 @@ async function markPronDone(request, db, student) {
 
 // The 発音 months this student sees, in order, and their names:
 // { months: [{ month: 1, label: "Month 2" }] }. An empty list is the usual
-// (every month under its own name).
+// (phrases.js USUAL_MONTHS under their own names).
 async function savePronMonths(request, db, student) {
   const { months } = await readJson(request);
   if (!Array.isArray(months)) throw new HttpError(400, "内容が正しくありません。");

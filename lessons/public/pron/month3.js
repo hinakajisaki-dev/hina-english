@@ -1,4 +1,5 @@
-// 発音 Month 3, from the teacher's 10月_発音課題 sheet. Every student gets the same phrases.
+// 発音 Month 3, from the teacher's 10月_発音課題 sheet. Only for the students the
+// teacher gives it to (phrases.js USUAL_MONTHS); the others don't see it.
 // Number 9's cell also has practice words under the sentence; only the sentence is here.
 //
 // Each phrase: id (never change it: students' 完了 and recordings use it), en, ja,

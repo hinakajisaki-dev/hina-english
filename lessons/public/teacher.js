@@ -4,7 +4,7 @@
 import { ApiError, api, diffHtml, esc, formatDateTime, icons, startOfJapanDay, toast } from "./common.js";
 import { UNITS } from "./grammar/lessons.js";
 import { bookWeeks, bookWords, setKey, weekWords, wordSets } from "./vocab/words.js";
-import { currentMonth, monthLabel, monthPhrases, pronMonths, studentMonths } from "./pron/phrases.js";
+import { USUAL_MONTHS, currentMonth, monthLabel, monthPhrases, pronMonths, studentMonths } from "./pron/phrases.js";
 import { CURRENT_WEEK, NOTES_FOR_STUDENTS } from "./course.js";
 import { MENUS } from "./menus.js";
 import { phraseSetKey, phraseSets, phraseWeeks, testSize } from "./phrases/book.js";
@@ -884,8 +884,9 @@ function renderSettings(panel) {
       .filter((m) => pronForm.elements[`show-${m}`].checked)
       .map((m) => ({ month: m, label: pronForm.elements[`label-${m}`].value.trim() || `Month ${m}` }));
     if (!months.length) return toast("Month を1つ以上えらんでください");
-    // Every month under its own name is the usual, so nothing is kept.
-    const usual = months.length === pronMonths().length && months.every((m) => m.label === `Month ${m.month}`);
+    // The usual months under their own names is the usual, so nothing is kept.
+    const usual = months.length === USUAL_MONTHS.length
+      && months.every((m, i) => m.month === USUAL_MONTHS[i] && m.label === `Month ${m.month}`);
     busy(button, "保存中…");
     try {
       await api(`/api/teacher/students/${student.id}/pron-months`, { method: "PUT", body: { months: usual ? [] : months } });
