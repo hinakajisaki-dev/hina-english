@@ -169,13 +169,14 @@ function pronLine(setting) {
   return [...shown, ...hidden].join("　");
 }
 
-// "もとの Month 1：完了 30 / 30（録音 0）" for each month.
+// "もとの Month 1：完了 30 / 30（録音 0・アプリの前に提出 30）" for each month.
 function pronProgress(done = {}) {
   return pronMonths().map((m) => {
     const phrases = monthPhrases(m);
     const finished = phrases.filter((p) => done[p.key]).length;
     const sent = phrases.filter((p) => done[p.key]?.sent_at).length;
-    return `もとの Month ${m}：完了 ${finished} / ${phrases.length}（録音 ${sent}）`;
+    const before = phrases.filter((p) => done[p.key]?.before_app).length;
+    return `もとの Month ${m}：完了 ${finished} / ${phrases.length}（録音 ${sent}${before ? `・アプリの前に提出 ${before}` : ""}）`;
   }).join("\n");
 }
 
@@ -361,16 +362,16 @@ const commands = {
     if (options.dry) {
       const { pronDone } = await studentData(student);
       const already = keys.filter((k) => pronDone[k]).length;
-      console.log(`${student.name}さんの発音 ${label} を、${day} 付けで完了にします（録音なし）。そのうち ${already} 文は、もう完了しています。まだ変えていません。`);
+      console.log(`${student.name}さんの発音 ${label} を、${day} 付けで完了にします（録音なし。生徒の画面には「先生に提出ずみ（アプリを使う前）」と出ます）。そのうち ${already} 文は、もう完了しています。まだ変えていません。`);
       return;
     }
     if (options.undo) {
       const { removed, kept } = await api(`/api/teacher/students/${student.id}/pron-done`, { method: "POST", body: { keys, undo: true } });
-      console.log(`${student.name}さんの発音 ${label} のうち、${removed} 文の完了をもどしました${kept ? `（録音があるか、もともと完了していない ${kept} 文は、そのまま）` : ""}。`);
+      console.log(`${student.name}さんの発音 ${label} のうち、${removed} 文の完了をもどしました${kept ? `（アプリで完了したか、もともと完了していない ${kept} 文は、そのまま）` : ""}。`);
       return;
     }
     const { added, already } = await api(`/api/teacher/students/${student.id}/pron-done`, { method: "POST", body: { keys, day } });
-    console.log(`${student.name}さんの発音 ${label} を完了にしました：新しく ${added} 文（${day} 付け、録音なし）${already ? `、もう完了していた ${already} 文はそのまま` : ""}。`);
+    console.log(`${student.name}さんの発音 ${label} を完了にしました：新しく ${added} 文（${day} 付け、録音なし。生徒の画面には「先生に提出ずみ（アプリを使う前）」）${already ? `、もう完了していた ${already} 文はそのまま` : ""}。`);
   },
 
   async "pron-months"([name], options) {

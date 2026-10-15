@@ -420,7 +420,8 @@ async function finishPhrase(request, env, student, key, secondsParam) {
        rec_type = COALESCE(?4, rec_type),
        rec_bytes = COALESCE(?5, rec_bytes),
        rec_seconds = CASE WHEN ?4 IS NULL THEN rec_seconds ELSE ?6 END,
-       sent_at = CASE WHEN ?4 IS NULL THEN sent_at ELSE ?3 END`,
+       sent_at = CASE WHEN ?4 IS NULL THEN sent_at ELSE ?3 END,
+       before_app = CASE WHEN ?4 IS NULL THEN before_app ELSE 0 END`,
     student.id, key, now(), recording?.type ?? null, recording?.bytes ?? null, recording?.seconds ?? null,
   );
   const row = await first(env.DB, `SELECT * FROM pron_progress WHERE student_id = ? AND phrase_key = ?`, student.id, key);
@@ -817,11 +818,12 @@ async function saveNote(request, db, student, row) {
   return json({ note: noteRow(await first(db, `SELECT * FROM lesson_notes WHERE id = ?`, meta.last_row_id)) });
 }
 
-// 発音 phrases the student finished before the app, put in as 完了 without a
-// recording: { keys: ["m1/01", …], day: "2026-09-30" }. The day must be before
-// today, so they don't count as today's 発音. A phrase already 完了 keeps its
-// own record. { keys, undo: true } takes such marks back (only those with no
-// recording, so a phrase the student did in the app stays).
+// 発音 phrases the student finished and handed in before the app, put in as
+// 完了 without a recording (before_app; the student sees 先生に提出ずみ):
+// { keys: ["m1/01", …], day: "2026-09-30" }. The day must be before today, so
+// they don't count as today's 発音. A phrase already 完了 keeps its own record.
+// { keys, undo: true } takes such marks back (only these, so a phrase the
+// student did in the app stays).
 async function markPronDone(request, db, student) {
   const { keys, day, undo } = await readJson(request);
   if (!Array.isArray(keys) || !keys.length) throw new HttpError(400, "完了にする文がありません。");
@@ -829,14 +831,14 @@ async function markPronDone(request, db, student) {
   const unknown = keys.filter((key) => !findPhrase(String(key)));
   if (unknown.length) throw new HttpError(400, `発音課題にない文です：${unknown.join("、")}`);
   const done = new Map(
-    (await all(db, `SELECT phrase_key, rec_type FROM pron_progress WHERE student_id = ?`, student.id))
+    (await all(db, `SELECT phrase_key, before_app FROM pron_progress WHERE student_id = ?`, student.id))
       .map((row) => [row.phrase_key, row]),
   );
   if (undo) {
-    const remove = keys.filter((key) => done.has(key) && !done.get(key).rec_type);
+    const remove = keys.filter((key) => done.get(key)?.before_app);
     if (remove.length) {
       await db.batch(remove.map((key) =>
-        db.prepare(`DELETE FROM pron_progress WHERE student_id = ? AND phrase_key = ? AND rec_type IS NULL`).bind(student.id, key)));
+        db.prepare(`DELETE FROM pron_progress WHERE student_id = ? AND phrase_key = ? AND before_app = 1`).bind(student.id, key)));
     }
     return json({ removed: remove.length, kept: keys.length - remove.length });
   }
@@ -848,7 +850,8 @@ async function markPronDone(request, db, student) {
   const add = keys.filter((key) => !done.has(key));
   if (add.length) {
     await db.batch(add.map((key) =>
-      db.prepare(`INSERT OR IGNORE INTO pron_progress (student_id, phrase_key, done_at) VALUES (?, ?, ?)`).bind(student.id, key, doneAt)));
+      db.prepare(`INSERT OR IGNORE INTO pron_progress (student_id, phrase_key, done_at, before_app) VALUES (?, ?, ?, 1)`)
+        .bind(student.id, key, doneAt)));
   }
   return json({ added: add.length, already: keys.length - add.length });
 }

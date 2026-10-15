@@ -759,13 +759,14 @@ function pronRecordingsHtml() {
   return [...mine.map((m) => m.month), ...others].map((month) => {
     const phrases = monthPhrases(month);
     const finished = phrases.filter((p) => done[p.key]).length;
+    const before = phrases.filter((p) => done[p.key]?.before_app).length;
     const sent = phrases.filter((p) => done[p.key]?.sent_at)
       .sort((a, b) => (done[a.key].sent_at < done[b.key].sent_at ? 1 : -1));
     const label = monthLabel(mine, month);
     const note = others.includes(month) ? "この生徒には出していない Month" : label === `Month ${month}` ? `全員共通 ${phrases.length} 文` : `もとの Month ${month}・${phrases.length} 文`;
     return `<section class="card stack">
       <h3>発音 ${esc(label)}（${note}）</h3>
-      <p class="muted small">完了 ${finished} / ${phrases.length}　録音 ${sent.length} 件${sent.length > 1 ? "（新しい順）" : ""}</p>
+      <p class="muted small">完了 ${finished} / ${phrases.length}${before ? `（うち ${before} 文はアプリを使う前に提出・録音なし）` : ""}　録音 ${sent.length} 件${sent.length > 1 ? "（新しい順）" : ""}</p>
       ${sent.length ? `<ul class="rows">${sent.map((p) => `<li><div class="main">
         <div class="en-main" lang="en">${Number(p.id)}. ${esc(p.en)}</div>
         <div class="sub">${esc(p.ja)}</div>

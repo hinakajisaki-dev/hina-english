@@ -174,8 +174,11 @@ const SCHEMA = [
 // them already, SQLite says "duplicate column name", which is fine.
 // journals.imported: an entry the teacher put in from before the app (past
 // diaries, written elsewhere); it is never sent to the AI.
+// pron_progress.before_app: a phrase the student finished and handed in before
+// the app, put in as 完了 by the teacher (no recording here).
 const ADDED_COLUMNS = [
   `ALTER TABLE journals ADD COLUMN imported INTEGER NOT NULL DEFAULT 0`,
+  `ALTER TABLE pron_progress ADD COLUMN before_app INTEGER NOT NULL DEFAULT 0`,
 ];
 
 let ready = false;
@@ -290,7 +293,9 @@ export async function studentBundle(db, studentId) {
   };
   const pronDone = {};
   for (const r of pronRows) {
-    pronDone[r.phrase_key] = { done_at: r.done_at, sent_at: r.sent_at, seconds: r.rec_seconds };
+    pronDone[r.phrase_key] = {
+      done_at: r.done_at, sent_at: r.sent_at, seconds: r.rec_seconds, ...(r.before_app ? { before_app: true } : {}),
+    };
   }
   const study = studyRows.map((r) => ({
     day: r.day, app_seconds: r.app_seconds, other_minutes: r.other_minutes, note: r.note,

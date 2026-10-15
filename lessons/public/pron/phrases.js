@@ -3,8 +3,9 @@
 // ("m1/05") that its 完了 and the student's recording are stored under.
 import { MONTH1 } from "./month1.js";
 import { MONTH2 } from "./month2.js";
+import { MONTH3 } from "./month3.js";
 
-const BOOKS = { 1: MONTH1, 2: MONTH2 };
+const BOOKS = { 1: MONTH1, 2: MONTH2, 3: MONTH3 };
 export const MONTHS = 6;
 
 export const pronMonths = () => Object.keys(BOOKS).map(Number);
