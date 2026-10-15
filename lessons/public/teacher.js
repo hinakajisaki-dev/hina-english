@@ -4,7 +4,7 @@
 import { ApiError, api, diffHtml, esc, formatDateTime, icons, startOfJapanDay, toast } from "./common.js";
 import { UNITS } from "./grammar/lessons.js";
 import { bookWeeks, bookWords, setKey, weekWords, wordSets } from "./vocab/words.js";
-import { currentMonth, monthLabel, monthPhrases, pronMonths, studentMonths } from "./pron/phrases.js";
+import { USUAL_MONTHS, currentMonth, monthLabel, monthPhrases, pronMonths, studentMonths } from "./pron/phrases.js";
 import { CURRENT_WEEK, NOTES_FOR_STUDENTS } from "./course.js";
 import { MENUS } from "./menus.js";
 import { phraseSetKey, phraseSets, phraseWeeks, testSize } from "./phrases/book.js";
@@ -759,13 +759,14 @@ function pronRecordingsHtml() {
   return [...mine.map((m) => m.month), ...others].map((month) => {
     const phrases = monthPhrases(month);
     const finished = phrases.filter((p) => done[p.key]).length;
+    const before = phrases.filter((p) => done[p.key]?.before_app).length;
     const sent = phrases.filter((p) => done[p.key]?.sent_at)
       .sort((a, b) => (done[a.key].sent_at < done[b.key].sent_at ? 1 : -1));
     const label = monthLabel(mine, month);
     const note = others.includes(month) ? "この生徒には出していない Month" : label === `Month ${month}` ? `全員共通 ${phrases.length} 文` : `もとの Month ${month}・${phrases.length} 文`;
     return `<section class="card stack">
       <h3>発音 ${esc(label)}（${note}）</h3>
-      <p class="muted small">完了 ${finished} / ${phrases.length}　録音 ${sent.length} 件${sent.length > 1 ? "（新しい順）" : ""}</p>
+      <p class="muted small">完了 ${finished} / ${phrases.length}${before ? `（うち ${before} 文はアプリを使う前に提出・録音なし）` : ""}　録音 ${sent.length} 件${sent.length > 1 ? "（新しい順）" : ""}</p>
       ${sent.length ? `<ul class="rows">${sent.map((p) => `<li><div class="main">
         <div class="en-main" lang="en">${Number(p.id)}. ${esc(p.en)}</div>
         <div class="sub">${esc(p.ja)}</div>
@@ -883,8 +884,9 @@ function renderSettings(panel) {
       .filter((m) => pronForm.elements[`show-${m}`].checked)
       .map((m) => ({ month: m, label: pronForm.elements[`label-${m}`].value.trim() || `Month ${m}` }));
     if (!months.length) return toast("Month を1つ以上えらんでください");
-    // Every month under its own name is the usual, so nothing is kept.
-    const usual = months.length === pronMonths().length && months.every((m) => m.label === `Month ${m.month}`);
+    // The usual months under their own names is the usual, so nothing is kept.
+    const usual = months.length === USUAL_MONTHS.length
+      && months.every((m, i) => m.month === USUAL_MONTHS[i] && m.label === `Month ${m.month}`);
     busy(button, "保存中…");
     try {
       await api(`/api/teacher/students/${student.id}/pron-months`, { method: "PUT", body: { months: usual ? [] : months } });

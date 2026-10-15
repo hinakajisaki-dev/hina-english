@@ -1709,7 +1709,8 @@ function renderPron(month) {
     <main class="wrap stack">
       <p class="muted">お手本を聞いて、自分の声を録音してください。<br>「完了」を押すと録音が先生に届きます。</p>
       ${months.map((m) => {
-        const phrases = monthPhrases(m);
+        // A month this student doesn't have shows as still to come.
+        const phrases = myMonths().some((x) => x.month === m) ? monthPhrases(m) : [];
         const label = esc(monthLabel(myMonths(), m));
         if (!phrases.length) return `<div class="lesson-card soon"><div><b>${label}</b><span class="muted small">まだありません</span></div></div>`;
         const done = phrases.filter((p) => pronDone(p.key)).length;
@@ -1844,6 +1845,8 @@ function renderPronPractice(which) {
   const doneLine = () => {
     const done = pronDone(item.key);
     if (!done) return "";
+    // Handed in before the app: no date or recording here.
+    if (done.before_app) return `<p class="done-line">✅ 完了 ・ 先生に提出ずみ（アプリを使う前）</p>`;
     return `<p class="done-line">✅ 完了（${shortDate(done.done_at)}）${done.sent_at ? ` ・ 録音は先生に届いています（${shortDate(done.sent_at)}）` : ""}</p>`;
   };
 
@@ -1854,7 +1857,7 @@ function renderPronPractice(which) {
       box.innerHTML = `
         <p class="finished">✅ 完了しました！${done?.sent_at ? "録音が先生に届きました。" : ""}</p>
         ${last
-          ? `<p>${which === "own" ? "先生が追加した文は、全部見ました。" : `Month ${which} の最後の文です。`}</p><a class="btn block" href="#/">ホームへ</a>`
+          ? `<p>${which === "own" ? "先生が追加した文は、全部見ました。" : `${esc(monthLabel(myMonths(), which))} の最後の文です。`}</p><a class="btn block" href="#/">ホームへ</a>`
           : `<button class="btn block" id="next">次の文へ →</button>`}
         <p class="muted small" style="text-align:center">今日の発音はこれでOK。もっとやりたいときは、次の文へ進めます。</p>`;
       document.getElementById("next")?.addEventListener("click", () => go(1));

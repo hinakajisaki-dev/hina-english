@@ -148,6 +148,9 @@ async function route(request, env, url) {
   if (parts[1] === "students" && parts[3] === "menus" && parts.length === 4 && method === "PUT") {
     return saveMenus(request, db, await findStudent(db, id(2)));
   }
+  if (parts[1] === "students" && parts[3] === "pron-done" && parts.length === 4 && method === "POST") {
+    return markPronDone(request, db, await findStudent(db, id(2)));
+  }
   if (parts[1] === "students" && parts[3] === "pron-months" && parts.length === 4 && method === "PUT") {
     return savePronMonths(request, db, await findStudent(db, id(2)));
   }
@@ -417,7 +420,8 @@ async function finishPhrase(request, env, student, key, secondsParam) {
        rec_type = COALESCE(?4, rec_type),
        rec_bytes = COALESCE(?5, rec_bytes),
        rec_seconds = CASE WHEN ?4 IS NULL THEN rec_seconds ELSE ?6 END,
-       sent_at = CASE WHEN ?4 IS NULL THEN sent_at ELSE ?3 END`,
+       sent_at = CASE WHEN ?4 IS NULL THEN sent_at ELSE ?3 END,
+       before_app = CASE WHEN ?4 IS NULL THEN before_app ELSE 0 END`,
     student.id, key, now(), recording?.type ?? null, recording?.bytes ?? null, recording?.seconds ?? null,
   );
   const row = await first(env.DB, `SELECT * FROM pron_progress WHERE student_id = ? AND phrase_key = ?`, student.id, key);
@@ -814,9 +818,47 @@ async function saveNote(request, db, student, row) {
   return json({ note: noteRow(await first(db, `SELECT * FROM lesson_notes WHERE id = ?`, meta.last_row_id)) });
 }
 
+// 発音 phrases the student finished and handed in before the app, put in as
+// 完了 without a recording (before_app; the student sees 先生に提出ずみ):
+// { keys: ["m1/01", …], day: "2026-09-30" }. The day must be before today, so
+// they don't count as today's 発音. A phrase already 完了 keeps its own record.
+// { keys, undo: true } takes such marks back (only these, so a phrase the
+// student did in the app stays).
+async function markPronDone(request, db, student) {
+  const { keys, day, undo } = await readJson(request);
+  if (!Array.isArray(keys) || !keys.length) throw new HttpError(400, "完了にする文がありません。");
+  if (keys.length > 200) throw new HttpError(400, "一度にできるのは 200 文までです。");
+  const unknown = keys.filter((key) => !findPhrase(String(key)));
+  if (unknown.length) throw new HttpError(400, `発音課題にない文です：${unknown.join("、")}`);
+  const done = new Map(
+    (await all(db, `SELECT phrase_key, before_app FROM pron_progress WHERE student_id = ?`, student.id))
+      .map((row) => [row.phrase_key, row]),
+  );
+  if (undo) {
+    const remove = keys.filter((key) => done.get(key)?.before_app);
+    if (remove.length) {
+      await db.batch(remove.map((key) =>
+        db.prepare(`DELETE FROM pron_progress WHERE student_id = ? AND phrase_key = ? AND before_app = 1`).bind(student.id, key)));
+    }
+    return json({ removed: remove.length, kept: keys.length - remove.length });
+  }
+  const when = String(day || "");
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(when) || Number.isNaN(Date.parse(when)) || when >= japanDay()) {
+    throw new HttpError(400, "日付は、きのうまでの日にしてください（今日の発音に数えないため）。");
+  }
+  const doneAt = new Date(`${when}T12:00:00+09:00`).toISOString();
+  const add = keys.filter((key) => !done.has(key));
+  if (add.length) {
+    await db.batch(add.map((key) =>
+      db.prepare(`INSERT OR IGNORE INTO pron_progress (student_id, phrase_key, done_at, before_app) VALUES (?, ?, ?, 1)`)
+        .bind(student.id, key, doneAt)));
+  }
+  return json({ added: add.length, already: keys.length - add.length });
+}
+
 // The 発音 months this student sees, in order, and their names:
 // { months: [{ month: 1, label: "Month 2" }] }. An empty list is the usual
-// (every month under its own name).
+// (phrases.js USUAL_MONTHS under their own names).
 async function savePronMonths(request, db, student) {
   const { months } = await readJson(request);
   if (!Array.isArray(months)) throw new HttpError(400, "内容が正しくありません。");
