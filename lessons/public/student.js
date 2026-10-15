@@ -648,6 +648,45 @@ function renderStudyEdit(day) {
   });
 }
 
+// ---------- つづきから ----------
+// Where the student stopped in each 単語カード / フレーズ set, kept on this phone
+// so the set opens there again, even after the app was closed:
+// { "<name>|phrase:p1/s2": { week, number, index, of: "3 / 8", at } }.
+// Finishing the set (on to its test) clears it.
+const RESUME_KEY = "hina-resume";
+
+function resumePlaces() {
+  try { return JSON.parse(localStorage.getItem(RESUME_KEY)) || {}; } catch { return {}; }
+}
+
+const resumeId = (kind, setKey) => `${state.me.student.name}|${kind}:${setKey}`;
+const resumeAt = (kind, setKey) => resumePlaces()[resumeId(kind, setKey)] || null;
+
+// place is null to forget the set (back at its start, or finished).
+function saveResume(kind, setKey, place) {
+  const places = resumePlaces();
+  const id = resumeId(kind, setKey);
+  if (place) places[id] = { ...place, at: Date.now() };
+  else if (id in places) delete places[id];
+  else return;
+  try { localStorage.setItem(RESUME_KEY, JSON.stringify(places)); } catch { /* private mode */ }
+}
+
+// The set of this kind the student stopped in last, or null.
+function lastResume(kind) {
+  const prefix = `${state.me.student.name}|${kind}:`;
+  return Object.entries(resumePlaces())
+    .filter(([id]) => id.startsWith(prefix))
+    .map(([id, place]) => ({ key: id.slice(prefix.length), ...place }))
+    .sort((a, b) => b.at - a.at)[0] || null;
+}
+
+// The つづきから button at the top of a list.
+const resumeCard = (href, where, of) => `<a class="lesson-card resume-card" href="${href}">
+    <div><b>▶ つづきから</b><span class="muted small">${where} ・ ${esc(of)}</span></div>
+    <span class="badge start">再開する</span>
+  </a>`;
+
 // ---------- vocab cards ----------
 // A week is the student's 単語帳 (the shared one, or another the teacher gave
 // them: vocab/words.js) plus the teacher's words for this student, in sets of
@@ -710,8 +749,12 @@ function renderVocab(week, setNumber, mode) {
     </a>`;
   });
 
+  const last = lastResume("vocab");
+  // (Only while it is still this student's set: the teacher may have changed their 単語帳.)
+  const lastSet = last && studentSetKey(last.week, last.number) === last.key && findSet(last.week, last.number);
   app.innerHTML = `${topbar("単語カード")}
     <main class="wrap stack">
+      ${lastSet ? resumeCard(`#/vocab/${last.week}/${last.number}`, `${weekLabel(last.week)} ・ ${lastSet.number}. ${esc(lastSet.title)}`, last.of) : ""}
       <div class="weeks">${tiles.join("")}</div>
     </main>`;
 }
@@ -725,9 +768,11 @@ function renderWeek(week) {
       ${sets.length ? "" : emptyState("この週の単語は、まだありません。")}
       ${sets.map((set) => {
         const result = testResult(week, set.number);
+        const place = resumeAt("vocab", studentSetKey(week, set.number));
         return `<a class="lesson-card" href="#/vocab/${week}/${set.number}">
           <div><b>${set.number}. ${esc(set.title)}</b><span class="muted small" lang="en">${set.words.map((w) => esc(w.word)).join(" ・ ")}</span></div>
-          ${result ? `<span class="badge">✓ ${result.best} / ${result.total}</span>` : `<span class="badge start">はじめる</span>`}
+          ${place ? `<span class="badge start">つづきから ${esc(place.of)}</span>`
+            : result ? `<span class="badge">✓ ${result.best} / ${result.total}</span>` : `<span class="badge start">はじめる</span>`}
         </a>`;
       }).join("")}
     </main>`;
@@ -741,8 +786,12 @@ function renderVocabSet(week, number) {
   const set = findSet(week, number);
   if (!set) return renderWeek(week);
   const id = studentSetKey(week, number);
-  if (state.vocab?.id !== id) state.vocab = { id, index: 0 };
+  if (state.vocab?.id !== id) {
+    const saved = resumeAt("vocab", id);
+    state.vocab = { id, index: saved && saved.index < set.words.length ? saved.index : 0 };
+  }
   const V = state.vocab;
+  saveResume("vocab", id, V.index ? { week, number, index: V.index, of: `${V.index + 1} / ${set.words.length}` } : null);
   const word = set.words[V.index];
   const last = V.index === set.words.length - 1;
   const rerender = () => {
@@ -817,6 +866,7 @@ function renderVocabSet(week, number) {
   });
   document.getElementById("next").addEventListener("click", () => {
     if (last) {
+      saveResume("vocab", id, null);
       state.vocab = null;
       state.vocabTest = null;
       location.hash = `#/vocab/${week}/${number}/test`;
@@ -1227,8 +1277,11 @@ function renderPhrases(week, setNumber, mode) {
       ${tests.total ? `<span class="badge ${tests.done ? "" : "start"}">テスト ${tests.done} / ${tests.total}</span>` : ""}
     </a>`;
   });
+  const last = lastResume("phrase");
+  const lastSet = last && findPhraseSet(last.week, last.number);
   app.innerHTML = `${topbar("フレーズ")}
     <main class="wrap stack">
+      ${lastSet ? resumeCard(`#/phrases/${last.week}/${last.number}`, `Week ${last.week} ・ ${esc(lastSet.title)}`, last.of) : ""}
       ${weeks.length ? weeks.join("") : emptyState("フレーズは準備中です。<br>用意ができたら、ここに出てきます。")}
     </main>`;
 }
@@ -1241,7 +1294,6 @@ function dayRange(sets) {
 }
 
 function renderPhraseWeek(week) {
-  state.phraseSet = null;
   state.phraseTest = null;
   const sets = phraseSets(week);
   const byDay = sets.length && sets[0].phrases[0].day;
@@ -1253,9 +1305,11 @@ function renderPhraseWeek(week) {
       ${sets.map((set) => {
         const result = phraseTestResult(week, set.number);
         const sub = byDay ? `${setNumbers(set)} ・ ${esc(setScenes(set))}` : `<span lang="en">${set.phrases.map((p) => esc(p.en)).join(" ・ ")}</span>`;
+        const place = resumeAt("phrase", phraseSetKey(week, set.number));
         return `<a class="lesson-card" href="#/phrases/${week}/${set.number}">
           <div><b>${esc(set.title)}</b><span class="muted small">${sub}</span></div>
-          ${result ? `<span class="badge">✓ ${result.best} / ${result.total}</span>` : `<span class="badge start">はじめる</span>`}
+          ${place ? `<span class="badge start">つづきから ${esc(place.of)}</span>`
+            : result ? `<span class="badge">✓ ${result.best} / ${result.total}</span>` : `<span class="badge start">はじめる</span>`}
         </a>`;
       }).join("")}
     </main>`;
@@ -1451,14 +1505,24 @@ function renderPhraseSet(week, number) {
   const set = findPhraseSet(week, number);
   if (!set) return renderPhraseWeek(week);
   const id = phraseSetKey(week, number);
-  if (state.phraseSet?.id !== id) state.phraseSet = { id, steps: phraseSteps(set.phrases), index: 0, revealed: {}, answers: {} };
+  if (state.phraseSet?.id !== id) {
+    const steps = phraseSteps(set.phrases);
+    const saved = resumeAt("phrase", id);
+    state.phraseSet = { id, steps, index: saved && saved.index < steps.length ? saved.index : 0, revealed: {}, answers: {} };
+  }
+  const P = state.phraseSet;
+  const phrases = [...new Set(P.steps.map((s) => s.phrase))];
+  saveResume("phrase", id, P.index
+    ? { week, number, index: P.index, of: `${phrases.indexOf(P.steps[P.index].phrase) + 1} / ${phrases.length}` }
+    : null);
   const hasTest = testSize(set) > 0;
-  renderPhraseSteps(state.phraseSet, {
+  renderPhraseSteps(P, {
     title: `Week ${week} ・ ${set.title}`,
     back: `#/phrases/${week}`,
     again: () => renderPhraseSet(week, number),
     finishLabel: hasTest ? "テストへ" : "おわり",
     finish: () => {
+      saveResume("phrase", id, null);
       state.phraseSet = null;
       state.phraseTest = null;
       location.hash = hasTest ? `#/phrases/${week}/${number}/test` : `#/phrases/${week}`;
