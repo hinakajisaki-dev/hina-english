@@ -1,31 +1,39 @@
 // Vocabulary shared by the student app and the server.
 //
 // A week's words are that week's 単語帳 followed by any words the teacher
-// added for this one student. Every week has one shared 単語帳 ("w1") that
-// students get; the teacher can give a student another book for a week instead
+// added for this one student. A week's own 単語帳 ("w1") is the one students
+// get, unless it is marked everyone: false (then only the students it is given
+// to have it); the teacher can give a student another book for a week instead
 // (vocab_books, like { "1": "ielts1" }), and that student sees only it. Every
 // word gets a key: "w1/go" or "ielts1/increase" for a 単語帳 word (its book's id,
 // then the word's), "item/12" for a teacher's word. The review list and test
 // results are stored by these keys.
 import { WEEK1 } from "./week1.js";
+import { WEEK2 } from "./week2.js";
+import { WEEK3 } from "./week3.js";
+import { WEEK4 } from "./week4.js";
+import { WEEK5 } from "./week5.js";
+import { WEEK6 } from "./week6.js";
 import { IELTS1 } from "./ielts1.js";
 
-const BOOKS = [WEEK1, IELTS1];
+const BOOKS = [WEEK1, WEEK2, WEEK3, WEEK4, WEEK5, WEEK6, IELTS1];
 export const SET_SIZE = 10;
 
 const findBook = (id) => BOOKS.find((b) => b.id === id) || null;
 const sharedBook = (week) => `w${week}`;
+const isShared = (book) => book.id === sharedBook(book.week) && book.everyone !== false;
 
 // Every 単語帳: { id, week, title, count, shared } (shared: the one everyone gets that week).
 export const vocabBooks = () =>
-  BOOKS.map((b) => ({ id: b.id, week: b.week, title: b.title, count: bookWords(b.id).length, shared: b.id === sharedBook(b.week) }));
+  BOOKS.map((b) => ({ id: b.id, week: b.week, title: b.title, count: bookWords(b.id).length, shared: isShared(b) }));
 
 // The 単語帳 a student has for a week: the one the teacher gave them (books is
 // the vocab_books setting, or null), else the shared one; null when there is none.
 export function weekBook(week, books) {
   const picked = books?.[week];
   if (picked && findBook(picked)) return picked;
-  return findBook(sharedBook(week)) ? sharedBook(week) : null;
+  const shared = findBook(sharedBook(week));
+  return shared && isShared(shared) ? shared.id : null;
 }
 
 // The words of one 単語帳, in its order.
@@ -113,8 +121,13 @@ export function bookSentences() {
   return texts;
 }
 
-// "〜 off" is read as "off".
-export const speakable = (word) => word.replace(/^[〜~]\s*/, "");
+// What the voice reads: "〜 off" is "off", "end up ~ing" is "end up", "How long ...?" is "How long?".
+export const speakable = (word) => word
+  .replace(/[〜~]\s*ing\b|\s-ing\b/g, "")
+  .replace(/[〜~]|\.\.\.|…|〇〇/g, "")
+  .replace(/\s+([?!.,])/g, "$1")
+  .replace(/\s+/g, " ")
+  .trim();
 
 // The word as it appears in a sentence (made for make), or null when it can't be found.
 export function findForm(sentence, word) {
