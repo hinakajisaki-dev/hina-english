@@ -693,9 +693,8 @@ function lessonResultsHtml() {
   </section>`;
 }
 
-// Weeks with more than one 単語帳 to choose from.
-const choiceWeeks = () => [...new Set(vocabBooks().map((b) => b.week))]
-  .filter((week) => vocabBooks().filter((b) => b.week === week).length > 1);
+// Weeks with a 単語帳 that is not everyone's, so there is a choice to make.
+const choiceWeeks = () => [...new Set(vocabBooks().filter((b) => !b.shared).map((b) => b.week))].sort((a, b) => a - b);
 
 // The 単語帳 this student has for each week that has a choice.
 function vocabBooksForm() {
@@ -705,7 +704,7 @@ function vocabBooksForm() {
     <h3>単語帳</h3>
     <p class="muted small">Week ごとに、この生徒に出す単語帳です。ほかの単語帳にすると、全員共通の単語帳はこの生徒には出ません（覚えた記録は残ります）。生徒ごとのチャットからも変えられます。</p>
     ${weeks.map((week) => `<label class="field"><span>Week ${week}</span>
-      <select name="week-${week}">${vocabBooks().filter((b) => b.week === week).map((b) =>
+      <select name="week-${week}">${vocabBooks().some((b) => b.week === week && b.shared) ? "" : `<option value="">（なし）</option>`}${vocabBooks().filter((b) => b.week === week).map((b) =>
         `<option value="${esc(b.id)}" ${weekBook(week, state.current.vocabBooks) === b.id ? "selected" : ""}>${esc(b.title)}（${b.count} 語${b.shared ? "・全員共通" : ""}）</option>`).join("")}</select>
     </label>`).join("")}
     <button class="btn" type="submit" style="align-self:flex-start">保存</button>
@@ -937,7 +936,10 @@ function renderSettings(panel) {
     event.preventDefault();
     const button = booksForm.querySelector("button");
     const books = {};
-    for (const week of choiceWeeks()) books[week] = booksForm.elements[`week-${week}`].value;
+    for (const week of choiceWeeks()) {
+      const value = booksForm.elements[`week-${week}`].value;
+      if (value) books[week] = value;
+    }
     busy(button, "保存中…");
     try {
       await api(`/api/teacher/students/${student.id}/vocab-books`, { method: "PUT", body: { books } });

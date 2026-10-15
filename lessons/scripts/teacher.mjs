@@ -186,12 +186,12 @@ function pronProgress(done = {}) {
 // Japan's date, offset by whole days ("2026-10-14").
 const japanDay = (offset = 0) => new Date(Date.now() + 9 * 3600e3 + offset * 86400e3).toISOString().slice(0, 10);
 
-// "Week 1：IELTS 語彙 Week 1（ielts1・100 語）" for each week that has a 単語帳.
+// "Week 1：IELTS 語彙 Week 1（ielts1・100 語）" for each week the app has a 単語帳 for.
 function bookLine(books) {
   const all = vocabBooks();
   return [...new Set(all.map((b) => b.week))].sort((a, b) => a - b).map((week) => {
     const book = all.find((b) => b.id === weekBook(week, books));
-    return `Week ${week}：${book.title}（${book.id}・${book.count} 語${book.shared ? "・全員共通" : ""}）`;
+    return `Week ${week}：${book ? `${book.title}（${book.id}・${book.count} 語${book.shared ? "・全員共通" : ""}）` : "（なし）"}`;
   }).join("\n");
 }
 

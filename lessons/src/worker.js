@@ -896,6 +896,7 @@ async function saveVocabBooks(request, db, student) {
   const have = vocabBooks();
   const clean = {};
   for (const [week, id] of Object.entries(books)) {
+    if (!id) continue;
     const book = have.find((b) => b.id === id);
     if (!book) throw new HttpError(400, `「${id}」という単語帳はありません（あるのは ${have.map((b) => b.id).join("・")}）。`);
     if (String(book.week) !== String(week)) throw new HttpError(400, `${book.title} は Week ${book.week} の単語帳です。`);

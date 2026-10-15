@@ -149,7 +149,10 @@ iPhone は Safari の共有ボタン →「ホーム画面に追加」で、ア�
 
 Week ごとに、全員共通の単語帳のかわりに、別の単語帳を出せます（先生ページの生徒の「設定・コード」→「単語帳」、または生徒ごとのチャットの `vocab-books` コマンド）。
 
-- いまある別の単語帳：`ielts1`「IELTS 語彙 Week 1」（`public/vocab/ielts1.js`。先生の PDF「IELTS 語彙 100」から。10 のテーマ × 10 語、例文は 1 語に 1 つ）
+- いまある別の単語帳：
+  - `ielts1`「IELTS 語彙 Week 1」（`public/vocab/ielts1.js`。先生の PDF「IELTS 語彙 100」から。10 のテーマ × 10 語、例文は 1 語に 1 つ）
+  - `w2`〜`w6`「単語帳 Week 2〜6」（`public/vocab/week2.js`〜`week6.js`。先生のスライド「単語帳 week 2〜6」から。100 語・例文 200 ずつ）。Week 1 のつづきですが、いまは全員共通ではなく、出した生徒だけに出ます（`everyone: false`。全員に出すときは、その行を消す）
+- 単語帳がない Week（たとえば Week 2 で、その生徒に `w2` を出していない）は、生徒の画面で「まだありません」
 - 別の単語帳にした生徒には、その Week の全員共通の単語帳は出ません。ほかの生徒は変わりません
 - カード・テスト・復習・音声は、全員共通の単語帳と同じです。テストの結果と復習カードは単語帳ごとに残るので、もとにもどすと、前の記録がまた出ます
 - 新しい単語帳（たとえば IELTS の Week 2）は、PDF やスライドを Claude に渡すと作れます。作ったあと、出したい生徒に `vocab-books` で設定します
@@ -321,7 +324,7 @@ API キーを入れると、そのあとに送られた日記から、AI が 1 �
 | `src/worker.js` | サーバー（ログイン、教材、日記、授業メモ、発音の録音、勉強時間） |
 | `public/grammar/lessons.js` | 文法の単元とレッスン（説明と問題） |
 | `public/mistakes.js` | 入力した答えのまちがい探し（スペルミス・文法・語順など。サーバーも同じものを使う） |
-| `public/vocab/week1.js`、`ielts1.js`、`words.js` | 単語帳 Week 1（全員共通）、IELTS 語彙 Week 1（出した生徒だけ）と、週・セット・復習・生徒ごとの単語帳の決まり |
+| `public/vocab/week1.js`〜`week6.js`、`ielts1.js`、`words.js` | 単語帳 Week 1（全員共通）、Week 2〜6 と IELTS 語彙 Week 1（出した生徒だけ）と、週・セット・復習・生徒ごとの単語帳の決まり |
 | `public/phrases/book.js`、`week1.js`、`week2.js` | フレーズ（週・Day・テストの決まりと、スモールトーク Week 1・2 の中身） |
 | `../smalltalk/` | スモールトークのフレーズ教材（md）と、書き方のルール |
 | `scripts/smalltalk-to-js.mjs`、`smalltalk-overrides.json` | md を `public/phrases/weekN.js` に変換する（md にない先生の変更も入れる） |
