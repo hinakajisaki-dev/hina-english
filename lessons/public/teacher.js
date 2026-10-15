@@ -177,7 +177,7 @@ async function renderList() {
                 <span><span class="code">${esc(formatCode(s.code))}</span></span>
                 <span class="muted small">${s.last_journal ? `最後の日記：${esc(formatDateTime(s.last_journal))}` : "まだ日記はありません"}</span>
               </a>
-              <button type="button" class="btn secondary small-btn copy-invite" data-id="${s.id}" aria-label="${esc(s.name)}さんの招待メッセージをコピー">招待をコピー</button>
+              <button type="button" class="btn secondary small-btn copy-code" data-id="${s.id}" aria-label="${esc(s.name)}さんのレッスンコードをコピー">コードをコピー</button>
             </div>`).join("")}</div>`
         : `<div class="card empty">まだ生徒がいません。上のフォームから追加してください。</div>`}
       <p class="footer-links"><button type="button" class="btn ghost small-btn" id="logout">ログアウト</button></p>
@@ -187,10 +187,10 @@ async function renderList() {
     await api("/api/teacher/logout", { method: "POST" }).catch(() => {});
     renderLogin();
   });
-  // A student's invite (the same message as on their page), or every code at once.
-  app.querySelectorAll(".copy-invite").forEach((button) => button.addEventListener("click", () => {
+  // A student's レッスンコード ("ABCD-EFGH"), or every code at once.
+  app.querySelectorAll(".copy-code").forEach((button) => button.addEventListener("click", () => {
     const student = state.students.find((s) => s.id === Number(button.dataset.id));
-    if (student) copy(inviteText(student));
+    if (student) copy(formatCode(student.code));
   }));
   document.getElementById("copy-all-codes")?.addEventListener("click", () => copy(allCodesText(state.students)));
 
@@ -849,7 +849,8 @@ function renderSettings(panel) {
   panel.innerHTML = `<div class="stack">
     <section class="card stack">
       <h3>レッスンコード</h3>
-      <p><span class="code" style="font-size:22px">${esc(formatCode(student.code))}</span></p>
+      <p class="code-row"><span class="code" style="font-size:22px">${esc(formatCode(student.code))}</span>
+        <button type="button" class="btn secondary small-btn" id="copy-code">コードをコピー</button></p>
       <p class="muted small">生徒は <b>${esc(location.origin)}/</b> を開いて、このコードを入れるとアプリに入れます。下のボタンで、URL とコードをまとめてコピーできます（LINE などで送ってください）。</p>
       <div class="btn-row" style="justify-content:flex-start">
         <button class="btn" id="copy" style="flex:none">招待メッセージをコピー</button>
@@ -903,6 +904,7 @@ function renderSettings(panel) {
   </div>`;
 
   document.getElementById("copy").addEventListener("click", () => copy(inviteText(student)));
+  document.getElementById("copy-code").addEventListener("click", () => copy(formatCode(student.code)));
   document.getElementById("new-code").addEventListener("click", async () => {
     if (!confirm("新しいコードにすると、いまのコードは使えなくなります。生徒はアプリからログアウトされるので、新しいコードを送ってください。よろしいですか？")) return;
     try {

@@ -9,10 +9,11 @@
   box-shadow: var(--shadow);
 }
 .student-card:hover { border-color: var(--sky); }
-/* The 招待をコピー button sits in the card's bottom corner, outside its link. */
+/* The コードをコピー button sits in the card's bottom corner, outside its link. */
 .student-item { position: relative; display: grid; }
 .student-item .student-card { padding-bottom: 58px; }
-.student-item .copy-invite { position: absolute; right: 14px; bottom: 14px; }
+.student-item .copy-code { position: absolute; right: 14px; bottom: 14px; }
+.code-row { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
 .student-card b { font-size: 18px; }
 .code {
   font-family: var(--en); font-weight: 800; letter-spacing: .08em; background: var(--sky-soft);
