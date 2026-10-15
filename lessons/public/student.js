@@ -15,7 +15,7 @@ import {
   weekTitle,
 } from "./phrases/book.js";
 import { findMistakes, normalizeWords } from "./mistakes.js";
-import { noteDayLabel, noteHtml as memoHtml, noteProblems } from "./notes/format.js";
+import { lessonDayLabel, lessonList, noteDayLabel, noteHtml as memoHtml, noteProblems } from "./notes/format.js";
 import {
   appMinutes, bindPanels, formatMinutes, monthPanel, monthStart, startStudyClock, studySplit, summary, today,
   totalMinutes, weekDays, weekPanel, weekStart,
@@ -315,6 +315,7 @@ function renderHome() {
   const week = summary(weekDays(state.me.study, weekStart(now)));
   const todayRow = state.me.study.find((r) => r.day === now);
   const latestNote = state.me.notes[0];
+  const lessonCount = lessonList(state.me.lessonDays, state.me.notes).length;
   const plan = state.me.plan;
 
   app.innerHTML = `
@@ -367,7 +368,10 @@ function renderHome() {
             ${shared.length ? `<div class="bar"><i style="width:${Math.round((pronFinished / shared.length) * 100)}%"></i></div>` : ""}` },
           NOTES_FOR_STUDENTS && { key: "notes", wide: true, html: `
             <span class="emoji" aria-hidden="true">📝</span>
-            <div><b>授業メモ</b><p class="muted">${latestNote ? `${esc(noteDayLabel(latestNote.day))}${latestNote.title ? ` ・ ${esc(latestNote.title)}` : ""}` : "授業のあとに、先生のメモがとどきます"}</p></div>` },
+            <div><b>授業メモ</b><p class="muted">${[
+              lessonCount ? `これまでの授業 ${lessonCount} 回` : "",
+              latestNote ? `${esc(noteDayLabel(latestNote.day))}${latestNote.title ? ` ・ ${esc(latestNote.title)}` : ""}` : "",
+            ].filter(Boolean).join(" ・ ") || "授業のあとに、先生のメモがとどきます"}</p></div>` },
           { key: "study", wide: true, html: `
             <span class="emoji" aria-hidden="true">⏱️</span>
             <div><b>勉強時間</b><p class="muted">今日 ${formatMinutes(totalMinutes(todayRow))} ・ 今週 ${formatMinutes(week.total)}</p></div>` },
@@ -390,7 +394,8 @@ function renderHome() {
 }
 
 // ---------- 授業メモ ----------
-// The teacher's memo of each lesson, newest first. A memo's 復習問題 are cards
+// Every lesson so far, numbered from the first (notes/format.js lessonList);
+// a lesson with the teacher's memo opens it. A memo's 復習問題 are cards
 // like 単語カード (the English; a tap shows the meaning and 解説), in a panel at
 // the bottom of the screen so the memo can still be read above it. Each card
 // can go into フレーズ復習 ("n12/3": memo 12's fourth card).
@@ -398,13 +403,18 @@ function renderHome() {
 function renderNotes(id) {
   if (id) return renderNote(Number(id));
   const notes = state.me.notes;
+  const lessons = lessonList(state.me.lessonDays, notes);
   app.innerHTML = `${topbar("授業メモ")}
     <main class="wrap stack">
-      ${notes.length ? `<p class="muted">授業で習ったことのまとめです。メモの内容で、いつでも復習できます。</p>` : ""}
-      ${notes.length ? notes.map((note) => `<a class="lesson-card" href="#/notes/${note.id}">
-          <div><b>${esc(noteDayLabel(note.day))}</b>${note.title ? `<span class="muted small">${esc(note.title)}</span>` : ""}</div>
-          ${note.problems ? `<span class="badge">復習 ${note.problems}こ</span>` : ""}
-        </a>`).join("") : emptyState("まだ授業メモはありません。<br>授業のあとに、先生のメモがここにとどきます。")}
+      ${lessons.length ? `<p class="muted">これまでの授業：<b>${lessons.length} 回</b>${notes.length ? "<br>メモがある授業は、タップすると授業で習ったことのまとめが見られます。メモの内容で、いつでも復習できます。" : ""}</p>` : ""}
+      ${lessons.length ? lessons.map((lesson) => {
+        const name = `${lesson.number}. ${esc(lessonDayLabel(lesson.day))}`;
+        if (!lesson.notes.length) return `<div class="lesson-card past-lesson"><div><b>${name}</b></div></div>`;
+        return lesson.notes.map((note) => `<a class="lesson-card" href="#/notes/${note.id}">
+          <div><b>${name}</b>${note.title ? `<span class="muted small">${esc(note.title)}</span>` : ""}</div>
+          ${note.problems ? `<span class="badge">復習 ${note.problems}こ</span>` : `<span class="badge">メモ</span>`}
+        </a>`).join("");
+      }).join("") : emptyState("まだ授業メモはありません。<br>授業のあとに、先生のメモがここにとどきます。")}
     </main>`;
 }
 
