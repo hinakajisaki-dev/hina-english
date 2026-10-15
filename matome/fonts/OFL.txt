@@ -11,6 +11,10 @@ Copyright 2014 The DM Sans Project Authors (https://github.com/googlefonts/dm-fo
 Caveat-700.woff2 (Caveat, Latin subset, from the @fontsource/caveat 5.3.0 package, unmodified):
 Copyright 2014 The Caveat Project Authors (https://github.com/googlefonts/caveat)
 
+ReggaeOne-Regular.woff2 (Reggae One, from github.com/google/fonts, subset to ASCII, kana and
+Japanese punctuation for the live slides' challenge titles):
+Copyright 2020 The Reggae Project Authors (https://github.com/fontworks-fonts/Reggae/)
+
 These fonts are licensed under the SIL Open Font License, Version 1.1.
 This license is copied below, and is also available with a FAQ at:
 https://openfontlicense.org

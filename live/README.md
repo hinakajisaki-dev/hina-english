@@ -5,7 +5,7 @@ YouTube の英語ライブで使う「瞬間英作文」のスライド。デザ
 | フォルダ | 内容 |
 | --- | --- |
 | `daily-phrases-part2/` | 塊で覚える 日常英会話フレーズ（フレーズ20個・40問）。`daily-phrases-part2.pptx`（Google スライド用）と `daily-phrases-part2.pdf`（確認用）、全46枚 |
-| `scott-will-can/` | Scott先生 × ひな コラボLIVE「ネイティブっぽく長い文章で話す方法」（Scott先生の紹介・will・前置詞＋名詞・can・瞬間英作文15問）。タイトルはポップなデザイン、1分間チャレンジはオレンジのステージ。全51枚 |
+| `scott-will-can/` | Scott先生 × ひな コラボLIVE「ネイティブっぽく長い文章で話す方法」（Scott先生の紹介・will・前置詞＋名詞・can・瞬間英作文15問）。タイトルはポップなデザイン、1分間チャレンジはオレンジのステージ。Scott先生の写真（`scott.jpg`）と国旗（`flag-ca.png` / `flag-us.png`）もこのフォルダに。全51枚 |
 
 ## スライドの流れ
 
@@ -24,7 +24,7 @@ npm install   # 初回のみ
 npm run live -- live/daily-phrases-part2
 ```
 
-`slides.html`、`.pdf`、`.pptx` が作り直されます。`.pptx` を Google ドライブにアップロードすると、Google スライドに変換されます（英語は DM Sans、日本語は Noto Sans JP、手書き風の英字は Caveat。どれも Google スライドに入っているフォントです）。
+`slides.html`、`.pdf`、`.pptx` が作り直されます。`.pptx` を Google ドライブにアップロードすると、Google スライドに変換されます（英語は DM Sans、日本語は Noto Sans JP、手書き風の英字は Caveat、チャレンジのタイトルは Reggae One。どれも Google スライドで使えるフォントです）。
 
 `phrases.md` の書き方：
 

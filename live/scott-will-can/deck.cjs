@@ -5,19 +5,21 @@
 //
 // 英文の書き方：[will] はオレンジ、{p:at the park} は場所（青）、{t:at 8pm} は時間（黄）、
 // {w:with my friends} はだれと（ピンク）。1行に収まらないところは <br> で改行します。
-const { esc, two, LOGO, deco, header, cover, ending, page, shapes, rays, star, sparkle } = require("../parts.cjs");
+const { esc, two, LOGO, deco, header, cover, ending, page, shapes, rays } = require("../parts.cjs");
 
 // ---------- 中身 ----------
 
 const TITLE = { title: "ネイティブっぽく<br>長い文章で話す方法", subtitle: "Scott先生 × ひな コラボLIVE", look: "pop" };
 
-// Scott先生の紹介。写真が届いたら PHOTO にファイル名（このフォルダに置く）を入れます。
+// Scott先生の紹介（本人のプロフィールから）。写真と国旗はこのフォルダの画像です。
 const SCOTT = {
-  photo: "",
+  photo: "scott.jpg",
   profile: [
-    ["出身", "（あとで入れます）"],
-    ["経歴", "（あとで入れます）"],
-    ["ひとこと", "（あとで入れます）"],
+    ["出身", "Born in Canada, grew up mostly in the US", "カナダ生まれ、ほぼアメリカ育ち"],
+    ["来日", "Came to Japan to study martial arts and 整体", "武道と整体を学びに日本へ"],
+    ["経歴", "Teaching for over 35 years", "35年以上、教えています"],
+    ["在住", "Lives in Osaka", "大阪在住"],
+    ["YouTube", "BananaeigoTV", ""],
   ],
 };
 
@@ -124,39 +126,33 @@ function theme() {
 }
 
 function scottIntro() {
-  const photo = SCOTT.photo
-    ? `<img class="photo" src="${esc(SCOTT.photo)}" alt="Scott先生">`
-    : `<div class="photo"><div class="ph-head"></div><div class="ph-body"></div><p class="ph-t">写真が入ります</p></div>`;
   return slide("intro r2", tag("SPECIAL GUEST", "Scott先生"), `
   <div class="in-body">
-    ${photo}
+    <div class="photo-frame"><img src="${esc(SCOTT.photo)}" alt="Scott先生"></div>
     <div class="in-right">
-      <span class="chip">SPECIAL GUEST</span>
       <p class="script">Hi, I'm Scott!</p>
-      <h2 class="in-name"><span class="en">Scott</span>先生</h2>
+      <div class="in-namerow">
+        <h2 class="in-name"><span class="en">Scott</span>先生</h2>
+        <div class="flags"><img src="flag-ca.png" alt="カナダの国旗"><span class="farrow">→</span><img src="flag-us.png" alt="アメリカの国旗"></div>
+      </div>
       <dl class="prof">
-        ${SCOTT.profile.map(([k, v]) => `<div><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join("\n        ")}
+        ${SCOTT.profile
+          .map(([k, en, ja]) => `<div class="${k === "YouTube" ? "yt" : ""}"><dt>${esc(k)}</dt><dd><p class="pe2">${esc(en)}</p>${ja ? `<p class="pj2">${esc(ja)}</p>` : ""}</dd></div>`)
+          .join("\n        ")}
       </dl>
     </div>
   </div>`);
 }
 
-// The 1-minute chat challenges: an orange "stage" with a sunburst, the question, a big timer
-// and the three steps along the bottom.
+// The 1-minute chat challenges: an orange "stage" with a soft sunburst behind the timer, a big
+// Japanese title in Reggae One (with a dark copy behind it as a drop shadow), the question and
+// the three steps along the bottom.
 function stage({ rn, text, badge, title, question, ja, under, steps }) {
-  const [a, b] = title;
   const logo = shapes(LOGO.map((d) => [d, "#F0521E"]));
-  const sparkles = shapes([
-    [star(1150, 170, 26), "#FFD966"],
-    [star(858, 262, 13), "#FFD966"],
-    [sparkle(884, 148, 17), "#FFFFFF"],
-    [sparkle(1240, 280, 12), "#FFFFFF"],
-    [sparkle(770, 560, 12), "#FFD966"],
-  ]);
   return `
 <section class="slide stage r4">
-  ${shapes([[rays(1066, 415, 36), "#F36B3D"]])}${header(tag(rn, text))}
-  <div class="st-head"><span class="st-badge">${esc(badge)}</span><h2 class="st-title">${a} <span class="y">${b}</span></h2></div>
+  ${shapes([[rays(1066, 415, 36), "#F25F2D"]])}${header(tag(rn, text))}
+  <div class="st-head"><span class="st-badge">${esc(badge)}</span><div class="st-title"><p class="st-sh">${esc(title)}</p><p class="st-tx">${esc(title)}</p></div></div>
   <div class="st-body">
     <div class="st-q">
       <p class="lab">QUESTION</p>
@@ -169,7 +165,7 @@ function stage({ rn, text, badge, title, question, ja, under, steps }) {
   <ol class="st-steps">
     ${steps.map((t, i) => `<li><span class="st-n">${i + 1}</span><span>${esc(t)}</span></li>`).join("\n    ")}
   </ol>
-  ${logo}${sparkles}
+  ${logo}
 </section>`;
 }
 
@@ -205,7 +201,7 @@ function challengeStage() {
     rn: "CHALLENGE STAGE",
     text: "1分間チャレンジ",
     badge: "1分間で、いくつ書ける？",
-    title: ["CHALLENGE", "STAGE"],
+    title: "チャレンジステージ",
     question: "tomorrow?",
     ja: "明日なにするの？",
     under: `<p class="st-blank">I will ＿＿＿＿＿.</p>`,
@@ -264,7 +260,7 @@ function challengeRound([q, ja], i) {
     rn: "CHALLENGE TIME",
     text: `ROUND ${i + 1}`,
     badge: `ROUND ${i + 1}　前置詞＋名詞で長く！`,
-    title: ["CHALLENGE", "TIME"],
+    title: "チャレンジタイム",
     question: q,
     ja,
     under: hints(),

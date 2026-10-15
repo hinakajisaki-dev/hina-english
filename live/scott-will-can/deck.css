@@ -69,30 +69,37 @@
 .aj2 { font-size: 18px; color: var(--muted); }
 
 /* ---------- Scott先生の紹介 ---------- */
-.in-body { flex: 1; display: grid; grid-template-columns: 440px 1fr; gap: 56px; align-items: center; }
-.photo { position: relative; width: 440px; height: 440px; border-radius: 44px; background: #FFE3EA; border: 6px solid #FFFFFF; box-shadow: var(--shadow); object-fit: cover; }
-.ph-head { position: absolute; left: 154px; top: 86px; width: 120px; height: 120px; border-radius: 50%; background: #FFB8C9; }
-.ph-body { position: absolute; left: 104px; top: 220px; width: 220px; height: 120px; border-radius: 60px; background: #FFB8C9; }
-.ph-t { position: absolute; left: 0; right: 0; bottom: 34px; text-align: center; font-size: 18px; color: #C2416A; }
+.in-body { flex: 1; display: grid; grid-template-columns: 440px 1fr; gap: 52px; align-items: center; }
+.photo-frame { width: 440px; height: 440px; padding: 6px; border-radius: 44px; background: #FFFFFF; box-shadow: var(--shadow); }
+.photo-frame img { display: block; width: 428px; height: 428px; border-radius: 38px; } /* corners are also rounded in the image */
 .in-right { display: flex; flex-direction: column; align-items: flex-start; }
-.in-right .script { font-size: 44px; margin-top: 16px; }
-.in-name { font-size: 72px; font-weight: 900; line-height: 1.15; margin-top: 4px; }
+.in-right .script { font-size: 44px; }
+.in-namerow { display: flex; align-items: center; gap: 22px; margin-top: 2px; }
+.in-name { font-size: 68px; font-weight: 900; line-height: 1.15; }
 .in-name .en { font-weight: 700; }
-.prof { align-self: stretch; margin-top: 24px; background: var(--card); border-radius: 22px; box-shadow: var(--shadow); padding: 6px 28px; }
-.prof div { display: grid; grid-template-columns: 110px 1fr; align-items: center; padding: 14px 0; }
+.flags { display: flex; align-items: center; gap: 8px; }
+.flags img { display: block; height: 32px; }
+.farrow { font-size: 20px; color: var(--muted); }
+.prof { align-self: stretch; margin-top: 18px; background: var(--card); border-radius: 22px; box-shadow: var(--shadow); padding: 4px 28px; }
+.prof div { display: grid; grid-template-columns: 96px 1fr; align-items: center; padding: 10px 0; }
 .prof div + div { border-top: 2px solid var(--line-warm); }
 .prof dt { font-size: 15px; color: var(--accent-text); }
-.prof dd { font-size: 20px; color: var(--muted); }
+.prof .yt dt { color: #D91F26; }
+.pe2 { font-family: var(--en); font-size: 21px; }
+.pj2 { font-size: 14px; color: var(--muted); margin-top: 1px; }
 
 /* ---------- チャレンジ（1分間）：オレンジのステージ ---------- */
 .stage { background: var(--accent); }
 .stage > :not(svg) { position: relative; } /* above the sunburst, which is drawn first */
 .stage .logo b { color: #FFFFFF; }
 .stage .mark { background: #FFFFFF; }
+@font-face { font-family: "Reggae One"; src: url("../../matome/fonts/ReggaeOne-Regular.woff2") format("woff2"); }
 .st-head { margin-top: 20px; }
-.st-badge { display: inline-block; background: #FFD966; color: var(--ink); font-size: 20px; font-weight: 900; padding: 6px 20px 8px; border-radius: 999px; }
-.st-title { font-family: var(--en); font-weight: 700; font-size: 76px; line-height: 1.05; letter-spacing: -1px; color: #FFFFFF; margin-top: 12px; }
-.st-title .y { color: #FFD966; }
+.st-badge { display: inline-block; background: #FFFFFF; color: var(--accent-text); font-size: 20px; font-weight: 900; padding: 6px 20px 8px; border-radius: 999px; }
+.st-title { position: relative; margin-top: 8px; padding: 0 8px 8px 0; }
+.st-title p { font-family: "Reggae One", var(--ja); font-weight: 400; font-size: 92px; line-height: 1.2; white-space: nowrap; }
+.st-sh { position: absolute; left: 7px; top: 7px; color: #A3300B; } /* drop shadow */
+.st-tx { position: relative; color: #FFFFFF; }
 .st-body { flex: 1; display: grid; grid-template-columns: 1fr 300px; gap: 48px; align-items: center; }
 .st-q { background: var(--card); border-radius: 28px; box-shadow: 0 16px 40px rgba(120, 30, 0, .25); padding: 22px 34px 26px; }
 .st-qen { font-family: var(--en); font-size: 42px; letter-spacing: -.6px; margin-top: 6px; }
@@ -100,12 +107,12 @@
 .st-blank { font-family: var(--en); font-size: 34px; color: var(--muted); margin-top: 14px; }
 .st-q .hints { margin-top: 16px; }
 .st-timer { display: grid; place-items: center; }
-.st-ring { width: 270px; height: 270px; border-radius: 50%; background: #FFFFFF; border: 18px solid #FFD966; box-shadow: 0 16px 40px rgba(120, 30, 0, .25); display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.st-ring { width: 270px; height: 270px; border-radius: 50%; background: #FFFFFF; border: 18px solid #FFD3C2; box-shadow: 0 16px 40px rgba(120, 30, 0, .25); display: flex; flex-direction: column; align-items: center; justify-content: center; }
 .tm { font-family: var(--en); font-size: 84px; line-height: 1; letter-spacing: -2px; color: var(--accent); }
 .tl { font-family: var(--en); font-size: 15px; letter-spacing: .2em; color: var(--accent-text); margin-top: 10px; }
 .st-steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 18px; }
 .st-steps li { display: flex; align-items: center; gap: 12px; background: #FFFFFF; border-radius: 18px; padding: 12px 18px; font-size: 20px; font-weight: 900; }
-.st-n { flex: none; width: 34px; height: 34px; border-radius: 50%; background: #FFD966; color: var(--ink); font-family: var(--en); font-size: 18px; display: grid; place-items: center; }
+.st-n { flex: none; width: 34px; height: 34px; border-radius: 50%; background: var(--accent); color: #FFFFFF; font-family: var(--en); font-size: 18px; display: grid; place-items: center; }
 .hints { display: flex; gap: 10px; margin-top: 24px; }
 
 /* ---------- LESSON 1 ---------- */

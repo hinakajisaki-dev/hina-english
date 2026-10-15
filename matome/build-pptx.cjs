@@ -188,9 +188,11 @@ function extract() {
 // Google Slides both have Arial, so the .pptx asks for that. Other fonts (DM Sans, Caveat)
 // keep their name; Google Slides has them built in.
 const PPTX_FONT = { "Liberation Sans": "Arial" };
+// Japanese display fonts that cover the whole run themselves (Google Slides has them too).
+const JA_FONTS = new Set(["Noto Sans JP", "Reggae One"]);
 function splitByScript(run) {
   const JA = "Noto Sans JP";
-  if (run.latinFont === JA) return [{ ...run, font: JA }];
+  if (JA_FONTS.has(run.latinFont)) return [{ ...run, font: run.latinFont }];
   const latin = PPTX_FONT[run.latinFont] || run.latinFont;
   const parts = run.text.match(/[\u0000-\u1fff]+|[^\u0000-\u1fff]+/g) || [];
   return parts.map((text) => ({ ...run, text, font: /^[\u0000-\u1fff]/.test(text) ? latin : JA }));
