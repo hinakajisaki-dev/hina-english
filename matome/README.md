@@ -6,7 +6,7 @@
 | --- | --- |
 | `9-phrases/` | 日常英会話フレーズ 9選（`9-phrases-matome.pdf` / 編集できる `9-phrases-matome.pptx`）。スライド11枚＋練習問題45問と解答 |
 | `lr-pronunciation/` | 発音解説動画「L と R の発音」（`lr-pronunciation-slides.pdf` / 編集できる `lr-pronunciation-slides.pptx`）。動画で映すスライド21枚。舌の位置の断面図（L・ら・R）と正面図、ペア単語のイラストつき。台本は `script.md`、スライド1枚ごとのセリフは `slide-script.md` |
-| `lr-practice/` | 発音練習動画「L と R 練習編」（講義編の続き）。動画で映すスライド15枚。ウォームアップ、L / R の単語8語ずつ、ペア単語6組 × 2、L と R が両方入った単語、文6つ、聞き分けチャレンジ5問、毎日5分の筋トレメニュー。セリフは `slide-script.md` |
+| `lr-practice/` | 発音練習動画「L と R 練習編」（講義編の続き。`lr-practice-slides.pdf` / 編集できる `lr-practice-slides.pptx`、1〜8枚目だけの `lr-practice-slides-1-8.pdf`）。動画で映すスライド15枚。ウォームアップ、L / R の単語8語ずつ、ペア単語6組 × 2、L と R が両方入った単語、文6つ、聞き分けチャレンジ5問、毎日5分の筋トレメニュー。セリフは `slide-script.md` |
 
 ## PDF の作り直し方
 
@@ -25,6 +25,7 @@ npm run matome:pptx -- matome/lr-pronunciation/slides.html matome/lr-pronunciati
 # L と R 練習編の動画スライド
 npm run matome -- matome/lr-practice/slides.html matome/lr-practice/lr-practice-slides.pdf
 npm run matome:pptx -- matome/lr-practice/slides.html matome/lr-practice/lr-practice-slides.pptx
+pdfseparate -f 1 -l 8 matome/lr-practice/lr-practice-slides.pdf /tmp/p-%02d.pdf && pdfunite /tmp/p-0?.pdf matome/lr-practice/lr-practice-slides-1-8.pdf  # 1〜8枚目だけ
 ```
 
 `lr-pronunciation/`・`lr-practice/` は、冠詞の動画スライド（ブランチ `claude/amazing-goodall-3xbl6t`）と共通のデザイン `hina.css` を読み込んでいます（サロンと同じ色・カード・フォント）。L はオレンジ、R は青、日本語の「ら」はグレーで色分けしています。
