@@ -25,11 +25,12 @@
 // node scripts/teacher.mjs pron-done なおみ (--month 1 | --keys m1/01,m1/02) [--day 2026-09-30] [--dry | --undo]
 //                                                                 (発音 finished before the app, as 完了 with no recording)
 // node scripts/teacher.mjs vocab-books なおみ [--set "1=ielts1" | --default]   (単語帳 per week instead of the shared one)
+// node scripts/teacher.mjs lesson-days なおみ [--add 2026-08-03,2026-08-16] [--remove 2026-08-03]   (the numbered lessons)
 //
 // A file of "-" is read from stdin.
 import { spawnSync } from "node:child_process";
 import { readFileSync } from "node:fs";
-import { noteDayLabel, noteProblems } from "../public/notes/format.js";
+import { lessonDayLabel, lessonList, noteDayLabel, noteProblems } from "../public/notes/format.js";
 import { MENUS, menuKey } from "../public/menus.js";
 import { monthPhrases, pronMonths, studentMonths } from "../public/pron/phrases.js";
 import { vocabBooks, weekBook } from "../public/vocab/words.js";
@@ -194,6 +195,15 @@ function bookLine(books) {
   }).join("\n");
 }
 
+// "1. 8月3日（月）　メモなし" for every lesson so far.
+function lessonLines(data) {
+  const lessons = lessonList(data.lessonDays, data.notes);
+  if (!lessons.length) return "（まだありません）";
+  return lessons.map((l) => `${l.number}. ${lessonDayLabel(l.day)}（${l.day}）　${l.notes.length
+    ? l.notes.map((n) => `[メモ ${n.id}]${n.published_at ? "" : "（下書き）"}`).join(" ")
+    : "メモなし"}`).join("\n");
+}
+
 const menuLine = (hidden = []) =>
   MENUS.map((m) => `${hidden.includes(m.key) ? "×" : "○"} ${m.name}`).join("　");
 
@@ -217,6 +227,7 @@ const commands = {
     console.log(`\n## 発音課題の完了\n${pronProgress(data.pronDone)}`);
     console.log(`\n## 単語帳\n${bookLine(data.vocabBooks)}`);
     console.log(`\n## 今週の勉強範囲\n${data.plan ? data.plan.body : "（まだありません）"}`);
+    console.log(`\n## これまでの授業\n${lessonLines(data)}`);
     for (const [kind, spec] of Object.entries(KINDS)) {
       const items = data.items.filter((i) => i.kind === kind);
       console.log(`\n## ${spec.name}（${items.length}）`);
@@ -424,6 +435,20 @@ const commands = {
     }
     const result = await api(`/api/teacher/students/${student.id}/vocab-books`, { method: "PUT", body: { books } });
     console.log(`${student.name}さんの単語帳を変えました：\n${bookLine(result.books)}`);
+  },
+
+  async "lesson-days"([name], options) {
+    const student = await findStudent(name);
+    const list = (value) => String(value || "").split(/[,、，\s]+/).filter(Boolean);
+    const add = list(options.add);
+    const remove = list(options.remove);
+    if (add.length || remove.length) {
+      await api(`/api/teacher/students/${student.id}/lesson-days`, { method: "POST", body: { add, remove } });
+    }
+    const data = await studentData(student);
+    const kept = remove.filter((day) => data.notes.some((n) => n.day === day));
+    const done = add.length || remove.length ? `${student.name}さんの授業の日を変えました。` : `${student.name}さんの授業：`;
+    console.log(`${done}\n${lessonLines(data)}${kept.length ? `\n（${kept.join("、")} は授業メモがあるので、残っています）` : ""}`);
   },
 
   async "delete-note"([name, id]) {

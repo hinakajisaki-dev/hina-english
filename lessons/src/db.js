@@ -144,6 +144,15 @@ const SCHEMA = [
     updated_at TEXT NOT NULL
   )`,
   `CREATE INDEX IF NOT EXISTS lesson_notes_student ON lesson_notes(student_id, day)`,
+  // Days the student had a lesson, put in by the teacher (lessons from before the
+  // app, or with no 授業メモ). The numbered list of lessons is these days and the
+  // days of 授業メモ together (public/notes/format.js lessonList).
+  `CREATE TABLE IF NOT EXISTS lesson_days (
+    student_id INTEGER NOT NULL REFERENCES students(id) ON DELETE CASCADE,
+    day TEXT NOT NULL,
+    created_at TEXT NOT NULL,
+    PRIMARY KEY (student_id, day)
+  )`,
   // 今週の勉強範囲: what the teacher wants the student to study this week, shown at
   // the top of the student's home (the same small Markdown as 授業メモ).
   `CREATE TABLE IF NOT EXISTS study_plans (
@@ -251,7 +260,7 @@ export function noteRow(row) {
 export async function studentBundle(db, studentId) {
   const [
     items, progress, lessonRows, reviewRows, testRows, phraseReviewRows, phraseTestRows, pronRows, studyRows, journals, plan,
-    menus, settings,
+    menus, settings, lessonDays,
   ] = await Promise.all([
     all(db, `SELECT * FROM items WHERE student_id = ? ORDER BY id`, studentId),
     all(db, `SELECT * FROM progress WHERE student_id = ?`, studentId),
@@ -266,6 +275,13 @@ export async function studentBundle(db, studentId) {
     first(db, `SELECT body, updated_at FROM study_plans WHERE student_id = ?`, studentId),
     first(db, `SELECT hidden FROM student_menus WHERE student_id = ?`, studentId),
     all(db, `SELECT name, value FROM student_settings WHERE student_id = ?`, studentId),
+    // Every day with a lesson: the days put in, and the days of every 授業メモ up
+    // to today (drafts too, so the student's numbering doesn't change when one is published).
+    all(
+      db,
+      `SELECT day FROM lesson_days WHERE student_id = ?1 UNION SELECT day FROM lesson_notes WHERE student_id = ?1 AND day <= ?2 ORDER BY day`,
+      studentId, japanDay(),
+    ),
   ]);
   const setting = (name) => {
     const row = settings.find((r) => r.name === name);
@@ -310,5 +326,6 @@ export async function studentBundle(db, studentId) {
     hidden: menus ? JSON.parse(menus.hidden) : [],
     pronMonths: setting("pron_months"),
     vocabBooks: setting("vocab_books"),
+    lessonDays: lessonDays.map((r) => r.day),
   };
 }

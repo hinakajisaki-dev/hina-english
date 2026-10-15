@@ -8,7 +8,7 @@ import { USUAL_MONTHS, currentMonth, monthLabel, monthPhrases, pronMonths, stude
 import { CURRENT_WEEK, NOTES_FOR_STUDENTS } from "./course.js";
 import { MENUS } from "./menus.js";
 import { phraseSetKey, phraseSets, phraseWeeks, testSize } from "./phrases/book.js";
-import { noteDayLabel, noteHtml, noteProblems } from "./notes/format.js";
+import { lessonDayLabel, lessonList, noteDayLabel, noteHtml, noteProblems } from "./notes/format.js";
 import { bindPanels, formatMinutes, monthPanel, monthStart, summary, today, weekDays, weekPanel, weekStart } from "./study.js";
 
 document.body.classList.add("teacher");
@@ -361,6 +361,18 @@ function notePreviewHtml(body) {
     </div>`;
 }
 
+// Every lesson so far, numbered, as the student sees it (with drafts marked).
+function lessonsHtml() {
+  const lessons = lessonList(state.current.lessonDays, state.current.notes);
+  return `<section class="card stack" id="lessons">
+    <h3>これまでの授業（${lessons.length} 回）</h3>
+    <p class="muted small">メモのある日と、生徒ごとのチャットの <code>lesson-days</code> で入れた日です。生徒の授業メモの画面に、この番号と日付で出ます（下書きのメモの日は、生徒にはメモなしの授業として出ます）。</p>
+    ${lessons.length ? `<ol class="lesson-days">${lessons.map((lesson) => `<li value="${lesson.number}">${esc(lessonDayLabel(lesson.day))}　<span class="muted small">${lesson.notes.length
+      ? lesson.notes.map((n) => `メモ${n.published_at ? "（公開中）" : "（下書き）"}${n.title ? ` ${esc(n.title)}` : ""}`).join("、")
+      : "メモなし"}</span></li>`).join("")}</ol>` : `<p class="empty">まだありません。</p>`}
+  </section>`;
+}
+
 function renderNotes(panel) {
   const { student, notes } = state.current;
   const editing = notes.find((n) => n.id === state.noteEdit?.id && state.noteEdit.student === student.id) || null;
@@ -389,6 +401,7 @@ function renderNotes(panel) {
       </div>
       <div class="note-preview card" id="note-preview" hidden></div>
     </form>
+    ${lessonsHtml()}
     ${notes.length ? notes.map((note) => `
       <details class="card note-entry" data-id="${note.id}">
         <summary>

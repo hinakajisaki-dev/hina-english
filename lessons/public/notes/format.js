@@ -177,6 +177,22 @@ export function noteHtml(body) {
   return out.join("\n");
 }
 
+// Every lesson so far, oldest first and numbered from 1: the days the teacher
+// put in (lesson_days) and the days of 授業メモ, together. A day with memos
+// carries them: [{ number, day, notes }].
+export function lessonList(days = [], notes = []) {
+  const all = [...new Set([...days, ...notes.map((n) => n.day)])].sort();
+  return all.map((day, i) => ({ number: i + 1, day, notes: notes.filter((n) => n.day === day) }));
+}
+
+// "8月3日（日）"
+export function lessonDayLabel(day) {
+  const [year, month, date] = String(day).split("-").map(Number);
+  if (!year || !month || !date) return String(day);
+  const weekday = "日月火水木金土"[new Date(Date.UTC(year, month - 1, date)).getUTCDay()];
+  return `${month}月${date}日（${weekday}）`;
+}
+
 // "10月12日の授業"
 export function noteDayLabel(day) {
   const [, month, date] = String(day).split("-").map(Number);

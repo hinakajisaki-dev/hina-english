@@ -157,6 +157,9 @@ async function route(request, env, url) {
   if (parts[1] === "students" && parts[3] === "vocab-books" && parts.length === 4 && method === "PUT") {
     return saveVocabBooks(request, db, await findStudent(db, id(2)));
   }
+  if (parts[1] === "students" && parts[3] === "lesson-days" && parts.length === 4 && method === "POST") {
+    return saveLessonDays(request, db, await findStudent(db, id(2)));
+  }
   if (parts[1] === "students" && parts[3] === "journals" && parts.length === 4 && method === "POST") {
     return importJournals(request, db, await findStudent(db, id(2)));
   }
@@ -909,6 +912,27 @@ async function saveVocabBooks(request, db, student) {
     student.id, JSON.stringify(clean), now(),
   );
   return json({ books: clean });
+}
+
+// Days the student had a lesson: { add: ["2026-08-03", …], remove: [...] }.
+// A day can't be after today. A day with a 授業メモ is a lesson anyway, so
+// taking it out here leaves it in the list. Returns every day put in.
+async function saveLessonDays(request, db, student) {
+  const { add = [], remove = [] } = await readJson(request);
+  if (!Array.isArray(add) || !Array.isArray(remove)) throw new HttpError(400, "内容が正しくありません。");
+  if (add.length + remove.length > 200) throw new HttpError(400, "一度にできるのは 200 日までです。");
+  const today = japanDay();
+  const bad = [...add, ...remove].map(String).find((day) => !/^\d{4}-\d{2}-\d{2}$/.test(day) || Number.isNaN(Date.parse(day)));
+  if (bad !== undefined) throw new HttpError(400, `日付が読めません：${bad}（2026-08-03 のように書いてください）`);
+  const future = add.map(String).find((day) => day > today);
+  if (future) throw new HttpError(400, `まだ来ていない日です：${future}`);
+  const statements = [
+    ...add.map((day) => db.prepare(`INSERT OR IGNORE INTO lesson_days (student_id, day, created_at) VALUES (?, ?, ?)`).bind(student.id, String(day), now())),
+    ...remove.map((day) => db.prepare(`DELETE FROM lesson_days WHERE student_id = ? AND day = ?`).bind(student.id, String(day))),
+  ];
+  if (statements.length) await db.batch(statements);
+  const days = (await all(db, `SELECT day FROM lesson_days WHERE student_id = ? ORDER BY day`, student.id)).map((r) => r.day);
+  return json({ days });
 }
 
 async function studentSetting(db, student, name) {
