@@ -81,6 +81,11 @@ function inviteText(student) {
   return `${student.name}さん\nHina English のレッスンアプリはこちらです👇\n${location.origin}/\nレッスンコード：${formatCode(student.code)}`;
 }
 
+// Every student's code under the app's address, to keep or pass on in one go.
+function allCodesText(students) {
+  return [`Hina English のレッスンアプリ：${location.origin}/`, ...students.map((s) => `${s.name}：${formatCode(s.code)}`)].join("\n");
+}
+
 async function copy(text) {
   try {
     await navigator.clipboard.writeText(text);
@@ -161,12 +166,19 @@ async function renderList() {
         <p class="muted small">追加すると、その生徒だけのレッスンコードができます。コードを生徒に送ると、アプリに入れます。</p>
       </section>
       ${state.students.length
-        ? `<div class="student-list">${state.students.map((s) => `
-            <a class="student-card" href="#/s/${s.id}">
-              <div class="head-row"><b>${esc(s.name)}</b>${s.unread ? `<span class="unread">未読 ${s.unread}</span>` : ""}</div>
-              <span><span class="code">${esc(formatCode(s.code))}</span></span>
-              <span class="muted small">${s.last_journal ? `最後の日記：${esc(formatDateTime(s.last_journal))}` : "まだ日記はありません"}</span>
-            </a>`).join("")}</div>`
+        ? `<div class="head-row">
+            <h3>生徒（${state.students.length}人）</h3>
+            <button type="button" class="btn secondary small-btn" id="copy-all-codes">全員のコードをまとめてコピー</button>
+          </div>
+          <div class="student-list">${state.students.map((s) => `
+            <div class="student-item">
+              <a class="student-card" href="#/s/${s.id}">
+                <div class="head-row"><b>${esc(s.name)}</b>${s.unread ? `<span class="unread">未読 ${s.unread}</span>` : ""}</div>
+                <span><span class="code">${esc(formatCode(s.code))}</span></span>
+                <span class="muted small">${s.last_journal ? `最後の日記：${esc(formatDateTime(s.last_journal))}` : "まだ日記はありません"}</span>
+              </a>
+              <button type="button" class="btn secondary small-btn copy-invite" data-id="${s.id}" aria-label="${esc(s.name)}さんの招待メッセージをコピー">招待をコピー</button>
+            </div>`).join("")}</div>`
         : `<div class="card empty">まだ生徒がいません。上のフォームから追加してください。</div>`}
       <p class="footer-links"><button type="button" class="btn ghost small-btn" id="logout">ログアウト</button></p>
     </main>`;
@@ -175,6 +187,12 @@ async function renderList() {
     await api("/api/teacher/logout", { method: "POST" }).catch(() => {});
     renderLogin();
   });
+  // A student's invite (the same message as on their page), or every code at once.
+  app.querySelectorAll(".copy-invite").forEach((button) => button.addEventListener("click", () => {
+    const student = state.students.find((s) => s.id === Number(button.dataset.id));
+    if (student) copy(inviteText(student));
+  }));
+  document.getElementById("copy-all-codes")?.addEventListener("click", () => copy(allCodesText(state.students)));
 
   const form = document.getElementById("add-student");
   form.addEventListener("submit", async (event) => {
