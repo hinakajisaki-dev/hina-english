@@ -24,6 +24,7 @@
 // node scripts/teacher.mjs pron-months なおみ [--set "1=Month 2" | --default]   (発音 months and their names)
 // node scripts/teacher.mjs pron-done なおみ (--month 1 | --keys m1/01,m1/02) [--day 2026-09-30] [--dry | --undo]
 //                                                                 (発音 finished before the app, as 完了 with no recording)
+// node scripts/teacher.mjs vocab-books なおみ [--set "1=ielts1" | --default]   (単語帳 per week instead of the shared one)
 //
 // A file of "-" is read from stdin.
 import { spawnSync } from "node:child_process";
@@ -31,6 +32,7 @@ import { readFileSync } from "node:fs";
 import { noteDayLabel, noteProblems } from "../public/notes/format.js";
 import { MENUS, menuKey } from "../public/menus.js";
 import { monthPhrases, pronMonths, studentMonths } from "../public/pron/phrases.js";
+import { vocabBooks, weekBook } from "../public/vocab/words.js";
 
 // Node's fetch only goes through the environment's proxy when asked to.
 if ((process.env.HTTPS_PROXY || process.env.https_proxy) && !process.env.NODE_USE_ENV_PROXY) {
@@ -183,6 +185,15 @@ function pronProgress(done = {}) {
 // Japan's date, offset by whole days ("2026-10-14").
 const japanDay = (offset = 0) => new Date(Date.now() + 9 * 3600e3 + offset * 86400e3).toISOString().slice(0, 10);
 
+// "Week 1：IELTS 語彙 Week 1（ielts1・100 語）" for each week that has a 単語帳.
+function bookLine(books) {
+  const all = vocabBooks();
+  return [...new Set(all.map((b) => b.week))].sort((a, b) => a - b).map((week) => {
+    const book = all.find((b) => b.id === weekBook(week, books));
+    return `Week ${week}：${book.title}（${book.id}・${book.count} 語${book.shared ? "・全員共通" : ""}）`;
+  }).join("\n");
+}
+
 const menuLine = (hidden = []) =>
   MENUS.map((m) => `${hidden.includes(m.key) ? "×" : "○"} ${m.name}`).join("　");
 
@@ -204,6 +215,7 @@ const commands = {
     console.log(`\n## 生徒の画面に出すもの\n${menuLine(data.hidden)}`);
     console.log(`\n## 発音課題の Month\n${pronLine(data.pronMonths)}`);
     console.log(`\n## 発音課題の完了\n${pronProgress(data.pronDone)}`);
+    console.log(`\n## 単語帳\n${bookLine(data.vocabBooks)}`);
     console.log(`\n## 今週の勉強範囲\n${data.plan ? data.plan.body : "（まだありません）"}`);
     for (const [kind, spec] of Object.entries(KINDS)) {
       const items = data.items.filter((i) => i.kind === kind);
@@ -392,6 +404,26 @@ const commands = {
     }
     const result = await api(`/api/teacher/students/${student.id}/pron-months`, { method: "PUT", body: { months } });
     console.log(`${student.name}さんの発音課題を変えました（○ 出す・× 出さない）：\n${pronLine(result.months)}`);
+  },
+
+  async "vocab-books"([name], options) {
+    const student = await findStudent(name);
+    if (!options.set && !options.default) {
+      const { vocabBooks: books } = await studentData(student);
+      const list = vocabBooks().map((b) => `${b.id}：Week ${b.week}・${b.title}（${b.count} 語${b.shared ? "・全員共通" : ""}）`).join("\n");
+      console.log(`${student.name}さんの単語帳：\n${bookLine(books)}\n\nアプリにある単語帳：\n${list}`);
+      return;
+    }
+    const books = {};
+    if (options.set) {
+      for (const part of String(options.set).split(/[,、，]/).map((p) => p.trim()).filter(Boolean)) {
+        const m = part.match(/^(\d+)\s*[=＝:：]\s*(.+)$/);
+        if (!m) stop(`「${part}」が読めません。「1=ielts1」のように、Week の番号と単語帳の名前（vocab-books ${name} で出る左の名前）を書いてください。`);
+        books[m[1]] = m[2].trim();
+      }
+    }
+    const result = await api(`/api/teacher/students/${student.id}/vocab-books`, { method: "PUT", body: { books } });
+    console.log(`${student.name}さんの単語帳を変えました：\n${bookLine(result.books)}`);
   },
 
   async "delete-note"([name, id]) {
