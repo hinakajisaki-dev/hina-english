@@ -73,8 +73,7 @@
 .photo-frame { width: 440px; height: 440px; padding: 6px; border-radius: 44px; background: #FFFFFF; box-shadow: var(--shadow); }
 .photo-frame img { display: block; width: 428px; height: 428px; border-radius: 38px; } /* corners are also rounded in the image */
 .in-right { display: flex; flex-direction: column; align-items: flex-start; }
-.in-right .script { font-size: 44px; }
-.in-namerow { display: flex; align-items: center; gap: 22px; margin-top: 2px; }
+.in-namerow { display: flex; align-items: center; gap: 22px; }
 .in-name { font-size: 68px; font-weight: 900; line-height: 1.15; }
 .in-name .en { font-weight: 700; }
 .flags { display: flex; align-items: center; gap: 8px; }
@@ -93,11 +92,11 @@
 .stage > :not(svg) { position: relative; } /* above the sunburst, which is drawn first */
 .stage .logo b { color: #FFFFFF; }
 .stage .mark { background: #FFFFFF; }
-@font-face { font-family: "Reggae One"; src: url("../../matome/fonts/ReggaeOne-Regular.woff2") format("woff2"); }
+@font-face { font-family: "Dela Gothic One"; src: url("../../matome/fonts/DelaGothicOne-Regular.woff2") format("woff2"); }
 .st-head { margin-top: 20px; }
 .st-badge { display: inline-block; background: #FFFFFF; color: var(--accent-text); font-size: 20px; font-weight: 900; padding: 6px 20px 8px; border-radius: 999px; }
 .st-title { position: relative; margin-top: 8px; padding: 0 8px 8px 0; }
-.st-title p { font-family: "Reggae One", var(--ja); font-weight: 400; font-size: 92px; line-height: 1.2; white-space: nowrap; }
+.st-title p { font-family: "Dela Gothic One", var(--ja); font-weight: 400; font-size: 84px; line-height: 1.25; letter-spacing: .02em; white-space: nowrap; }
 .st-sh { position: absolute; left: 7px; top: 7px; color: #A3300B; } /* drop shadow */
 .st-tx { position: relative; color: #FFFFFF; }
 .st-body { flex: 1; display: grid; grid-template-columns: 1fr 300px; gap: 48px; align-items: center; }

@@ -22,9 +22,10 @@ function asterisk(cx, cy, r, t) {
 const LOGO = asterisk(82, 58, 10.5, 3.6); // centre of .mark in the header
 const deco = (...paths) => `<svg class="deco" viewBox="0 0 1280 720" aria-hidden="true">${paths.flat().map((d) => `<path d="${d}"/>`).join("")}</svg>`;
 
-const header = (right = "") => `
+// logo: false leaves an empty spot, so the right-hand part stays on the right.
+const header = (right = "", { logo = true } = {}) => `
   <header class="top">
-    <div class="logo"><span class="mark"></span><b>Hina English</b></div>
+    ${logo ? `<div class="logo"><span class="mark"></span><b>Hina English</b></div>` : "<span></span>"}
     ${right}
   </header>`;
 
@@ -210,9 +211,9 @@ function cover({ title, subtitle, look = "okinawa" }) {
 </section>`;
 }
 
-function ending({ lead = "今日のフレーズ、まずは1つ<br>実際の会話で使ってみてね。" } = {}) {
+function ending({ lead = "今日のフレーズ、まずは1つ<br>実際の会話で使ってみてね。", logo = true } = {}) {
   return `
-<section class="slide ending">${header()}
+<section class="slide ending">${header("", { logo })}
   <div class="cbody">
     <p class="script">Thank you for joining!</p>
     <h1>おつかれさまでした！</h1>
@@ -220,7 +221,7 @@ function ending({ lead = "今日のフレーズ、まずは1つ<br>実際の会�
     <div class="chips"><span class="chip w">チャンネル登録</span><span class="chip w">高評価</span><span class="chip w">感想をコメントしてね</span></div>
   </div>
   <div class="tile"></div>
-  ${deco(LOGO, asterisk(1112, 198, 36, 12))}
+  ${logo ? deco(LOGO, asterisk(1112, 198, 36, 12)) : ""}
   <div class="sample">
     <p class="lab">NEXT LIVE</p>
     <p class="sj">次回のライブも<br>お楽しみに！</p>

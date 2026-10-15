@@ -189,7 +189,7 @@ function extract() {
 // keep their name; Google Slides has them built in.
 const PPTX_FONT = { "Liberation Sans": "Arial" };
 // Japanese display fonts that cover the whole run themselves (Google Slides has them too).
-const JA_FONTS = new Set(["Noto Sans JP", "Reggae One"]);
+const JA_FONTS = new Set(["Noto Sans JP", "Dela Gothic One"]);
 function splitByScript(run) {
   const JA = "Noto Sans JP";
   if (JA_FONTS.has(run.latinFont)) return [{ ...run, font: run.latinFont }];

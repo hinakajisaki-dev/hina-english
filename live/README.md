@@ -24,7 +24,7 @@ npm install   # 初回のみ
 npm run live -- live/daily-phrases-part2
 ```
 
-`slides.html`、`.pdf`、`.pptx` が作り直されます。`.pptx` を Google ドライブにアップロードすると、Google スライドに変換されます（英語は DM Sans、日本語は Noto Sans JP、手書き風の英字は Caveat、チャレンジのタイトルは Reggae One。どれも Google スライドで使えるフォントです）。
+`slides.html`、`.pdf`、`.pptx` が作り直されます。`.pptx` を Google ドライブにアップロードすると、Google スライドに変換されます（英語は DM Sans、日本語は Noto Sans JP、手書き風の英字は Caveat、チャレンジのタイトルは Dela Gothic One。どれも Google スライドで使えるフォントです）。
 
 `phrases.md` の書き方：
 

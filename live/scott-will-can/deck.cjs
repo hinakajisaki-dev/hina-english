@@ -5,7 +5,7 @@
 //
 // 英文の書き方：[will] はオレンジ、{p:at the park} は場所（青）、{t:at 8pm} は時間（黄）、
 // {w:with my friends} はだれと（ピンク）。1行に収まらないところは <br> で改行します。
-const { esc, two, LOGO, deco, header, cover, ending, page, shapes, rays } = require("../parts.cjs");
+const { esc, two, header, cover, ending, page, shapes, rays } = require("../parts.cjs");
 
 // ---------- 中身 ----------
 
@@ -104,10 +104,10 @@ const mark = (s) =>
     .replace(/\[([^\]]+)\]/g, '<span class="v">$1</span>')
     .replace(/\{([ptw]):([^}]+)\}/g, '<span class="k$1">$2</span>');
 const tag = (rn, text) => `<div class="where"><span class="round-tag"><span class="dot"></span><span class="rn">${rn}</span><span>${esc(text)}</span></span></div>`;
+// This deck leaves the Hina English logo out of the header.
 const slide = (cls, right, body) => `
-<section class="slide ${cls}">${header(right)}
+<section class="slide ${cls}">${header(right, { logo: false })}
 ${body}
-  ${deco(LOGO)}
 </section>`;
 const hints = () => `<div class="hints"><span class="c p">at ＋ 場所</span><span class="c t">at ＋ 時間</span><span class="c w">with ＋ 人</span></div>`;
 
@@ -130,7 +130,6 @@ function scottIntro() {
   <div class="in-body">
     <div class="photo-frame"><img src="${esc(SCOTT.photo)}" alt="Scott先生"></div>
     <div class="in-right">
-      <p class="script">Hi, I'm Scott!</p>
       <div class="in-namerow">
         <h2 class="in-name"><span class="en">Scott</span>先生</h2>
         <div class="flags"><img src="flag-ca.png" alt="カナダの国旗"><span class="farrow">→</span><img src="flag-us.png" alt="アメリカの国旗"></div>
@@ -145,13 +144,12 @@ function scottIntro() {
 }
 
 // The 1-minute chat challenges: an orange "stage" with a soft sunburst behind the timer, a big
-// Japanese title in Reggae One (with a dark copy behind it as a drop shadow), the question and
+// Japanese title in Dela Gothic One (with a dark copy behind it as a drop shadow), the question and
 // the three steps along the bottom.
 function stage({ rn, text, badge, title, question, ja, under, steps }) {
-  const logo = shapes(LOGO.map((d) => [d, "#F0521E"]));
   return `
 <section class="slide stage r4">
-  ${shapes([[rays(1066, 415, 36), "#F25F2D"]])}${header(tag(rn, text))}
+  ${shapes([[rays(1066, 415, 36), "#F25F2D"]])}${header(tag(rn, text), { logo: false })}
   <div class="st-head"><span class="st-badge">${esc(badge)}</span><div class="st-title"><p class="st-sh">${esc(title)}</p><p class="st-tx">${esc(title)}</p></div></div>
   <div class="st-body">
     <div class="st-q">
@@ -165,7 +163,6 @@ function stage({ rn, text, badge, title, question, ja, under, steps }) {
   <ol class="st-steps">
     ${steps.map((t, i) => `<li><span class="st-n">${i + 1}</span><span>${esc(t)}</span></li>`).join("\n    ")}
   </ol>
-  ${logo}
 </section>`;
 }
 
@@ -358,6 +355,6 @@ module.exports = () => {
     slides.push(shunkanCover(r, i));
     r.qs.forEach((q, k) => slides.push(shunkanQ(r, i, q, k, false), shunkanQ(r, i, q, k, true)));
   });
-  slides.push(ending({ lead: "will と can、今日から<br>どんどん使ってみてね！" }));
+  slides.push(ending({ lead: "will と can、今日から<br>どんどん使ってみてね！", logo: false }));
   return page({ title: "ネイティブっぽく長い文章で話す方法｜Scott先生 × ひな コラボLIVE", slides, css: ["deck.css"], source: "deck.cjs" });
 };
