@@ -104,6 +104,10 @@ iPhone は Safari の共有ボタン →「ホーム画面に追加」で、ア�
 
 先生は、生徒1人に1つ Claude のチャットを持ち、その生徒だけの授業メモ・単語・発音・文法の問題・日記のテーマを、チャットからアプリに直接入れられます（`scripts/teacher.mjs`）。はじめの設定（Worker のシークレット `TEACHER_API_TOKEN` と、Claude の環境の `HINA_TEACHER_TOKEN`・ネットワーク）と使い方は `docs/student-chats.md`。
 
+## エラーの記録とエラー係のチャット
+
+日記の添削ができなかった、🔊 の音声を作れなかった、サーバーや画面（生徒の画面・先生ページ）でエラーが起きた、といったことは、アプリのデータベースに記録されます。送って 10 分たっても添削がない日記も、エラーとして出ます。Claude のチャットを1つ「エラー係」にしておくと、1時間に1回これを見て、日記の添削のやり直しなど直せるものはその場で直し、先生に知らせます（キーやクレジットなど、先生がすることがあるときも）。コマンドと、エラー係がすることは `docs/error-chat.md`。
+
 ## 過去の日記を入れる
 
 アプリを使う前に書いていた日記は、生徒ごとのチャットから、その日付のまま入れられます（`journals` コマンド。書き方は `docs/student-chats.md`）。
@@ -311,7 +315,7 @@ API キーを入れると、そのあとに送られた日記から、AI が 1 �
 | --- | --- |
 | 先生ページで「TEACHER_PASSWORD がまだ設定されていません」 | 手順 3 のシークレットが入っているか |
 | 🔊 の声が、自然な声でなく機械っぽい声になる | その日の音声の無料枠を使いきったか、音声が作れなかった。Cloudflare の Worker の「Logs」で `tts error` を探す |
-| 生徒の添削で「AI の設定に問題があります」 | `ANTHROPIC_API_KEY` が正しいか、Anthropic のクレジットが残っているか |
+| 生徒の添削で「AI の設定に問題があります」 | `ANTHROPIC_API_KEY` が正しいか、Anthropic のクレジットが残っているか。本当の原因は `node scripts/teacher.mjs errors` の「くわしく」に出る |
 | デプロイでデータベースのエラー | Cloudflare の「Storage & Databases」→「D1」で `hina-lessons` を作り、その ID を `wrangler.jsonc` の `d1_databases` に `"database_id"` として書く |
 
 ## ファイル
@@ -334,6 +338,7 @@ API キーを入れると、そのあとに送られた日記から、AI が 1 �
 | `public/notes/format.js` | 授業メモ（と今週の勉強範囲）の書き方を読んで表示する（復習カードも取り出す。サーバーも同じものを使う） |
 | `../docs/lesson-notes.md` | 授業メモの流れ・整理のルール・本文の書き方 |
 | `scripts/teacher.mjs`、`../docs/student-chats.md` | 生徒ごとのチャットが、その生徒の内容をアプリに入れる道具と、その使い方 |
+| `src/errors.js`、`../docs/error-chat.md` | エラーの記録と、それを見て直すエラー係のチャットのやり方 |
 | `public/study.js` | 勉強時間（自動で数える時計と、週・月のグラフ） |
 | `public/manifest.webmanifest`、`icons/` | ホーム画面に追加したときの名前・アイコン・色 |
 | `public/journal/topics.js` | 日記の初心者向けお題（45 個） |

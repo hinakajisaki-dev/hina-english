@@ -27,6 +27,11 @@
 // node scripts/teacher.mjs vocab-books なおみ [--set "1=ielts1" | --default]   (単語帳 per week instead of the shared one)
 // node scripts/teacher.mjs lesson-days なおみ [--add 2026-08-03,2026-08-16] [--remove 2026-08-03]   (the numbered lessons)
 //
+// For the error chat (docs/error-chat.md):
+// node scripts/teacher.mjs errors [--all] [--peek]        (open errors, new ones first marked 新; --peek: don't mark them seen)
+// node scripts/teacher.mjs error-done 12 "どう直したか"     (closes error 12)
+// node scripts/teacher.mjs retry-journal 225              (asks the AI to correct diary 225 again, if it has no correction)
+//
 // A file of "-" is read from stdin.
 import { spawnSync } from "node:child_process";
 import { readFileSync } from "node:fs";
@@ -94,6 +99,7 @@ function parseArgs(args) {
     else if (arg === "--dry") options.dry = true;
     else if (arg === "--default") options.default = true;
     else if (arg === "--undo") options.undo = true;
+    else if (arg === "--peek") options.peek = true;
     else if (arg.startsWith("--")) options[arg.slice(2)] = args[++i];
     else rest.push(arg);
   }
@@ -202,6 +208,24 @@ function lessonLines(data) {
   return lessons.map((l) => `${l.number}. ${lessonDayLabel(l.day)}（${l.day}）　${l.notes.length
     ? l.notes.map((n) => `[メモ ${n.id}]${n.published_at ? "" : "（下書き）"}`).join(" ")
     : "メモなし"}`).join("\n");
+}
+
+// "10/16 14:19" in Japan time.
+function japanTime(iso) {
+  const d = new Date(Date.parse(iso) + 9 * 3600e3);
+  const two = (n) => String(n).padStart(2, "0");
+  return `${d.getUTCMonth() + 1}/${d.getUTCDate()} ${two(d.getUTCHours())}:${two(d.getUTCMinutes())}`;
+}
+
+const ERROR_KINDS = { journal: "日記の添削", judge: "AI の判定", speech: "音声", server: "サーバー", browser: "画面" };
+
+function errorLines(e) {
+  const when = e.count > 1 ? `${japanTime(e.first_at)} 〜 ${japanTime(e.last_at)}（${e.count} 回）` : japanTime(e.last_at);
+  const head = `[${e.id}]${e.new ? " 新" : ""} ${ERROR_KINDS[e.kind] || e.kind}・${e.student ? `${e.student.name}さん` : "生徒なし"}・${when}`;
+  const lines = [head, `    ${e.message}`];
+  if (e.detail) lines.push(...e.detail.slice(0, 800).split("\n").filter(Boolean).slice(0, 8).map((l) => `    | ${l}`));
+  if (e.done_at) lines.push(`    → 直した（${japanTime(e.done_at)}）：${e.done_note || "（メモなし）"}`);
+  return lines.join("\n");
 }
 
 const menuLine = (hidden = []) =>
@@ -449,6 +473,38 @@ const commands = {
     const kept = remove.filter((day) => data.notes.some((n) => n.day === day));
     const done = add.length || remove.length ? `${student.name}さんの授業の日を変えました。` : `${student.name}さんの授業：`;
     console.log(`${done}\n${lessonLines(data)}${kept.length ? `\n（${kept.join("、")} は授業メモがあるので、残っています）` : ""}`);
+  },
+
+  async errors(_, options) {
+    const { errors, now } = await api(`/api/teacher/errors${options.all ? "?all=1" : ""}`);
+    const open = errors.filter((e) => !e.done_at);
+    const fresh = open.filter((e) => e.new);
+    if (options.all) {
+      console.log(errors.length ? `エラー（新しい順、${errors.length} 件。まだ直っていないもの ${open.length} 件）：` : "エラーの記録はありません。");
+    } else if (!open.length) {
+      console.log("まだ直っていないエラーはありません。");
+    } else {
+      console.log(`まだ直っていないエラー ${open.length} 件（前に見たあとに起きた「新」${fresh.length} 件）：`);
+    }
+    const shown = options.all ? errors : open;
+    for (const e of [...shown.filter((e) => e.new), ...shown.filter((e) => !e.new)]) console.log(`\n${errorLines(e)}`);
+    if (!options.peek && fresh.length) await api("/api/teacher/errors/seen", { method: "POST", body: { until: now } });
+  },
+
+  async "error-done"([id, note]) {
+    if (!/^\d+$/.test(String(id || ""))) stop("エラーの番号を入れてください（errors で出る [12] の数字）。");
+    if (!note) stop("どう直したか（または、なぜこのままにするか）を短く書いてください。");
+    const { already } = await api(`/api/teacher/errors/${Number(id)}/done`, { method: "POST", body: { note } });
+    console.log(already ? `エラー ${id} は、もう直したことになっています。` : `エラー ${id} を「直した」にしました：${note}`);
+  },
+
+  async "retry-journal"([id]) {
+    if (!/^\d+$/.test(String(id || ""))) stop("日記の番号を入れてください（エラーの「日記 225」の数字）。");
+    const { journal, ai_error: aiError } = await api(`/api/teacher/journals/${Number(id)}/correct`, { method: "POST", body: {} });
+    if (aiError) stop(`日記 ${id} は、また添削できませんでした：${aiError}（くわしくは errors）`);
+    if (!journal.correction) stop(`日記 ${id} には添削がつきませんでした（アプリの前の日記は、添削しません）。`);
+    const first = journal.correction.corrections?.[0];
+    console.log(`日記 ${id} は添削ずみです（${japanTime(journal.corrected_at)}）。\n直した文：${journal.correction.corrected.slice(0, 120)}${journal.correction.corrected.length > 120 ? "…" : ""}${first ? `\nポイント1：${first.before} → ${first.after}` : ""}`);
   },
 
   async "delete-note"([name, id]) {

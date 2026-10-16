@@ -5,6 +5,9 @@
 // The teacher signs in with TEACHER_PASSWORD; the cookie holds an HMAC of it.
 import { AiError, correctJournal, judgeAnswer } from "./ai.js";
 import { SpeechError, speechFor } from "./speech.js";
+import {
+  closeErrors, journalErrorKey, listErrors, markErrorDone, markErrorsSeen, noteStuckJournals, recordError,
+} from "./errors.js";
 import { findLesson, lessonExampleSentences, plain, questionCount } from "../public/grammar/lessons.js";
 import { findMistakes } from "../public/mistakes.js";
 import { bookSentences, bookWord, setKey, vocabBooks, weekWords, wordSets } from "../public/vocab/words.js";
@@ -44,18 +47,28 @@ export default {
   async fetch(request, env) {
     const url = new URL(request.url);
     if (!url.pathname.startsWith("/api/")) return new Response("Not found", { status: 404 });
+    const who = {}; // the student, once the request is known to be theirs
     try {
       await ensureSchema(env.DB);
-      return await route(request, env, url);
+      return await route(request, env, url, who);
     } catch (error) {
       if (error instanceof HttpError) return json({ error: error.message }, error.status);
       console.error(error);
+      const where = `${request.method} ${url.pathname}`;
+      await recordError(env.DB, {
+        kind: "server",
+        message: `サーバーのエラー（${where}）：${error?.message ?? error}`,
+        detail: String(error?.stack ?? error),
+        studentId: who.studentId ?? null,
+        ref: where,
+        key: `server|${where.replace(/\d+/g, ":id")}|${error?.message ?? error}`,
+      });
       return json({ error: "サーバーでエラーが起きました。少し待ってから、もう一度ためしてください。" }, 500);
     }
   },
 };
 
-async function route(request, env, url) {
+async function route(request, env, url, who) {
   const method = request.method;
   const path = url.pathname.replace(/\/+$/, "");
   const parts = path.split("/").slice(2); // ["teacher", "students", "3"]
@@ -68,7 +81,9 @@ async function route(request, env, url) {
   }
   if (parts[0] !== "teacher") {
     const student = await requireStudent(request, env);
+    who.studentId = student.id;
     if (path === "/api/me" && method === "GET") return studentHome(env, student);
+    if (path === "/api/errors" && method === "POST") return saveBrowserError(request, env, student.id);
     if (path === "/api/progress" && method === "POST") return saveProgress(request, env, student);
     if (path === "/api/speech" && method === "GET") return speech(env, student, url.searchParams.get("text"));
     if (parts[0] === "lessons" && parts.length === 2 && method === "POST") {
@@ -111,6 +126,33 @@ async function route(request, env, url) {
   if (path === "/api/teacher/students") {
     if (method === "GET") return listStudents(db);
     if (method === "POST") return addStudent(request, db);
+  }
+  // The error log, for the error chat (docs/error-chat.md, scripts/teacher.mjs errors).
+  if (path === "/api/teacher/errors") {
+    if (method === "GET") {
+      const at = now();
+      if (aiEnabled(env)) await noteStuckJournals(db);
+      return json({ errors: await listErrors(db, { everything: url.searchParams.get("all") === "1" }), now: at });
+    }
+    if (method === "POST") return saveBrowserError(request, env, null);
+  }
+  if (path === "/api/teacher/errors/seen" && method === "POST") {
+    const { until } = await readJson(request);
+    if (Number.isNaN(Date.parse(until))) throw new HttpError(400, "内容が正しくありません。");
+    await markErrorsSeen(db, new Date(until).toISOString());
+    return json({ ok: true });
+  }
+  if (parts[1] === "errors" && parts[3] === "done" && parts.length === 4 && method === "POST") {
+    const { note } = await readJson(request);
+    const row = await markErrorDone(db, id(2), String(note || "").trim().slice(0, 500));
+    if (!row) throw new HttpError(404, "そのエラーは見つかりません。");
+    return json({ ok: true, already: !!row.done_at });
+  }
+  if (parts[1] === "journals" && parts[3] === "correct" && parts.length === 4 && method === "POST") {
+    const row = await first(db, `SELECT student_id FROM journals WHERE id = ?`, id(2));
+    if (!row) throw new HttpError(404, "その日記は見つかりません。");
+    if (!aiEnabled(env)) throw new HttpError(400, "ANTHROPIC_API_KEY がないので、添削できません。");
+    return retryCorrection(env, await findStudent(db, row.student_id), id(2));
   }
   if (parts[1] === "students" && parts.length === 3) {
     const student = await findStudent(db, id(2));
@@ -352,6 +394,13 @@ async function speech(env, student, text) {
     });
   } catch (error) {
     if (!(error instanceof SpeechError)) throw error;
+    await recordError(env.DB, {
+      kind: "speech",
+      message: "音声を作れなかった（生徒の画面では、スマホの声で読んだ）",
+      detail: error.detail,
+      studentId: student.id,
+      ref: text.slice(0, 100),
+    });
     // The page falls back to the phone's own voice.
     throw new HttpError(503, "音声を作れませんでした。");
   }
@@ -553,7 +602,8 @@ async function savePhraseTest(request, env, student, week, number) {
   return json({ ok: true });
 }
 
-// Only an entry with no correction yet (its first try failed) can be sent again.
+// Only an entry with no correction yet (its first try failed) can be sent again
+// (by the student, or by the teacher's error chat).
 async function retryCorrection(env, student, journalId) {
   const row = await first(env.DB, `SELECT * FROM journals WHERE id = ? AND student_id = ?`, journalId, student.id);
   if (!row) throw new HttpError(404, "見つかりません。");
@@ -563,6 +613,7 @@ async function retryCorrection(env, student, journalId) {
 
 // Each entry is corrected once. It is saved before the AI runs, so if the AI
 // fails the student keeps their text and the message comes back as ai_error.
+// A failure goes in the error log, and is closed there when a later try works.
 async function correctOnce(env, student, journalId) {
   const entry = await first(env.DB, `SELECT * FROM journals WHERE id = ?`, journalId);
   let aiError = null;
@@ -573,9 +624,18 @@ async function correctOnce(env, student, journalId) {
       `UPDATE journals SET correction = ?, corrected_at = ? WHERE id = ? AND correction IS NULL`,
       JSON.stringify(correction), now(), journalId,
     );
+    await closeErrors(env.DB, journalErrorKey(journalId), "もう一度ためして、添削できた");
   } catch (error) {
     if (!(error instanceof AiError)) throw error;
     aiError = error.message;
+    await recordError(env.DB, {
+      kind: "journal",
+      message: `日記 ${journalId} の添削ができなかった（生徒の画面：${error.message}）`,
+      detail: error.detail,
+      studentId: student.id,
+      ref: String(journalId),
+      key: journalErrorKey(journalId),
+    });
   }
   const row = await first(env.DB, `SELECT * FROM journals WHERE id = ?`, journalId);
   return json({ journal: journalRow(row), ai_error: aiError });
@@ -619,6 +679,13 @@ async function judgeTyped(request, env, student) {
     verdict = await judgeAnswer(env, { question, given, found });
   } catch (error) {
     if (!(error instanceof AiError)) throw error;
+    await recordError(env.DB, {
+      kind: "judge",
+      message: "打った答えの AI 判定ができなかった（生徒の画面では、教材の答えで判定した）",
+      detail: error.detail,
+      studentId: student.id,
+      ref: question.source,
+    });
     throw new HttpError(503, error.message);
   }
   await run(
@@ -663,6 +730,29 @@ async function explainedQuestion(env, student, input) {
   const data = item && JSON.parse(item.data);
   if (!data || data.choices?.length) throw new HttpError(404, "見つかりません。");
   return { source: `item/${item.id}`, question: data.question, note: data.explanation, answers: data.answer.split("/") };
+}
+
+// A script error in a student's browser, or the teacher's (public/common.js watchErrors).
+async function saveBrowserError(request, env, studentId) {
+  const input = await readJson(request);
+  const text = (value, n) => String(value ?? "").slice(0, n).trim();
+  const message = text(input.message, 300);
+  if (!message) throw new HttpError(400, "内容が読めませんでした。");
+  const where = text(input.source, 200) + (input.line ? `:${Number(input.line) || 0}:${Number(input.column) || 0}` : "");
+  await recordError(env.DB, {
+    kind: "browser",
+    message: `${studentId ? "生徒の画面" : "先生ページ"}のエラー：${message}`,
+    detail: [
+      `page: ${text(input.page, 200)}`,
+      `at: ${where}`,
+      text(input.stack, 2000),
+      `browser: ${text(request.headers.get("User-Agent"), 300)}`,
+    ].join("\n"),
+    studentId,
+    ref: text(input.page, 200),
+    key: `browser|${studentId ?? "teacher"}|${message}|${where}`,
+  });
+  return json({ ok: true });
 }
 
 // ---------- teacher handlers ----------

@@ -2,7 +2,7 @@
 // today's phrase, pronunciation, grammar and the journal with its correction.
 import {
   ApiError, api, diffHtml, esc, formatDate, icons, japanDayNumber,
-  SPEEDS, getSpeed, setSpeed, speak, startOfJapanDay, stopSpeaking, toast,
+  SPEEDS, getSpeed, setSpeed, speak, startOfJapanDay, stopSpeaking, toast, watchErrors,
 } from "./common.js";
 import { UNITS, findLesson, plain, questionCount } from "./grammar/lessons.js";
 import { bookWeeks, setKey, speakable, splitOnForm, weekWords, wordSets } from "./vocab/words.js";
@@ -20,6 +20,8 @@ import {
   appMinutes, bindPanels, formatMinutes, monthPanel, monthStart, startStudyClock, studySplit, summary, today,
   totalMinutes, weekDays, weekPanel, weekStart,
 } from "./study.js";
+
+watchErrors("/api/errors");
 
 const app = document.getElementById("app");
 const state = {

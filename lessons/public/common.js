@@ -24,6 +24,46 @@ export async function api(path, { method = "GET", body } = {}) {
   return data;
 }
 
+// Sends this page's script errors to the error log (src/errors.js), for the
+// teacher's error chat: each message once, at most 5 per page. A failed API
+// call (ApiError) is not sent; the server keeps its own. Returns the sender,
+// for an error the page catches itself.
+export function watchErrors(endpoint) {
+  const sent = new Set();
+  const send = (error, where = {}) => {
+    if (error instanceof ApiError) return;
+    const message = String(where.message || error?.message || error || "").slice(0, 300);
+    if (!message || sent.has(message) || sent.size >= 5) return;
+    sent.add(message);
+    fetch(endpoint, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "same-origin",
+      keepalive: true,
+      body: JSON.stringify({
+        message,
+        stack: String(error?.stack || "").slice(0, 2000),
+        source: where.source || "",
+        line: where.line || 0,
+        column: where.column || 0,
+        page: location.pathname + location.hash,
+      }),
+    }).catch(() => {});
+  };
+  window.addEventListener("error", (event) => {
+    // Other sites' scripts (extensions, translation) show up as "Script error." with no file.
+    if (!event.filename?.startsWith(location.origin)) return;
+    send(event.error, {
+      message: event.message,
+      source: event.filename.slice(location.origin.length),
+      line: event.lineno,
+      column: event.colno,
+    });
+  });
+  window.addEventListener("unhandledrejection", (event) => send(event.reason));
+  return send;
+}
+
 const ESCAPES = { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" };
 export const esc = (value) => String(value ?? "").replace(/[&<>"']/g, (c) => ESCAPES[c]);
 
