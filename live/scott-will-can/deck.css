@@ -23,39 +23,31 @@
 .note { display: flex; align-items: center; gap: 14px; font-size: 20px; margin-top: 20px; }
 
 /* ---------- 今日のテーマ ---------- */
-.theme-t { font-size: 56px; font-weight: 900; line-height: 1.35; margin-top: auto; }
-.steps4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; margin-top: 40px; margin-bottom: auto; }
-.steps4 li { background: var(--card); border-radius: 22px; box-shadow: var(--shadow); padding: 22px 24px 24px; display: flex; flex-direction: column; align-items: flex-start; gap: 6px; }
-.sn { width: 40px; height: 40px; border-radius: 50%; background: var(--accent); color: #FFFFFF; font-family: var(--en); font-size: 20px; display: grid; place-items: center; }
-.sk { font-size: 24px; font-weight: 900; margin-top: 8px; }
-.sd { font-size: 16px; color: var(--muted); }
+.theme-t { font-size: 46px; font-weight: 900; line-height: 1.35; margin-top: 8px; }
+.steps4 { flex: 1; display: flex; flex-direction: column; margin-top: 22px; background: var(--card); border-radius: 26px; box-shadow: var(--shadow); padding: 4px 36px; }
+.steps4 li { flex: 1; display: flex; align-items: center; gap: 22px; }
+.steps4 li + li { border-top: 2px solid var(--line-warm); }
+.sn { flex: none; width: 44px; height: 44px; border-radius: 50%; background: var(--accent); color: #FFFFFF; font-family: var(--en); font-size: 22px; display: grid; place-items: center; }
+.sk { width: 360px; font-size: 30px; font-weight: 900; }
+.sd { font-size: 20px; color: var(--muted); }
 
 /* ---------- 文法（will / can） ---------- */
 .formula { display: flex; align-items: center; gap: 18px; margin-top: 24px; }
 .grammar .formula { margin-top: auto; }
-.grammar .notes, .grammar .note { margin-bottom: auto; }
-.fbox { min-width: 230px; background: var(--card); border-radius: 22px; box-shadow: var(--shadow); padding: 16px 30px 18px; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.grammar > :last-child { margin-bottom: auto; }
+.fbox { min-width: 200px; background: var(--card); border-radius: 22px; box-shadow: var(--shadow); padding: 16px 30px 18px; display: flex; flex-direction: column; align-items: center; gap: 4px; }
 .fbox.key { background: var(--accent); }
 .fb { font-size: 34px; font-weight: 900; }
 .fb.en { font-size: 38px; font-weight: 700; }
 .fc { font-size: 15px; color: var(--muted); }
 .fbox.key .fb, .fbox.key .fc { color: #FFFFFF; }
-.fex { display: flex; align-items: center; gap: 16px; margin-top: 22px; }
-.fe { font-family: var(--en); font-size: 34px; }
-.fj { font-size: 18px; color: var(--ink-2); }
-.notes { margin-top: 22px; background: rgba(255, 255, 255, .6); border-radius: 20px; padding: 6px 28px; }
-.nt { font-size: 20px; padding: 11px 0; }
-.nt + .nt { border-top: 2px dashed var(--line); }
-.ok, .ng { display: inline-block; width: 44px; height: 28px; border-radius: 14px; margin-right: 12px; font-family: var(--en); font-size: 14px; line-height: 28px; text-align: center; vertical-align: 2px; }
-.ok { background: var(--accent-soft); color: var(--accent-text); }
-.ng { background: #E6EAF2; color: var(--ink-2); }
-
 .mcards { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 22px; }
 .mcard2 { background: var(--card); border-radius: 24px; box-shadow: var(--shadow); padding: 28px 32px; display: flex; flex-direction: column; justify-content: center; }
 .mt2 { font-size: 20px; font-weight: 900; }
 .mn { display: inline-block; width: 30px; height: 30px; border-radius: 50%; margin-right: 10px; background: var(--accent); color: #FFFFFF; font-family: var(--en); font-size: 16px; line-height: 30px; text-align: center; vertical-align: 1px; }
 .me { font-family: var(--en); font-size: 34px; margin-top: 14px; }
 .mj { font-size: 17px; color: var(--muted); margin-top: 4px; }
+.mdsc { font-size: 17px; color: var(--ink-2); margin-top: 8px; }
 
 /* ---------- What will you do tomorrow? の答え ---------- */
 .qhead2 { display: flex; align-items: baseline; gap: 22px; margin-top: 34px; }
@@ -69,9 +61,9 @@
 .aj2 { font-size: 18px; color: var(--muted); }
 
 /* ---------- Scott先生の紹介 ---------- */
-.in-body { flex: 1; display: grid; grid-template-columns: 440px 1fr; gap: 52px; align-items: center; }
-.photo-frame { width: 440px; height: 440px; padding: 6px; border-radius: 44px; background: #FFFFFF; box-shadow: var(--shadow); }
-.photo-frame img { display: block; width: 428px; height: 428px; border-radius: 38px; } /* corners are also rounded in the image */
+.in-body { flex: 1; display: grid; grid-template-columns: 400px 1fr; gap: 52px; align-items: center; margin-top: 18px; }
+.photo-frame { width: 400px; height: 400px; padding: 6px; border-radius: 44px; background: #FFFFFF; box-shadow: var(--shadow); }
+.photo-frame img { display: block; width: 388px; height: 388px; border-radius: 38px; } /* corners are also rounded in the image */
 .in-right { display: flex; flex-direction: column; align-items: flex-start; }
 .in-namerow { display: flex; align-items: center; gap: 22px; }
 .in-name { font-size: 68px; font-weight: 900; line-height: 1.15; }

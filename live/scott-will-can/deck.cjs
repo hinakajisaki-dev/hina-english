@@ -9,7 +9,7 @@ const { esc, two, header, cover, ending, page, shapes, rays } = require("../part
 
 // ---------- 中身 ----------
 
-const TITLE = { title: "ネイティブっぽく<br>長い文章で話す方法", subtitle: "Scott先生 × ひな コラボLIVE", look: "pop" };
+const TITLE = { title: "ネイティブっぽく<br>長い文章で話す方法", look: "simple" };
 
 // Scott先生の紹介（本人のプロフィールから）。写真と国旗はこのフォルダの画像です。
 const SCOTT = {
@@ -113,12 +113,13 @@ const hints = () => `<div class="hints"><span class="c p">at ＋ 場所</span><s
 
 function theme() {
   const steps = [
-    ["I will ＋ 動詞", "未来のことを言う"],
+    ["主語 ＋ will ＋ 動詞", "未来のことを言う"],
     ["前置詞 ＋ 名詞", "文を長くする"],
-    ["I can ＋ 動詞", "will との違い"],
+    ["主語 ＋ can ＋ 動詞", "will との違い"],
     ["瞬間英作文", "will と can で練習"],
   ];
   return slide("theme r3", tag("TODAY'S THEME", "今日のテーマ"), `
+  <p class="lab">TODAY'S THEME</p>
   <h2 class="theme-t">ネイティブっぽく<br><span class="v">長い文章</span>で話せるようになる方法</h2>
   <ol class="steps4">
     ${steps.map(([k, d], i) => `<li><span class="sn">${i + 1}</span><p class="sk">${esc(k)}</p><p class="sd">${esc(d)}</p></li>`).join("\n    ")}
@@ -127,6 +128,8 @@ function theme() {
 
 function scottIntro() {
   return slide("intro r2", tag("SPECIAL GUEST", "Scott先生"), `
+  <p class="lab">TODAY'S GUEST</p>
+  <h2 class="h2">今日のゲスト</h2>
   <div class="in-body">
     <div class="photo-frame"><img src="${esc(SCOTT.photo)}" alt="Scott先生"></div>
     <div class="in-right">
@@ -171,17 +174,17 @@ function willGrammar() {
   <p class="lab">GRAMMAR</p>
   <h2 class="h2">未来のことは <span class="v en">will</span> ひとつでOK！</h2>
   <div class="formula">
-    <div class="fbox key"><p class="fb en">I will</p><p class="fc">未来・意志</p></div>
+    <div class="fbox"><p class="fb">主語</p><p class="fc">I / You / We など</p></div>
+    <span class="plus">＋</span>
+    <div class="fbox key"><p class="fb en">will</p><p class="fc">未来・意志</p></div>
     <span class="plus">＋</span>
     <div class="fbox"><p class="fb">動詞の原形</p><p class="fc">ing はつけない</p></div>
     <span class="plus">＋</span>
     <div class="fbox"><p class="fb">目的語</p><p class="fc">なにを</p></div>
   </div>
-  <div class="fex"><span class="chip">例</span><p class="fe"><span class="v">I will</span> eat lunch.</p><p class="fj">ランチを食べる</p></div>
-  <div class="notes">
-    <p class="nt"><span class="ok">OK</span>will ひとつで、未来のことが言える</p>
-    <p class="nt"><span class="ok">OK</span>明日も来週も、どんな時でも使える</p>
-    <p class="nt"><span class="ng">NG</span><span class="en muted">I will eating</span> → <span class="en">I will eat</span>（ing はつけない）</p>
+  <div class="mcards">
+    <div class="mcard2"><p class="mt2"><span class="mn">1</span>未来（これからすること・予定）</p><p class="mdsc">明日も来週も来年も、will ひとつで言える</p><p class="me"><span class="v">I will</span> study English tomorrow.</p><p class="mj">明日、英語を勉強する</p></div>
+    <div class="mcard2"><p class="mt2"><span class="mn">2</span>意志（「やります！」の気持ち）</p><p class="mdsc">その場で「やる！」と決めたときにも使う</p><p class="me"><span class="v">I will</span> do it!</p><p class="mj">やります！</p></div>
   </div>`);
 }
 
@@ -246,7 +249,7 @@ function challengeNative() {
   return slide("challenge2 r4", tag("CHALLENGE TIME", "ネイティブ版"), `
   <p class="lab">CHALLENGE TIME</p>
   <h2 class="h2">前置詞 ＋ 名詞をつけて、もう一回！</h2>
-  <div class="recipe"><span class="base"><span class="v">I will</span> ＿＿</span><span class="plus">＋</span><span class="c p">at ＋ 場所</span><span class="plus">＋</span><span class="c t">at ＋ 時間</span><span class="plus">＋</span><span class="c w">with ＋ 人</span></div>
+  <div class="recipe"><span class="base">主語 ＋ <span class="v">will</span> ＋ 動詞</span><span class="plus">＋</span><span class="c p">at ＋ 場所</span><span class="plus">＋</span><span class="c t">at ＋ 時間</span><span class="plus">＋</span><span class="c w">with ＋ 人</span></div>
   <div class="rounds3">
     ${CHALLENGE_ROUNDS.map(([q, ja], i) => `<div class="rcard"><p class="rl">ROUND ${i + 1}</p><p class="rq">What will you do<br>${esc(q)}</p><p class="rj">${esc(ja)}</p></div>`).join("\n    ")}
   </div>`);
@@ -279,7 +282,9 @@ function canGrammar() {
   <p class="lab">GRAMMAR</p>
   <h2 class="h2"><span class="v en">can</span> ＝ 〜できる</h2>
   <div class="formula">
-    <div class="fbox key"><p class="fb en">I can</p><p class="fc">可能・能力</p></div>
+    <div class="fbox"><p class="fb">主語</p><p class="fc">I / You / We など</p></div>
+    <span class="plus">＋</span>
+    <div class="fbox key"><p class="fb en">can</p><p class="fc">可能・能力</p></div>
     <span class="plus">＋</span>
     <div class="fbox"><p class="fb">動詞の原形</p><p class="fc">will と同じ形</p></div>
   </div>

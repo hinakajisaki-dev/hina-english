@@ -197,8 +197,22 @@ function popScene() {
   return { behind, front, extra };
 }
 
+// "simple": two big soft circles in the corners, cut off at the slide edge.
+function simpleScene() {
+  const disc = (cx, cy, r) => {
+    const pts = Array.from({ length: 96 }, (_, k) => [cx + Math.cos((k * Math.PI) / 48) * r, cy + Math.sin((k * Math.PI) / 48) * r]);
+    return `M ${clipToSlide(pts).map(pt).join(" L ")} Z`;
+  };
+  const behind = shapes([
+    [disc(1170, 70, 280), "#D6E8F8"],
+    [disc(90, 680, 230), "#FFE1D3"],
+  ]);
+  return { behind, front: "", extra: "" };
+}
+
 function cover({ title, subtitle, look = "okinawa" }) {
-  const { behind, front, extra } = look === "pop" ? popScene() : okinawaScene();
+  const scenes = { okinawa: okinawaScene, pop: popScene, simple: simpleScene };
+  const { behind, front, extra } = scenes[look]();
   return `
 <section class="slide cover ${look}">
   ${behind}

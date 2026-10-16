@@ -131,6 +131,10 @@ ol, ul { list-style: none; }
 /* ---------- cover ---------- */
 .cover { justify-content: center; align-items: center; background: #E3F4FA; } /* Okinawa sky */
 .cover.pop { background: #FFEFF4; }
+.cover.simple { background: #EAF2FB; }
+.cover.simple .cover-card { width: 1060px; background: transparent; box-shadow: none; } /* just the title */
+.cover.simple .ttl.two h1 { font-size: 88px; }
+.cover.simple .ttl.two .mk { height: 34px; }
 .bub { position: absolute; height: 72px; font-family: var(--hand); font-size: 36px; line-height: 72px; text-align: center; color: var(--accent-text); }
 .cover-card {
   position: relative;
