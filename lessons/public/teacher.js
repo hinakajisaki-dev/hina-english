@@ -9,6 +9,7 @@ import { CURRENT_WEEK, NOTES_FOR_STUDENTS } from "./course.js";
 import { MENUS } from "./menus.js";
 import { phraseSetKey, phraseSets, phraseWeeks, testSize } from "./phrases/book.js";
 import { lessonDayLabel, lessonList, noteDayLabel, noteHtml, noteProblems } from "./notes/format.js";
+import { shownPoints, spellingMap } from "./journal/spelling.js";
 import { bindPanels, formatMinutes, monthPanel, monthStart, summary, today, weekDays, weekPanel, weekStart } from "./study.js";
 
 document.body.classList.add("teacher");
@@ -306,8 +307,8 @@ function renderJournals(panel) {
       <div class="journal-body stack">
         <div><h3>生徒が書いた文</h3><p class="journal-text" lang="en">${esc(j.body)}</p></div>
         ${c ? `
-          <div><h3>AI の添削</h3><p class="journal-text diff" lang="en">${diffHtml(j.body, c.corrected)}</p></div>
-          ${c.corrections.length ? `<div class="stack">${c.corrections.map((fix) => `
+          <div><h3>AI の添削</h3><p class="journal-text diff" lang="en">${diffHtml(j.body, c.corrected, spellingMap(c))}</p></div>
+          ${shownPoints(c).length ? `<div class="stack">${shownPoints(c).map((fix) => `
             <div class="fix">
               <p class="change" lang="en"><del>${esc(fix.before)}</del><span class="arrow">→</span><ins>${esc(fix.after)}</ins></p>
               <p>${esc(fix.why)}</p>
