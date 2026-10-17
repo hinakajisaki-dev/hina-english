@@ -1,4 +1,5 @@
 // Helpers shared by the student app and the teacher page.
+import { isSpelling } from "./journal/spelling.js";
 
 export class ApiError extends Error {
   constructor(status, message) {
@@ -205,7 +206,9 @@ function lcsPairs(a, b, same = (x, y) => x === y) {
 // with <del> for removed words and <ins> for added ones. Line breaks are kept.
 // Punctuation is left as the student wrote it and never marked as a change
 // (the teacher doesn't correct commas, periods, hyphens and the like).
-export function diffHtml(before, after) {
+// A word in `spelling` (journal/spelling.js spellingMap) only had its spelling
+// fixed: it shows as the right word alone, <ins class="spell">.
+export function diffHtml(before, after, spelling = new Map()) {
   // "yesterday,so" is two words.
   const tokenize = (text) =>
     String(text).replace(/([,;:])(?=[A-Za-z])/g, "$1 ").split(/(\n)|[ \t]+/).filter((t) => t !== undefined && t !== "");
@@ -223,6 +226,18 @@ export function diffHtml(before, after) {
     const removed = a.slice(i, ai).filter((t) => t !== "\n");
     const added = b.slice(j, bj).filter((t) => !isPunct(t));
     const words = removed.filter((t) => !isPunct(t));
+    // Word for word, when one of them is a spelling fix.
+    if (words.length && words.length === added.length && !added.includes("\n")
+      && words.some((w, k) => isSpelling(spelling, w, added[k]))) {
+      words.forEach((w, k) => {
+        if (!isSpelling(spelling, w, added[k])) return out.push(`<del>${esc(w)}</del> <ins>${esc(added[k])}</ins>`);
+        // The right word, with the student's own punctuation around it.
+        const [, lead, , trail] = parts(w);
+        out.push(`${esc(lead)}<ins class="spell">${esc(parts(added[k])[2])}</ins>${esc(trail)}`);
+      });
+      if (removed.length > words.length) out.push(removed.filter(isPunct).map(esc).join(" "));
+      return;
+    }
     if (words.length) out.push(`<del>${words.map(esc).join(" ")}</del>`);
     if (removed.length > words.length) out.push(removed.filter(isPunct).map(esc).join(" "));
     if (added.length) {

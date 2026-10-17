@@ -10,6 +10,7 @@ import { MONTHS, currentMonth, monthLabel, monthPhrases, studentMonths } from ".
 import { CURRENT_WEEK, NOTES_FOR_STUDENTS } from "./course.js";
 import { MENUS } from "./menus.js";
 import { TOPICS } from "./journal/topics.js";
+import { shownPoints, spellingMap } from "./journal/spelling.js";
 import {
   TEST_SIZE, phraseByKey, phraseSetKey, phraseSets, phraseWeeks, setDrills, setNumbers, setScenes, testSize, weekPhrases,
   weekTitle,
@@ -2792,6 +2793,9 @@ function renderJournalEntry(id) {
   }
   const c = j.correction;
   const aiError = state.aiError[j.id];
+  // Spelling fixes only show as the right word in the diary, in blue.
+  const spelling = c && spellingMap(c);
+  const points = c ? shownPoints(c) : [];
 
   app.innerHTML = `${topbar(formatDate(j.created_at))}
     <main class="wrap stack">
@@ -2800,17 +2804,18 @@ function renderJournalEntry(id) {
         <section class="card stack">
           ${j.topic ? `<p class="muted small">お題：${esc(j.topic)}</p>` : ""}
           <h3>添削した日記</h3>
-          <p class="journal-text diff" lang="en">${diffHtml(j.body, c.corrected)}</p>
+          <p class="journal-text diff" lang="en">${diffHtml(j.body, c.corrected, spelling)}</p>
+          ${spelling.size ? `<p class="muted small"><ins class="spell">青い字</ins>は、つづりを直したところです。</p>` : ""}
         </section>
-        ${c.corrections.length ? `
+        ${points.length ? `
           <section class="card stack">
             <h3>直したところ</h3>
-            ${c.corrections.map((fix) => `
+            ${points.map((fix) => `
               <div class="fix">
                 <p class="change" lang="en"><del>${esc(fix.before)}</del><span class="arrow" aria-label="を">→</span><ins>${esc(fix.after)}</ins></p>
                 <p>${esc(fix.why)}</p>
               </div>`).join("")}
-          </section>` : `<p class="notice good">まちがいはありませんでした！すばらしい！</p>`}
+          </section>` : spelling.size ? "" : `<p class="notice good">まちがいはありませんでした！すばらしい！</p>`}
         <details class="card"><summary>はじめに書いた文を見る</summary><p class="journal-text" lang="en" style="margin-top:10px">${esc(j.body)}</p></details>
       ` : `
         ${state.me.ai && !j.imported ? `<p class="notice ${aiError ? "bad" : ""}">${esc(aiError || "この日記は、まだ添削がありません。")}</p>` : ""}
