@@ -179,6 +179,25 @@ const SCHEMA = [
     updated_at TEXT NOT NULL,
     PRIMARY KEY (student_id, name)
   )`,
+  // Problems the app ran into, for the teacher's error chat (src/errors.js).
+  // dedupe: what makes two problems the same one; seen_at: when the error chat
+  // last looked at it; done_at/done_note: when and how it was fixed.
+  `CREATE TABLE IF NOT EXISTS app_errors (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    kind TEXT NOT NULL,
+    message TEXT NOT NULL,
+    detail TEXT NOT NULL DEFAULT '',
+    student_id INTEGER REFERENCES students(id) ON DELETE SET NULL,
+    ref TEXT NOT NULL DEFAULT '',
+    dedupe TEXT NOT NULL,
+    count INTEGER NOT NULL DEFAULT 1,
+    first_at TEXT NOT NULL,
+    last_at TEXT NOT NULL,
+    seen_at TEXT,
+    done_at TEXT,
+    done_note TEXT NOT NULL DEFAULT ''
+  )`,
+  `CREATE INDEX IF NOT EXISTS app_errors_open ON app_errors(dedupe, done_at)`,
 ];
 
 // Columns added to a table after it was first made. On a database that has

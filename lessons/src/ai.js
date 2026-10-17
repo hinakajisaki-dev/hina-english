@@ -1,9 +1,17 @@
 // Journal correction and the judging of typed answers with Claude. Each returns
 // the parsed result, or throws an AiError whose message is safe to show the
-// student (in Japanese).
+// student (in Japanese), and whose detail says what really happened (for the
+// error log, src/errors.js).
 import Anthropic from "@anthropic-ai/sdk";
 
-export class AiError extends Error {}
+export class AiError extends Error {
+  constructor(message, detail = "") {
+    super(message);
+    this.detail = detail;
+  }
+}
+
+const apiDetail = (error) => `Anthropic API ${error?.status ?? "(no status)"}: ${error?.message ?? error}`;
 
 const SYSTEM = `You help an English teacher in Japan by correcting English journal entries written by the teacher's private students.
 The students are Japanese adults learning English. Feedback is read by the student, so write every explanation in natural, friendly Japanese.
@@ -54,7 +62,7 @@ const words = (text) => String(text).toLowerCase().replace(/[^a-z0-9'’]+/g, " 
 const punctuationOnly = (fix) => words(fix.before) === words(fix.after);
 
 export async function correctJournal(env, { body, topic, note }) {
-  if (!env.ANTHROPIC_API_KEY) throw new AiError("添削の設定がまだです。先生に知らせてください。");
+  if (!env.ANTHROPIC_API_KEY) throw new AiError("添削の設定がまだです。先生に知らせてください。", "ANTHROPIC_API_KEY がない");
 
   const parts = [];
   if (note) parts.push(`<teacher_note>\n${note}\n</teacher_note>`);
@@ -78,24 +86,25 @@ export async function correctJournal(env, { body, topic, note }) {
     });
   } catch (error) {
     console.error("anthropic error", error?.status, error?.message);
+    const detail = apiDetail(error);
     if (error instanceof Anthropic.AuthenticationError) {
-      throw new AiError("添削の設定に問題があります。先生に知らせてください。");
+      throw new AiError("添削の設定に問題があります。先生に知らせてください。", detail);
     }
     if (error instanceof Anthropic.RateLimitError) {
-      throw new AiError("いま混み合っています。少し待ってから、もう一度ためしてください。");
+      throw new AiError("いま混み合っています。少し待ってから、もう一度ためしてください。", detail);
     }
     if (error instanceof Anthropic.APIError && error.status === 400) {
       // Most often an empty credit balance on the Anthropic account.
-      throw new AiError("添削の設定に問題があります。先生に知らせてください。");
+      throw new AiError("添削の設定に問題があります。先生に知らせてください。", detail);
     }
-    throw new AiError("添削できませんでした。少し待ってから、もう一度ためしてください。");
+    throw new AiError("添削できませんでした。少し待ってから、もう一度ためしてください。", detail);
   }
 
   if (response.stop_reason === "refusal") {
-    throw new AiError("この内容は添削できませんでした。文章を少し変えて、もう一度ためしてください。");
+    throw new AiError("この内容は添削できませんでした。文章を少し変えて、もう一度ためしてください。", `stop_reason refusal (${response.model})`);
   }
   if (response.stop_reason === "max_tokens") {
-    throw new AiError("文章が長すぎて添削できませんでした。短くして、もう一度ためしてください。");
+    throw new AiError("文章が長すぎて添削できませんでした。短くして、もう一度ためしてください。", `stop_reason max_tokens (${response.model})`);
   }
 
   const text = response.content.find((block) => block.type === "text")?.text;
@@ -108,7 +117,7 @@ export async function correctJournal(env, { body, topic, note }) {
     };
   } catch {
     console.error("could not parse correction", text?.slice(0, 200));
-    throw new AiError("添削できませんでした。もう一度ためしてください。");
+    throw new AiError("添削できませんでした。もう一度ためしてください。", `could not parse the correction (stop_reason ${response.stop_reason}): ${text?.slice(0, 200)}`);
   }
 }
 
@@ -184,7 +193,7 @@ const difference = (m) => {
 // closest answer. Returns { acceptable, comment, points: [{ n, kind, topic, why }] },
 // one point per mistake, n counting from 1.
 export async function judgeAnswer(env, { question, given, found }) {
-  if (!env.ANTHROPIC_API_KEY) throw new AiError("AI の設定がまだです。");
+  if (!env.ANTHROPIC_API_KEY) throw new AiError("AI の設定がまだです。", "ANTHROPIC_API_KEY がない");
   const others = question.answers.filter((a) => a !== found.answer);
   const parts = [];
   if (question.japanese) parts.push(`<japanese>${question.japanese}</japanese>`);
@@ -213,7 +222,7 @@ export async function judgeAnswer(env, { question, given, found }) {
     });
   } catch (error) {
     console.error("anthropic error", error?.status, error?.message);
-    throw new AiError("AI に確認できませんでした。");
+    throw new AiError("AI に確認できませんでした。", apiDetail(error));
   }
   const text = response.content.find((block) => block.type === "text")?.text;
   try {
@@ -230,6 +239,6 @@ export async function judgeAnswer(env, { question, given, found }) {
     return { acceptable, comment: String(result.comment || "").slice(0, 200), points };
   } catch {
     console.error("could not parse judgment", response.stop_reason, text?.slice(0, 200));
-    throw new AiError("AI に確認できませんでした。");
+    throw new AiError("AI に確認できませんでした。", `could not parse the judgment (stop_reason ${response.stop_reason}): ${text?.slice(0, 200)}`);
   }
 }

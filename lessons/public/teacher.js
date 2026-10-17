@@ -1,7 +1,7 @@
 // Teacher page: add students, give each one their own words,
 // pronunciation sentences, grammar problems and journal topics, and read
 // their journals with the AI corrections.
-import { ApiError, api, diffHtml, esc, formatDateTime, icons, startOfJapanDay, toast } from "./common.js";
+import { ApiError, api, diffHtml, esc, formatDateTime, icons, startOfJapanDay, toast, watchErrors } from "./common.js";
 import { UNITS } from "./grammar/lessons.js";
 import { bookWeeks, setKey, vocabBooks, weekBook, weekWords, wordSets } from "./vocab/words.js";
 import { USUAL_MONTHS, currentMonth, monthLabel, monthPhrases, pronMonths, studentMonths } from "./pron/phrases.js";
@@ -12,6 +12,8 @@ import { lessonDayLabel, lessonList, noteDayLabel, noteHtml, noteProblems } from
 import { bindPanels, formatMinutes, monthPanel, monthStart, summary, today, weekDays, weekPanel, weekStart } from "./study.js";
 
 document.body.classList.add("teacher");
+const reportError = watchErrors("/api/teacher/errors");
+
 const app = document.getElementById("app");
 const state = { students: [], current: null, vocabWeek: null, studyView: null, noteEdit: null };
 const WEEKS = 24;
@@ -63,6 +65,7 @@ async function render() {
     else await renderList();
   } catch (error) {
     if (error instanceof ApiError && error.status === 401) return renderLogin();
+    reportError(error);
     app.innerHTML = `<main class="wrap"><div class="card empty" style="margin-top:40px">${esc(error.message)}<br><br><a class="btn" href="#/">一覧にもどる</a></div></main>`;
   }
 }

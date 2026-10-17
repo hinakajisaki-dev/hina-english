@@ -4,7 +4,12 @@
 
 const MODEL = "@cf/deepgram/aura-2-en";
 
-export class SpeechError extends Error {}
+export class SpeechError extends Error {
+  constructor(message, detail = "") {
+    super(message);
+    this.detail = detail;
+  }
+}
 
 export async function speechFor(env, text) {
   const voice = env.VOICE || "thalia";
@@ -23,12 +28,12 @@ async function synthesize(env, text, voice) {
     output = await env.AI.run(MODEL, { text, speaker: voice });
   } catch (error) {
     console.error("tts error", error?.message);
-    throw new SpeechError("audio could not be made");
+    throw new SpeechError("audio could not be made", `Workers AI ${MODEL}: ${error?.message ?? error}`);
   }
   const bytes = await toBytes(output);
   if (!looksLikeMp3(bytes)) {
     console.error("tts returned something other than MP3", typeof output, bytes.slice(0, 16));
-    throw new SpeechError("audio could not be made");
+    throw new SpeechError("audio could not be made", `Workers AI ${MODEL} returned no MP3 (${typeof output}, ${bytes.length} bytes)`);
   }
   return bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength);
 }
