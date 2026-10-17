@@ -47,13 +47,13 @@ const GROW = [
 
 const CHALLENGE_ROUNDS = [
   ["tomorrow?", "明日なにするの？"],
-  ["next weekend?", "来週末なにするの？"],
+  ["this weekend?", "今週末なにするの？"],
   ["for Christmas?", "クリスマスはなにするの？"],
 ];
 
 const TALK = [
   ["アメリカ・カナダの<br>クリスマス", "Christmas in the U.S. & Canada"],
-  ["日本の<br>お正月", "New Year's in Japan"],
+  ["日本の<br>クリスマス", "Christmas in Japan"],
   ["サンクスギビング<br>（感謝祭）", "Thanksgiving"],
 ];
 
@@ -65,7 +65,7 @@ const SHUNKAN = [
     qs: [
       ["明日ランチ行けるよ〜", "I [can] go for lunch tomorrow."],
       ["8時に駅で会えるよ", "I [can] meet you {p:at the station} {t:at 8}."],
-      ["週末なら家族とキャンプに行けるよ", "I [can] go camping {w:with my family} this weekend."],
+      ["今週末は家族とキャンプに行けるよ", "I [can] go camping {w:with my family} this weekend."],
       ["英語、少し話せるよ", "I [can] speak a little English."],
       ["公園で一緒に走れるよ", "I [can] run {w:with you} {p:at the park}."],
     ],
@@ -77,7 +77,7 @@ const SHUNKAN = [
     qs: [
       ["明日は家で映画を見るよ", "I [will] watch a movie {p:at home} tomorrow."],
       ["7時に友達と夜ごはんを食べるよ", "I [will] eat dinner {w:with my friends} {t:at 7}."],
-      ["週末は妹と海に行くよ", "I [will] go to the beach {w:with my sister}<br>this weekend."],
+      ["今週末は妹と海に行くよ", "I [will] go to the beach {w:with my sister}<br>this weekend."],
       ["今夜はカフェで英語を勉強するよ", "I [will] study English {p:at a cafe} tonight."],
       ["クリスマスは家族と過ごすよ", "I [will] spend Christmas {w:with my family}."],
     ],
@@ -90,8 +90,8 @@ const SHUNKAN = [
       ["3時なら駅に行けるよ", "I [can] go to the station {t:at 3}."],
       ["明日の朝、ジムに行くよ", "I [will] go to the gym tomorrow morning."],
       ["今夜なら電話できるよ", "I [can] call you tonight."],
-      ["週末は友達とビーチでBBQするよ", "I [will] have a BBQ {p:at the beach}<br>{w:with my friends} this weekend."],
-      ["お正月は実家でのんびりするよ", "I [will] relax {p:at my parents' house}<br>over New Year's."],
+      ["今週末は友達とビーチでBBQするよ", "I [will] have a BBQ {p:at the beach}<br>{w:with my friends} this weekend."],
+      ["クリスマスは実家でのんびりするよ", "I [will] relax {p:at my parents' house}<br>over Christmas."],
     ],
   },
 ];
