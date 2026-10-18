@@ -10,7 +10,7 @@ import { MENUS } from "./menus.js";
 import { phraseSetKey, phraseSets, phraseWeeks, testSize } from "./phrases/book.js";
 import { lessonDayLabel, lessonList, noteDayLabel, noteHtml, noteProblems } from "./notes/format.js";
 import { shownPoints, spellingMap } from "./journal/spelling.js";
-import { bindPanels, formatMinutes, monthPanel, monthStart, summary, today, weekDays, weekPanel, weekStart } from "./study.js";
+import { allTime, bindPanels, formatMinutes, monthPanel, monthStart, summary, today, totalPanel, weekDays, weekPanel, weekStart } from "./study.js";
 
 document.body.classList.add("teacher");
 const reportError = watchErrors("/api/teacher/errors");
@@ -265,6 +265,7 @@ async function renderStudent(id, tab) {
         <div class="stat"><b>${tries ? `${Math.round((grammarTries.right / tries) * 100)}%` : "—"}</b><span>文法の正解率</span></div>
         <div class="stat"><b>${pronFinished} / ${shared.length}</b><span>発音 ${esc(monthLabel(myMonths, pronMonth))} の完了</span></div>
         <div class="stat"><b>${formatMinutes(studyWeek.total)}</b><span>今週の勉強時間</span></div>
+        <div class="stat"><b>${formatMinutes(allTime(data.study || []).total)}</b><span>これまでの勉強時間</span></div>
       </div>
       <nav class="tabs" aria-label="内容">
         ${tabs.map(([key, label]) => `<a href="#/s/${student.id}/${key}" ${key === tab ? 'aria-current="page"' : ""}>${esc(label)}</a>`).join("")}
@@ -839,7 +840,8 @@ function renderStudyTab(panel) {
     state.studyView = { student: student.id, week: weekStart(today()), month: monthStart(today()) };
   }
   panel.innerHTML = `<div class="stack">
-    <p class="muted small">アプリを開いて使っていた時間（自動）と、生徒が自分で記入したアプリ以外の勉強時間です。生徒はどちらも直せます。</p>
+    <p class="muted small">アプリを開いて使っていた時間（自動）と、生徒が自分で記入したアプリ以外の勉強時間です。生徒はどちらも直せます。アプリを使う前の勉強時間は、アプリ以外に入っています。</p>
+    ${totalPanel(study || [])}
     ${weekPanel(study || [], state.studyView.week)}
     ${monthPanel(study || [], state.studyView.month)}
   </div>`;

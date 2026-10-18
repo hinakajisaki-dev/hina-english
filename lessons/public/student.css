@@ -41,7 +41,6 @@
 .task .go { color: var(--muted); font-size: 22px; line-height: 1; }
 
 /* 勉強時間 */
-.study-today .big { font-size: 40px; font-weight: 900; line-height: 1.1; }
 .study-days li { align-items: center; }
 .minutes-field { display: flex; align-items: center; gap: 8px; }
 .minutes-field input { max-width: 120px; }

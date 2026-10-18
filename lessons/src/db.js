@@ -289,7 +289,7 @@ export async function studentBundle(db, studentId) {
     all(db, `SELECT * FROM phrase_review WHERE student_id = ? ORDER BY added_at`, studentId),
     all(db, `SELECT * FROM phrase_tests WHERE student_id = ?`, studentId),
     all(db, `SELECT * FROM pron_progress WHERE student_id = ?`, studentId),
-    all(db, `SELECT * FROM study_days WHERE student_id = ? AND day >= ? ORDER BY day`, studentId, japanDay(-400)),
+    all(db, `SELECT * FROM study_days WHERE student_id = ? ORDER BY day`, studentId),
     all(db, `SELECT * FROM journals WHERE student_id = ? ORDER BY created_at DESC, id DESC LIMIT 60`, studentId),
     first(db, `SELECT body, updated_at FROM study_plans WHERE student_id = ?`, studentId),
     first(db, `SELECT hidden FROM student_menus WHERE student_id = ?`, studentId),

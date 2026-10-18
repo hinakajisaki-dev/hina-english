@@ -175,46 +175,98 @@ ins { background: var(--good-soft); color: var(--good); text-decoration: none; b
 del { color: var(--bad); text-decoration: line-through; text-decoration-thickness: 2px; opacity: .8; }
 ins.spell { background: var(--spell-soft); color: var(--spell); }
 
-/* ---------- study time chart (student app and teacher page) ----------
-   Stacked columns per day: app time (accent) at the bottom, other study (blue)
-   on top, 2px surface gap between them, 4px rounded top, square at the baseline. */
-:root { --study-app: #F0521E; --study-other: #4A90D9; }
-.study-chart { margin: 0; display: flex; flex-direction: column; gap: 8px; }
-.chart-legend { display: flex; gap: 14px; flex-wrap: wrap; font-size: 13px; color: var(--ink-2); }
-.chart-legend span { display: inline-flex; align-items: center; gap: 6px; }
-/* (swatch, not "key": grammar lessons use .key for their ポイント line) */
-.swatch { width: 12px; height: 12px; border-radius: 3px; display: inline-block; }
-.swatch.app { background: var(--study-app); }
-.swatch.other { background: var(--study-other); }
-.chart-plot { position: relative; height: 180px; margin: 6px 0 34px 44px; }
-.chart-grid { position: absolute; inset: 0; border-bottom: 1px solid var(--line); }
-.chart-grid .tick { position: absolute; left: 0; right: 0; border-top: 1px solid var(--line); }
-.chart-grid .tick span {
-  position: absolute; right: calc(100% + 6px); top: -9px; font-size: 11px; color: var(--muted);
-  white-space: nowrap; font-variant-numeric: tabular-nums;
+/* ---------- study time (student app and teacher page) ----------
+   Two kinds of study, everywhere in the same colors: time in the app (accent)
+   and other study (blue). Bars are at most 24px thick, with a 2px gap between
+   the two kinds and a 4px rounded end. The calendar's days get darker with
+   more study (one orange ramp, light to dark; ink text on the two light steps,
+   white on the two dark ones). */
+:root {
+  --study-app: #F0521E; --study-other: #4A90D9;
+  --cal-1: #F7A07A; --cal-2: #F07446; --cal-3: #C8461A; --cal-4: #8E2E0C;
 }
-.chart-cols { position: absolute; inset: 0; display: flex; }
-.chart-cols .col {
-  flex: 1 1 0; min-width: 0; position: relative; border: 0; padding: 0; margin: 0; background: none;
-  cursor: pointer; display: flex; justify-content: center; align-items: flex-end; border-radius: 6px;
-}
-.chart-cols .col[disabled] { cursor: default; }
-.chart-cols .col[aria-pressed="true"] { background: rgba(74, 144, 217, .1); }
-.stack-bar {
-  display: flex; flex-direction: column; gap: 2px; width: 60%; max-width: 24px; min-width: 3px;
-  border-radius: 4px 4px 0 0; overflow: hidden;
-}
-.stack-bar .seg { display: block; flex-basis: 0; min-height: 2px; }
-.seg.app { background: var(--study-app); }
-.seg.other { background: var(--study-other); }
-.col-label {
-  position: absolute; top: calc(100% + 4px); left: 50%; transform: translateX(-50%);
-  font-size: 11px; line-height: 1.25; color: var(--muted); text-align: center; white-space: nowrap;
-}
-.col.today .col-label { color: var(--ink); font-weight: 700; }
-.chart-readout { font-size: 13px; color: var(--ink-2); min-height: 2.6em; }
+.swatch { width: 12px; height: 12px; border-radius: 3px; display: inline-block; flex: none; }
+.swatch.app, .seg.app { background: var(--study-app); }
+.swatch.other, .seg.other { background: var(--study-other); }
+.seg { display: block; flex-basis: 0; }
+
+/* Big figures: the numbers large, 時間 and 分 smaller. */
+.hero, .period-total .big, .today-big { font-weight: 900; line-height: 1.1; letter-spacing: -.01em; }
+.hero small, .period-total .big small, .today-big small { font-size: .5em; font-weight: 700; margin: 0 .12em; }
+.hero { font-size: 48px; }
+.today-big { font-size: 36px; }
+.period-total { display: flex; flex-direction: column; gap: 2px; }
+.period-total > span { font-size: 14px; color: var(--ink-2); }
+.period-total .big { font-size: 34px; }
+.panel-sub { font-size: 15px; }
+
+/* The two kinds and their totals: also the charts' legend. */
+.split { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 14px; color: var(--ink-2); }
+.split span { display: inline-flex; align-items: center; gap: 6px; }
+.split b { color: var(--ink); }
+
 .chart-nav { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-.chart-nav h3 { font-size: 16px; text-align: center; flex: 1; }
-.chart-stats { display: flex; gap: 18px; flex-wrap: wrap; align-items: baseline; }
-.chart-stats .big { font-size: 28px; font-weight: 900; line-height: 1.1; }
-.chart-stats span { font-size: 13px; color: var(--ink-2); }
+.chart-nav h3 { font-size: 17px; text-align: center; flex: 1; }
+.chart-readout { font-size: 14px; color: var(--ink); background: var(--bg); border-radius: 12px; padding: 10px 12px; min-height: 3.2em; }
+
+/* Week: a column a day, its total written above it. */
+.week-chart { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px; max-width: 560px; }
+.wcol { display: flex; flex-direction: column; align-items: center; min-width: 0; }
+.wcol-plot {
+  height: 168px; width: 100%; display: flex; flex-direction: column; justify-content: flex-end; align-items: center;
+  border-bottom: 1px solid var(--line);
+}
+.wcol-value { font-size: 12px; font-weight: 700; line-height: 1.2; text-align: center; margin-bottom: 4px; white-space: nowrap; }
+.stack-bar { display: flex; flex-direction: column; gap: 2px; width: 70%; max-width: 24px; border-radius: 4px 4px 0 0; overflow: hidden; }
+.stack-bar .seg { min-height: 2px; }
+.wcol-day { margin-top: 6px; font-size: 12px; line-height: 1.3; color: var(--ink-2); text-align: center; white-space: nowrap; }
+.wcol-day b { display: block; font-size: 14px; color: var(--ink); }
+.wcol.today .wcol-day b { color: var(--accent-text); }
+.wcol.today .wcol-plot { background: var(--accent-soft); border-radius: 8px 8px 0 0; }
+.wcol.future .wcol-day { opacity: .5; }
+
+/* The week's days as a list. */
+.study-days .day-line { display: flex; justify-content: space-between; gap: 10px; font-weight: 700; }
+.study-days .day-line b { font-size: 17px; white-space: nowrap; }
+.study-days li.empty { padding-block: 8px; }
+.study-days li.empty .day-line { font-weight: 400; color: var(--muted); }
+.study-days li.empty .day-line b { font-size: 14px; font-weight: 400; }
+
+/* Month: a calendar. */
+.calendar { margin: 0; display: flex; flex-direction: column; gap: 12px; max-width: 560px; }
+.cal-grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px; }
+.cal-head { text-align: center; font-size: 13px; font-weight: 700; color: var(--ink-2); }
+.cal-day {
+  min-height: 58px; min-width: 0; padding: 4px 2px; margin: 0; border: 1px solid var(--line); border-radius: 10px;
+  background: var(--card); color: var(--ink); font: inherit; cursor: pointer;
+  display: flex; flex-direction: column; align-items: center; justify-content: flex-start; gap: 2px;
+}
+.cal-day.future { border-style: dashed; background: transparent; cursor: default; }
+.cal-date { font-size: 12px; line-height: 1.2; font-weight: 700; }
+.cal-day.future .cal-date { color: var(--muted); font-weight: 400; }
+.cal-min { font-size: 11px; font-weight: 700; line-height: 1.2; text-align: center; white-space: nowrap; }
+.cal-day.lv1 { background: var(--cal-1); border-color: var(--cal-1); }
+.cal-day.lv2 { background: var(--cal-2); border-color: var(--cal-2); }
+.cal-day.lv3 { background: var(--cal-3); border-color: var(--cal-3); color: #fff; }
+.cal-day.lv4 { background: var(--cal-4); border-color: var(--cal-4); color: #fff; }
+.cal-day.today { outline: 2px solid var(--ink); outline-offset: 1px; }
+.cal-day[aria-pressed="true"] { box-shadow: 0 0 0 3px var(--card), 0 0 0 5px var(--study-other); }
+.cal-scale { display: flex; flex-direction: column; gap: 4px; font-size: 13px; color: var(--ink-2); }
+.cal-keys { display: flex; flex-wrap: wrap; gap: 4px 12px; }
+.cal-keys span { display: inline-flex; align-items: center; gap: 5px; }
+.cal-key { width: 14px; height: 14px; border-radius: 4px; display: inline-block; }
+.cal-key.lv1 { background: var(--cal-1); } .cal-key.lv2 { background: var(--cal-2); }
+.cal-key.lv3 { background: var(--cal-3); } .cal-key.lv4 { background: var(--cal-4); }
+
+/* Everything so far: a bar a month. */
+.month-bars { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+.mbar {
+  width: 100%; display: grid; grid-template-columns: 4.6em minmax(0, 1fr) 6.6em; align-items: center; gap: 10px;
+  padding: 8px 6px; margin: 0; border: 0; border-radius: 10px; background: none; font: inherit; color: inherit; cursor: pointer; text-align: left;
+}
+.mbar:hover { background: var(--bg); }
+.mbar-name { font-size: 14px; font-weight: 700; white-space: nowrap; }
+.mbar-track { height: 16px; display: flex; }
+.hbar { display: flex; gap: 2px; height: 100%; border-radius: 0 4px 4px 0; overflow: hidden; }
+.hbar .seg { min-width: 2px; }
+.mbar-value { font-size: 14px; font-weight: 700; text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
