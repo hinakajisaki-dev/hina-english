@@ -21,6 +21,7 @@
 // node scripts/teacher.mjs plan なおみ [plan.md | --clear]      (今週の勉強範囲: see, set or clear)
 // node scripts/teacher.mjs menu なおみ [--only 日記,発音課題,勉強時間 | --all]   (what the home screen shows)
 // node scripts/teacher.mjs journals なおみ diaries.md [--dry]   (past diaries, no AI correction)
+// node scripts/teacher.mjs study-days なおみ days.txt [--dry | --replace | --undo]   (past study time: "2026-09-02 55")
 // node scripts/teacher.mjs pron-months なおみ [--set "1=Month 2" | --default]   (発音 months and their names)
 // node scripts/teacher.mjs pron-done なおみ (--month 1 | --keys m1/01,m1/02) [--day 2026-09-30] [--dry | --undo]
 //                                                                 (発音 finished before the app, as 完了 with no recording)
@@ -100,6 +101,7 @@ function parseArgs(args) {
     else if (arg === "--default") options.default = true;
     else if (arg === "--undo") options.undo = true;
     else if (arg === "--peek") options.peek = true;
+    else if (arg === "--replace") options.replace = true;
     else if (arg.startsWith("--")) options[arg.slice(2)] = args[++i];
     else rest.push(arg);
   }
@@ -168,6 +170,22 @@ function parseJournals(text) {
     else current.lines.push(line);
   }
   return entries.map((e) => ({ day: e.day, topic: e.topic, body: e.lines.join("\n").trim() }));
+}
+
+// Past study time, one day a line: "2026-09-02 55" (also 2026/9/2, 55分,
+// "2026-09-02 | 55"). Blank lines and lines starting with # are skipped.
+function parseStudyDays(text) {
+  const days = [];
+  for (const line of text.replace(/\r\n?/g, "\n").split("\n")) {
+    if (!line.trim() || line.trim().startsWith("#")) continue;
+    const m = line.match(/^\s*(\d{4})\s*[-/.年]\s*(\d{1,2})\s*[-/.月]\s*(\d{1,2})\s*日?\s*[|:：,\t ]\s*(\d+)\s*分?\s*$/);
+    if (!m) stop(`「${line.trim().slice(0, 40)}」が読めません。「2026-09-02 55」のように、日付と分を1行に1日ずつ書いてください。`);
+    const [, y, mo, d, minutes] = m;
+    days.push({ day: `${y}-${mo.padStart(2, "0")}-${d.padStart(2, "0")}`, minutes: Number(minutes) });
+  }
+  const twice = days.filter((d, i) => days.findIndex((e) => e.day === d.day) !== i).map((d) => d.day);
+  if (twice.length) stop(`同じ日付が2回あります：${[...new Set(twice)].join("、")}`);
+  return days.sort((a, b) => a.day.localeCompare(b.day));
 }
 
 // "Month 2（もとの Month 1）" for each month the student sees, then the ones they don't.
@@ -391,6 +409,37 @@ const commands = {
     }
     const { added, skipped } = await api(`/api/teacher/students/${student.id}/journals`, { method: "POST", body: { entries } });
     console.log(`${student.name}さんに過去の日記を ${added} 日分入れました（添削なし）${skipped ? `。同じものがすでにあった ${skipped} 日分は、とばしました` : ""}。`);
+  },
+
+  async "study-days"([name, file], options) {
+    if (!file) stop("過去の勉強時間のファイルを指定してください（- で標準入力）。");
+    const days = parseStudyDays(readText(file));
+    if (!days.length) stop("勉強時間がありません。「2026-09-02 55」のように、日付と分を1行に1日ずつ書いてください。");
+    const student = await findStudent(name);
+    const total = days.reduce((sum, d) => sum + d.minutes, 0);
+    const label = `${days.length} 日分（${days[0].day} 〜 ${days[days.length - 1].day}、合計 ${total.toLocaleString()} 分）`;
+    if (options.dry) {
+      const { study } = await studentData(student);
+      const have = new Map(study.map((row) => [row.day, row]));
+      const list = days.map((d) => {
+        const row = have.get(d.day);
+        if (!row) return `${d.day} ${d.minutes}分`;
+        const record = `アプリ ${Math.round(row.app_seconds / 60)}分・アプリ以外 ${row.other_minutes}分`;
+        return `${d.day} ${d.minutes}分 ← もう記録があります（${record}）. ${options.replace ? "アプリ以外を上書き" : "とばす"}`;
+      }).join("\n");
+      console.log(`${student.name}さんに入れる過去の勉強時間 ${label}。アプリ以外の勉強として入れます。まだ入れていません：\n${list}`);
+      return;
+    }
+    if (options.undo) {
+      const { removed, kept } = await api(`/api/teacher/students/${student.id}/study-days`, { method: "POST", body: { days, undo: true } });
+      console.log(`${student.name}さんの過去の勉強時間を ${removed} 日分もどしました${kept ? `（分がちがう・記録がない ${kept} 日分は、そのまま）` : ""}。`);
+      return;
+    }
+    const { added, replaced, skipped } = await api(`/api/teacher/students/${student.id}/study-days`, {
+      method: "POST",
+      body: { days, replace: !!options.replace },
+    });
+    console.log(`${student.name}さんに過去の勉強時間を入れました（アプリ以外の勉強として）：新しく ${added} 日分${replaced ? `、上書き ${replaced} 日分` : ""}${skipped.length ? `。もう記録があった ${skipped.length} 日分（${skipped.join("、")}）は、とばしました（上書きするときは --replace）` : ""}。`);
   },
 
   async "pron-done"([name], options) {
