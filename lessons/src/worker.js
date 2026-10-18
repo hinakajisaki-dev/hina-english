@@ -205,6 +205,9 @@ async function route(request, env, url, who) {
   if (parts[1] === "students" && parts[3] === "journals" && parts.length === 4 && method === "POST") {
     return importJournals(request, db, await findStudent(db, id(2)));
   }
+  if (parts[1] === "students" && parts[3] === "study-days" && parts.length === 4 && method === "POST") {
+    return importStudyDays(request, db, await findStudent(db, id(2)));
+  }
   if (parts[1] === "notes" && parts.length === 3) {
     const row = await first(db, `SELECT * FROM lesson_notes WHERE id = ?`, id(2));
     if (!row) throw new HttpError(404, "見つかりません。");
@@ -1067,6 +1070,63 @@ async function importJournals(request, db, student) {
       ).bind(student.id, entry.topic, entry.body, entry.created_at)));
   }
   return json({ added: fresh.length, skipped: clean.length - fresh.length });
+}
+
+// Study time from before the app, one total per day, put in as study outside
+// the app (other_minutes; the app time stays as counted): { days: [{ day:
+// "2026-09-02", minutes: 55 }] }. A day that already has a record is skipped
+// (so sending the same file twice adds nothing) unless replace is set: then its
+// other study becomes the file's minutes, and its app time and note stay.
+// { days, undo: true } takes the minutes back off the days that still have them.
+async function importStudyDays(request, db, student) {
+  const { days, replace, undo } = await readJson(request);
+  if (!Array.isArray(days) || !days.length) throw new HttpError(400, "入れる勉強時間がありません。");
+  if (days.length > 400) throw new HttpError(400, "一度に入れられるのは 400 日分までです。");
+  const today = japanDay();
+  const clean = days.map((entry, i) => {
+    const day = String(entry?.day || "");
+    const minutes = Number(entry?.minutes);
+    // (Date.parse takes 2026-02-30 as March 2.)
+    const date = new Date(`${day}T00:00:00Z`);
+    const real = /^\d{4}-\d{2}-\d{2}$/.test(day) && !Number.isNaN(date.getTime()) && date.toISOString().slice(0, 10) === day;
+    if (!real || day >= today) {
+      throw new HttpError(400, `${i + 1}つめの日付が正しくありません（${day || "なし"}. きのうまでの日にしてください）。`);
+    }
+    if (!Number.isInteger(minutes) || minutes < 1 || minutes > 1440) {
+      throw new HttpError(400, `${i + 1}つめ（${day}）の分が正しくありません（1〜1440）。`);
+    }
+    return { day, minutes };
+  });
+  if (new Set(clean.map((d) => d.day)).size < clean.length) throw new HttpError(400, "同じ日付が2回あります。");
+  const old = new Map(
+    (await all(db, `SELECT * FROM study_days WHERE student_id = ?`, student.id)).map((row) => [row.day, row]),
+  );
+
+  if (undo) {
+    const remove = clean.filter((d) => old.get(d.day)?.other_minutes === d.minutes);
+    if (remove.length) {
+      await db.batch(remove.flatMap((d) => [
+        db.prepare(`UPDATE study_days SET other_minutes = 0, updated_at = ? WHERE student_id = ? AND day = ?`).bind(now(), student.id, d.day),
+        db.prepare(`DELETE FROM study_days WHERE student_id = ? AND day = ? AND app_seconds = 0 AND other_minutes = 0 AND note = ''`)
+          .bind(student.id, d.day),
+      ]));
+    }
+    return json({ removed: remove.length, kept: clean.length - remove.length });
+  }
+
+  const put = clean.filter((d) => replace || !old.has(d.day));
+  if (put.length) {
+    await db.batch(put.map((d) =>
+      db.prepare(
+        `INSERT INTO study_days (student_id, day, other_minutes, updated_at) VALUES (?1, ?2, ?3, ?4)
+         ON CONFLICT (student_id, day) DO UPDATE SET other_minutes = ?3, updated_at = ?4`,
+      ).bind(student.id, d.day, d.minutes, now())));
+  }
+  return json({
+    added: put.filter((d) => !old.has(d.day)).length,
+    replaced: put.filter((d) => old.has(d.day)).length,
+    skipped: clean.filter((d) => !put.includes(d)).map((d) => d.day),
+  });
 }
 
 // The parts of the home screen hidden from this student: { hidden: ["vocab", …] }.
