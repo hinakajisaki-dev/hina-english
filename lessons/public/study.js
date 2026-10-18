@@ -30,7 +30,6 @@ export function addMonths(day, n) {
 const WEEKDAYS = ["日", "月", "火", "水", "木", "金", "土"];
 const weekday = (day) => WEEKDAYS[new Date(dayMs(day)).getUTCDay()];
 const md = (day) => `${Number(day.slice(5, 7))}/${Number(day.slice(8, 10))}`;
-export const shortDay = (day) => `${md(day)}（${weekday(day)}）`;
 export const dayLabel = (day) => `${Number(day.slice(5, 7))}月${Number(day.slice(8, 10))}日（${weekday(day)}）`;
 export const monthLabel = (day) => `${day.slice(0, 4)}年${Number(day.slice(5, 7))}月`;
 
@@ -110,7 +109,8 @@ const dayParts = (d) => [d.app && `アプリ ${formatMinutes(d.app)}`, d.other &
 // the eye goes down one column of names and one column of numbers. One soft
 // color; the current day / week / month is the strong one.
 
-// items: { name, sub, total, detail, current, future, href, data }. A bar is
+// items: { name, sub, total, note, detail, current, future, href, data }; the
+// note is always shown under the bar, the detail only when 詳細 is open. A bar is
 // full at the longest one, or at `atLeast` minutes when all are shorter (so a
 // week of a few minutes doesn't look full).
 function barList(items, atLeast) {
@@ -123,6 +123,7 @@ function barList(items, atLeast) {
         <span class="bar-track">${it.total ? `<span class="bar-fill" style="width:${Math.max(3, (it.total / max) * 100)}%"></span>` : ""}</span>
         <span class="bar-value">${it.future ? "" : it.total ? formatMinutes(it.total) : "—"}</span>
         ${it.href || it.data ? `<span class="bar-go" aria-hidden="true">›</span>` : ""}
+        ${it.note ? `<span class="bar-note">${it.note}</span>` : ""}
         ${it.detail ? `<span class="bar-detail">${it.detail}</span>` : ""}`;
       if (it.href && !it.future) return `<li><a class="${cls}" href="${it.href}">${inner}</a></li>`;
       if (it.data && !it.future) return `<li><button type="button" class="${cls}" ${it.data}>${inner}</button></li>`;
@@ -135,18 +136,23 @@ function barList(items, atLeast) {
 // Used by the student's 勉強時間 page and the teacher's 勉強時間 tab: the week,
 // the month, then everything so far. With editable, a day opens its 記入 page.
 
-const longDay = (day) => `${day.slice(0, 4)}年${Number(day.slice(5, 7))}月${Number(day.slice(8, 10))}日`;
-
-// The big total of a panel, and the numbers that go with it.
+// The big total of a panel, and the numbers that go with it, as two tiles.
 const headline = (label, total, side) => `<div class="headline">
-    <div><span>${label}</span><b class="big">${timeHtml(total)}</b></div>
-    <div class="headline-side">${side}</div>
+    <div class="stat-tile main"><span>${label}</span><b class="big">${timeHtml(total)}</b></div>
+    ${side ? `<div class="stat-tile side">${side}</div>` : ""}
   </div>`;
 
 const navHtml = (key, title, atEnd) => `<div class="chart-nav">
     <button type="button" class="btn ghost small-btn" data-${key}="-1" aria-label="前">‹ 前</button>
-    <h3>${title}</h3>
+    <h3><span class="period">${title}</span></h3>
     <button type="button" class="btn ghost small-btn" data-${key}="1" aria-label="次" ${atEnd ? "disabled" : ""}>次 ›</button>
+  </div>`;
+
+// 詳細をひらく / 閉じる: the split between app and other study, and each row's
+// detail. Closed at first; bindPanels keeps it open or closed across redraws.
+const detailsHtml = (key, sum) => `<div class="details-bar">
+    <p class="split">${splitOf(sum)}</p>
+    <button type="button" class="details-toggle" data-details="${key}" aria-expanded="false">詳細をひらく</button>
   </div>`;
 
 export function weekPanel(rows, start, { editable = false } = {}) {
@@ -166,9 +172,9 @@ export function weekPanel(rows, start, { editable = false } = {}) {
     };
   });
   return `<section class="card stack week-panel">
-    ${navHtml("week", `${shortDay(start)} 〜 ${shortDay(addDays(start, 6))}`, start >= weekStart(now))}
+    ${navHtml("week", `${md(start)} 〜 ${md(addDays(start, 6))}`, start >= weekStart(now))}
     ${headline("この週の合計", sum.total, `<span>勉強した日</span><b>${sum.studied}<small> / 7日</small></b>`)}
-    <p class="split">${splitOf(sum)}</p>
+    ${detailsHtml("week", sum)}
     ${barList(items, 60)}
     ${editable ? `<p class="muted small">日をタップすると、その日の時間を記入・編集できます。</p>` : ""}
   </section>`;
@@ -195,14 +201,15 @@ export function monthPanel(rows, start) {
       total: s.total,
       current: first <= now && now <= last,
       future: first > now,
-      detail: [first === last ? md(first) : `${md(first)}〜${md(last)}`, s.total && `勉強した日 ${s.studied}日`].filter(Boolean).join(" ・ "),
+      note: first === last ? md(first) : `${md(first)}〜${md(last)}`,
+      detail: s.total ? `勉強した日 ${s.studied}日 ・ ${splitOf(s)}` : "",
       data: `data-goto-week="${weekStart(first)}"`,
     };
   });
   return `<section class="card stack month-panel">
     ${navHtml("month", monthLabel(start), start >= monthStart(now))}
     ${headline("この月の合計", sum.total, `<span>勉強した日</span><b>${sum.studied}<small>日</small></b><span>1日平均 ${formatMinutes(Math.round(sum.total / elapsed))}</span>`)}
-    <p class="split">${splitOf(sum)}</p>
+    ${detailsHtml("month", sum)}
     ${barList(items, 5 * 60)}
     <p class="muted small">週をタップすると、上でその週の日ごとの時間が見られます。</p>
   </section>`;
@@ -222,21 +229,36 @@ export function totalPanel(rows) {
     sub: m.start.slice(0, 4) === today().slice(0, 4) ? "" : `${m.start.slice(0, 4)}年`,
     total: m.total,
     current: m.start === monthStart(today()),
-    detail: m.total ? `勉強した日 ${m.studied}日` : "",
+    detail: m.total ? `勉強した日 ${m.studied}日 ・ ${splitOf(m)}` : "",
     data: `data-goto-month="${m.start}"`,
   }));
   return `<section class="card stack total-card">
-    ${headline("これまでの合計", all.total, `<span>勉強した日</span><b>${all.studied}<small>日</small></b><span>${longDay(all.first)}から</span>`)}
-    <p class="split">${splitOf(all)}</p>
+    ${headline("これまでの合計", all.total, `<span>勉強した日</span><b>${all.studied}<small>日</small></b><span>${all.first.slice(0, 4)}/${md(all.first)}から</span>`)}
+    ${detailsHtml("total", all)}
     <h3 class="panel-sub">月ごとの合計</h3>
     ${barList(items, 20 * 60)}
   </section>`;
 }
 
-// Hooks up the ‹ › buttons and the weeks and months that open another panel;
-// view is { week, month } (start days), changed in place before redraw() runs.
+// Hooks up the ‹ › buttons, the 詳細 buttons and the weeks and months that open
+// another panel; view is { week, month, open } (start days, and which panels
+// have 詳細 open), changed in place before redraw() runs.
 export function bindPanels(root, view, redraw) {
   const go = (selector) => root.querySelector(selector)?.scrollIntoView({ behavior: "smooth", block: "start" });
+  view.open ||= {};
+  root.querySelectorAll("[data-details]").forEach((button) => {
+    const key = button.dataset.details;
+    const show = () => {
+      button.closest("section").classList.toggle("open", !!view.open[key]);
+      button.setAttribute("aria-expanded", !!view.open[key]);
+      button.textContent = view.open[key] ? "詳細を閉じる" : "詳細をひらく";
+    };
+    show();
+    button.addEventListener("click", () => {
+      view.open[key] = !view.open[key];
+      show();
+    });
+  });
   root.querySelectorAll("[data-week]").forEach((b) => b.addEventListener("click", () => {
     view.week = addDays(view.week, 7 * Number(b.dataset.week));
     redraw();

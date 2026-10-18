@@ -187,18 +187,40 @@ ins.spell { background: var(--spell-soft); color: var(--spell); }
 .today-big { font-size: 36px; }
 
 .chart-nav { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-.chart-nav h3 { font-size: 17px; text-align: center; flex: 1; }
+.chart-nav h3 { flex: 1; min-width: 0; text-align: center; }
+.chart-nav .btn { flex: none; white-space: nowrap; }
+/* The week or month shown, as a pill. */
+.period {
+  display: inline-block; padding: 6px 16px; border-radius: 999px; background: var(--sky-soft);
+  font-size: 16px; font-weight: 700; white-space: nowrap; box-shadow: 0 2px 0 rgba(26, 34, 56, .08);
+}
 
-/* A panel's total on the left, its other numbers on the right. */
-.headline { display: flex; justify-content: space-between; align-items: flex-end; gap: 8px 16px; flex-wrap: wrap; }
-.headline > div { display: flex; flex-direction: column; }
-.headline span { font-size: 14px; color: var(--ink-2); }
-.headline .big { font-size: 36px; }
-.headline-side { align-items: flex-end; text-align: right; }
-.headline-side b { font-size: 22px; line-height: 1.2; }
-.headline-side b small { font-size: 14px; color: var(--ink-2); }
-.split { font-size: 14px; color: var(--ink-2); }
+/* A panel's total (orange tile) and its other numbers (blue tile). */
+.headline { display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); gap: 10px; }
+.stat-tile {
+  display: flex; flex-direction: column; justify-content: center; gap: 2px; padding: 12px 14px; border-radius: 16px;
+  box-shadow: 0 2px 0 rgba(26, 34, 56, .08);
+}
+.stat-tile span { font-size: 13px; font-weight: 700; color: var(--ink-2); }
+.stat-tile.main { background: var(--accent-soft); }
+.stat-tile.main span { color: var(--accent-text); }
+.stat-tile.main .big { font-size: 34px; }
+.stat-tile.side { background: var(--sky-soft); }
+.stat-tile.side b { font-size: 24px; line-height: 1.2; }
+.stat-tile.side b small { font-size: 14px; color: var(--ink-2); }
+.stat-tile.side span + span { font-weight: 400; }
 .panel-sub { font-size: 16px; }
+
+/* 詳細をひらく / 閉じる: the app / other split and each row's detail. */
+.details-bar { display: flex; align-items: center; justify-content: flex-end; gap: 6px 12px; flex-wrap: wrap; }
+.details-bar .split { flex: 1 1 14em; font-size: 14px; color: var(--ink-2); display: none; }
+.details-toggle {
+  border: 1px solid var(--line); border-radius: 999px; background: var(--card); padding: 4px 14px;
+  font-size: 14px; font-weight: 700; color: var(--accent-text); cursor: pointer;
+}
+.details-toggle::after { content: " ▾"; }
+.open .details-toggle::after { content: " ▴"; }
+.open .details-bar .split { display: block; }
 
 .week-panel, .month-panel, .total-card { scroll-margin-top: 84px; }
 .bar-list { list-style: none; margin: 0; padding: 0; }
@@ -216,7 +238,9 @@ a.bar-row:hover, button.bar-row:hover { background: var(--bg); }
 .bar-fill { display: block; height: 100%; border-radius: 0 6px 6px 0; background: var(--bar-soft); }
 .bar-value { font-size: 16px; font-weight: 700; text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
 .bar-go { font-size: 20px; line-height: 1; color: var(--muted); text-align: right; }
-.bar-detail { grid-column: 2 / -1; font-size: 13px; line-height: 1.5; color: var(--ink-2); overflow-wrap: anywhere; }
+.bar-note, .bar-detail { grid-column: 2 / -1; font-size: 13px; line-height: 1.5; color: var(--ink-2); overflow-wrap: anywhere; }
+.bar-detail { display: none; }
+.open .bar-detail { display: block; }
 .bar-row.current, .bar-row.current:hover { background: var(--accent-soft); }
 .bar-row.current .bar-fill { background: var(--accent); }
 .bar-row.current .bar-name { color: var(--accent-text); }
