@@ -549,8 +549,8 @@ function homeTiles(tiles) {
 
 // ---------- study time ----------
 // Time in the app is counted by itself (study.js); the student adds study done
-// elsewhere and can fix either number. The page shows today, everything so
-// far (by month), a week and a month.
+// elsewhere and can fix either number. The page shows today, a week (by day),
+// a month (by week) and everything so far (by month).
 
 // The page fetches fresh numbers (at most every 30 seconds), in case the app
 // was also used on another phone or computer.
@@ -579,9 +579,9 @@ function renderStudy(page, day) {
         <a class="btn secondary" href="#/study/edit/${now}">記入・編集する</a>
         <p class="muted small">アプリで勉強している時間は、自動で記録されます。本・動画・オンライン英会話など、アプリの外で勉強した時間は、自分で記入しましょう。</p>
       </section>
-      ${totalPanel(rows)}
       ${weekPanel(rows, state.study.week, { editable: true })}
       ${monthPanel(rows, state.study.month)}
+      ${totalPanel(rows)}
     </main>`;
   bindPanels(app, state.study, () => renderStudy());
 }

@@ -28,6 +28,8 @@
 .head-row { display: flex; gap: 12px; align-items: center; justify-content: space-between; flex-wrap: wrap; }
 .head-row h2 { font-size: 24px; font-weight: 900; }
 
+/* The study time panels stay phone-wide, so their bars and numbers stay close. */
+.teacher .week-panel, .teacher .month-panel, .teacher .total-card { max-width: 680px; }
 .stats { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
 .stat { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 10px 14px; }
 .stat b { display: block; font-family: var(--en); font-size: 22px; line-height: 1.3; }

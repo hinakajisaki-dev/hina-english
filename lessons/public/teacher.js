@@ -841,9 +841,9 @@ function renderStudyTab(panel) {
   }
   panel.innerHTML = `<div class="stack">
     <p class="muted small">アプリを開いて使っていた時間（自動）と、生徒が自分で記入したアプリ以外の勉強時間です。生徒はどちらも直せます。アプリを使う前の勉強時間は、アプリ以外に入っています。</p>
-    ${totalPanel(study || [])}
     ${weekPanel(study || [], state.studyView.week)}
     ${monthPanel(study || [], state.studyView.month)}
+    ${totalPanel(study || [])}
   </div>`;
   bindPanels(panel, state.studyView, () => renderStudyTab(panel));
 }
