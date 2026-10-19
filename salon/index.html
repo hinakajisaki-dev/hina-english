@@ -3,14 +3,15 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Hina English</title>
-<meta name="description" content="書いて、話して、学んで、もう一度使う。毎月16回のZoomライブと6〜8本の講義動画、5レベル・3,000語の学習アプリで、英語を暮らしの中に。Hina English のオンラインサロンです。">
+<title>ʻOhana English</title>
+<meta name="description" content="書いて、話して、学んで、もう一度使う。毎月16回のZoomライブと6〜8本の講義動画、5レベル・3,000語の学習アプリで、英語を暮らしの中に。ʻOhana English のオンラインサロンです。">
 <!-- TODO: 公開するときに OGP（og:title / og:description / og:image / og:url）を追加 -->
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=DM+Sans:opsz,wght@9..40,500;9..40,700;9..40,800&family=Noto+Sans+JP:wght@400;500;700;900&display=swap">
 <style>
-  /* Layout: the Hina English app's own look (light-blue ground, warm-white
+  /* Layout: the ʻOhana English app's own look (light-blue ground, warm-white
      panels, orange asterisk tile, Caveat handwriting) turned into a scrolling
      page. App screens are rebuilt in HTML as small working-looking cards. */
   :root {
@@ -100,11 +101,11 @@
     width: 42px;
     height: 42px;
     border-radius: 13px;
-    background: linear-gradient(145deg, #FF6A3D, var(--accent-2));
+    background: linear-gradient(135deg, #C63F16, #F65323);
     color: var(--on-accent);
     box-shadow: 0 6px 16px rgba(214, 62, 16, .25);
   }
-  .mark svg { width: 22px; height: 22px; }
+  .mark svg { width: 34px; height: 34px; }
 
   .btn {
     display: inline-flex;
@@ -205,7 +206,7 @@
     border-radius: 20px;
     transform: rotate(10deg);
   }
-  .sticker svg { width: 32px; height: 32px; }
+  .sticker svg { width: 52px; height: 52px; }
   .hero-figure img { position: relative; width: 86%; height: auto; margin-inline: auto; }
   .hello {
     position: absolute;
@@ -617,7 +618,7 @@
     .hero-figure { width: min(78%, 320px); justify-self: end; margin-right: 4%; }
     .hello { left: -22%; top: 8%; font-size: 17px; }
     .sticker { width: 52px; height: 52px; border-radius: 16px; }
-    .sticker svg { width: 26px; height: 26px; }
+    .sticker svg { width: 42px; height: 42px; }
     .pillars, .pair, .learn3, .flow, .teachers { grid-template-columns: minmax(0, 1fr); }
     .pair { gap: 64px; }
     .price-card { grid-template-columns: minmax(0, 1fr); }
@@ -690,8 +691,8 @@
 <header class="site-head">
   <div class="wrap">
     <a class="logo" href="#top">
-      <span class="mark"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5v17M3.5 12h17M6 6l12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg></span>
-      <span class="logo-name" lang="en"><b>Hina English</b><small>Learn. Write. Grow.</small></span>
+      <span class="mark"><svg class="logo-hibiscus" viewBox="0 0 100 100" aria-hidden="true" focusable="false"><g fill="#fff" stroke="none"><path d="M50 52C33 44 26 18 41 9c5-3 13-2 16 3 15 6 13 30-7 40z" transform="rotate(0 50 50)"/><path d="M50 52C33 44 26 18 41 9c5-3 13-2 16 3 15 6 13 30-7 40z" transform="rotate(72 50 50)"/><path d="M50 52C33 44 26 18 41 9c5-3 13-2 16 3 15 6 13 30-7 40z" transform="rotate(144 50 50)"/><path d="M50 52C33 44 26 18 41 9c5-3 13-2 16 3 15 6 13 30-7 40z" transform="rotate(216 50 50)"/><path d="M50 52C33 44 26 18 41 9c5-3 13-2 16 3 15 6 13 30-7 40z" transform="rotate(288 50 50)"/></g><circle cx="50" cy="50" r="9" fill="#FFD0BC" stroke="none"/><path d="M50 50Q60 38 70 27" fill="none" stroke="#FFD0BC" stroke-width="3.2"/><g fill="#FFE27A" stroke="none"><circle cx="71" cy="25" r="3.4"/><circle cx="66" cy="23" r="2.6"/><circle cx="74" cy="30" r="2.6"/></g></svg></span>
+      <span class="logo-name" lang="en"><b>ʻOhana English</b><small>By Hina</small></span>
     </a>
     <nav class="site-nav" aria-label="ページ内リンク">
       <a href="#features">サロンの中身</a>
@@ -737,7 +738,7 @@
       </div>
       <figure class="hero-figure">
         <div class="tile"></div>
-        <span class="mark sticker"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5v17M3.5 12h17M6 6l12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg></span>
+        <span class="mark sticker"><svg class="logo-hibiscus" viewBox="0 0 100 100" aria-hidden="true" focusable="false"><g fill="#fff" stroke="none"><path d="M50 52C33 44 26 18 41 9c5-3 13-2 16 3 15 6 13 30-7 40z" transform="rotate(0 50 50)"/><path d="M50 52C33 44 26 18 41 9c5-3 13-2 16 3 15 6 13 30-7 40z" transform="rotate(72 50 50)"/><path d="M50 52C33 44 26 18 41 9c5-3 13-2 16 3 15 6 13 30-7 40z" transform="rotate(144 50 50)"/><path d="M50 52C33 44 26 18 41 9c5-3 13-2 16 3 15 6 13 30-7 40z" transform="rotate(216 50 50)"/><path d="M50 52C33 44 26 18 41 9c5-3 13-2 16 3 15 6 13 30-7 40z" transform="rotate(288 50 50)"/></g><circle cx="50" cy="50" r="9" fill="#FFD0BC" stroke="none"/><path d="M50 50Q60 38 70 27" fill="none" stroke="#FFD0BC" stroke-width="3.2"/><g fill="#FFE27A" stroke="none"><circle cx="71" cy="25" r="3.4"/><circle cx="66" cy="23" r="2.6"/><circle cx="74" cy="30" r="2.6"/></g></svg></span>
         <img src="character.png" width="638" height="852" alt="手をふるひなのイラスト">
         <p class="hello" lang="en">Hi, I'm Hina!<small>ひなです</small></p>
       </figure>
@@ -758,7 +759,7 @@
         <li>自分の苦手がどこなのか、よくわからない</li>
         <li>忙しくて、まとまった勉強時間がとれない</li>
       </ul>
-      <p class="bridge">Hina English は、<em>今日の小さな一歩を、自分の言葉につなげる</em>場所です。<span>1日3分の単語カードから、月16回のライブまで。あなたのペースで続けられます。</span></p>
+      <p class="bridge">ʻOhana English は、<em>今日の小さな一歩を、自分の言葉につなげる</em>場所です。<span>1日3分の単語カードから、月16回のライブまで。あなたのペースで続けられます。</span></p>
     </div>
   </section>
 
@@ -785,7 +786,7 @@
         <article class="pillar">
           <p class="label">App</p>
           <p class="big">5<small>レベル</small></p>
-          <h3>学習アプリ Hina English</h3>
+          <h3>学習アプリ ʻOhana English</h3>
           <p>初級1から上級まで、3,000語の単語帳。ジャーナリング、AI添削、復習テストに、ライブや講義動画まで、すべてアプリで完結します。</p>
         </article>
       </div>
@@ -799,7 +800,7 @@
       <header class="sec-head">
         <p class="label">Daily habit</p>
         <h2>1日約20分。英語を、毎日の習慣に。</h2>
-        <p class="sub">学習アプリ Hina English は、毎日同じ4ステップで進みます。やることが決まっているから、迷わず続けられます。Zoomライブの予定も講義動画も、すべてアプリの中にあります。</p>
+        <p class="sub">学習アプリ ʻOhana English は、毎日同じ4ステップで進みます。やることが決まっているから、迷わず続けられます。Zoomライブの予定も講義動画も、すべてアプリの中にあります。</p>
       </header>
       <div class="daily">
         <div class="daily-head">
@@ -1031,14 +1032,14 @@
           <p class="price-note">Zoomライブだけで考えても、1回あたり750円です。</p>
           <p class="price-note">1か月ごとの自動更新です。解約・返金については、<a href="tokushoho.html">特定商取引法に基づく表記</a>をご確認ください。</p>
           <!-- TODO: 申し込みページが決まったら、そのURLに変える（今はアプリのトップ） -->
-          <a class="btn" href="https://hina-english-flax.vercel.app/">サロンに参加する</a>
+          <a class="btn" href="https://my.ohana-english.app/">サロンに参加する</a>
         </div>
         <div class="price-inc">
           <h3>プランに含まれるもの</h3>
           <ul class="inc">
             <li><span class="label">Live</span><span><b>Zoomライブ 月16回</b><small>ひなが月4回、ほかの回はネイティブ講師と日本人講師が担当。アーカイブあり</small></span></li>
             <li><span class="label">Lesson</span><span><b>講義動画 毎月6〜8本</b><small>好きな時間に、何度でも</small></span></li>
-            <li><span class="label">App</span><span><b>学習アプリ Hina English</b><small>5レベル・3,000語の単語帳（すべてひなの音声つき）、ジャーナリング、AI添削とAI相談、フレーズ練習、発音・聞き取り（91フレーズ）、復習テスト、学習のきろく</small></span></li>
+            <li><span class="label">App</span><span><b>学習アプリ ʻOhana English</b><small>5レベル・3,000語の単語帳（すべてひなの音声つき）、ジャーナリング、AI添削とAI相談、フレーズ練習、発音・聞き取り（91フレーズ）、復習テスト、学習のきろく</small></span></li>
           </ul>
         </div>
       </div>
@@ -1059,7 +1060,7 @@
         </li>
         <li>
           <h3><span class="step-n">2</span>アプリにログイン</h3>
-          <p>登録したアカウントで、学習アプリ Hina English に入れます。Zoomライブの予定も講義動画も、すべてアプリから見られます。</p>
+          <p>登録したアカウントで、学習アプリ ʻOhana English に入れます。Zoomライブの予定も講義動画も、すべてアプリから見られます。</p>
         </li>
         <li>
           <h3><span class="step-n">3</span>最初のひとことを書く</h3>
@@ -1141,21 +1142,21 @@
 <footer class="site-foot">
   <div class="wrap">
     <a class="logo" href="#top">
-      <span class="mark"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5v17M3.5 12h17M6 6l12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg></span>
-      <span class="logo-name" lang="en"><b>Hina English</b><small>Learn. Write. Grow.</small></span>
+      <span class="mark"><svg class="logo-hibiscus" viewBox="0 0 100 100" aria-hidden="true" focusable="false"><g fill="#fff" stroke="none"><path d="M50 52C33 44 26 18 41 9c5-3 13-2 16 3 15 6 13 30-7 40z" transform="rotate(0 50 50)"/><path d="M50 52C33 44 26 18 41 9c5-3 13-2 16 3 15 6 13 30-7 40z" transform="rotate(72 50 50)"/><path d="M50 52C33 44 26 18 41 9c5-3 13-2 16 3 15 6 13 30-7 40z" transform="rotate(144 50 50)"/><path d="M50 52C33 44 26 18 41 9c5-3 13-2 16 3 15 6 13 30-7 40z" transform="rotate(216 50 50)"/><path d="M50 52C33 44 26 18 41 9c5-3 13-2 16 3 15 6 13 30-7 40z" transform="rotate(288 50 50)"/></g><circle cx="50" cy="50" r="9" fill="#FFD0BC" stroke="none"/><path d="M50 50Q60 38 70 27" fill="none" stroke="#FFD0BC" stroke-width="3.2"/><g fill="#FFE27A" stroke="none"><circle cx="71" cy="25" r="3.4"/><circle cx="66" cy="23" r="2.6"/><circle cx="74" cy="30" r="2.6"/></g></svg></span>
+      <span class="logo-name" lang="en"><b>ʻOhana English</b><small>By Hina</small></span>
     </a>
     <nav class="foot-links" aria-label="サイト情報">
       <a href="tokushoho.html">特定商取引法に基づく表記</a>
       <a href="privacy.html">プライバシーポリシー</a>
       <a href="mailto:hinatoeicpresent@gmail.com">お問い合わせ</a>
     </nav>
-    <p class="copy">運営：株式会社UPSTAR　© 2026 Hina English</p>
+    <p class="copy">運営：株式会社UPSTAR　© 2026 ʻOhana English</p>
   </div>
 </footer>
 
 <!-- スマホだけ画面の下に出る申し込みボタン -->
 <div class="sticky-cta">
-  <p><b>Hina English</b>月額 ¥12,000（税込）</p>
+  <p><b>ʻOhana English</b>月額 ¥12,000（税込）</p>
   <a class="btn" href="#price">参加する</a>
 </div>
 

@@ -1,12 +1,13 @@
-# Hina English サロン LP
+# ʻOhana English サロン LP
 
-オンラインサロン「Hina English」の紹介ページ。いまは **Stripe の審査に出すための仮バージョン** です。審査が通ったら、下の「本格版で必要なもの」をそろえてブラッシュアップします。
+オンラインサロン「ʻOhana English」の紹介ページ。いまは **Stripe の審査に出すための仮バージョン** です。審査が通ったら、下の「本格版で必要なもの」をそろえてブラッシュアップします。
 
 | ファイル | 内容 |
 | --- | --- |
 | `index.html` | LP 本体 |
 | `tokushoho.html` | 特定商取引法に基づく表記 |
 | `privacy.html` | プライバシーポリシー |
+| `favicon.svg` | ブラウザのタブに出るアイコン（アプリと同じハイビスカス） |
 | `character.png` | ひなのイラスト |
 | `teacher-native.svg` / `teacher-japanese.svg` | 講師の仮キャラクター（写真が届くまでの代わり） |
 
