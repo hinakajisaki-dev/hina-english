@@ -30,7 +30,6 @@ export function addMonths(day, n) {
 const WEEKDAYS = ["日", "月", "火", "水", "木", "金", "土"];
 const weekday = (day) => WEEKDAYS[new Date(dayMs(day)).getUTCDay()];
 const md = (day) => `${Number(day.slice(5, 7))}/${Number(day.slice(8, 10))}`;
-export const shortDay = (day) => `${md(day)}（${weekday(day)}）`;
 export const dayLabel = (day) => `${Number(day.slice(5, 7))}月${Number(day.slice(8, 10))}日（${weekday(day)}）`;
 export const monthLabel = (day) => `${day.slice(0, 4)}年${Number(day.slice(5, 7))}月`;
 
@@ -45,9 +44,16 @@ export function formatMinutes(minutes) {
   return `${Math.floor(minutes / 60)}時間${rest ? `${rest}分` : ""}`;
 }
 
-const tickLabel = (minutes) => (minutes < 60 ? `${minutes}分` : `${+(minutes / 60).toFixed(1)}時間`);
+// A number of minutes for a big figure, its units smaller: 40時間19分.
+export function timeHtml(minutes) {
+  const part = (n, unit) => `${n}<small>${unit}</small>`;
+  const hours = Math.floor(minutes / 60);
+  const rest = minutes % 60;
+  if (!hours) return part(rest, "分");
+  return part(hours, "時間") + (rest ? part(rest, "分") : "");
+}
 
-// ---------- charts ----------
+// ---------- days and months ----------
 
 // The days from `from` for `count` days, with their minutes.
 function series(rows, from, count) {
@@ -68,71 +74,6 @@ export function monthDays(rows, start) {
   return series(rows, start, Math.round((dayMs(next) - dayMs(start)) / 86400e3));
 }
 
-// A clean axis: 3–4 ticks of 10, 15, 30 minutes or whole hours.
-function axis(max) {
-  const step = [10, 15, 30, 60, 120, 180, 240].find((s) => max / s <= 4) || 300;
-  const top = Math.max(step, Math.ceil(max / step) * step);
-  const ticks = [];
-  for (let m = step; m <= top; m += step) ticks.push(m);
-  return { top, ticks };
-}
-
-const readout = (d) => `${dayLabel(d.day)}　合計 ${formatMinutes(d.app + d.other)}（アプリ ${formatMinutes(d.app)} ・ アプリ以外 ${formatMinutes(d.other)}）${d.note ? `　${d.note}` : ""}`;
-
-// Stacked columns, one per day: time in the app at the bottom, other study on
-// top. Tapping (or hovering) a column shows its numbers under the chart.
-// `labelEvery` thins the day labels for a month.
-export function chartHtml(days, { labelEvery = 1, wide = false } = {}) {
-  const max = Math.max(0, ...days.map((d) => d.app + d.other));
-  const { top, ticks } = axis(max);
-  const now = today();
-  // Shown first: the last day with study so far (findLast is too new for older iPhones).
-  const past = days.filter((d) => d.day <= now).reverse();
-  const shown = past.find((d) => d.app + d.other) || past[0] || days[0];
-  const pct = (m) => `${(m / top) * 100}%`;
-  return `<figure class="study-chart${wide ? " wide" : ""}">
-    <div class="chart-legend" aria-hidden="true">
-      <span><i class="swatch app"></i>アプリで勉強</span>
-      <span><i class="swatch other"></i>アプリ以外の勉強</span>
-    </div>
-    <div class="chart-plot">
-      <div class="chart-grid" aria-hidden="true">
-        ${ticks.map((t) => `<div class="tick" style="bottom:${pct(t)}"><span>${tickLabel(t)}</span></div>`).join("")}
-      </div>
-      <div class="chart-cols">
-        ${days.map((d, i) => {
-          const future = d.day > now;
-          const label = i % labelEvery === 0 ? (labelEvery === 1 ? `${weekday(d.day)}<br>${md(d.day)}` : Number(d.day.slice(8))) : "";
-          return `<button type="button" class="col${d.day === now ? " today" : ""}" data-day="${d.day}" ${future ? "disabled" : ""}
-              aria-pressed="${d.day === shown.day}" aria-label="${esc(readout(d))}" data-readout="${esc(readout(d))}">
-            <span class="stack-bar" style="height:${pct(d.app + d.other)}">
-              ${d.other ? `<i class="seg other" style="flex-grow:${d.other}"></i>` : ""}
-              ${d.app ? `<i class="seg app" style="flex-grow:${d.app}"></i>` : ""}
-            </span>
-            <span class="col-label">${label}</span>
-          </button>`;
-        }).join("")}
-      </div>
-    </div>
-    <figcaption class="chart-readout" aria-live="polite">${esc(readout(shown))}</figcaption>
-  </figure>`;
-}
-
-// Makes the columns in `root` show their numbers when tapped or hovered.
-export function bindCharts(root) {
-  root.querySelectorAll(".study-chart").forEach((chart) => {
-    const out = chart.querySelector(".chart-readout");
-    const pick = (col) => {
-      chart.querySelectorAll(".col").forEach((c) => c.setAttribute("aria-pressed", c === col));
-      out.textContent = col.dataset.readout;
-    };
-    chart.querySelectorAll(".col:not([disabled])").forEach((col) => {
-      col.addEventListener("click", () => pick(col));
-      col.addEventListener("pointerenter", (event) => event.pointerType === "mouse" && pick(col));
-    });
-  });
-}
-
 // Totals for a run of days.
 export function summary(days) {
   const total = days.reduce((n, d) => n + d.app + d.other, 0);
@@ -140,61 +81,183 @@ export function summary(days) {
   return { total, studied, app: days.reduce((n, d) => n + d.app, 0), other: days.reduce((n, d) => n + d.other, 0) };
 }
 
-// ---------- week and month panels ----------
-// Used by the student's 勉強時間 page and the teacher's 勉強時間 tab. With
-// editable, each day of the week gets an 編集 link.
+// Everything so far: the totals, the first day with study, and each month
+// from that one to this one.
+export function allTime(rows) {
+  const days = rows
+    .map((r) => ({ day: r.day, app: appMinutes(r), other: r.other_minutes || 0, note: r.note || "" }))
+    .filter((d) => d.app + d.other > 0)
+    .sort((a, b) => (a.day < b.day ? -1 : 1));
+  const first = days[0]?.day || null;
+  const months = [];
+  if (first) {
+    for (let m = monthStart(first); m <= monthStart(today()); m = addMonths(m, 1)) {
+      months.push({ start: m, ...summary(days.filter((d) => d.day.startsWith(m.slice(0, 7)))) });
+    }
+  }
+  return { ...summary(days), first, months };
+}
 
 export const studySplit = (row) => `アプリ ${formatMinutes(appMinutes(row))} ・ アプリ以外 ${formatMinutes(row?.other_minutes || 0)}`;
+const splitOf = (sum) => `アプリ ${formatMinutes(sum.app)} ・ アプリ以外 ${formatMinutes(sum.other)}`;
+// Only the kinds there were, for one day: "アプリ 18分 ・ アプリ以外 1時間".
+const dayParts = (d) => [d.app && `アプリ ${formatMinutes(d.app)}`, d.other && `アプリ以外 ${formatMinutes(d.other)}`].filter(Boolean).join(" ・ ");
+
+// ---------- bar lists ----------
+// The week, the month and everything so far all look the same: a row each
+// (a day, a week, a month) with its name, a bar and its total, lined up, so
+// the eye goes down one column of names and one column of numbers. One soft
+// color; the current day / week / month is the strong one.
+
+// items: { name, sub, total, note, detail, current, future, href, data }; the
+// note is always shown under the bar, the detail only when 詳細 is open. A bar is
+// full at the longest one, or at `atLeast` minutes when all are shorter (so a
+// week of a few minutes doesn't look full).
+function barList(items, atLeast) {
+  const max = Math.max(atLeast, ...items.map((it) => it.total));
+  return `<ul class="bar-list">
+    ${items.map((it) => {
+      const cls = ["bar-row", it.current && "current", it.future && "future", it.total === 0 && !it.future && "zero"].filter(Boolean).join(" ");
+      const inner = `
+        <span class="bar-name">${it.name}${it.sub ? `<small>${it.sub}</small>` : ""}</span>
+        <span class="bar-track">${it.total ? `<span class="bar-fill" style="width:${Math.max(3, (it.total / max) * 100)}%"></span>` : ""}</span>
+        <span class="bar-value">${it.future ? "" : it.total ? formatMinutes(it.total) : "—"}</span>
+        ${it.href || it.data ? `<span class="bar-go" aria-hidden="true">›</span>` : ""}
+        ${it.note ? `<span class="bar-note">${it.note}</span>` : ""}
+        ${it.detail ? `<span class="bar-detail">${it.detail}</span>` : ""}`;
+      if (it.href && !it.future) return `<li><a class="${cls}" href="${it.href}">${inner}</a></li>`;
+      if (it.data && !it.future) return `<li><button type="button" class="${cls}" ${it.data}>${inner}</button></li>`;
+      return `<li><div class="${cls}">${inner}</div></li>`;
+    }).join("")}
+  </ul>`;
+}
+
+// ---------- panels ----------
+// Used by the student's 勉強時間 page and the teacher's 勉強時間 tab: the week,
+// the month, then everything so far. With editable, a day opens its 記入 page.
+
+// The big total of a panel, and the numbers that go with it, as two tiles.
+const headline = (label, total, side) => `<div class="headline">
+    <div class="stat-tile main"><span>${label}</span><b class="big">${timeHtml(total)}</b></div>
+    ${side ? `<div class="stat-tile side">${side}</div>` : ""}
+  </div>`;
+
+const navHtml = (key, title, atEnd) => `<div class="chart-nav">
+    <button type="button" class="btn ghost small-btn" data-${key}="-1" aria-label="前">‹ 前</button>
+    <h3><span class="period">${title}</span></h3>
+    <button type="button" class="btn ghost small-btn" data-${key}="1" aria-label="次" ${atEnd ? "disabled" : ""}>次 ›</button>
+  </div>`;
+
+// 詳細 ▾ / ▴: the split between app and other study, and each row's detail.
+// Closed at first; bindPanels keeps it open or closed across redraws.
+const detailsHtml = (key, sum) => `<div class="details-bar">
+    <p class="split">${splitOf(sum)}</p>
+    <button type="button" class="details-toggle" data-details="${key}" aria-expanded="false">詳細</button>
+  </div>`;
 
 export function weekPanel(rows, start, { editable = false } = {}) {
   const now = today();
   const days = weekDays(rows, start);
   const sum = summary(days);
-  return `<section class="card stack">
-    <div class="chart-nav">
-      <button type="button" class="btn ghost small-btn" data-week="-1" aria-label="前の週">‹ 前</button>
-      <h3>${shortDay(start)} 〜 ${shortDay(addDays(start, 6))}</h3>
-      <button type="button" class="btn ghost small-btn" data-week="1" aria-label="次の週" ${start >= weekStart(now) ? "disabled" : ""}>次 ›</button>
-    </div>
-    <div class="chart-stats">
-      <p><span>この週の合計</span><br><b class="big">${formatMinutes(sum.total)}</b></p>
-      <p><span>勉強した日</span><br><b class="big">${sum.studied}<small> / 7日</small></b></p>
-    </div>
-    ${chartHtml(days)}
-    <ul class="rows study-days">
-      ${days.filter((d) => d.day <= now).reverse().map((d) => `<li>
-        <div class="main"><b>${dayLabel(d.day)}　${formatMinutes(d.app + d.other)}</b>
-          <div class="sub">${studySplit({ app_seconds: d.app * 60, other_minutes: d.other })}${d.note ? `　${esc(d.note)}` : ""}</div></div>
-        ${editable ? `<div class="tools"><a class="btn ghost small-btn" href="#/study/edit/${d.day}">編集</a></div>` : ""}
-      </li>`).join("")}
-    </ul>
+  const items = days.map((d) => {
+    const total = d.app + d.other;
+    return {
+      name: d.day === now ? "今日" : weekday(d.day),
+      sub: md(d.day),
+      total,
+      current: d.day === now,
+      future: d.day > now,
+      detail: [dayParts(d), d.note && esc(d.note)].filter(Boolean).join(" ・ "),
+      href: editable ? `#/study/edit/${d.day}` : "",
+    };
+  });
+  return `<section class="card stack week-panel">
+    ${navHtml("week", `${md(start)} 〜 ${md(addDays(start, 6))}`, start >= weekStart(now))}
+    ${headline("この週の合計", sum.total, `<span>勉強した日</span><b>${sum.studied}<small> / 7日</small></b>`)}
+    ${detailsHtml("week", sum)}
+    ${barList(items, 60)}
+    ${editable ? `<p class="muted small">日をタップすると、その日の時間を記入・編集できます。</p>` : ""}
   </section>`;
 }
 
+// The month by weeks (Monday to Sunday, only the days in this month); a week
+// opens in the week panel above.
 export function monthPanel(rows, start) {
   const now = today();
   const days = monthDays(rows, start);
   const sum = summary(days);
   const elapsed = days.filter((d) => d.day <= now).length || 1;
-  return `<section class="card stack">
-    <div class="chart-nav">
-      <button type="button" class="btn ghost small-btn" data-month="-1" aria-label="前の月">‹ 前</button>
-      <h3>${monthLabel(start)}</h3>
-      <button type="button" class="btn ghost small-btn" data-month="1" aria-label="次の月" ${start >= monthStart(now) ? "disabled" : ""}>次 ›</button>
-    </div>
-    <div class="chart-stats">
-      <p><span>この月の合計</span><br><b class="big">${formatMinutes(sum.total)}</b></p>
-      <p><span>勉強した日</span><br><b class="big">${sum.studied}<small> 日</small></b></p>
-      <p><span>1日平均</span><br><b class="big">${formatMinutes(Math.round(sum.total / elapsed))}</b></p>
-    </div>
-    ${chartHtml(days, { labelEvery: 7 })}
+  const weeks = [];
+  for (const d of days) {
+    if (!weeks.length || weekStart(d.day) !== weekStart(weeks.at(-1)[0].day)) weeks.push([]);
+    weeks.at(-1).push(d);
+  }
+  const items = weeks.map((week, i) => {
+    const first = week[0].day;
+    const last = week.at(-1).day;
+    const s = summary(week);
+    return {
+      name: `第${i + 1}週`,
+      total: s.total,
+      current: first <= now && now <= last,
+      future: first > now,
+      note: first === last ? md(first) : `${md(first)}〜${md(last)}`,
+      detail: s.total ? `勉強した日 ${s.studied}日 ・ ${splitOf(s)}` : "",
+      data: `data-goto-week="${weekStart(first)}"`,
+    };
+  });
+  return `<section class="card stack month-panel">
+    ${navHtml("month", monthLabel(start), start >= monthStart(now))}
+    ${headline("この月の合計", sum.total, `<span>勉強した日</span><b>${sum.studied}<small>日</small></b><span>1日平均 ${formatMinutes(Math.round(sum.total / elapsed))}</span>`)}
+    ${detailsHtml("month", sum)}
+    ${barList(items, 5 * 60)}
+    <p class="muted small">週をタップすると、上でその週の日ごとの時間が見られます。</p>
   </section>`;
 }
 
-// Hooks up the charts and the ‹ › buttons; view is { week, month } (start days),
-// changed in place before redraw() runs.
+// Everything so far, and the last 12 months (a month opens in the month panel above).
+export function totalPanel(rows) {
+  const all = allTime(rows);
+  if (!all.first) {
+    return `<section class="card stack total-card">
+      ${headline("これまでの合計", 0, "")}
+      <p class="muted">勉強すると、ここに合計がたまっていきます。</p>
+    </section>`;
+  }
+  const items = all.months.slice(-12).map((m) => ({
+    name: `${Number(m.start.slice(5, 7))}月`,
+    sub: m.start.slice(0, 4) === today().slice(0, 4) ? "" : `${m.start.slice(0, 4)}年`,
+    total: m.total,
+    current: m.start === monthStart(today()),
+    detail: m.total ? `勉強した日 ${m.studied}日 ・ ${splitOf(m)}` : "",
+    data: `data-goto-month="${m.start}"`,
+  }));
+  return `<section class="card stack total-card">
+    ${headline("これまでの合計", all.total, `<span>勉強した日</span><b>${all.studied}<small>日</small></b><span>${all.first.slice(0, 4)}/${md(all.first)}から</span>`)}
+    ${detailsHtml("total", all)}
+    <h3 class="panel-sub">月ごとの合計</h3>
+    ${barList(items, 20 * 60)}
+  </section>`;
+}
+
+// Hooks up the ‹ › buttons, the 詳細 buttons and the weeks and months that open
+// another panel; view is { week, month, open } (start days, and which panels
+// have 詳細 open), changed in place before redraw() runs.
 export function bindPanels(root, view, redraw) {
-  bindCharts(root);
+  const go = (selector) => root.querySelector(selector)?.scrollIntoView({ behavior: "smooth", block: "start" });
+  view.open ||= {};
+  root.querySelectorAll("[data-details]").forEach((button) => {
+    const key = button.dataset.details;
+    const show = () => {
+      button.closest("section").classList.toggle("open", !!view.open[key]);
+      button.setAttribute("aria-expanded", !!view.open[key]);
+    };
+    show();
+    button.addEventListener("click", () => {
+      view.open[key] = !view.open[key];
+      show();
+    });
+  });
   root.querySelectorAll("[data-week]").forEach((b) => b.addEventListener("click", () => {
     view.week = addDays(view.week, 7 * Number(b.dataset.week));
     redraw();
@@ -202,6 +265,16 @@ export function bindPanels(root, view, redraw) {
   root.querySelectorAll("[data-month]").forEach((b) => b.addEventListener("click", () => {
     view.month = addMonths(view.month, Number(b.dataset.month));
     redraw();
+  }));
+  root.querySelectorAll("[data-goto-week]").forEach((b) => b.addEventListener("click", () => {
+    view.week = b.dataset.gotoWeek;
+    redraw();
+    go(".week-panel");
+  }));
+  root.querySelectorAll("[data-goto-month]").forEach((b) => b.addEventListener("click", () => {
+    view.month = b.dataset.gotoMonth;
+    redraw();
+    go(".month-panel");
   }));
 }
 

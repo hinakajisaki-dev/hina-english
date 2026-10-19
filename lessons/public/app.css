@@ -175,46 +175,74 @@ ins { background: var(--good-soft); color: var(--good); text-decoration: none; b
 del { color: var(--bad); text-decoration: line-through; text-decoration-thickness: 2px; opacity: .8; }
 ins.spell { background: var(--spell-soft); color: var(--spell); }
 
-/* ---------- study time chart (student app and teacher page) ----------
-   Stacked columns per day: app time (accent) at the bottom, other study (blue)
-   on top, 2px surface gap between them, 4px rounded top, square at the baseline. */
-:root { --study-app: #F0521E; --study-other: #4A90D9; }
-.study-chart { margin: 0; display: flex; flex-direction: column; gap: 8px; }
-.chart-legend { display: flex; gap: 14px; flex-wrap: wrap; font-size: 13px; color: var(--ink-2); }
-.chart-legend span { display: inline-flex; align-items: center; gap: 6px; }
-/* (swatch, not "key": grammar lessons use .key for their ポイント line) */
-.swatch { width: 12px; height: 12px; border-radius: 3px; display: inline-block; }
-.swatch.app { background: var(--study-app); }
-.swatch.other { background: var(--study-other); }
-.chart-plot { position: relative; height: 180px; margin: 6px 0 34px 44px; }
-.chart-grid { position: absolute; inset: 0; border-bottom: 1px solid var(--line); }
-.chart-grid .tick { position: absolute; left: 0; right: 0; border-top: 1px solid var(--line); }
-.chart-grid .tick span {
-  position: absolute; right: calc(100% + 6px); top: -9px; font-size: 11px; color: var(--muted);
-  white-space: nowrap; font-variant-numeric: tabular-nums;
-}
-.chart-cols { position: absolute; inset: 0; display: flex; }
-.chart-cols .col {
-  flex: 1 1 0; min-width: 0; position: relative; border: 0; padding: 0; margin: 0; background: none;
-  cursor: pointer; display: flex; justify-content: center; align-items: flex-end; border-radius: 6px;
-}
-.chart-cols .col[disabled] { cursor: default; }
-.chart-cols .col[aria-pressed="true"] { background: rgba(74, 144, 217, .1); }
-.stack-bar {
-  display: flex; flex-direction: column; gap: 2px; width: 60%; max-width: 24px; min-width: 3px;
-  border-radius: 4px 4px 0 0; overflow: hidden;
-}
-.stack-bar .seg { display: block; flex-basis: 0; min-height: 2px; }
-.seg.app { background: var(--study-app); }
-.seg.other { background: var(--study-other); }
-.col-label {
-  position: absolute; top: calc(100% + 4px); left: 50%; transform: translateX(-50%);
-  font-size: 11px; line-height: 1.25; color: var(--muted); text-align: center; white-space: nowrap;
-}
-.col.today .col-label { color: var(--ink); font-weight: 700; }
-.chart-readout { font-size: 13px; color: var(--ink-2); min-height: 2.6em; }
+/* ---------- study time (student app and teacher page) ----------
+   The week, the month and everything so far are lists of rows: a name, a bar
+   and a total, lined up in columns. One soft color for the bars (the numbers
+   are written beside them); the current day / week / month in the accent. */
+:root { --bar-soft: #F7A07A; --bar-track: #EEF2F8; }
+
+/* Big figures: the numbers large, 時間 and 分 smaller. */
+.today-big, .headline .big { font-weight: 900; line-height: 1.1; letter-spacing: -.01em; }
+.today-big small, .headline .big small { font-size: .5em; font-weight: 700; margin: 0 .12em; }
+.today-big { font-size: 36px; }
+
 .chart-nav { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-.chart-nav h3 { font-size: 16px; text-align: center; flex: 1; }
-.chart-stats { display: flex; gap: 18px; flex-wrap: wrap; align-items: baseline; }
-.chart-stats .big { font-size: 28px; font-weight: 900; line-height: 1.1; }
-.chart-stats span { font-size: 13px; color: var(--ink-2); }
+.chart-nav h3 { flex: 1; min-width: 0; text-align: center; }
+.chart-nav .btn { flex: none; white-space: nowrap; }
+/* The week or month shown, as a pill. */
+.period {
+  display: inline-block; padding: 6px 16px; border-radius: 999px; background: var(--sky-soft);
+  font-size: 16px; font-weight: 700; white-space: nowrap; box-shadow: 0 2px 0 rgba(26, 34, 56, .08);
+}
+
+/* A panel's total (orange tile) and its other numbers (blue tile). */
+.headline { display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); gap: 10px; }
+.stat-tile {
+  display: flex; flex-direction: column; justify-content: center; gap: 2px; padding: 12px 14px; border-radius: 16px;
+  box-shadow: 0 2px 0 rgba(26, 34, 56, .08);
+}
+.stat-tile span { font-size: 13px; font-weight: 700; color: var(--ink-2); }
+.stat-tile.main { background: var(--accent-soft); }
+.stat-tile.main span { color: var(--accent-text); }
+.stat-tile.main .big { font-size: 34px; }
+.stat-tile.side { background: var(--sky-soft); }
+.stat-tile.side b { font-size: 24px; line-height: 1.2; }
+.stat-tile.side b small { font-size: 14px; color: var(--ink-2); }
+.stat-tile.side span + span { font-weight: 400; }
+.panel-sub { font-size: 16px; }
+
+/* 詳細 ▾ / ▴: the app / other split and each row's detail. */
+.details-bar { display: flex; align-items: center; justify-content: flex-end; gap: 6px 12px; flex-wrap: wrap; }
+.details-bar .split { flex: 1 1 14em; font-size: 14px; color: var(--ink-2); display: none; }
+.details-toggle {
+  border: 1px solid var(--line); border-radius: 999px; background: var(--card); padding: 4px 14px;
+  font-size: 14px; font-weight: 700; color: var(--accent-text); cursor: pointer;
+}
+.details-toggle::after { content: "▾"; margin-left: 6px; }
+.open .details-toggle::after { content: "▴"; }
+.open .details-bar .split { display: block; }
+
+.week-panel, .month-panel, .total-card { scroll-margin-top: 84px; }
+.bar-list { list-style: none; margin: 0; padding: 0; }
+.bar-list li + li { border-top: 1px solid var(--line); }
+.bar-row {
+  width: 100%; display: grid; grid-template-columns: 3.2em minmax(0, 1fr) 5.6em .8em; column-gap: 10px; row-gap: 4px;
+  align-items: center; padding: 12px 8px; margin: 0; border: 0; border-radius: 12px; background: none;
+  font: inherit; color: inherit; text-align: left; text-decoration: none;
+}
+a.bar-row, button.bar-row { cursor: pointer; }
+a.bar-row:hover, button.bar-row:hover { background: var(--bg); }
+.bar-name { font-size: 16px; font-weight: 700; line-height: 1.2; white-space: nowrap; }
+.bar-name small { display: block; margin-top: 2px; font-size: 12px; font-weight: 400; color: var(--ink-2); }
+.bar-track { height: 12px; border-radius: 6px; background: var(--bar-track); overflow: hidden; }
+.bar-fill { display: block; height: 100%; border-radius: 0 6px 6px 0; background: var(--bar-soft); }
+.bar-value { font-size: 16px; font-weight: 700; text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.bar-go { font-size: 20px; line-height: 1; color: var(--muted); text-align: right; }
+.bar-note, .bar-detail { grid-column: 2 / -1; font-size: 13px; line-height: 1.5; color: var(--ink-2); overflow-wrap: anywhere; }
+.bar-detail { display: none; }
+.open .bar-detail { display: block; }
+.bar-row.current, .bar-row.current:hover { background: var(--accent-soft); }
+.bar-row.current .bar-fill { background: var(--accent); }
+.bar-row.current .bar-name { color: var(--accent-text); }
+.bar-row.zero .bar-value { color: var(--muted); font-weight: 400; }
+.bar-row.future { opacity: .45; }

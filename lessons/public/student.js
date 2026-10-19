@@ -18,8 +18,8 @@ import {
 import { findMistakes, normalizeWords } from "./mistakes.js";
 import { lessonDayLabel, lessonList, noteDayLabel, noteHtml as memoHtml, noteProblems } from "./notes/format.js";
 import {
-  appMinutes, bindPanels, formatMinutes, monthPanel, monthStart, startStudyClock, studySplit, summary, today,
-  totalMinutes, weekDays, weekPanel, weekStart,
+  allTime, appMinutes, bindPanels, formatMinutes, monthPanel, monthStart, startStudyClock, studySplit, summary, timeHtml,
+  today, totalMinutes, totalPanel, weekDays, weekPanel, weekStart,
 } from "./study.js";
 
 watchErrors("/api/errors");
@@ -104,7 +104,7 @@ function startClock() {
     row.app_seconds += seconds;
     const total = document.getElementById("today-total");
     if (total) {
-      total.textContent = formatMinutes(totalMinutes(row));
+      total.innerHTML = timeHtml(totalMinutes(row));
       document.getElementById("today-split").textContent = studySplit(row);
     }
   });
@@ -377,7 +377,7 @@ function renderHome() {
             ].filter(Boolean).join(" ・ ") || "授業のあとに、先生のメモがとどきます"}</p></div>` },
           { key: "study", wide: true, html: `
             <span class="emoji" aria-hidden="true">⏱️</span>
-            <div><b>勉強時間</b><p class="muted">今日 ${formatMinutes(totalMinutes(todayRow))} ・ 今週 ${formatMinutes(week.total)}</p></div>` },
+            <div><b>勉強時間</b><p class="muted">今日 ${formatMinutes(totalMinutes(todayRow))} ・ 今週 ${formatMinutes(week.total)} ・ これまで ${formatMinutes(allTime(state.me.study).total)}</p></div>` },
         ])}
       </nav>
       <p class="footer-links">
@@ -549,7 +549,8 @@ function homeTiles(tiles) {
 
 // ---------- study time ----------
 // Time in the app is counted by itself (study.js); the student adds study done
-// elsewhere and can fix either number. The charts show a week and a month.
+// elsewhere and can fix either number. The page shows today, a week (by day),
+// a month (by week) and everything so far (by month).
 
 // The page fetches fresh numbers (at most every 30 seconds), in case the app
 // was also used on another phone or computer.
@@ -573,13 +574,14 @@ function renderStudy(page, day) {
     <main class="wrap stack">
       <section class="card stack study-today">
         <p class="label">今日の勉強時間</p>
-        <p class="big" id="today-total">${formatMinutes(totalMinutes(todayRow))}</p>
+        <p class="today-big" id="today-total">${timeHtml(totalMinutes(todayRow))}</p>
         <p class="muted" id="today-split">${studySplit(todayRow)}</p>
         <a class="btn secondary" href="#/study/edit/${now}">記入・編集する</a>
         <p class="muted small">アプリで勉強している時間は、自動で記録されます。本・動画・オンライン英会話など、アプリの外で勉強した時間は、自分で記入しましょう。</p>
       </section>
       ${weekPanel(rows, state.study.week, { editable: true })}
       ${monthPanel(rows, state.study.month)}
+      ${totalPanel(rows)}
     </main>`;
   bindPanels(app, state.study, () => renderStudy());
 }
