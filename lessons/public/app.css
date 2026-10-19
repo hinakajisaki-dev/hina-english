@@ -211,15 +211,15 @@ ins.spell { background: var(--spell-soft); color: var(--spell); }
 .stat-tile.side span + span { font-weight: 400; }
 .panel-sub { font-size: 16px; }
 
-/* 詳細をひらく / 閉じる: the app / other split and each row's detail. */
+/* 詳細 ▾ / ▴: the app / other split and each row's detail. */
 .details-bar { display: flex; align-items: center; justify-content: flex-end; gap: 6px 12px; flex-wrap: wrap; }
 .details-bar .split { flex: 1 1 14em; font-size: 14px; color: var(--ink-2); display: none; }
 .details-toggle {
   border: 1px solid var(--line); border-radius: 999px; background: var(--card); padding: 4px 14px;
   font-size: 14px; font-weight: 700; color: var(--accent-text); cursor: pointer;
 }
-.details-toggle::after { content: " ▾"; }
-.open .details-toggle::after { content: " ▴"; }
+.details-toggle::after { content: "▾"; margin-left: 6px; }
+.open .details-toggle::after { content: "▴"; }
 .open .details-bar .split { display: block; }
 
 .week-panel, .month-panel, .total-card { scroll-margin-top: 84px; }

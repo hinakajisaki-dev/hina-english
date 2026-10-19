@@ -148,11 +148,11 @@ const navHtml = (key, title, atEnd) => `<div class="chart-nav">
     <button type="button" class="btn ghost small-btn" data-${key}="1" aria-label="次" ${atEnd ? "disabled" : ""}>次 ›</button>
   </div>`;
 
-// 詳細をひらく / 閉じる: the split between app and other study, and each row's
-// detail. Closed at first; bindPanels keeps it open or closed across redraws.
+// 詳細 ▾ / ▴: the split between app and other study, and each row's detail.
+// Closed at first; bindPanels keeps it open or closed across redraws.
 const detailsHtml = (key, sum) => `<div class="details-bar">
     <p class="split">${splitOf(sum)}</p>
-    <button type="button" class="details-toggle" data-details="${key}" aria-expanded="false">詳細をひらく</button>
+    <button type="button" class="details-toggle" data-details="${key}" aria-expanded="false">詳細</button>
   </div>`;
 
 export function weekPanel(rows, start, { editable = false } = {}) {
@@ -251,7 +251,6 @@ export function bindPanels(root, view, redraw) {
     const show = () => {
       button.closest("section").classList.toggle("open", !!view.open[key]);
       button.setAttribute("aria-expanded", !!view.open[key]);
-      button.textContent = view.open[key] ? "詳細を閉じる" : "詳細をひらく";
     };
     show();
     button.addEventListener("click", () => {
