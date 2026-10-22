@@ -361,6 +361,20 @@ a.week:hover { border-color: var(--sky); }
 .quiz-meaning { font-size: 17px; font-weight: 700; line-height: 1.6; padding-top: 8px; border-top: 1px dashed var(--line); }
 .quiz-note { border-radius: 12px; padding: 8px 12px; background: var(--cream); font-size: 14px; line-height: 1.7; }
 .quiz-done { font-size: 18px; font-weight: 900; text-align: center; padding: 8px 0; }
+/* 瞬間英作文 and 並び替え: the kind, the Japanese, the words to order, then the answer. */
+.quiz-kind {
+  justify-self: start; padding: 2px 12px; border-radius: 999px; background: var(--accent-soft);
+  color: var(--accent-text); font-size: 13px; font-weight: 700;
+}
+.quiz-ja { font-size: 19px; font-weight: 800; line-height: 1.6; }
+.quiz-pieces { display: flex; flex-wrap: wrap; gap: 8px; }
+.piece {
+  padding: 6px 14px; border-radius: 12px; background: var(--sky-soft); box-shadow: 0 2px 0 rgba(26, 34, 56, .1);
+  font-family: var(--en); font-size: 17px; font-weight: 700;
+}
+.quiz-card.answered .quiz-ja { font-size: 16px; color: var(--ink-2); }
+.quiz-card.answered .piece { opacity: .55; }
+.quiz-answer { display: grid; gap: 8px; padding-top: 10px; border-top: 1px dashed var(--line); }
 /* Room under the memo, so its end can scroll up above the panel. */
 body.quiz-open .wrap { padding-bottom: 62vh; }
 
