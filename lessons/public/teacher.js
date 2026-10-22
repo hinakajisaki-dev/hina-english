@@ -745,7 +745,7 @@ function vocabSetList(data) {
   const books = data.vocabBooks;
   const weeks = [...new Set([...bookWeeks(books), ...data.items.filter((i) => i.kind === "vocab").map((i) => i.data.week || "other")])];
   return weeks.flatMap((week) =>
-    wordSets(weekWords(week, data.items, books), week, data.vocabTests).map((set) => ({ week, ...set, key: setKey(week, set.number, books, data.vocabTests) })),
+    wordSets(weekWords(week, data.items, books), week).map((set) => ({ week, ...set, key: setKey(week, set.number, books) })),
   );
 }
 
@@ -893,7 +893,7 @@ function renderSettings(panel) {
     <form class="card stack" id="plan">
       <h3>今週の勉強範囲</h3>
       <p class="muted small">生徒のホームのいちばん上に出ます。空にして保存すると消えます。生徒ごとのチャットからも変えられます。</p>
-      <textarea name="body" rows="5" maxlength="5000" placeholder="- フレーズ Week 1 の Day 1〜3&#10;- 単語 Week 1 の Day 1〜3&#10;- 発音 Month 1 を毎日1文">${esc(state.current.plan?.body || "")}</textarea>
+      <textarea name="body" rows="5" maxlength="5000" placeholder="- フレーズ Week 1 の Day 1〜3&#10;- 単語 Week 1 のセット 1〜5&#10;- 発音 Month 1 を毎日1文">${esc(state.current.plan?.body || "")}</textarea>
       ${state.current.plan ? `<p class="muted small">${esc(formatDateTime(state.current.plan.updated_at))} に更新</p>` : ""}
       <button class="btn" type="submit" style="align-self:flex-start">保存</button>
     </form>

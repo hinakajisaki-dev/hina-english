@@ -305,7 +305,7 @@ function todaysTasks() {
 
 function renderHome() {
   // Progress counts this week's 単語 and フレーズ (course.js) and this month's 発音.
-  const sets = studentSets(CURRENT_WEEK).map((s) => studentSetKey(CURRENT_WEEK, s.number));
+  const sets = wordSets(studentWeekWords(CURRENT_WEEK), CURRENT_WEEK).map((s) => studentSetKey(CURRENT_WEEK, s.number));
   const tested = sets.filter((key) => state.me.vocabTests[key]).length;
   const review = reviewWords().length;
   const phraseTests = phraseTestCount(phraseWeeks().includes(CURRENT_WEEK) ? [CURRENT_WEEK] : []);
@@ -761,9 +761,7 @@ const resumeCard = (href, where, of) => `<a class="lesson-card resume-card" href
 const WEEKS = 24;
 const weekLabel = (week) => (week === "other" ? "そのほか" : `Week ${week}`);
 const studentWeekWords = (week) => weekWords(week, state.me.items, state.me.vocabBooks);
-const studentSetKey = (week, number) => setKey(week, number, state.me.vocabBooks, state.me.vocabTests);
-// A week's sets for this student (days, or sets of ten if they began this 単語帳 that way).
-const studentSets = (week, words = studentWeekWords(week)) => wordSets(words, week, state.me.vocabTests);
+const studentSetKey = (week, number) => setKey(week, number, state.me.vocabBooks);
 const inReview = (key) => state.me.review.some((r) => r.key === key);
 const testResult = (week, number) => state.me.vocabTests[studentSetKey(week, number)];
 
@@ -807,7 +805,7 @@ function renderVocab(week, setNumber, mode) {
   const tiles = weeks.map((week) => {
     const words = studentWeekWords(week);
     if (!words.length) return `<div class="week empty-week"><b>${weekLabel(week)}</b><span>まだありません</span></div>`;
-    const sets = studentSets(week, words);
+    const sets = wordSets(words, week);
     const tested = sets.filter((s) => testResult(week, s.number)).length;
     return `<a class="week ${tested === sets.length ? "done" : ""}" href="#/vocab/${week}">
       <b>${weekLabel(week)}</b>
@@ -828,7 +826,7 @@ function renderVocab(week, setNumber, mode) {
 
 function renderWeek(week) {
   state.vocabTest = null;
-  const sets = studentSets(week);
+  const sets = wordSets(studentWeekWords(week), week);
   app.innerHTML = `${topbar(`単語カード ・ ${weekLabel(week)}`, "#/vocab")}
     <main class="wrap stack">
       <p class="muted">${sets[0]?.day ? "1日分ずつ（Day 1〜Day 7）覚えて" : "10語ずつ覚えて"}、最後にテストをします。まちがえた単語は「復習」に入ります。</p>
@@ -846,7 +844,7 @@ function renderWeek(week) {
 }
 
 function findSet(week, number) {
-  return studentSets(week).find((s) => s.number === number);
+  return wordSets(studentWeekWords(week), week).find((s) => s.number === number);
 }
 
 function renderVocabSet(week, number) {
