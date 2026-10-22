@@ -14,6 +14,7 @@ export const MENUS = [
   { key: "grammar", name: "文法" },
   { key: "pron", name: "発音課題" },
   { key: "notes", name: "授業メモ" },
+  { key: "drill", name: "瞬間英作文" },
   { key: "study", name: "勉強時間" },
 ];
 
