@@ -118,10 +118,13 @@ const shows = (key) => !(state.me?.hidden || []).includes(key);
 const items = (kind) => state.me.items.filter((item) => item.kind === kind);
 const progress = (id) => state.me.progress[id] || {};
 
+// Deeper pages also get a ホーム button, so the student doesn't have to go
+// back one page at a time.
 function topbar(title, back = "#/") {
   return `<header class="topbar"><div class="topbar-in">
     <a class="icon-btn" href="${back}" aria-label="もどる">${icons.back}</a>
     <h1>${esc(title)}</h1>
+    ${back === "#/" ? "" : `<a class="home-btn" href="#/" aria-label="ホームへもどる">${icons.home}ホーム</a>`}
   </div></header>`;
 }
 

@@ -87,6 +87,12 @@ button, input, textarea, select { font: inherit; color: inherit; }
   font-size: 18px; color: var(--ink);
 }
 .icon-btn svg { width: 20px; height: 20px; }
+.home-btn {
+  flex: none; display: inline-flex; align-items: center; gap: 5px; height: 40px; padding: 0 14px 0 11px;
+  border-radius: 999px; background: var(--card); box-shadow: var(--shadow);
+  font-size: 14px; font-weight: 700; color: var(--accent-text); text-decoration: none; white-space: nowrap;
+}
+.home-btn svg { width: 18px; height: 18px; }
 
 /* ---------- cards and buttons ---------- */
 .card {
