@@ -193,6 +193,8 @@ function linesHtml(lines, options = {}) {
   let para = [];
   let list = [];
   let table = [];
+  // Examples (**例**) one after another go together under one 例.
+  let examples = [];
   const flush = () => {
     if (para.length) out.push(`<p>${para.map(inline).join("<br>")}</p>`);
     if (list.length) out.push(listHtml(list));
@@ -200,6 +202,10 @@ function linesHtml(lines, options = {}) {
     para = [];
     list = [];
     table = [];
+  };
+  const flushExamples = () => {
+    if (examples.length) out.push(`<div class="note-examples"><p class="note-examples-tag">例</p>${examples.join("")}</div>`);
+    examples = [];
   };
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
@@ -212,9 +218,17 @@ function linesHtml(lines, options = {}) {
     let end = i + 1;
     while (end < lines.length && lines[end].trim() && !HEADING.test(lines[end]) && !START.test(lines[end])) end++;
     const start = line.match(START);
-    if (start && (start[1] === "例" || options.cards) && lines.slice(i, end).some((l) => FIELD.test(l))) {
+    const block = lines.slice(i, end);
+    if (start?.[1] === "例" && block.some((l) => FIELD.test(l))) {
       flush();
-      out.push(problemCardHtml(lines.slice(i, end), options.speak, start[1] === "例"));
+      examples.push(exampleHtml(block, options.speak));
+      i = end - 1;
+      continue;
+    }
+    flushExamples();
+    if (start && options.cards && block.some((l) => FIELD.test(l))) {
+      flush();
+      out.push(problemCardHtml(block, options.speak));
       i = end - 1;
       continue;
     }
@@ -259,14 +273,12 @@ function linesHtml(lines, options = {}) {
     para.push(line.trim());
   }
   flush();
+  flushExamples();
   return out.join("\n");
 }
 
-// An 英作文 as a card that turns over: the Japanese and a hint, then the
-// 答え and ほかの言い方 (with 🔊) and the points under them. An example
-// (**例**) shows them all from the start.
-function problemCardHtml(block, speak, example = false) {
-  const ja = block[0].match(START)[2];
+// An 英作文's Japanese, its English ({ label, en }: 答え / ほかの言い方) and the rest (its points).
+function problemParts(block) {
   const answers = [];
   const rest = [];
   for (const line of block.slice(1)) {
@@ -274,15 +286,31 @@ function problemCardHtml(block, speak, example = false) {
     if (field) answers.push({ label: field[1], en: unbold(field[2]) });
     else rest.push(line);
   }
-  const say = (en) => (speak ? `<button type="button" class="speak icon-only" data-say="${esc(en)}" aria-label="聞く">${speak}</button>` : "");
-  const back = `${answers.map((a) => `<div class="say-answer"><span class="say-tag">${a.label}</span><p lang="en">${esc(a.en)}</p>${say(a.en)}</div>`).join("")}
+  return { ja: block[0].match(START)[2], answers, rest };
+}
+
+const sayButton = (speak, en) =>
+  speak ? `<button type="button" class="speak icon-only" data-say="${esc(en)}" aria-label="聞く">${speak}</button>` : "";
+
+// An example (**例**), small and open: the English (🔊), the Japanese under
+// it, then ほかの言い方 and the points.
+function exampleHtml(block, speak) {
+  const { ja, answers, rest } = problemParts(block);
+  const [main, ...others] = answers;
+  return `<div class="note-example">
+    <div class="ex-en"><p lang="en">${esc(main.en)}</p>${sayButton(speak, main.en)}</div>
+    <p class="ex-ja">${inline(ja)}</p>
+    ${others.map((a) => `<p class="ex-alt"><span>${a.label}</span> <span lang="en">${esc(a.en)}</span></p>`).join("")}
+    ${rest.length ? `<div class="ex-note">${linesHtml(rest)}</div>` : ""}
+  </div>`;
+}
+
+// An 英作文 as a card that turns over: the Japanese and a hint, then the
+// 答え and ほかの言い方 (with 🔊) and the points under them.
+function problemCardHtml(block, speak) {
+  const { ja, answers, rest } = problemParts(block);
+  const back = `${answers.map((a) => `<div class="say-answer"><span class="say-tag">${a.label}</span><p lang="en">${esc(a.en)}</p>${sayButton(speak, a.en)}</div>`).join("")}
       ${linesHtml(rest)}`;
-  if (example) {
-    return `<div class="say-card example">
-      <div class="say-front"><span class="say-kind">例</span><span class="say-ja">${inline(ja)}</span></div>
-      <div class="say-back">${back}</div>
-    </div>`;
-  }
   return `<div class="say-card">
     <button type="button" class="say-front" data-flip aria-expanded="false">
       <span class="say-kind">英作文</span>
