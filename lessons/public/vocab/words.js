@@ -15,9 +15,10 @@ import { WEEK4 } from "./week4.js";
 import { WEEK5 } from "./week5.js";
 import { WEEK6 } from "./week6.js";
 import { IELTS1 } from "./ielts1.js";
+import { IELTS2 } from "./ielts2.js";
 import { LINKUP1 } from "./linkup1.js";
 
-const BOOKS = [WEEK1, WEEK2, WEEK3, WEEK4, WEEK5, WEEK6, IELTS1, LINKUP1];
+const BOOKS = [WEEK1, WEEK2, WEEK3, WEEK4, WEEK5, WEEK6, IELTS1, IELTS2, LINKUP1];
 export const SET_SIZE = 10;
 
 const findBook = (id) => BOOKS.find((b) => b.id === id) || null;
