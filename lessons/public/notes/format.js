@@ -3,6 +3,8 @@
 // and it is shown as written in this small Markdown:
 //   ## 見出し / ### 小見出し      headings
 //   **太字**                       bold
+//   {青:until} {赤:I graduated}    words in blue / red (a sentence's grammar:
+//                                  the joining word blue, the subject and verb red)
 //   - 箇条書き (two spaces deeper for each level), 1. numbered
 //   | 表 | 表 | with | --- | --- | as its second row
 //   ---                            a line
@@ -40,6 +42,15 @@ function split(body) {
 const cells = (line) => line.trim().replace(/^\|/, "").replace(/\|$/, "").split("|").map((c) => c.trim());
 const unbold = (text) => text.replace(/\*\*(.+?)\*\*/g, "$1").trim();
 
+// {青:…} and {赤:…}: coloured words. colors() works on HTML that is already
+// escaped; plain() is the text without the marks (what is voiced, and the
+// 復習問題 cards, which have no colours).
+const COLOR = /\{(青|赤)[:：]\s*([^{}]+?)\}/g;
+const COLOR_CLASS = { 青: "note-blue", 赤: "note-red" };
+const colors = (html) => html.replace(COLOR, (_, color, words) => `<span class="${COLOR_CLASS[color]}">${words}</span>`);
+const plain = (text) => text.replace(COLOR, "$2");
+const clean = (text) => plain(unbold(text));
+
 const JAPANESE = /[\u3040-\u30ff\u3400-\u9fff]/;
 
 // The 復習問題 as cards: [{ type, en, ja, note, pieces }]. Each table in the
@@ -66,8 +77,8 @@ export function noteProblems(body) {
     const m = line.match(LIST);
     const text = m ? m[3] : line.trim();
     const arrow = text.lastIndexOf("→");
-    const left = unbold(text.slice(0, arrow));
-    const right = unbold(text.slice(arrow + 1));
+    const left = clean(text.slice(0, arrow));
+    const right = clean(text.slice(arrow + 1));
     if (arrow > 0 && left && right) {
       problems.push(JAPANESE.test(left) ? card("card", right, left) : card("card", left, right));
     }
@@ -98,12 +109,12 @@ function tableProblems(rows) {
   for (const row of rows.slice(start)) {
     if (TABLE_RULE.test(row)) continue;
     const c = cells(row);
-    const en = unbold(c[col.en] || "");
-    const ja = unbold(c[col.ja] || "");
-    const note = col.note === -1 ? "" : unbold(c[col.note] || "");
+    const en = clean(c[col.en] || "");
+    const ja = clean(c[col.ja] || "");
+    const note = col.note === -1 ? "" : clean(c[col.note] || "");
     if (!en || !ja) continue;
     if (type === "order") {
-      const pieces = unbold(c[col.pieces] || "").split("/").map((w) => w.trim()).filter(Boolean);
+      const pieces = clean(c[col.pieces] || "").split("/").map((w) => w.trim()).filter(Boolean);
       if (pieces.length >= 2) problems.push(card("order", en, ja, note, pieces));
     } else {
       problems.push(card(type, en, ja, note));
@@ -115,7 +126,7 @@ function tableProblems(rows) {
 // ✗ and ○ are marks only when a space follows them ("✗ I have…"), so a
 // placeholder like ○○ stays as it is.
 function inline(text) {
-  return esc(text)
+  return colors(esc(text))
     .replace(/\*\*(.+?)\*\*/g, "<b>$1</b>")
     .replace(/(^|[\s→（(>])[✗×✕](?=\s)/g, '$1<span class="ng">✗</span>')
     .replace(/(^|[\s→（(>])[○〇](?=\s)/g, '$1<span class="ok">○</span>');
@@ -183,7 +194,7 @@ export function noteSentences(body) {
   const texts = new Set(noteProblems(body).map((p) => p.en));
   for (const line of split(body).memo) {
     const field = line.match(FIELD);
-    if (field) texts.add(unbold(field[2]));
+    if (field) texts.add(clean(field[2]));
   }
   return texts;
 }
@@ -277,7 +288,8 @@ function linesHtml(lines, options = {}) {
   return out.join("\n");
 }
 
-// An 英作文's Japanese, its English ({ label, en }: 答え / ほかの言い方) and the rest (its points).
+// An 英作文's Japanese, its English ({ label, en }: 答え / ほかの言い方, with
+// their colour marks) and the rest (its points).
 function problemParts(block) {
   const answers = [];
   const rest = [];
@@ -290,7 +302,8 @@ function problemParts(block) {
 }
 
 const sayButton = (speak, en) =>
-  speak ? `<button type="button" class="speak icon-only" data-say="${esc(en)}" aria-label="聞く">${speak}</button>` : "";
+  speak ? `<button type="button" class="speak icon-only" data-say="${esc(plain(en))}" aria-label="聞く">${speak}</button>` : "";
+const enHtml = (en) => colors(esc(en));
 
 // An example (**例**), small and open: the English (🔊), the Japanese under
 // it, then ほかの言い方 and the points.
@@ -298,9 +311,9 @@ function exampleHtml(block, speak) {
   const { ja, answers, rest } = problemParts(block);
   const [main, ...others] = answers;
   return `<div class="note-example">
-    <div class="ex-en"><p lang="en">${esc(main.en)}</p>${sayButton(speak, main.en)}</div>
+    <div class="ex-en"><p lang="en">${enHtml(main.en)}</p>${sayButton(speak, main.en)}</div>
     <p class="ex-ja">${inline(ja)}</p>
-    ${others.map((a) => `<p class="ex-alt"><span>${a.label}</span> <span lang="en">${esc(a.en)}</span></p>`).join("")}
+    ${others.map((a) => `<p class="ex-alt"><span>${a.label}</span> <span lang="en">${enHtml(a.en)}</span></p>`).join("")}
     ${rest.length ? `<div class="ex-note">${linesHtml(rest)}</div>` : ""}
   </div>`;
 }
@@ -309,7 +322,7 @@ function exampleHtml(block, speak) {
 // 答え and ほかの言い方 (with 🔊) and the points under them.
 function problemCardHtml(block, speak) {
   const { ja, answers, rest } = problemParts(block);
-  const back = `${answers.map((a) => `<div class="say-answer"><span class="say-tag">${a.label}</span><p lang="en">${esc(a.en)}</p>${sayButton(speak, a.en)}</div>`).join("")}
+  const back = `${answers.map((a) => `<div class="say-answer"><span class="say-tag">${a.label}</span><p lang="en">${enHtml(a.en)}</p>${sayButton(speak, a.en)}</div>`).join("")}
       ${linesHtml(rest)}`;
   return `<div class="say-card">
     <button type="button" class="say-front" data-flip aria-expanded="false">

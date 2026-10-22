@@ -381,11 +381,12 @@ async function speech(env, student, text) {
     });
   }
   // The English of the student's published 授業メモ: its 復習問題 and the answers of its 英作文.
+  // (Every memo is read: with colour marks, {赤:I graduated}, an answer isn't in the body as voiced.)
   if (!allowed && text && NOTES_FOR_STUDENTS) {
     const notes = await all(
       env.DB,
-      `SELECT body FROM lesson_notes WHERE student_id = ? AND published_at IS NOT NULL AND instr(body, ?) > 0`,
-      student.id, text,
+      `SELECT body FROM lesson_notes WHERE student_id = ? AND published_at IS NOT NULL`,
+      student.id,
     );
     allowed = notes.some((row) => noteSentences(row.body).has(text));
   }
