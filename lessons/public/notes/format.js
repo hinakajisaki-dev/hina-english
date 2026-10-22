@@ -40,37 +40,26 @@ const unbold = (text) => text.replace(/\*\*(.+?)\*\*/g, "$1").trim();
 
 const JAPANESE = /[\u3040-\u30ff\u3400-\u9fff]/;
 
-// The 復習問題 as cards: [{ en, ja, note }]. The table's 英語, 意味 (or 日本語)
-// and 解説 columns; a table without those headings is read as 日本語 | 英語,
-// as memos were first written. Lines like "- English → 意味" work too.
+// The 復習問題 as cards: [{ type, en, ja, note, pieces }]. Each table in the
+// section is one kind of card, told by its headings, and one memo may have
+// several:
+//   | 英語 | 意味 | 解説 |           card: the English → tap for the meaning
+//   | 日本語 | 答え | ポイント |      write (瞬間英作文): the Japanese → tap for the English
+//   | 日本語 | ならべる単語 | 答え |   order (並び替え): the Japanese and the words
+//                                      ("until / come / I", in the order shown) → tap for the sentence
+// A table without headings is read as 日本語 | 英語, as memos were first
+// written. Lines like "- English → 意味" work too.
 export function noteProblems(body) {
   const { review } = split(body);
-  const rows = review.filter((line) => TABLE.test(line));
-  const problems = [];
-  if (rows.length) {
-    let col = { ja: 0, en: 1, note: -1 };
-    let start = 0;
-    if (rows[1] && TABLE_RULE.test(rows[1])) {
-      const head = cells(rows[0]);
-      const find = (...words) => head.findIndex((h) => words.some((w) => h.includes(w)));
-      col = {
-        en: find("英語", "English", "フレーズ"),
-        ja: find("意味", "日本語", "和訳"),
-        note: find("解説", "ポイント"),
-      };
-      if (col.en === -1) col.en = col.ja === 0 ? 1 : 0;
-      if (col.ja === -1) col.ja = col.en === 0 ? 1 : 0;
-      start = 2;
-    }
-    for (const row of rows.slice(start)) {
-      if (TABLE_RULE.test(row)) continue;
-      const c = cells(row);
-      const en = unbold(c[col.en] || "");
-      const ja = unbold(c[col.ja] || "");
-      if (en && ja) problems.push({ en, ja, note: col.note === -1 ? "" : unbold(c[col.note] || "") });
-    }
-    return problems;
+  const tables = [];
+  let table = null;
+  for (const line of review) {
+    if (!TABLE.test(line)) table = null;
+    else if (table) table.push(line);
+    else tables.push((table = [line]));
   }
+  if (tables.length) return tables.flatMap(tableProblems);
+  const problems = [];
   for (const line of review) {
     const m = line.match(LIST);
     const text = m ? m[3] : line.trim();
@@ -78,7 +67,44 @@ export function noteProblems(body) {
     const left = unbold(text.slice(0, arrow));
     const right = unbold(text.slice(arrow + 1));
     if (arrow > 0 && left && right) {
-      problems.push(JAPANESE.test(left) ? { en: right, ja: left, note: "" } : { en: left, ja: right, note: "" });
+      problems.push(JAPANESE.test(left) ? card("card", right, left) : card("card", left, right));
+    }
+  }
+  return problems;
+}
+
+const card = (type, en, ja, note = "", pieces = null) => ({ type, en, ja, note, ...(pieces ? { pieces } : {}) });
+
+function tableProblems(rows) {
+  let type = "card";
+  let col = { ja: 0, en: 1, note: -1, pieces: -1 };
+  let start = 0;
+  if (rows[1] && TABLE_RULE.test(rows[1])) {
+    const head = cells(rows[0]);
+    const find = (...words) => head.findIndex((h) => words.some((w) => h.includes(w)));
+    const english = find("英語", "English", "フレーズ");
+    const answer = find("答え");
+    col = { ja: find("意味", "日本語", "和訳"), note: find("解説", "ポイント"), pieces: find("ならべる", "並べる", "並び替え", "ならびかえ") };
+    if (col.pieces !== -1) type = "order";
+    else if (english === -1 && answer !== -1) type = "write";
+    col.en = type === "card" ? english : answer;
+    if (col.en === -1) col.en = col.ja === 0 ? 1 : 0;
+    if (col.ja === -1) col.ja = col.en === 0 ? 1 : 0;
+    start = 2;
+  }
+  const problems = [];
+  for (const row of rows.slice(start)) {
+    if (TABLE_RULE.test(row)) continue;
+    const c = cells(row);
+    const en = unbold(c[col.en] || "");
+    const ja = unbold(c[col.ja] || "");
+    const note = col.note === -1 ? "" : unbold(c[col.note] || "");
+    if (!en || !ja) continue;
+    if (type === "order") {
+      const pieces = unbold(c[col.pieces] || "").split("/").map((w) => w.trim()).filter(Boolean);
+      if (pieces.length >= 2) problems.push(card("order", en, ja, note, pieces));
+    } else {
+      problems.push(card(type, en, ja, note));
     }
   }
   return problems;

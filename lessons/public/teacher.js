@@ -372,14 +372,18 @@ const NOTE_PLACEHOLDER = `## 1. 英作文：日曜日のこと（日本語 → �
 | --- | --- | --- |
 | When I want to relax, I go to Osaka. | リラックスしたい時は大阪に行きます | When I want to 〜 ＝ 〜したい時 |`;
 
+const PROBLEM_KIND = { write: "瞬間英作文", order: "並び替え" };
+
 // The memo as the student will see it, with its 復習問題 listed for checking.
 function notePreviewHtml(body) {
   const problems = noteProblems(body);
   return `<div class="note-body">${noteHtml(body)}</div>
     <div class="note-problems stack">
-      <p><b>復習 ${problems.length} こ</b><span class="muted small">（生徒には「内容を元に復習する」ボタンで、カードが1枚ずつ出ます。英語 → タップで意味と解説）</span></p>
+      <p><b>復習 ${problems.length} こ</b><span class="muted small">（生徒には「内容を元に復習する」ボタンで、カードが1枚ずつ出ます。英語 → タップで意味と解説。瞬間英作文は日本語 → 英語、並び替えは日本語と単語 → 英文）</span></p>
       ${problems.length
-        ? `<ol>${problems.map((p) => `<li><span lang="en"><b>${esc(p.en)}</b></span><br>${esc(p.ja)}${p.note ? `<br><span class="muted small">${esc(p.note)}</span>` : ""}</li>`).join("")}</ol>`
+        ? `<ol>${problems.map((p) => `<li>${PROBLEM_KIND[p.type] ? `<span class="pill">${PROBLEM_KIND[p.type]}</span> ` : ""}${p.type === "card"
+          ? `<span lang="en"><b>${esc(p.en)}</b></span><br>${esc(p.ja)}`
+          : `${esc(p.ja)}${p.pieces ? `<br><span class="muted small" lang="en">${p.pieces.map(esc).join(" ／ ")}</span>` : ""}<br><span lang="en"><b>${esc(p.en)}</b></span>`}${p.note ? `<br><span class="muted small">${esc(p.note)}</span>` : ""}</li>`).join("")}</ol>`
         : `<p class="notice small">復習のカードがありません。いちばん最後に「## 復習問題」と「| 英語 | 意味 | 解説 |」の表を入れると、ボタンになります。</p>`}
     </div>`;
 }

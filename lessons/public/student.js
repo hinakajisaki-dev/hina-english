@@ -494,15 +494,7 @@ function drawQuiz() {
         <button type="button" class="btn secondary" data-again>もう一度</button>
         <button type="button" class="btn" data-close>とじる</button>
       </div>` : `
-      <div class="quiz-card ${shown ? "" : "front"}" ${shown ? "" : 'role="button" tabindex="0" aria-label="意味と解説を見る" data-show'}>
-        <div class="quiz-en-row">
-          <p class="quiz-en" lang="en">${esc(p.en)}</p>
-          <button type="button" class="speak icon-only" data-say="${esc(p.en)}" aria-label="聞く">${icons.speaker}</button>
-        </div>
-        ${shown
-          ? `<p class="quiz-meaning">${esc(p.ja)}</p>${p.note ? `<p class="quiz-note">${noteHtml(p.note)}</p>` : ""}`
-          : `<p class="hint">タップして意味を見る</p>`}
-      </div>
+      ${quizCardHtml(p, shown)}
       ${shown ? (inPhraseReview(key)
         ? `<button type="button" class="btn secondary block review-on" data-review aria-pressed="true">✓ 復習タブに入っています</button>`
         : `<button type="button" class="btn ghost block review-add" data-review aria-pressed="false">＋ 復習タブに入れる</button>`) : ""}
@@ -510,7 +502,7 @@ function drawQuiz() {
         ${index ? `<button type="button" class="btn secondary" data-back>前へ</button>` : ""}
         ${shown
           ? `<button type="button" class="btn" data-next>${index + 1 < problems.length ? "次へ" : "おわる"}</button>`
-          : `<button type="button" class="btn" data-show>意味を見る</button>`}
+          : `<button type="button" class="btn" data-show>${p.type === "card" || !p.type ? "意味を見る" : "答えを見る"}</button>`}
       </div>`}
   </div>`;
   const on = (selector, action) => sheet.querySelectorAll(selector).forEach((b) => b.addEventListener("click", (event) => {
@@ -535,6 +527,36 @@ function drawQuiz() {
     quiz.shown = true;
     drawQuiz();
   });
+}
+
+// One 復習問題 card (notes/format.js noteProblems), its front or, once shown, its answer:
+//   card   the English (🔊) → the meaning and 解説
+//   write  瞬間英作文: the Japanese → the English (🔊) and ポイント
+//   order  並び替え: the Japanese and the words to put in order → the sentence (🔊)
+function quizCardHtml(p, shown) {
+  const front = shown ? "" : 'role="button" tabindex="0" data-show';
+  const english = `<div class="quiz-en-row">
+      <p class="quiz-en" lang="en">${esc(p.en)}</p>
+      <button type="button" class="speak icon-only" data-say="${esc(p.en)}" aria-label="聞く">${icons.speaker}</button>
+    </div>`;
+  const note = p.note ? `<p class="quiz-note">${noteHtml(p.note)}</p>` : "";
+  if (p.type === "write" || p.type === "order") {
+    const kind = p.type === "write" ? "瞬間英作文" : "並び替え";
+    const pieces = p.type === "order"
+      ? `<div class="quiz-pieces" lang="en">${p.pieces.map((w) => `<span class="piece">${esc(w)}</span>`).join("")}</div>` : "";
+    return `<div class="quiz-card ${shown ? "answered" : "front"}" ${front} ${shown ? "" : 'aria-label="答えを見る"'}>
+      <p class="quiz-kind">${kind}</p>
+      <p class="quiz-ja">${esc(p.ja)}</p>
+      ${pieces}
+      ${shown
+        ? `<div class="quiz-answer">${english}${note}</div>`
+        : `<p class="hint">${p.type === "write" ? "英語で言ってみよう。タップして答えを見る" : "正しい順にならべてみよう。タップして答えを見る"}</p>`}
+    </div>`;
+  }
+  return `<div class="quiz-card ${shown ? "" : "front"}" ${front} ${shown ? "" : 'aria-label="意味と解説を見る"'}>
+    ${english}
+    ${shown ? `<p class="quiz-meaning">${esc(p.ja)}</p>${note}` : `<p class="hint">タップして意味を見る</p>`}
+  </div>`;
 }
 
 // The home tiles this student sees. Half-width tiles go two to a row; one left
