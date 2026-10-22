@@ -226,6 +226,14 @@ export async function ensureSchema(db) {
   ready = true;
 }
 
+// The database itself can't answer for now (the day's read limit, overloaded,
+// a reset or a timeout), as opposed to a bug in a query. The message is all
+// D1 gives: "D1_ERROR: Your account has exceeded D1's free tier daily row read
+// limit.", "D1 DB is overloaded. Too many requests queued.", "Network connection lost." …
+const DB_BUSY = /exceeded|overloaded|too many requests|timeout|timed out|network connection lost|transient|internal error|reset because|to be reset|unavailable|SQLITE_BUSY/i;
+
+export const isDbBusy = (error) => DB_BUSY.test(String(error?.message ?? error ?? ""));
+
 export const now = () => new Date().toISOString();
 
 // Today's date in Japan, "2026-10-12"; offset moves it by whole days.

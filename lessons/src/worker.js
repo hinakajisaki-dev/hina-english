@@ -17,12 +17,13 @@ import { noteProblems, noteSentences } from "../public/notes/format.js";
 import { NOTES_FOR_STUDENTS } from "../public/course.js";
 import { MENUS } from "../public/menus.js";
 import {
-  all, ensureSchema, first, itemRow, japanDay, journalRow, noteRow, now, run, studentBundle,
+  all, ensureSchema, first, isDbBusy, itemRow, japanDay, journalRow, noteRow, now, run, studentBundle,
 } from "./db.js";
 
 const STUDENT_COOKIE = "hl_student";
 const TEACHER_COOKIE = "hl_teacher";
 const YEAR = 365 * 24 * 3600;
+const DB_BUSY_MESSAGE = "ただいまサーバーが混み合っています。少し待ってから、もう一度ためしてください。";
 
 // Fields each kind of item keeps; the first `required` of them must be filled.
 const KINDS = {
@@ -44,7 +45,7 @@ class HttpError extends Error {
 }
 
 export default {
-  async fetch(request, env) {
+  async fetch(request, env, ctx) {
     const url = new URL(request.url);
     if (!url.pathname.startsWith("/api/")) return new Response("Not found", { status: 404 });
     const who = {}; // the student, once the request is known to be theirs
@@ -55,7 +56,9 @@ export default {
       if (error instanceof HttpError) return json({ error: error.message }, error.status);
       console.error(error);
       const where = `${request.method} ${url.pathname}`;
-      await recordError(env.DB, {
+      // Kept after the answer is sent: a database that is failing can be slow
+      // to fail again, and the person shouldn't wait for that.
+      const record = recordError(env.DB, {
         kind: "server",
         message: `サーバーのエラー（${where}）：${error?.message ?? error}`,
         detail: String(error?.stack ?? error),
@@ -63,6 +66,10 @@ export default {
         ref: where,
         key: `server|${where.replace(/\d+/g, ":id")}|${error?.message ?? error}`,
       });
+      if (ctx?.waitUntil) ctx.waitUntil(record);
+      else await record;
+      // Not a sign-in problem: the pages only send people back to sign in on a 401.
+      if (isDbBusy(error)) return json({ error: DB_BUSY_MESSAGE }, 503, { "Retry-After": "60" });
       return json({ error: "サーバーでエラーが起きました。少し待ってから、もう一度ためしてください。" }, 500);
     }
   },
