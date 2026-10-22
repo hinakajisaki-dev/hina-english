@@ -794,6 +794,17 @@ const noteHtml = (note) => esc(note).replace(/\n/g, "<br>");
 // 名詞 / 動詞 above an example, when a word's examples use it in different ways.
 const exTag = (ex) => (ex.tag ? `<span class="ex-tag">${esc(ex.tag)}</span>` : "");
 
+// A word's example sentences (🔊, the word in red, the Japanese and the note):
+// on the back of its card and when it is opened in 単語復習.
+const wordExamplesHtml = (word) => (word.examples.length ? `<ul class="word-examples">${word.examples.map((ex) => `<li>
+  ${sayIcon(ex.en)}
+  <div>
+    ${exTag(ex)}<p class="en" lang="en">${exampleHtml(ex)}</p>
+    ${ex.ja ? `<p class="ja">${esc(ex.ja)}</p>` : ""}
+    ${ex.note ? `<p class="word-note">${noteHtml(ex.note)}</p>` : ""}
+  </div>
+</li>`).join("")}</ul>` : "");
+
 function renderVocab(week, setNumber, mode) {
   const w = week === "other" ? "other" : Number(week);
   if (week && setNumber && mode === "test") return renderVocabTest(w, Number(setNumber));
@@ -877,14 +888,7 @@ function renderVocabSet(week, number) {
           ${sayIcon(speakable(word.word))}
         </div>
         <p class="meaning">${noteHtml(word.meaning)}</p>
-        ${word.examples.length ? `<ul class="word-examples">${word.examples.map((ex) => `<li>
-          ${sayIcon(ex.en)}
-          <div>
-            ${exTag(ex)}<p class="en" lang="en">${exampleHtml(ex)}</p>
-            ${ex.ja ? `<p class="ja">${esc(ex.ja)}</p>` : ""}
-            ${ex.note ? `<p class="word-note">${noteHtml(ex.note)}</p>` : ""}
-          </div>
-        </li>`).join("")}</ul>` : ""}
+        ${wordExamplesHtml(word)}
         <div>${speedControl()}</div>
         <label class="review-check">
           <input type="checkbox" id="review-check" ${inReview(word.key) ? "checked" : ""}>
@@ -1099,10 +1103,22 @@ function renderReview(level) {
         </a>` : ""}
         <section class="card stack">
           <h3>復習カード</h3>
-          <ul class="review-list">${words.map((w) => `<li>
-            <div><b lang="en">${esc(w.word)}</b><span class="muted small">${esc(w.meaning)}</span></div>
-            <span class="badge ${w.source === "test" ? "teacher" : ""}">${w.source === "test" ? "テスト" : "チェック"}</span>
-            <button type="button" class="btn ghost small-btn" data-remove="${esc(w.key)}">外す</button>
+          <p class="muted small">単語をタップすると、意味と例文が出ます。</p>
+          <ul class="review-list open-list">${words.map((w) => `<li>
+            <div class="review-row">
+              <button type="button" class="review-word" data-open aria-expanded="false">
+                <b lang="en">${esc(w.word)}</b><span class="review-chev" aria-hidden="true">▾</span>
+              </button>
+              <span class="badge ${w.source === "test" ? "teacher" : ""}">${w.source === "test" ? "テスト" : "チェック"}</span>
+              <button type="button" class="btn ghost small-btn" data-remove="${esc(w.key)}">外す</button>
+            </div>
+            <div class="review-detail" hidden>
+              <div class="detail-head">
+                <div>${w.pos ? `<span class="pill">${esc(w.pos)}</span>` : ""}<p class="meaning">${noteHtml(w.meaning)}</p></div>
+                ${sayIcon(speakable(w.word))}
+              </div>
+              ${wordExamplesHtml(w)}
+            </div>
           </li>`).join("")}</ul>
         </section>`
       : emptyState("まだ復習カードがありません。<br>単語カードで「復習カードに入れる」にチェックするか、<br>テストでまちがえた単語がここに入ります。")}
@@ -1112,6 +1128,13 @@ function renderReview(level) {
     button.addEventListener("click", async () => {
       await setReview(button.dataset.remove, false);
       renderReview();
+    }),
+  );
+  app.querySelectorAll("[data-open]").forEach((button) =>
+    button.addEventListener("click", () => {
+      const detail = button.closest("li").querySelector(".review-detail");
+      detail.hidden = !detail.hidden;
+      button.setAttribute("aria-expanded", String(!detail.hidden));
     }),
   );
 }
