@@ -886,7 +886,7 @@ function renderVocabSet(week, number) {
   });
 }
 
-// ---------- ten-word test ----------
+// ---------- set test ----------
 // Pick the meaning of each word from four. A miss goes into the 復習 list.
 
 function meaningChoices(word, pool) {
