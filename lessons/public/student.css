@@ -335,6 +335,9 @@ a.week:hover { border-color: var(--sky); }
 .note-body hr { border: 0; border-top: 1px dashed var(--line); margin: 16px 0; }
 .note-body b { font-weight: 900; }
 .note-body .ng { color: var(--bad); font-weight: 900; }
+/* {青:until} {赤:I graduated}: the joining word blue, the subject and verb red */
+.note-blue { color: var(--spell); font-weight: 800; }
+.note-red { color: var(--bad); font-weight: 800; }
 .note-body .ok { color: var(--good); font-weight: 900; }
 .note-table { overflow-x: auto; }
 .note-table table { border-collapse: collapse; font-size: 14px; line-height: 1.5; min-width: 100%; }
