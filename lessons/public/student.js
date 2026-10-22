@@ -118,10 +118,13 @@ const shows = (key) => !(state.me?.hidden || []).includes(key);
 const items = (kind) => state.me.items.filter((item) => item.kind === kind);
 const progress = (id) => state.me.progress[id] || {};
 
+// Deeper pages also get a ホーム button, so the student doesn't have to go
+// back one page at a time.
 function topbar(title, back = "#/") {
   return `<header class="topbar"><div class="topbar-in">
     <a class="icon-btn" href="${back}" aria-label="もどる">${icons.back}</a>
     <h1>${esc(title)}</h1>
+    ${back === "#/" ? "" : `<a class="home-btn" href="#/" aria-label="ホームへもどる">${icons.home}ホーム</a>`}
   </div></header>`;
 }
 
@@ -302,7 +305,7 @@ function todaysTasks() {
 
 function renderHome() {
   // Progress counts this week's 単語 and フレーズ (course.js) and this month's 発音.
-  const sets = wordSets(studentWeekWords(CURRENT_WEEK)).map((s) => studentSetKey(CURRENT_WEEK, s.number));
+  const sets = wordSets(studentWeekWords(CURRENT_WEEK), CURRENT_WEEK).map((s) => studentSetKey(CURRENT_WEEK, s.number));
   const tested = sets.filter((key) => state.me.vocabTests[key]).length;
   const review = reviewWords().length;
   const phraseTests = phraseTestCount(phraseWeeks().includes(CURRENT_WEEK) ? [CURRENT_WEEK] : []);
@@ -745,7 +748,7 @@ function renderVocab(week, setNumber, mode) {
   const tiles = weeks.map((week) => {
     const words = studentWeekWords(week);
     if (!words.length) return `<div class="week empty-week"><b>${weekLabel(week)}</b><span>まだありません</span></div>`;
-    const sets = wordSets(words);
+    const sets = wordSets(words, week);
     const tested = sets.filter((s) => testResult(week, s.number)).length;
     return `<a class="week ${tested === sets.length ? "done" : ""}" href="#/vocab/${week}">
       <b>${weekLabel(week)}</b>
@@ -759,23 +762,23 @@ function renderVocab(week, setNumber, mode) {
   const lastSet = last && studentSetKey(last.week, last.number) === last.key && findSet(last.week, last.number);
   app.innerHTML = `${topbar("単語カード")}
     <main class="wrap stack">
-      ${lastSet ? resumeCard(`#/vocab/${last.week}/${last.number}`, `${weekLabel(last.week)} ・ ${lastSet.number}. ${esc(lastSet.title)}`, last.of) : ""}
+      ${lastSet ? resumeCard(`#/vocab/${last.week}/${last.number}`, `${weekLabel(last.week)} ・ ${esc(lastSet.label)}`, last.of) : ""}
       <div class="weeks">${tiles.join("")}</div>
     </main>`;
 }
 
 function renderWeek(week) {
   state.vocabTest = null;
-  const sets = wordSets(studentWeekWords(week));
+  const sets = wordSets(studentWeekWords(week), week);
   app.innerHTML = `${topbar(`単語カード ・ ${weekLabel(week)}`, "#/vocab")}
     <main class="wrap stack">
-      <p class="muted">10語ずつ覚えて、最後にテストをします。まちがえた単語は「復習」に入ります。</p>
+      <p class="muted">${sets[0]?.day ? "1日分ずつ（Day 1〜Day 7）覚えて" : "10語ずつ覚えて"}、最後にテストをします。まちがえた単語は「復習」に入ります。</p>
       ${sets.length ? "" : emptyState("この週の単語は、まだありません。")}
       ${sets.map((set) => {
         const result = testResult(week, set.number);
         const place = resumeAt("vocab", studentSetKey(week, set.number));
         return `<a class="lesson-card" href="#/vocab/${week}/${set.number}">
-          <div><b>${set.number}. ${esc(set.title)}</b><span class="muted small" lang="en">${set.words.map((w) => esc(w.word)).join(" ・ ")}</span></div>
+          <div><b>${esc(set.label)}</b>${set.day ? `<span class="muted small">${esc(set.title)} ・ ${set.words.length}語</span>` : ""}<span class="muted small" lang="en">${set.words.map((w) => esc(w.word)).join(" ・ ")}</span></div>
           ${place ? `<span class="badge start">つづきから ${esc(place.of)}</span>`
             : result ? `<span class="badge">✓ ${result.best} / ${result.total}</span>` : `<span class="badge start">はじめる</span>`}
         </a>`;
@@ -784,7 +787,7 @@ function renderWeek(week) {
 }
 
 function findSet(week, number) {
-  return wordSets(studentWeekWords(week)).find((s) => s.number === number);
+  return wordSets(studentWeekWords(week), week).find((s) => s.number === number);
 }
 
 function renderVocabSet(week, number) {
@@ -804,7 +807,7 @@ function renderVocabSet(week, number) {
     window.scrollTo(0, 0);
   };
 
-  app.innerHTML = `${topbar(`${weekLabel(week)} ・ ${set.number}. ${set.title}`, `#/vocab/${week}`)}
+  app.innerHTML = `${topbar(`${weekLabel(week)} ・ ${set.label}`, `#/vocab/${week}`)}
     <main class="wrap stack">
       <div class="lesson-progress" role="progressbar" aria-valuemin="1" aria-valuemax="${set.words.length}" aria-valuenow="${V.index + 1}">
         <div class="bar"><i style="width:${Math.round(((V.index + 1) / set.words.length) * 100)}%"></i></div>
@@ -883,7 +886,7 @@ function renderVocabSet(week, number) {
   });
 }
 
-// ---------- ten-word test ----------
+// ---------- set test ----------
 // Pick the meaning of each word from four. A miss goes into the 復習 list.
 
 function meaningChoices(word, pool) {
@@ -922,7 +925,7 @@ function renderVocabTest(week, number) {
 
   const { word, choices } = T.questions[T.index];
   const answer = T.answers[T.index];
-  app.innerHTML = `${topbar(`テスト ・ ${set.number}. ${set.title}`, back)}
+  app.innerHTML = `${topbar(`テスト ・ ${set.label}`, back)}
     <main class="wrap stack">
       <div class="lesson-progress" role="progressbar" aria-valuemin="1" aria-valuemax="${T.questions.length}" aria-valuenow="${T.index + 1}">
         <div class="bar"><i style="width:${Math.round((T.index / T.questions.length) * 100)}%"></i></div>
@@ -983,7 +986,7 @@ function renderVocabTestResult(week, set, rerender) {
   const next = findSet(week, set.number + 1);
   const perfect = score === T.questions.length;
 
-  app.innerHTML = `${topbar(`テスト ・ ${set.number}. ${set.title}`, `#/vocab/${week}`)}
+  app.innerHTML = `${topbar(`テスト ・ ${set.label}`, `#/vocab/${week}`)}
     <main class="wrap stack">
       <section class="card stack" style="text-align:center">
         <p style="font-size:40px">${perfect ? "🎉" : "👏"}</p>
@@ -994,7 +997,7 @@ function renderVocabTestResult(week, set, rerender) {
         <h3>復習カードに入れた単語</h3>
         <ul class="plain-list">${missed.map((w) => `<li><b lang="en">${esc(w.word)}</b>　${esc(w.meaning)}</li>`).join("")}</ul>
       </section>` : ""}
-      ${next ? `<a class="btn block" href="#/vocab/${week}/${next.number}">次の10語へ（${next.number}. ${esc(next.title)}）</a>` : ""}
+      ${next ? `<a class="btn block" href="#/vocab/${week}/${next.number}">${next.day ? "次の日へ" : "次の10語へ"}（${esc(next.label)}）</a>` : ""}
       <button type="button" class="btn secondary block" id="again">もう一度テスト</button>
       <a class="btn ghost block" href="#/vocab/${week}">${weekLabel(week)} にもどる</a>
     </main>`;

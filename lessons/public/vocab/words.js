@@ -83,31 +83,50 @@ export function weekWords(week, items = [], books = null) {
 export const bookWeeks = (books = null) =>
   [...new Set(BOOKS.map((b) => b.week))].filter((week) => weekBook(week, books)).sort((a, b) => a - b);
 
-// Words in sets of ten; each set ends with a test. Titles name the slide
-// groups it covers (動詞 ①・②).
-export function wordSets(words) {
-  const sets = [];
-  for (let i = 0; i < words.length; i += SET_SIZE) {
-    const chunk = words.slice(i, i + SET_SIZE);
-    const groups = [...new Set(chunk.map((w) => w.group))];
-    sets.push({ number: sets.length + 1, words: chunk, title: setTitle(groups) });
+// From Week 2, a week with a 単語帳 is split into 7 days (Day 1〜Day 7; 100
+// words are 15, 15 and then 14 a day) instead of sets of ten.
+const DAYS_FROM_WEEK = 2;
+const DAYS = 7;
+const byDays = (week, hasBook) => week !== "other" && Number(week) >= DAYS_FROM_WEEK && hasBook;
+
+// A week's words in sets (sets of ten, or days); each set ends with a test.
+// Titles name the slide groups it covers (動詞 ①・②); label is what the
+// screens call the set ("1. 動詞 ①・②", or "Day 1").
+export function wordSets(words, week) {
+  const days = byDays(week, words.some((w) => !w.key.startsWith("item/")));
+  const chunks = [];
+  if (days) {
+    for (let day = 0, at = 0; day < DAYS && at < words.length; day++) {
+      const size = Math.floor(words.length / DAYS) + (day < words.length % DAYS ? 1 : 0);
+      chunks.push(words.slice(at, (at += size)));
+    }
+  } else {
+    for (let i = 0; i < words.length; i += SET_SIZE) chunks.push(words.slice(i, i + SET_SIZE));
   }
-  return sets;
+  return chunks.filter((chunk) => chunk.length).map((chunk, i) => {
+    const title = setTitle([...new Set(chunk.map((w) => w.group))]);
+    return { number: i + 1, words: chunk, title, label: days ? `Day ${i + 1}` : `${i + 1}. ${title}`, day: days };
+  });
 }
 
 function setTitle(groups) {
-  // "動詞 ①", "動詞 ②" → "動詞 ①・②"
-  const parts = groups.map((g) => g.match(/^(.*?)\s*([①-⑳])$/));
-  if (parts.every(Boolean) && parts.every((p) => p[1] === parts[0][1])) {
-    return `${parts[0][1]} ${parts.map((p) => p[2]).join("・")}`;
+  // "動詞 ①", "動詞 ②", "形容詞 ①" → "動詞 ①・② / 形容詞 ①"
+  const named = [];
+  for (const group of groups) {
+    const [, base, n] = group.match(/^(.*?)\s*([①-⑳])$/) || [null, group, ""];
+    const last = named.at(-1);
+    if (last && n && last.base === base) last.numbers.push(n);
+    else named.push({ base, numbers: n ? [n] : [] });
   }
-  return groups.join("・");
+  return named.map((g) => (g.numbers.length ? `${g.base} ${g.numbers.join("・")}` : g.base)).join(" / ");
 }
 
-// A set's test results are kept under its book ("w1/s3", "ielts1/s3"); a week
-// with only the teacher's words uses "w{week}".
-export const setKey = (week, number, books = null) =>
-  `${(week !== "other" && weekBook(week, books)) || `w${week}`}/s${number}`;
+// A set's test results are kept under its book ("w1/s3", "ielts1/s3"; a day
+// is "w2/d3"); a week with only the teacher's words uses "w{week}".
+export function setKey(week, number, books = null) {
+  const book = week !== "other" && weekBook(week, books);
+  return `${book || `w${week}`}/${byDays(week, !!book) ? "d" : "s"}${number}`;
+}
 
 // Every 単語帳 text the app may voice: the words and their example sentences.
 export function bookSentences() {

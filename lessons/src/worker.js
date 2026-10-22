@@ -546,12 +546,12 @@ async function requireWordKey(db, student, key) {
   throw new HttpError(404, "見つかりません。");
 }
 
-// The score of a ten-word set test. The total is the set's size, worked out here.
+// The score of a set's test (ten words, or a day's). The total is the set's size, worked out here.
 async function saveVocabTest(request, env, student, weekParam, number) {
   const week = weekParam === "other" ? "other" : Number(weekParam);
   const items = (await all(env.DB, `SELECT * FROM items WHERE student_id = ? AND kind = 'vocab'`, student.id)).map(itemRow);
   const books = await studentSetting(env.DB, student, "vocab_books");
-  const set = wordSets(weekWords(week, items, books)).find((s) => s.number === number);
+  const set = wordSets(weekWords(week, items, books), week).find((s) => s.number === number);
   if (!set) throw new HttpError(404, "見つかりません。");
   const total = set.words.length;
   const { score } = await readJson(request);
