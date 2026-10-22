@@ -346,6 +346,14 @@ a.week:hover { border-color: var(--sky); }
 .note-end { text-align: center; background: var(--accent-soft); border-color: transparent; }
 /* An 英作文 in a memo: the Japanese, then a tap shows the answer. */
 .say-card { border: 1px solid var(--line); border-radius: 14px; background: var(--card); overflow: hidden; }
+/* A worked example (**例**): its answer shows from the start. */
+.say-card.example .say-front { cursor: default; background: var(--sky-soft); }
+.say-card.example .say-kind { background: var(--card); color: var(--ink); }
+/* The page's 大事なポイント (**ポイント**：…) */
+.note-point { border-radius: 14px; padding: 12px 14px; background: var(--cream); border-left: 5px solid var(--yellow); }
+.note-point > * + * { margin-top: 6px; }
+.note-point-tag { font-size: 12px; font-weight: 700; color: var(--accent-text); }
+.note-point p:not(.note-point-tag) { font-weight: 700; }
 .note-body .say-card + .say-card { margin-top: 12px; }
 .say-front {
   width: 100%; display: grid; gap: 4px; padding: 12px 14px; margin: 0; border: 0; background: var(--bg);
