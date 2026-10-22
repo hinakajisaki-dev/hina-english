@@ -367,7 +367,7 @@ function renderHome() {
             <span class="muted">${phraseReviewCount ? `${phraseReviewCount} フレーズ` : "まだありません"}</span>` },
           { key: "grammar", html: `
             <span class="emoji" aria-hidden="true">✏️</span><b>文法</b>
-            <span class="muted">${UNITS.map((u) => esc(u.title)).join("・")}${grammar.length ? ` ＋ 先生からの問題` : ""}</span>` },
+            <span class="muted">全 ${UNITS.reduce((n, u) => n + u.lessons.length, 0)} レッスン${grammar.length ? `<br>＋ 先生からの問題` : ""}</span>` },
           { key: "pron", html: `
             <span class="emoji" aria-hidden="true">🎤</span><b>発音課題</b>
             <span class="muted">${shared.length ? `${esc(monthLabel(myMonths(), pronMonth))} ・ 完了 ${pronFinished} / ${shared.length}` : "まだありません"}</span>

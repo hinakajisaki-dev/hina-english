@@ -18,7 +18,7 @@ export const PERFECT = {
           text: ["過去のことが、**今**につながっているときに使います。"],
           key: "[[have]] / [[has]] + [[過去分詞]]",
           examples: [
-            { en: "I [[have visited]] Kyoto.", ja: "私は京都を訪れたことがあります。" },
+            { en: "We [[have met]] him before.", ja: "私たちは以前、彼に会ったことがあります。" },
             { en: "She [[has finished]] her homework.", ja: "彼女は宿題を終えました。\n（今は終わっている）" },
           ],
         },
@@ -89,7 +89,7 @@ export const PERFECT = {
             ],
           },
           examples: [
-            { en: "I [[have]] {{never}} [[eaten]] sushi.", ja: "私は一度もお寿司を食べたことがありません。" },
+            { en: "I [[have]] {{never}} [[played]] golf.", ja: "私は一度もゴルフをしたことがありません。" },
             { en: "I [[have been]] to Hokkaido {{once}}.", ja: "私は北海道に1回行ったことがあります。" },
           ],
           key: ["「〜に行ったことがある」は", "[[have been]] to 〜"],
@@ -168,11 +168,11 @@ export const PERFECT = {
         },
         {
           type: "choice",
-          q: "I ___ to Hawaii last year.",
-          ja: "私は去年ハワイに行きました。",
+          q: "I ___ to Kyoto two years ago.",
+          ja: "私は2年前に京都に行きました。",
           choices: ["went", "have been"],
           answer: "went",
-          why: "**last year**（去年）といつかを言っているので、過去形の [[went]] です。",
+          why: "**two years ago**（2年前）と、いつかを言っているので、過去形の [[went]] です。",
         },
         {
           type: "write",
@@ -212,8 +212,8 @@ export const PERFECT = {
           title: "完了：「ちょうど〜した」「もう〜した」",
           text: ["**たった今**終わったこと、**もう**終わったことを伝えるときに使います。"],
           examples: [
-            { en: "I [[have]] {{just}} [[finished]] lunch.", ja: "ちょうど昼食を食べ終えました。" },
-            { en: "She [[has]] {{already}} [[bought]] the cake.", ja: "彼女はもうケーキを買いました。" },
+            { en: "I [[have]] {{just}} [[finished]] my work.", ja: "ちょうど仕事を終えました。" },
+            { en: "He [[has]] {{already}} [[left]] home.", ja: "彼はもう家を出ました。" },
           ],
         },
         {
@@ -323,7 +323,7 @@ export const PERFECT = {
           text: ["過去に始まって、**今も続いている**ことを伝えます。"],
           examples: [
             { en: "I [[have lived]] in Tokyo {{for}} five years.", ja: "私は東京に5年間住んでいます。" },
-            { en: "She [[has studied]] English {{since}} 2023.", ja: "彼女は2023年から英語を勉強しています。" },
+            { en: "He [[has worked]] here {{since}} 2020.", ja: "彼は2020年からここで働いています。" },
           ],
         },
         {
@@ -362,8 +362,8 @@ export const PERFECT = {
           type: "explain",
           title: "{{How long}}：「どのくらいの間？」",
           examples: [
-            { en: "{{How long}} [[have]] you [[lived]] here?", ja: "ここにどのくらい住んでいますか？" },
-            { en: "For three years.", ja: "3年間です。" },
+            { en: "{{How long}} [[have]] you [[known]] her?", ja: "彼女とはどのくらいの知り合いですか？" },
+            { en: "For ten years.", ja: "10年です。" },
           ],
           key: ["{{How long}} + [[have]] + 主語", "+ 過去分詞 〜?"],
         },
@@ -382,8 +382,8 @@ export const PERFECT = {
             labels: ["今の状態", "ずっと続いている"],
             rows: [
               [
-                { en: "He [[is]] sick.", ja: "彼は病気です。" },
-                { en: "He [[has been]] sick {{for}} three days.", ja: "彼は3日間ずっと病気です。" },
+                { en: "She [[is]] busy.", ja: "彼女は忙しいです。" },
+                { en: "She [[has been]] busy {{since}} morning.", ja: "彼女は朝からずっと忙しいです。" },
               ],
             ],
           },
@@ -489,16 +489,16 @@ export const PERFECT = {
             labels: ["行ってしまった（今いない）", "行ったことがある（経験）"],
             rows: [
               [
-                { en: "She [[has gone]] to Tokyo.", ja: "彼女は東京へ行ってしまいました。" },
-                { en: "She [[has been]] to Tokyo.", ja: "彼女は東京に行ったことがあります。" },
+                { en: "He [[has gone]] to Osaka.", ja: "彼は大阪へ行ってしまいました。" },
+                { en: "He [[has been]] to Osaka.", ja: "彼は大阪に行ったことがあります。" },
               ],
             ],
           },
         },
         {
           type: "choice",
-          q: "She ___ to Tokyo. She isn't here now.",
-          ja: "彼女は東京へ行ってしまいました。今ここにいません。",
+          q: "My father ___ to the bank. He isn't here now.",
+          ja: "父は銀行へ行ってしまいました。今ここにいません。",
           choices: ["has gone", "has been"],
           answer: "has gone",
           why: "今ここにいないので、[[has gone]] to です。",
@@ -511,8 +511,8 @@ export const PERFECT = {
             labels: ["過去形（点）", "現在完了形（線）"],
             rows: [
               [
-                { en: "I [[lost]] my key yesterday.", ja: "昨日、鍵をなくしました。" },
-                { en: "I [[have lost]] my key.", ja: "鍵をなくしてしまいました。\n（今も困っている）" },
+                { en: "I [[lost]] my wallet last week.", ja: "先週、財布をなくしました。" },
+                { en: "I [[have lost]] my wallet.", ja: "財布をなくしてしまいました。\n（今も見つかっていない）" },
               ],
             ],
           },

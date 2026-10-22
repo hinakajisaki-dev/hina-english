@@ -188,8 +188,8 @@ export const ARTICLES = {
     },
     {
       id: "articles-uncountable",
-      title: "数えられない名詞・冠詞なし",
-      subtitle: "a / an をつけない名詞",
+      title: "数えられない名詞",
+      subtitle: "a / an をつけない名詞・冠詞なし",
       steps: [
         {
           type: "explain",

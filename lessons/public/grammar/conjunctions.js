@@ -20,8 +20,8 @@ export const CONJUNCTIONS = {
             labels: ["2つの文", "1つの文に"],
             rows: [
               [
-                { en: "I was tired. I went to the gym.", ja: "疲れていました。ジムに行きました。" },
-                { en: "I was tired, {{but}} I went to the gym.", ja: "疲れていましたが、ジムに行きました。" },
+                { en: "It was cold. I went swimming.", ja: "寒かったです。泳ぎに行きました。" },
+                { en: "It was cold, {{but}} I went swimming.", ja: "寒かったですが、泳ぎに行きました。" },
               ],
             ],
           },
@@ -39,7 +39,7 @@ export const CONJUNCTIONS = {
           },
           examples: [
             { en: "I had lunch, {{and}} I went shopping.", ja: "ランチを食べて、買い物に行きました。" },
-            { en: "Do you want coffee {{or}} tea?", ja: "コーヒーと紅茶、どちらが欲しいですか？" },
+            { en: "Do you want rice {{or}} bread?", ja: "ご飯とパン、どちらがいいですか？" },
           ],
           note: ["文と文をつなぐときは、{{and}} / {{but}} の前に「,」をつけます。"],
         },
@@ -107,7 +107,7 @@ export const CONJUNCTIONS = {
           title: "{{because}}：「〜なので」",
           text: ["**結果**のあとに、**理由**を続けます。"],
           examples: [
-            { en: "I stayed home {{because}} [[it was]] raining.", ja: "雨が降っていたので、家にいました。" },
+            { en: "I didn't go out {{because}} [[it was]] cold.", ja: "寒かったので、出かけませんでした。" },
             { en: "She was late {{because}} [[the train was]] delayed.", ja: "電車が遅れたので、彼女は遅刻しました。" },
           ],
           key: ["結果 + {{because}} + 理由", "（理由は [[主語＋動詞]]）"],
@@ -117,7 +117,7 @@ export const CONJUNCTIONS = {
           title: "{{so}}：「だから」",
           text: ["**理由**のあとに、**結果**を続けます。"],
           examples: [
-            { en: "It was raining, {{so}} [[I stayed]] home.", ja: "雨が降っていました。だから、家にいました。" },
+            { en: "It was raining, {{so}} [[I took]] a taxi.", ja: "雨が降っていました。だから、タクシーに乗りました。" },
             { en: "I was hungry, {{so}} [[I ate]] a snack.", ja: "お腹が空いていたので、おやつを食べました。" },
           ],
           key: "理由 + , {{so}} + 結果",
@@ -129,27 +129,27 @@ export const CONJUNCTIONS = {
             labels: ["{{because}}（結果 → 理由）", "{{so}}（理由 → 結果）"],
             rows: [
               [
-                { en: "I stayed home {{because}} it was raining.", ja: "雨が降っていたので、家にいました。" },
-                { en: "It was raining, {{so}} I stayed home.", ja: "雨が降っていたので、家にいました。" },
+                { en: "I went to bed early {{because}} I was tired.", ja: "疲れていたので、早く寝ました。" },
+                { en: "I was tired, {{so}} I went to bed early.", ja: "疲れていたので、早く寝ました。" },
               ],
             ],
           },
         },
         {
           type: "choice",
-          q: "I stayed home ___ it was raining.",
-          ja: "雨が降っていたので、家にいました。",
+          q: "She was happy ___ she passed the test.",
+          ja: "テストに合格したので、彼女はうれしかったです。",
           choices: ["because", "so"],
           answer: "because",
-          why: "結果（家にいた）のあとに理由なので、{{because}} です。",
+          why: "結果（うれしい）のあとに理由なので、{{because}} です。",
         },
         {
           type: "choice",
-          q: "I was hungry, ___ I made dinner.",
-          ja: "お腹が空いていました。だから夕食を作りました。",
+          q: "It was sunny, ___ we went to the beach.",
+          ja: "晴れていたので、私たちは海に行きました。",
           choices: ["because", "so"],
           answer: "so",
-          why: "理由（お腹が空いた）のあとに結果なので、{{so}} です。",
+          why: "理由（晴れていた）のあとに結果なので、{{so}} です。",
         },
         {
           type: "choice",
@@ -228,7 +228,7 @@ export const CONJUNCTIONS = {
           type: "explain",
           title: "{{if}}：「もし〜なら」",
           examples: [
-            { en: "{{If}} [[I have]] time, I will study English.", ja: "時間があれば、英語を勉強します。" },
+            { en: "{{If}} [[I have]] money, I will buy a new bike.", ja: "お金があれば、新しい自転車を買います。" },
             { en: "{{If}} [[it is]] sunny tomorrow, we will go to the park.", ja: "明日晴れたら、公園に行きます。" },
           ],
           key: ["{{if}} のあとは、", "これからのことでも**現在形**"],
