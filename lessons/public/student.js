@@ -2311,7 +2311,7 @@ function explainHtml(step) {
     </div>`).join("")}
     ${step.table ? `<div class="table-wrap"><table>
       <thead><tr>${step.table.head.map((h) => `<th>${line(h)}</th>`).join("")}</tr></thead>
-      <tbody>${step.table.rows.map((row) => `<tr>${row.map((cell) => `<td>${line(cell)}</td>`).join("")}</tr>`).join("")}</tbody>
+      <tbody>${step.table.rows.map((row) => `<tr>${row.map((cell) => `<td>${line(cell).replace(/\n/g, "<br>")}</td>`).join("")}</tr>`).join("")}</tbody>
     </table></div>` : ""}
     ${step.key ? `<p class="key">${[].concat(step.key).map(line).join("<br>")}</p>` : ""}
     ${(step.note || []).map((p) => `<p class="note">${line(p)}</p>`).join("")}
