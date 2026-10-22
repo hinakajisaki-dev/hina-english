@@ -30,12 +30,10 @@ const KINDS = {
   pron: { fields: ["text", "tip"], required: 1 },
   grammar: { fields: ["question", "answer", "choices", "explanation"], required: 2 },
   topic: { fields: ["prompt"], required: 1 },
-  // 瞬間英作文: the student's weak points from that week's diaries, a week at a time.
-  drill: { fields: ["ja", "en", "point"], required: 2 },
 };
 const WEEKS = 24;
 const FIELD_NAMES = {
-  word: "単語", meaning: "意味", text: "文", question: "問題", answer: "答え", prompt: "テーマ", ja: "日本語", en: "英語",
+  word: "単語", meaning: "意味", text: "文", question: "問題", answer: "答え", prompt: "テーマ",
 };
 
 class HttpError extends Error {
@@ -364,7 +362,7 @@ async function newJournal(request, env, student) {
 // sentences and 授業メモ), the 単語帳, the フレーズ or the grammar lessons'
 // examples, so the endpoint can't be used to voice anything else.
 // (The pronunciation months play the teacher's own recordings instead.)
-const SPOKEN_FIELDS = { vocab: ["word", "example"], pron: ["text"], drill: ["en"] };
+const SPOKEN_FIELDS = { vocab: ["word", "example"], pron: ["text"] };
 const LESSON_SENTENCES = lessonExampleSentences();
 const BOOK_SENTENCES = bookSentences();
 const PHRASE_SENTENCES = phraseSentences();
@@ -374,7 +372,7 @@ async function speech(env, student, text) {
   if (!allowed) {
     const rows = await all(
       env.DB,
-      `SELECT kind, data FROM items WHERE student_id = ? AND kind IN ('vocab', 'pron', 'drill')`,
+      `SELECT kind, data FROM items WHERE student_id = ? AND kind IN ('vocab', 'pron')`,
       student.id,
     );
     allowed = rows.some((row) => {
@@ -853,15 +851,6 @@ async function addItems(request, db, student) {
   return json({ ok: true, added: clean.length });
 }
 
-// The Monday of the week a day ("2026-10-22") is in; null when it isn't a day.
-function mondayOf(day) {
-  const text = String(day ?? "");
-  const date = new Date(`${text}T00:00:00Z`);
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(text) || Number.isNaN(date.getTime()) || date.toISOString().slice(0, 10) !== text) return null;
-  date.setUTCDate(date.getUTCDate() - ((date.getUTCDay() + 6) % 7));
-  return date.toISOString().slice(0, 10);
-}
-
 function cleanItem(kind, data) {
   const spec = KINDS[kind];
   if (!data || typeof data !== "object") throw new HttpError(400, "内容が正しくありません。");
@@ -885,8 +874,6 @@ function cleanItem(kind, data) {
     const week = Number(data.week);
     clean.week = Number.isInteger(week) && week >= 1 && week <= WEEKS ? week : null;
   }
-  // 瞬間英作文 are grouped by the Monday of their week (Japan time): this week's unless given.
-  if (kind === "drill") clean.week = mondayOf(data.week) || mondayOf(japanDay());
   return clean;
 }
 

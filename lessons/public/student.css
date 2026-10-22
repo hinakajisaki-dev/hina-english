@@ -341,13 +341,6 @@ a.week:hover { border-color: var(--sky); }
 .note-table th, .note-table td { border: 1px solid var(--line); padding: 6px 8px; text-align: left; vertical-align: top; }
 .note-table th { background: var(--sky-soft); font-weight: 700; }
 .quiz-start { min-height: 52px; }
-/* 瞬間英作文: the Japanese, then the answer under it */
-.drill-card.front { cursor: pointer; }
-.drill-kind { font-size: 13px; font-weight: 700; color: var(--accent-text); }
-.drill-ja { font-size: 21px; font-weight: 800; line-height: 1.6; }
-.drill-card .hint { color: var(--muted); font-size: 13px; font-weight: 700; text-align: center; }
-.drill-answer { display: grid; gap: 8px; padding-top: 10px; border-top: 1px dashed var(--line); }
-
 /* A memo a page at a time; the last page leads on to the 復習問題. */
 .note-page .note-body h3:first-child { font-size: 19px; }
 .note-end { text-align: center; background: var(--accent-soft); border-color: transparent; }

@@ -21,8 +21,6 @@
 // node scripts/teacher.mjs plan なおみ [plan.md | --clear]      (今週の勉強範囲: see, set or clear)
 // node scripts/teacher.mjs menu なおみ [--only 日記,発音課題,勉強時間 | --all]   (what the home screen shows)
 // node scripts/teacher.mjs journals なおみ diaries.md [--dry]   (past diaries, no AI correction)
-// node scripts/teacher.mjs diaries なおみ [--days 7]           (the week's diaries and their corrections, for 瞬間英作文)
-// node scripts/teacher.mjs add なおみ drill lines.txt [--week 2026-10-19]   (瞬間英作文: 日本語 | 英語 | ポイント; this week unless --week)
 // node scripts/teacher.mjs study-days なおみ days.txt [--dry | --replace | --undo]   (past study time: "2026-09-02 55")
 // node scripts/teacher.mjs pron-months なおみ [--set "1=Month 2" | --default]   (発音 months and their names)
 // node scripts/teacher.mjs pron-done なおみ (--month 1 | --keys m1/01,m1/02) [--day 2026-09-30] [--dry | --undo]
@@ -62,7 +60,6 @@ const KINDS = {
   pron: { name: "発音", columns: ["text", "tip"], required: 1 },
   grammar: { name: "文法", columns: ["question", "answer", "choices", "explanation"], required: 2 },
   topic: { name: "日記のテーマ", columns: ["prompt"], required: 1 },
-  drill: { name: "瞬間英作文", columns: ["ja", "en", "point"], required: 2 },
 };
 
 class Stop extends Error {}
@@ -213,17 +210,6 @@ function pronProgress(done = {}) {
 // Japan's date, offset by whole days ("2026-10-14").
 const japanDay = (offset = 0) => new Date(Date.now() + 9 * 3600e3 + offset * 86400e3).toISOString().slice(0, 10);
 
-// The Japan date of a saved time ("2026-10-14").
-const japanDate = (iso) => new Date(Date.parse(iso) + 9 * 3600e3).toISOString().slice(0, 10);
-
-// The Monday of the week a day ("2026-10-22" → "2026-10-19"); null when it isn't a real day.
-function mondayOf(day) {
-  const date = new Date(`${day}T00:00:00Z`);
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(day) || Number.isNaN(date.getTime()) || date.toISOString().slice(0, 10) !== day) return null;
-  date.setUTCDate(date.getUTCDate() - ((date.getUTCDay() + 6) % 7));
-  return date.toISOString().slice(0, 10);
-}
-
 // "Week 1：IELTS 語彙 Week 1（ielts1・100 語）" for each week the app has a 単語帳 for.
 function bookLine(books) {
   const all = vocabBooks();
@@ -293,11 +279,6 @@ const commands = {
           console.log(week === "そのほか" ? "### そのほか（Week なし）" : `### Week ${week}`);
           for (const i of items.filter((i) => (i.data.week || "そのほか") === week)) console.log(`[${i.id}] ${itemLine(kind, i.data)}`);
         }
-      } else if (kind === "drill") {
-        for (const week of [...new Set(items.map((i) => i.data.week))].sort()) {
-          console.log(`### ${week} の週`);
-          for (const i of items.filter((i) => i.data.week === week)) console.log(`[${i.id}] ${itemLine(kind, i.data)}`);
-        }
       } else {
         for (const i of items) console.log(`[${i.id}] ${itemLine(kind, i.data)}`);
       }
@@ -320,15 +301,9 @@ const commands = {
       week = Number(options.week);
       if (!Number.isInteger(week) || week < 1 || week > 24) stop("単語は --week 1〜24 で週を指定してください。");
     }
-    // 瞬間英作文 go into this week, or the week of --week 2026-10-19 (any day of it).
-    if (kind === "drill") {
-      week = options.week ? mondayOf(String(options.week)) : null;
-      if (options.week && !week) stop("瞬間英作文の --week は、その週の日付（2026-10-19 など）です。");
-    }
     const items = parsed.map((p) => (week ? { ...p.data, week } : p.data));
     const { added } = await api(`/api/teacher/students/${student.id}/items`, { method: "POST", body: { kind, items } });
-    const where = kind === "vocab" ? `（Week ${week}）` : kind === "drill" ? `（${week || mondayOf(japanDay())} の週${!week || week === mondayOf(japanDay()) ? "・今週" : ""}）` : "";
-    console.log(`${student.name}さんに${KINDS[kind].name}を ${added} こ追加しました${where}。`);
+    console.log(`${student.name}さんに${KINDS[kind].name}を ${added} こ追加しました${week ? `（Week ${week}）` : ""}。`);
   },
 
   async "edit-item"([name, id, line]) {
@@ -465,27 +440,6 @@ const commands = {
       body: { days, replace: !!options.replace },
     });
     console.log(`${student.name}さんに過去の勉強時間を入れました（アプリ以外の勉強として）：新しく ${added} 日分${replaced ? `、上書き ${replaced} 日分` : ""}${skipped.length ? `。もう記録があった ${skipped.length} 日分（${skipped.join("、")}）は、とばしました（上書きするときは --replace）` : ""}。`);
-  },
-
-  // The diaries of the last days (7 unless --days), with the AI's corrections and
-  // the teacher's comment: what the week's 瞬間英作文 are made from.
-  async diaries([name], options) {
-    const data = await studentData(await findStudent(name));
-    const days = Number(options.days) || 7;
-    const since = japanDay(-(days - 1));
-    const list = data.journals.filter((j) => japanDate(j.created_at) >= since).reverse();
-    console.log(`# ${data.student.name}さんの日記（${since} から ${list.length} こ）`);
-    for (const j of list) {
-      console.log(`\n## 日記 ${j.id}　${japanTime(j.created_at)}${j.topic ? `　お題：${j.topic}` : ""}${j.imported ? "（アプリの前）" : ""}`);
-      console.log(j.body);
-      const c = j.correction;
-      if (c) {
-        console.log(`\n直した文：${c.corrected}`);
-        for (const fix of c.corrections || []) console.log(`- ${fix.before} → ${fix.after}：${fix.why}`);
-        if (c.spelling?.length) console.log(`- つづり：${c.spelling.map((s) => `${s.wrong} → ${s.right}`).join("、")}`);
-      }
-      if (j.teacher_comment) console.log(`先生のコメント：${j.teacher_comment}`);
-    }
   },
 
   async "pron-done"([name], options) {

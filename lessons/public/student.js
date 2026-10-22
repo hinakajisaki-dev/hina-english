@@ -18,7 +18,7 @@ import {
 import { findMistakes, normalizeWords } from "./mistakes.js";
 import { lessonDayLabel, lessonList, noteDayLabel, noteHtml as memoHtml, notePages, noteProblems } from "./notes/format.js";
 import {
-  addDays, allTime, appMinutes, bindPanels, formatMinutes, monthPanel, monthStart, startStudyClock, studySplit, summary, timeHtml,
+  allTime, appMinutes, bindPanels, formatMinutes, monthPanel, monthStart, startStudyClock, studySplit, summary, timeHtml,
   today, totalMinutes, totalPanel, weekDays, weekPanel, weekStart,
 } from "./study.js";
 
@@ -59,7 +59,7 @@ function render() {
   if (screen === "pron") state.pron = { which: null, index: 0 };
   const screens = {
     vocab: renderVocab, review: renderReview, phrases: renderPhrases, "phrase-review": renderPhraseReview, pron: renderPron,
-    grammar: renderGrammar, journal: renderJournal, study: renderStudy, drill: renderDrill, ...(NOTES_FOR_STUDENTS ? { notes: renderNotes } : {}),
+    grammar: renderGrammar, journal: renderJournal, study: renderStudy, ...(NOTES_FOR_STUDENTS ? { notes: renderNotes } : {}),
   };
   (screens[screen] || renderHome)(...rest.map(decodeURIComponent));
 }
@@ -372,15 +372,12 @@ function renderHome() {
             <span class="emoji" aria-hidden="true">🎤</span><b>発音課題</b>
             <span class="muted">${shared.length ? `${esc(monthLabel(myMonths(), pronMonth))} ・ 完了 ${pronFinished} / ${shared.length}` : "まだありません"}</span>
             ${shared.length ? `<div class="bar"><i style="width:${Math.round((pronFinished / shared.length) * 100)}%"></i></div>` : ""}` },
-          NOTES_FOR_STUDENTS && { key: "notes", html: `
+          NOTES_FOR_STUDENTS && { key: "notes", wide: true, html: `
             <span class="emoji" aria-hidden="true">📝</span>
             <div><b>授業メモ</b><p class="muted">${[
               lessonCount ? `これまでの授業 ${lessonCount} 回` : "",
               latestNote ? `${esc(noteDayLabel(latestNote.day))}${latestNote.title ? ` ・ ${esc(latestNote.title)}` : ""}` : "",
             ].filter(Boolean).join(" ・ ") || "授業のあとに、先生のメモがとどきます"}</p></div>` },
-          { key: "drill", html: `
-            <span class="emoji" aria-hidden="true">🗣️</span>
-            <div><b>瞬間英作文</b><p class="muted">${drillTileText()}</p></div>` },
           { key: "study", wide: true, html: `
             <span class="emoji" aria-hidden="true">⏱️</span>
             <div><b>勉強時間</b><p class="muted">今日 ${formatMinutes(totalMinutes(todayRow))} ・ 今週 ${formatMinutes(week.total)} ・ これまで ${formatMinutes(allTime(state.me.study).total)}</p></div>` },
@@ -608,134 +605,6 @@ function homeTiles(tiles) {
     const cls = ["tile", tile.wide && "wide", alone && "solo", tile.cls].filter(Boolean).join(" ");
     return `<a class="${cls}" href="#/${tile.key}">${tile.html}</a>`;
   }).join("");
-}
-
-// ---------- 瞬間英作文 ----------
-// Sentences the teacher makes from this student's weak points in that week's
-// diaries (items of kind "drill", grouped by the Monday of their week). The
-// student sees the Japanese, says it in English, then sees the answer (🔊)
-// and its point and marks 言えた or もう一回. もう一回 comes back a few
-// sentences later, so a round goes on until every sentence was said.
-
-const drillWeeks = () => [...new Set(items("drill").map((i) => i.data.week).filter(Boolean))].sort().reverse();
-const drillsOf = (week) => items("drill").filter((i) => week === "all" || i.data.week === week);
-const drillWeekRange = (monday) => {
-  const md = (day) => `${Number(day.slice(5, 7))}/${Number(day.slice(8, 10))}`;
-  return `${md(monday)}〜${md(addDays(monday, 6))}`;
-};
-const drillWeekName = (week) => {
-  const thisWeek = weekStart(today());
-  if (week === "all") return "全部の週";
-  return week === thisWeek ? "今週" : week === addDays(thisWeek, -7) ? "先週" : drillWeekRange(week);
-};
-
-function drillTileText() {
-  const thisWeek = drillsOf(weekStart(today())).length;
-  const all = items("drill").length;
-  if (thisWeek) return `今週の問題 ${thisWeek}問`;
-  return all ? `これまでの問題 ${all}問` : "日記から、あなた用の問題がとどきます";
-}
-
-function renderDrill(week) {
-  if (week) return renderDrillRound(week);
-  state.drill = null;
-  const weeks = drillWeeks();
-  app.innerHTML = `${topbar("瞬間英作文")}
-    <main class="wrap stack">
-      <p class="muted">あなたの日記から、まちがえやすい文法をえらんだ問題です。日本語を見て、英語で言ってみよう。全部言えるまで、何回でも出ます。</p>
-      ${weeks.length ? `
-        ${weeks.map((w) => `<a class="lesson-card" href="#/drill/${w}">
-          <div><b>${drillWeekName(w)}の問題</b><span class="muted small">${[
-            drillWeekName(w) !== drillWeekRange(w) && drillWeekRange(w), `${drillsOf(w).length}問`,
-          ].filter(Boolean).join(" ・ ")}</span></div>
-          <span class="badge start">練習する</span>
-        </a>`).join("")}
-        ${weeks.length > 1 ? `<a class="lesson-card" href="#/drill/all">
-          <div><b>全部の週からまぜて練習</b><span class="muted small">${items("drill").length}問</span></div>
-          <span class="badge start">練習する</span>
-        </a>` : ""}`
-      : emptyState("まだ問題がありません。<br>日記を書くと、先生があなたの弱いところから問題を作ります。")}
-    </main>`;
-}
-
-function renderDrillRound(week) {
-  if (state.drill?.week !== week) {
-    const list = drillsOf(week);
-    if (!list.length) {
-      location.hash = "#/drill";
-      return;
-    }
-    state.drill = { week, queue: shuffle(list.map((i) => i.id)), total: list.length, said: 0, again: 0, shown: false };
-  }
-  const D = state.drill;
-  const rerender = () => {
-    renderDrillRound(week);
-    window.scrollTo(0, 0);
-  };
-  const title = `瞬間英作文 ・ ${drillWeekName(week)}`;
-  if (!D.queue.length) {
-    app.innerHTML = `${topbar(title, "#/drill")}
-      <main class="wrap stack">
-        <section class="card stack" style="text-align:center">
-          <p style="font-size:40px">🎉</p>
-          <p class="score">${D.total}<small> 問 全部言えた！</small></p>
-          <p>${D.again ? `「もう一回」は ${D.again} 回でした。` : "1回で全部言えました！"}</p>
-        </section>
-        <button type="button" class="btn block" data-restart>もう一度練習する</button>
-        <a class="btn ghost block" href="#/drill">問題の一覧へ</a>
-      </main>`;
-    app.querySelector("[data-restart]").addEventListener("click", () => {
-      state.drill = null;
-      rerender();
-    });
-    return;
-  }
-  const item = items("drill").find((i) => i.id === D.queue[0]);
-  app.innerHTML = `${topbar(title, "#/drill")}
-    <main class="wrap stack">
-      <div class="lesson-progress" role="progressbar" aria-valuemin="0" aria-valuemax="${D.total}" aria-valuenow="${D.said}">
-        <div class="bar"><i style="width:${Math.round((D.said / D.total) * 100)}%"></i></div>
-        <span class="counter">${D.said} / ${D.total} 言えた</span>
-      </div>
-      <section class="card stack drill-card ${D.shown ? "" : "front"}" ${D.shown ? "" : 'role="button" tabindex="0" data-show aria-label="答えを見る"'}>
-        <p class="drill-kind">英語で言ってみよう</p>
-        <p class="drill-ja">${esc(item.data.ja)}</p>
-        ${D.shown ? `<div class="drill-answer">
-          <div class="quiz-en-row"><p class="quiz-en" lang="en">${esc(item.data.en)}</p>${sayIcon(item.data.en)}</div>
-          ${item.data.point ? `<p class="quiz-note">${noteHtml(item.data.point)}</p>` : ""}
-        </div>` : `<p class="hint">言えたら、タップして答えを見る</p>`}
-      </section>
-      ${D.shown
-        ? `<div class="btn-row">
-            <button type="button" class="btn secondary" data-again>△ もう一回</button>
-            <button type="button" class="btn" data-said>○ 言えた</button>
-          </div>`
-        : `<button type="button" class="btn block" data-show>答えを見る</button>`}
-    </main>`;
-  app.querySelectorAll("[data-show]").forEach((el) => el.addEventListener("click", () => {
-    D.shown = true;
-    rerender();
-  }));
-  app.querySelector(".drill-card.front")?.addEventListener("keydown", (event) => {
-    if (event.key !== "Enter" && event.key !== " ") return;
-    event.preventDefault();
-    D.shown = true;
-    rerender();
-  });
-  app.querySelector("[data-said]")?.addEventListener("click", () => {
-    D.queue.shift();
-    D.said += 1;
-    D.shown = false;
-    rerender();
-  });
-  // もう一回 comes back after three more sentences (or last, when fewer are left).
-  app.querySelector("[data-again]")?.addEventListener("click", () => {
-    const current = D.queue.shift();
-    D.queue.splice(Math.min(3, D.queue.length), 0, current);
-    D.again += 1;
-    D.shown = false;
-    rerender();
-  });
 }
 
 // ---------- study time ----------

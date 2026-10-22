@@ -48,24 +48,10 @@ const KINDS = {
     format: "テーマ（1行に1つ）",
     example: "週末にしたこと\n最近うれしかったこと",
   },
-  drill: {
-    tab: "瞬間英作文",
-    columns: ["ja", "en", "point"],
-    required: 2,
-    format: "日本語 | 英語 | ポイント（なくてもOK）",
-    example: "駅に着くまで、音楽を聞いていました。 | I listened to music until I got to the station. | until のあとは主語＋動詞",
-  },
 };
 const COLUMN_NAMES = {
-  word: "単語", meaning: "意味", text: "文", question: "問題", answer: "答え", prompt: "テーマ", ja: "日本語", en: "英語",
+  word: "単語", meaning: "意味", text: "文", question: "問題", answer: "答え", prompt: "テーマ",
 };
-
-// "2026-10-19" (a Monday) → "10/19〜10/25"
-function drillWeekLabel(monday) {
-  const md = (d) => `${d.getUTCMonth() + 1}/${d.getUTCDate()}`;
-  const start = new Date(`${monday}T00:00:00Z`);
-  return `${md(start)}〜${md(new Date(start.getTime() + 6 * 86400e3))}`;
-}
 
 // ---------- boot and routing ----------
 
@@ -571,10 +557,6 @@ function rowHtml(kind, item, progress) {
     const key = `item/${item.id}`;
     if (state.current.pronDone?.[key]) pill = `<span class="pill good">完了</span>`;
     if (state.current.pronDone?.[key]?.sent_at) extra = recordingPlayer(key);
-  } else if (kind === "drill") {
-    main = d.en;
-    sub = [d.ja, d.point].filter(Boolean).join(" ・ ");
-    if (d.week) pill = `<span class="pill">${drillWeekLabel(d.week)}の週</span>`;
   } else if (kind === "grammar") {
     main = d.question;
     sub = [`答え：${d.answer}`, d.choices?.length ? `選択肢：${d.choices.join(" / ")}` : "", d.explanation].filter(Boolean).join(" ・ ");
@@ -640,7 +622,6 @@ function renderItems(panel, kind) {
       </form>
       ${kind === "grammar" ? `<p class="muted small">選択肢がない問題は、生徒が答えを入力します。正解が2つ以上あるときは、答えを <code>I'm / I am</code> のように / で区切ってください。</p>` : ""}
       ${kind === "topic" ? `<p class="muted small">日記のページで、毎日この中から順番に1つが「今日のテーマ」になります。生徒は別のテーマや、テーマなしも選べます。</p>` : ""}
-      ${kind === "drill" ? `<p class="muted small">今週の問題として入ります。生徒の「瞬間英作文」で、日本語 → 英語で言ってみる → 答え（🔊）とポイント、をくり返し練習します。その週の日記の弱いところから作ってください。</p>` : ""}
     </section>
     <section class="card">
       ${list.length ? `<ul class="rows" id="item-rows">${list.map((item) => rowHtml(kind, item, progress)).join("")}</ul>` : `<p class="empty">まだありません。</p>`}
