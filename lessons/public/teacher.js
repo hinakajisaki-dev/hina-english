@@ -8,7 +8,7 @@ import { USUAL_MONTHS, currentMonth, monthLabel, monthPhrases, pronMonths, stude
 import { CURRENT_WEEK, NOTES_FOR_STUDENTS } from "./course.js";
 import { MENUS } from "./menus.js";
 import { phraseSetKey, phraseSets, phraseWeeks, testSize } from "./phrases/book.js";
-import { lessonDayLabel, lessonList, noteDayLabel, noteHtml, noteProblems } from "./notes/format.js";
+import { lessonDayLabel, lessonList, noteDayLabel, noteHtml, notePages, noteProblems } from "./notes/format.js";
 import { shownPoints, spellingMap } from "./journal/spelling.js";
 import { allTime, bindPanels, formatMinutes, monthPanel, monthStart, summary, today, totalPanel, weekDays, weekPanel, weekStart } from "./study.js";
 
@@ -377,7 +377,9 @@ const PROBLEM_KIND = { write: "瞬間英作文", order: "並び替え" };
 // The memo as the student will see it, with its 復習問題 listed for checking.
 function notePreviewHtml(body) {
   const problems = noteProblems(body);
-  return `<div class="note-body">${noteHtml(body)}</div>
+  const pages = notePages(body).length;
+  return `${pages > 1 ? `<p class="muted small">生徒の画面では「## 」の見出しごとに ${pages} ページに分かれ、「次へ」で進みます。英作文（**問題**・**答え**）は、日本語 → タップで答えのカードになります。</p>` : ""}
+    <div class="note-body">${noteHtml(body)}</div>
     <div class="note-problems stack">
       <p><b>復習 ${problems.length} こ</b><span class="muted small">（生徒には「内容を元に復習する」ボタンで、カードが1枚ずつ出ます。英語 → タップで意味と解説。瞬間英作文は日本語 → 英語、並び替えは日本語と単語 → 英文）</span></p>
       ${problems.length
