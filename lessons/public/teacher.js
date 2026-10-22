@@ -734,12 +734,12 @@ function vocabBooksForm() {
   </form>`;
 }
 
-// Every ten-word set this student has (their 単語帳 and own words), with its key.
+// Every set this student has (sets of ten, or days; their 単語帳 and own words), with its key.
 function vocabSetList(data) {
   const books = data.vocabBooks;
   const weeks = [...new Set([...bookWeeks(books), ...data.items.filter((i) => i.kind === "vocab").map((i) => i.data.week || "other")])];
   return weeks.flatMap((week) =>
-    wordSets(weekWords(week, data.items, books)).map((set) => ({ week, ...set, key: setKey(week, set.number, books) })),
+    wordSets(weekWords(week, data.items, books), week).map((set) => ({ week, ...set, key: setKey(week, set.number, books) })),
   );
 }
 
@@ -753,7 +753,7 @@ function vocabResultsHtml() {
     <ul class="rows">${vocabSetList(state.current).map((set) => {
       const r = results[set.key];
       return `<li><div class="main">
-        <div><b>${set.week === "other" ? "そのほか" : `Week ${set.week}`} ・ ${set.number}. ${esc(set.title)}</b></div>
+        <div><b>${set.week === "other" ? "そのほか" : `Week ${set.week}`} ・ ${esc(set.label)}</b></div>
         <div class="sub">${r
           ? `ベスト ${r.best} / ${r.total}　前回 ${r.last} / ${r.total}　${r.times} 回　（${esc(formatDateTime(r.updated_at))}）`
           : "まだやっていません"}</div>
