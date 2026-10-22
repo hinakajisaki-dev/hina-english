@@ -193,7 +193,7 @@ export const CONJUNCTIONS = {
           ja: "お腹が空いていました。だから夕食を作りました。",
           answers: ["I was hungry, so I made dinner.", "I was hungry so I made dinner.", "I was hungry, so I cooked dinner."],
           hint: "hungry（お腹が空いた）\nmake（作る）→ made",
-          why: "理由のあとに結果なので、, {{so}} です。",
+          why: "理由のあとに結果なので、{{so}} です。",
         },
         {
           type: "write",

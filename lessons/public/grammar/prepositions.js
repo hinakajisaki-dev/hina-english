@@ -194,7 +194,6 @@ export const PREPOSITIONS = {
           type: "explain",
           title: "[[between]] A and B：「AとBの間」",
           examples: [{ en: "The library is [[between]] the park and the school.", ja: "図書館は公園と学校の間にあります。" }],
-          key: "[[between]] A and B",
         },
         {
           type: "explain",
