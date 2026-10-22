@@ -99,6 +99,12 @@
 .mode-banner.drill span { font-size: 13px; color: var(--ink-2); font-weight: 500; }
 .hint-box summary { width: fit-content; cursor: pointer; font-size: 14px; font-weight: 700; color: var(--accent-text); padding: 4px 0; }
 .hint-box p { margin-top: 6px; font-size: 14px; color: var(--ink-2); }
+/* ヒント beside its hints, one per line ("climb（登る）\nMt. Fuji（富士山）") */
+.hint-lines { display: flex; gap: 8px; align-items: baseline; font-size: 14px; color: var(--muted); }
+.hint-tag { flex: none; font-size: 12px; font-weight: 700; padding: 1px 8px; border-radius: 99px; background: var(--sky-soft); color: var(--ink-2); }
+.hint-lines p { margin: 0; line-height: 1.7; }
+/* a phrase that stays on one line when it fits (phrased() in student.js) */
+.phrase { display: inline-block; }
 
 /* pronunciation */
 .sentence { font-family: var(--en); font-weight: 700; font-size: clamp(22px, 6.5vw, 28px); line-height: 1.45; }
@@ -294,6 +300,19 @@ a.week:hover { border-color: var(--sky); }
 .review-list li { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-top: 1px solid var(--line); }
 .review-list li:first-child { border-top: 0; }
 .review-list li > div { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+/* 単語復習: a word opens to its meaning and examples */
+.open-list > li { display: block; }
+.open-list .word-examples li { display: flex; align-items: flex-start; gap: 10px; padding: 0; border-top: 0; }
+.open-list > li > .review-row { display: flex; flex-direction: row; align-items: center; gap: 10px; }
+.open-list > li > .review-detail { display: grid; gap: 12px; margin-top: 6px; padding: 14px; border-radius: 14px; background: var(--paper); border: 1px solid var(--line); }
+.open-list > li > .review-detail[hidden] { display: none; }
+.review-word { flex: 1; min-width: 0; display: flex; align-items: center; gap: 8px; padding: 6px 0; border: 0; background: none; font: inherit; color: inherit; text-align: left; cursor: pointer; }
+.review-word b { font-family: var(--en); font-size: 18px; overflow-wrap: anywhere; }
+.review-chev { flex: none; color: var(--muted); font-size: 14px; transition: transform .15s; }
+.review-word[aria-expanded="true"] .review-chev { transform: rotate(180deg); }
+.review-detail .detail-head { display: flex; align-items: center; gap: 10px; }
+.review-detail .detail-head > div { flex: 1; min-width: 0; display: grid; gap: 4px; justify-items: start; }
+.review-detail .meaning { font-size: 18px; font-weight: 900; line-height: 1.5; }
 .letters { letter-spacing: .12em; font-weight: 700; }
 .center { text-align: center; }
 

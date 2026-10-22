@@ -5,7 +5,8 @@
 // A lesson is a list of steps, one screen each:
 //   explain: title, text (paragraphs), compare { labels, rows: [[before, after]] } where each side
 //            is { en, ja }, chips
-//            [{ label (optional), items, tone: "red" | "plain" }], table { head, rows }, note (paragraphs
+//            [{ label (optional), items, tone: "red" | "plain" }], table { head, rows } (a \n in a
+//            cell starts a new line), note (paragraphs
 //            under the key), key (what to remember, shown big; a list shows one per line), examples
 //            [{ en, ja }], highlight (whole words shown in red)
 //
@@ -19,9 +20,12 @@
 // 中学文法 document. The order here is the order students see.
 import { BE } from "./be.js";
 import { TENSE } from "./tense.js";
+import { PERFECT } from "./perfect.js";
+import { CONJUNCTIONS } from "./conjunctions.js";
 import { ARTICLES } from "./articles.js";
+import { PREPOSITIONS } from "./prepositions.js";
 
-export const UNITS = [BE, TENSE, ARTICLES];
+export const UNITS = [BE, TENSE, PERFECT, CONJUNCTIONS, ARTICLES, PREPOSITIONS];
 
 export function findLesson(lessonId) {
   for (const unit of UNITS) {

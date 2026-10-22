@@ -367,7 +367,7 @@ function renderHome() {
             <span class="muted">${phraseReviewCount ? `${phraseReviewCount} フレーズ` : "まだありません"}</span>` },
           { key: "grammar", html: `
             <span class="emoji" aria-hidden="true">✏️</span><b>文法</b>
-            <span class="muted">${UNITS.map((u) => esc(u.title)).join("・")}${grammar.length ? ` ＋ 先生からの問題` : ""}</span>` },
+            <span class="muted">全 ${UNITS.reduce((n, u) => n + u.lessons.length, 0)} レッスン${grammar.length ? `<br>＋ 先生からの問題` : ""}</span>` },
           { key: "pron", html: `
             <span class="emoji" aria-hidden="true">🎤</span><b>発音課題</b>
             <span class="muted">${shared.length ? `${esc(monthLabel(myMonths(), pronMonth))} ・ 完了 ${pronFinished} / ${shared.length}` : "まだありません"}</span>
@@ -794,6 +794,17 @@ const noteHtml = (note) => esc(note).replace(/\n/g, "<br>");
 // 名詞 / 動詞 above an example, when a word's examples use it in different ways.
 const exTag = (ex) => (ex.tag ? `<span class="ex-tag">${esc(ex.tag)}</span>` : "");
 
+// A word's example sentences (🔊, the word in red, the Japanese and the note):
+// on the back of its card and when it is opened in 単語復習.
+const wordExamplesHtml = (word) => (word.examples.length ? `<ul class="word-examples">${word.examples.map((ex) => `<li>
+  ${sayIcon(ex.en)}
+  <div>
+    ${exTag(ex)}<p class="en" lang="en">${exampleHtml(ex)}</p>
+    ${ex.ja ? `<p class="ja">${esc(ex.ja)}</p>` : ""}
+    ${ex.note ? `<p class="word-note">${noteHtml(ex.note)}</p>` : ""}
+  </div>
+</li>`).join("")}</ul>` : "");
+
 function renderVocab(week, setNumber, mode) {
   const w = week === "other" ? "other" : Number(week);
   if (week && setNumber && mode === "test") return renderVocabTest(w, Number(setNumber));
@@ -877,14 +888,7 @@ function renderVocabSet(week, number) {
           ${sayIcon(speakable(word.word))}
         </div>
         <p class="meaning">${noteHtml(word.meaning)}</p>
-        ${word.examples.length ? `<ul class="word-examples">${word.examples.map((ex) => `<li>
-          ${sayIcon(ex.en)}
-          <div>
-            ${exTag(ex)}<p class="en" lang="en">${exampleHtml(ex)}</p>
-            ${ex.ja ? `<p class="ja">${esc(ex.ja)}</p>` : ""}
-            ${ex.note ? `<p class="word-note">${noteHtml(ex.note)}</p>` : ""}
-          </div>
-        </li>`).join("")}</ul>` : ""}
+        ${wordExamplesHtml(word)}
         <div>${speedControl()}</div>
         <label class="review-check">
           <input type="checkbox" id="review-check" ${inReview(word.key) ? "checked" : ""}>
@@ -1099,10 +1103,22 @@ function renderReview(level) {
         </a>` : ""}
         <section class="card stack">
           <h3>復習カード</h3>
-          <ul class="review-list">${words.map((w) => `<li>
-            <div><b lang="en">${esc(w.word)}</b><span class="muted small">${esc(w.meaning)}</span></div>
-            <span class="badge ${w.source === "test" ? "teacher" : ""}">${w.source === "test" ? "テスト" : "チェック"}</span>
-            <button type="button" class="btn ghost small-btn" data-remove="${esc(w.key)}">外す</button>
+          <p class="muted small">単語をタップすると、意味と例文が出ます。</p>
+          <ul class="review-list open-list">${words.map((w) => `<li>
+            <div class="review-row">
+              <button type="button" class="review-word" data-open aria-expanded="false">
+                <b lang="en">${esc(w.word)}</b><span class="review-chev" aria-hidden="true">▾</span>
+              </button>
+              <span class="badge ${w.source === "test" ? "teacher" : ""}">${w.source === "test" ? "テスト" : "チェック"}</span>
+              <button type="button" class="btn ghost small-btn" data-remove="${esc(w.key)}">外す</button>
+            </div>
+            <div class="review-detail" hidden>
+              <div class="detail-head">
+                <div>${w.pos ? `<span class="pill">${esc(w.pos)}</span>` : ""}<p class="meaning">${noteHtml(w.meaning)}</p></div>
+                ${sayIcon(speakable(w.word))}
+              </div>
+              ${wordExamplesHtml(w)}
+            </div>
           </li>`).join("")}</ul>
         </section>`
       : emptyState("まだ復習カードがありません。<br>単語カードで「復習カードに入れる」にチェックするか、<br>テストでまちがえた単語がここに入ります。")}
@@ -1112,6 +1128,13 @@ function renderReview(level) {
     button.addEventListener("click", async () => {
       await setReview(button.dataset.remove, false);
       renderReview();
+    }),
+  );
+  app.querySelectorAll("[data-open]").forEach((button) =>
+    button.addEventListener("click", () => {
+      const detail = button.closest("li").querySelector(".review-detail");
+      detail.hidden = !detail.hidden;
+      button.setAttribute("aria-expanded", String(!detail.hidden));
     }),
   );
 }
@@ -2120,6 +2143,39 @@ const paint = (html) =>
   html.replace(/\[\[(.+?)\]\]/g, '<span class="hl">$1</span>').replace(/\{\{(.+?)\}\}/g, '<span class="hl2">$1</span>');
 const fmt = (text) => paint(esc(text).replace(/\*\*(.+?)\*\*/g, "<b>$1</b>"));
 
+// Japanese wraps anywhere, so a line can end in the middle of a phrase and
+// leave 「まだ」 alone on the next line. Each phrase ending in 、。： (outside the
+// **bold** / [[red]] / {{blue}} marks, with a closing 」） kept on it) is kept
+// whole, so lines break between phrases; a phrase longer than the line still
+// wraps inside. A \n is a new line.
+function phrased(text, format = fmt) {
+  return String(text ?? "").split("\n").map((part) => {
+    const phrases = [];
+    let start = 0;
+    let marks = 0;
+    let bold = false;
+    for (let i = 0; i < part.length; i++) {
+      const two = part.slice(i, i + 2);
+      if (two === "**") bold = !bold;
+      else if (two === "[[" || two === "{{") marks++;
+      else if (two === "]]" || two === "}}") marks--;
+      if (["**", "[[", "{{", "]]", "}}"].includes(two)) {
+        i++;
+        continue;
+      }
+      if (!"、。：".includes(part[i]) || bold || marks > 0) continue;
+      let end = i + 1;
+      while ("」』）)".includes(part[end] || "x")) end++;
+      if (end >= part.length) break;
+      phrases.push(part.slice(start, end));
+      start = end;
+      i = end - 1;
+    }
+    phrases.push(part.slice(start));
+    return phrases.length > 1 ? phrases.map((p) => `<span class="phrase">${format(p)}</span>`).join("") : format(part);
+  }).join("<br>");
+}
+
 function renderGrammar(unitId, lessonId) {
   if (unitId === "teacher") return renderTeacherProblems();
   const unit = UNITS.find((u) => u.id === unitId);
@@ -2288,16 +2344,17 @@ function cmpCard(cell, side, label, line) {
   const { en, ja } = typeof cell === "string" ? { en: cell } : cell;
   return `<div class="cmp ${side}"><div>
     ${label ? `<p class="cmp-label">${line(label)}</p>` : ""}
-    <p class="en" lang="en">${line(en)}</p>${ja ? `<p class="ja">${line(ja)}</p>` : ""}
+    <p class="en" lang="en">${line(en)}</p>${ja ? `<p class="ja">${phrased(ja, line)}</p>` : ""}
   </div>${sayIcon(en)}</div>`;
 }
 
 function explainHtml(step) {
   const hl = highlighter(step);
   const line = (text) => hl(fmt(text));
+  const lines = (text) => phrased(text, line);
   return `<section class="card stack explain">
-    <h2>${line(step.title)}</h2>
-    ${(step.text || []).map((p) => `<p>${line(p)}</p>`).join("")}
+    <h2>${lines(step.title)}</h2>
+    ${(step.text || []).map((p) => `<p>${lines(p)}</p>`).join("")}
     ${step.compare ? `<div class="compare">
       ${step.compare.rows.map(([before, after], i) => `<div class="cmp-row">
         ${cmpCard(before, "before", i ? "" : step.compare.labels[0], line)}
@@ -2311,14 +2368,14 @@ function explainHtml(step) {
     </div>`).join("")}
     ${step.table ? `<div class="table-wrap"><table>
       <thead><tr>${step.table.head.map((h) => `<th>${line(h)}</th>`).join("")}</tr></thead>
-      <tbody>${step.table.rows.map((row) => `<tr>${row.map((cell) => `<td>${line(cell)}</td>`).join("")}</tr>`).join("")}</tbody>
+      <tbody>${step.table.rows.map((row) => `<tr>${row.map((cell) => `<td>${line(cell).replace(/\n/g, "<br>")}</td>`).join("")}</tr>`).join("")}</tbody>
     </table></div>` : ""}
-    ${step.key ? `<p class="key">${[].concat(step.key).map(line).join("<br>")}</p>` : ""}
-    ${(step.note || []).map((p) => `<p class="note">${line(p)}</p>`).join("")}
+    ${step.key ? `<p class="key">${[].concat(step.key).map(lines).join("<br>")}</p>` : ""}
+    ${(step.note || []).map((p) => `<p class="note">${lines(p)}</p>`).join("")}
     ${step.examples?.length ? `<ul class="examples">${step.examples.map((ex) => `
       <li>
         ${sayIcon(ex.en)}
-        <div><p class="en" lang="en">${line(ex.en)}</p><p class="ja">${line(ex.ja)}</p></div>
+        <div><p class="en" lang="en">${line(ex.en)}</p><p class="ja">${lines(ex.ja)}</p></div>
       </li>`).join("")}</ul>` : ""}
     ${step.examples?.length || step.compare ? `<div>${speedControl()}</div>` : ""}
   </section>`;
@@ -2467,12 +2524,12 @@ function questionStepHtml(step, answer) {
       <p class="verdict ${typed.tone}" id="verdict-head">${typed.head}</p>
       ${typed.body}
       ${answer.judging ? "" : `${step.say ? `<div>${sayButton(step.say, "正解を聞く")}</div>` : ""}
-        ${step.why ? `<p class="muted">${fmt(step.why)}</p>` : ""}`}
+        ${step.why ? `<p class="muted">${phrased(step.why)}</p>` : ""}`}
     </section>` : `
     <section class="card stack" id="verdict" aria-live="polite">
       <p class="verdict ${answer.right ? "right" : "wrong"}">${answer.right ? "⭕ 正解！" : "❌ ざんねん"}</p>
       ${answer.right ? "" : `<p>正解は <b lang="en">${esc(correctAnswer(step))}</b></p>`}
-      ${step.why ? `<p class="muted">${fmt(step.why)}</p>` : ""}
+      ${step.why ? `<p class="muted">${phrased(step.why)}</p>` : ""}
     </section>`;
 
   if (step.type === "choice") {
@@ -2491,7 +2548,7 @@ function questionStepHtml(step, answer) {
   if (step.type === "order") {
     return `<section class="card stack">
       <p class="label">並べかえ</p>
-      <p class="question-ja">${esc(step.ja)}</p>
+      <p class="question-ja">${phrased(step.ja, esc)}</p>
       ${answer
         ? `<p class="question" lang="en">${esc(answer.given)}${esc(step.end || "")}</p>`
         : `<div class="order stack">
@@ -2506,10 +2563,10 @@ function questionStepHtml(step, answer) {
   // with hintLater the hint waits behind a ヒントを見る button (tests).
   const hint = step.hint && !answer && step.hintLater
     ? `<details class="hint-box"><summary>ヒントを見る</summary><p>${noteHtml(step.hint)}</p></details>`
-    : step.hint ? `<p class="muted small">ヒント：${noteHtml(step.hint)}</p>` : "";
+    : step.hint ? `<div class="hint-lines"><span class="hint-tag">ヒント</span><p>${noteHtml(step.hint)}</p></div>` : "";
   return `<section class="card stack">
     <p class="label">${esc(step.label || "英語にしてみよう")}</p>
-    <p class="question-ja">${esc(step.ja)}</p>
+    <p class="question-ja">${phrased(step.ja, esc)}</p>
     ${hint}
     ${answer
       ? typed.mine || `<p class="question" lang="en">${esc(answer.given || "（答えを見た）")}</p>`

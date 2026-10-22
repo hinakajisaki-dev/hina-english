@@ -51,7 +51,7 @@ export const ARTICLES = {
             { label: "それ以外の音 → [[a]]", tone: "plain", items: ["[[a]] book 本", "[[a]] cat 猫", "[[a]] uniform 制服"] },
           ],
           key: "ア・イ・ウ・エ・オの音 → [[an]]",
-          note: ["※スペルではなく**音**で決まります。uniform は u でも「ユ」の音なので a、hour は h を読まずに「ア」の音なので an です。"],
+          note: ["※スペルではなく**音**で決まります。uniform は u でも「ユ」の音なので a、hour は h を読まずに「ア」の音なので、an です。"],
         },
         {
           type: "choice",
@@ -75,7 +75,7 @@ export const ARTICLES = {
           ja: "私は1時間待ちました。",
           choices: ["a", "an"],
           answer: "an",
-          why: "hour は「アワー」と「ア」の音で始まるので [[an]] です。",
+          why: "hour は「アワー」と「ア」の音で始まるので、[[an]] です。",
         },
         {
           type: "explain",
@@ -113,7 +113,7 @@ export const ARTICLES = {
           ja: "私は昨日、新しいバッグを1つ買いました。",
           choices: ARTICLE_CHOICES,
           answer: "a",
-          why: "はじめて話に出る「1つのバッグ」なので [[a]] です。",
+          why: "はじめて話に出る「1つのバッグ」なので、[[a]] です。",
         },
         {
           type: "choice",
@@ -121,7 +121,7 @@ export const ARTICLES = {
           ja: "そのバッグは黒いです。",
           choices: ARTICLE_CHOICES,
           answer: "the",
-          why: "さっき話したバッグなので [[The]] です。",
+          why: "さっき話したバッグなので、[[The]] です。",
         },
         {
           type: "choice",
@@ -129,7 +129,7 @@ export const ARTICLES = {
           ja: "私は犬を1匹飼っています。",
           choices: ARTICLE_CHOICES,
           answer: "a",
-          why: "はじめて話に出る「1匹の犬」なので [[a]] です。",
+          why: "はじめて話に出る「1匹の犬」なので、[[a]] です。",
         },
         {
           type: "choice",
@@ -137,7 +137,7 @@ export const ARTICLES = {
           ja: "その犬はとても人懐っこいです。",
           choices: ARTICLE_CHOICES,
           answer: "the",
-          why: "さっき話した犬なので [[The]] です。",
+          why: "さっき話した犬なので、[[The]] です。",
         },
         {
           type: "choice",
@@ -153,7 +153,7 @@ export const ARTICLES = {
           ja: "彼女は英語の先生です。",
           choices: ARTICLE_CHOICES,
           answer: "an",
-          why: "職業なので a / an。English は「イ」の音で始まるので [[an]] です。",
+          why: "職業なので、a / an。English は「イ」の音で始まるので [[an]] です。",
         },
         {
           type: "choice",
@@ -168,14 +168,14 @@ export const ARTICLES = {
           ja: "私は昨日、あるカフェに行きました。",
           answers: ["I went to a cafe yesterday.", "Yesterday I went to a cafe.", "I went to a coffee shop yesterday."],
           hint: "cafe（カフェ）",
-          why: "はじめて話に出る「あるカフェ」なので [[a]] cafe です。",
+          why: "はじめて話に出る「あるカフェ」なので、[[a]] cafe です。",
         },
         {
           type: "write",
           ja: "そのカフェはとても混んでいました。",
           answers: ["The cafe was very crowded.", "The cafe was very busy."],
           hint: "crowded（混んでいる）",
-          why: "さっきのカフェなので [[The]] cafe です。",
+          why: "さっきのカフェなので、[[The]] cafe です。",
         },
         {
           type: "write",
@@ -188,8 +188,8 @@ export const ARTICLES = {
     },
     {
       id: "articles-uncountable",
-      title: "数えられない名詞・冠詞なし",
-      subtitle: "a / an をつけない名詞",
+      title: "数えられない名詞",
+      subtitle: "a / an をつけない名詞・冠詞なし",
       steps: [
         {
           type: "explain",
