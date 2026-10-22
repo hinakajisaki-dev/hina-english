@@ -2506,7 +2506,7 @@ function questionStepHtml(step, answer) {
   // with hintLater the hint waits behind a ヒントを見る button (tests).
   const hint = step.hint && !answer && step.hintLater
     ? `<details class="hint-box"><summary>ヒントを見る</summary><p>${noteHtml(step.hint)}</p></details>`
-    : step.hint ? `<p class="muted small">ヒント：${noteHtml(step.hint)}</p>` : "";
+    : step.hint ? `<div class="hint-lines"><span class="hint-tag">ヒント</span><p>${noteHtml(step.hint)}</p></div>` : "";
   return `<section class="card stack">
     <p class="label">${esc(step.label || "英語にしてみよう")}</p>
     <p class="question-ja">${esc(step.ja)}</p>

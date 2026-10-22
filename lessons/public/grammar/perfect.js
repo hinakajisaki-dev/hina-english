@@ -92,7 +92,7 @@ export const PERFECT = {
             { en: "I [[have]] {{never}} [[eaten]] sushi.", ja: "私は一度もお寿司を食べたことがありません。" },
             { en: "I [[have been]] to Hokkaido {{once}}.", ja: "私は北海道に1回行ったことがあります。" },
           ],
-          key: "「〜に行ったことがある」は [[have been]] to 〜",
+          key: ["「〜に行ったことがある」は", "[[have been]] to 〜"],
         },
         {
           type: "order",
@@ -120,7 +120,7 @@ export const PERFECT = {
               ],
             ],
           },
-          key: "have not = [[haven't]] / has not = [[hasn't]]",
+          key: ["have not → [[haven't]]", "has not → [[hasn't]]"],
         },
         {
           type: "choice",
@@ -178,14 +178,14 @@ export const PERFECT = {
           type: "write",
           ja: "あなたは今までに、富士山に登ったことはありますか？",
           answers: ["Have you ever climbed Mt. Fuji?", "Have you ever climbed Mt Fuji?", "Have you ever climbed Mount Fuji?"],
-          hint: "climb（登る）、Mt. Fuji（富士山）",
+          hint: "climb（登る）\nMt. Fuji（富士山）",
           why: "疑問文なので [[Have]] を前に。「今までに」は {{ever}} です。",
         },
         {
           type: "write",
           ja: "私は一度もこの映画を見たことがありません。",
           answers: ["I have never seen this movie.", "I've never seen this movie."],
-          hint: "see（見る）の過去分詞は seen、movie（映画）",
+          hint: "see（見る）→ 過去分詞は seen\nmovie（映画）",
           why: "[[have]] + {{never}} + [[seen]] の順です。",
         },
         {
@@ -197,7 +197,7 @@ export const PERFECT = {
             "She has been to the restaurant 3 times.",
             "She has been to that restaurant 3 times.",
           ],
-          hint: "「行ったことがある」は have been to、3回は three times",
+          hint: "行ったことがある → have been to\n3回 → three times",
           why: "[[She]] なので [[has been]] to。{{three times}} は文の最後です。",
         },
       ],
