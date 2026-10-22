@@ -2120,6 +2120,39 @@ const paint = (html) =>
   html.replace(/\[\[(.+?)\]\]/g, '<span class="hl">$1</span>').replace(/\{\{(.+?)\}\}/g, '<span class="hl2">$1</span>');
 const fmt = (text) => paint(esc(text).replace(/\*\*(.+?)\*\*/g, "<b>$1</b>"));
 
+// Japanese wraps anywhere, so a line can end in the middle of a phrase and
+// leave 「まだ」 alone on the next line. Each phrase ending in 、。： (outside the
+// **bold** / [[red]] / {{blue}} marks, with a closing 」） kept on it) is kept
+// whole, so lines break between phrases; a phrase longer than the line still
+// wraps inside. A \n is a new line.
+function phrased(text, format = fmt) {
+  return String(text ?? "").split("\n").map((part) => {
+    const phrases = [];
+    let start = 0;
+    let marks = 0;
+    let bold = false;
+    for (let i = 0; i < part.length; i++) {
+      const two = part.slice(i, i + 2);
+      if (two === "**") bold = !bold;
+      else if (two === "[[" || two === "{{") marks++;
+      else if (two === "]]" || two === "}}") marks--;
+      if (["**", "[[", "{{", "]]", "}}"].includes(two)) {
+        i++;
+        continue;
+      }
+      if (!"、。：".includes(part[i]) || bold || marks > 0) continue;
+      let end = i + 1;
+      while ("」』）)".includes(part[end] || "x")) end++;
+      if (end >= part.length) break;
+      phrases.push(part.slice(start, end));
+      start = end;
+      i = end - 1;
+    }
+    phrases.push(part.slice(start));
+    return phrases.length > 1 ? phrases.map((p) => `<span class="phrase">${format(p)}</span>`).join("") : format(part);
+  }).join("<br>");
+}
+
 function renderGrammar(unitId, lessonId) {
   if (unitId === "teacher") return renderTeacherProblems();
   const unit = UNITS.find((u) => u.id === unitId);
@@ -2288,16 +2321,17 @@ function cmpCard(cell, side, label, line) {
   const { en, ja } = typeof cell === "string" ? { en: cell } : cell;
   return `<div class="cmp ${side}"><div>
     ${label ? `<p class="cmp-label">${line(label)}</p>` : ""}
-    <p class="en" lang="en">${line(en)}</p>${ja ? `<p class="ja">${line(ja)}</p>` : ""}
+    <p class="en" lang="en">${line(en)}</p>${ja ? `<p class="ja">${phrased(ja, line)}</p>` : ""}
   </div>${sayIcon(en)}</div>`;
 }
 
 function explainHtml(step) {
   const hl = highlighter(step);
   const line = (text) => hl(fmt(text));
+  const lines = (text) => phrased(text, line);
   return `<section class="card stack explain">
-    <h2>${line(step.title)}</h2>
-    ${(step.text || []).map((p) => `<p>${line(p)}</p>`).join("")}
+    <h2>${lines(step.title)}</h2>
+    ${(step.text || []).map((p) => `<p>${lines(p)}</p>`).join("")}
     ${step.compare ? `<div class="compare">
       ${step.compare.rows.map(([before, after], i) => `<div class="cmp-row">
         ${cmpCard(before, "before", i ? "" : step.compare.labels[0], line)}
@@ -2313,12 +2347,12 @@ function explainHtml(step) {
       <thead><tr>${step.table.head.map((h) => `<th>${line(h)}</th>`).join("")}</tr></thead>
       <tbody>${step.table.rows.map((row) => `<tr>${row.map((cell) => `<td>${line(cell).replace(/\n/g, "<br>")}</td>`).join("")}</tr>`).join("")}</tbody>
     </table></div>` : ""}
-    ${step.key ? `<p class="key">${[].concat(step.key).map(line).join("<br>")}</p>` : ""}
-    ${(step.note || []).map((p) => `<p class="note">${line(p)}</p>`).join("")}
+    ${step.key ? `<p class="key">${[].concat(step.key).map(lines).join("<br>")}</p>` : ""}
+    ${(step.note || []).map((p) => `<p class="note">${lines(p)}</p>`).join("")}
     ${step.examples?.length ? `<ul class="examples">${step.examples.map((ex) => `
       <li>
         ${sayIcon(ex.en)}
-        <div><p class="en" lang="en">${line(ex.en)}</p><p class="ja">${line(ex.ja)}</p></div>
+        <div><p class="en" lang="en">${line(ex.en)}</p><p class="ja">${lines(ex.ja)}</p></div>
       </li>`).join("")}</ul>` : ""}
     ${step.examples?.length || step.compare ? `<div>${speedControl()}</div>` : ""}
   </section>`;
@@ -2467,12 +2501,12 @@ function questionStepHtml(step, answer) {
       <p class="verdict ${typed.tone}" id="verdict-head">${typed.head}</p>
       ${typed.body}
       ${answer.judging ? "" : `${step.say ? `<div>${sayButton(step.say, "正解を聞く")}</div>` : ""}
-        ${step.why ? `<p class="muted">${fmt(step.why)}</p>` : ""}`}
+        ${step.why ? `<p class="muted">${phrased(step.why)}</p>` : ""}`}
     </section>` : `
     <section class="card stack" id="verdict" aria-live="polite">
       <p class="verdict ${answer.right ? "right" : "wrong"}">${answer.right ? "⭕ 正解！" : "❌ ざんねん"}</p>
       ${answer.right ? "" : `<p>正解は <b lang="en">${esc(correctAnswer(step))}</b></p>`}
-      ${step.why ? `<p class="muted">${fmt(step.why)}</p>` : ""}
+      ${step.why ? `<p class="muted">${phrased(step.why)}</p>` : ""}
     </section>`;
 
   if (step.type === "choice") {
@@ -2491,7 +2525,7 @@ function questionStepHtml(step, answer) {
   if (step.type === "order") {
     return `<section class="card stack">
       <p class="label">並べかえ</p>
-      <p class="question-ja">${esc(step.ja)}</p>
+      <p class="question-ja">${phrased(step.ja, esc)}</p>
       ${answer
         ? `<p class="question" lang="en">${esc(answer.given)}${esc(step.end || "")}</p>`
         : `<div class="order stack">
@@ -2509,7 +2543,7 @@ function questionStepHtml(step, answer) {
     : step.hint ? `<div class="hint-lines"><span class="hint-tag">ヒント</span><p>${noteHtml(step.hint)}</p></div>` : "";
   return `<section class="card stack">
     <p class="label">${esc(step.label || "英語にしてみよう")}</p>
-    <p class="question-ja">${esc(step.ja)}</p>
+    <p class="question-ja">${phrased(step.ja, esc)}</p>
     ${hint}
     ${answer
       ? typed.mine || `<p class="question" lang="en">${esc(answer.given || "（答えを見た）")}</p>`

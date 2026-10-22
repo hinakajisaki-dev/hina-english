@@ -19,7 +19,7 @@ export const PERFECT = {
           key: "[[have]] / [[has]] + [[過去分詞]]",
           examples: [
             { en: "I [[have visited]] Kyoto.", ja: "私は京都を訪れたことがあります。" },
-            { en: "She [[has finished]] her homework.", ja: "彼女は宿題を終えました（今は終わっている）。" },
+            { en: "She [[has finished]] her homework.", ja: "彼女は宿題を終えました。\n（今は終わっている）" },
           ],
         },
         {
@@ -40,7 +40,7 @@ export const PERFECT = {
           ja: "私は京都を訪れたことがあります。",
           choices: ["have", "has"],
           answer: "have",
-          why: "I なので [[have]] です。",
+          why: "I なので、[[have]] です。",
         },
         {
           type: "choice",
@@ -48,7 +48,7 @@ export const PERFECT = {
           ja: "彼女は京都を訪れたことがあります。",
           choices: ["have", "has"],
           answer: "has",
-          why: "[[She]] は三単現なので [[has]] です。",
+          why: "[[She]] は三単現なので、[[has]] です。",
         },
         {
           type: "explain",
@@ -128,7 +128,7 @@ export const PERFECT = {
           ja: "私はこの映画を見たことがありません。",
           choices: ["haven't", "hasn't", "didn't"],
           answer: "haven't",
-          why: "I なので [[haven't]] です。",
+          why: "I なので、[[haven't]] です。",
         },
         {
           type: "explain",
@@ -155,7 +155,7 @@ export const PERFECT = {
         {
           type: "explain",
           title: "「いつ」を言うときは過去形",
-          text: ["経験の文には、**yesterday / last year** など、いつかをはっきり言うことばはつけません。"],
+          text: ["経験の文には、**yesterday / last year** などはつけません。"],
           compare: {
             labels: ["いつかを言う（過去形）", "経験を言う（現在完了形）"],
             rows: [
@@ -179,7 +179,7 @@ export const PERFECT = {
           ja: "あなたは今までに、富士山に登ったことはありますか？",
           answers: ["Have you ever climbed Mt. Fuji?", "Have you ever climbed Mt Fuji?", "Have you ever climbed Mount Fuji?"],
           hint: "climb（登る）\nMt. Fuji（富士山）",
-          why: "疑問文なので [[Have]] を前に。「今までに」は {{ever}} です。",
+          why: "疑問文なので、[[Have]] を前に。「今までに」は {{ever}} です。",
         },
         {
           type: "write",
@@ -198,7 +198,7 @@ export const PERFECT = {
             "She has been to that restaurant 3 times.",
           ],
           hint: "行ったことがある → have been to\n3回 → three times",
-          why: "[[She]] なので [[has been]] to。{{three times}} は文の最後です。",
+          why: "[[She]] なので、[[has been]] to。{{three times}} は文の最後です。",
         },
       ],
     },
@@ -275,7 +275,7 @@ export const PERFECT = {
           ja: "彼らはまだ宿題を終えていません。",
           words: ["They", "haven't", "finished", "their", "homework", "yet"],
           end: ".",
-          why: "They なので [[haven't]]。{{yet}} は文の最後です。",
+          why: "They なので、[[haven't]]。{{yet}} は文の最後です。",
         },
         {
           type: "write",
@@ -294,14 +294,14 @@ export const PERFECT = {
             "She has already seen that movie.",
           ],
           hint: "already（すでに）\nwatch（見る）→ watched",
-          why: "[[She]] なので [[has]]。{{already}} は [[has]] と [[watched]] のあいだです。",
+          why: "[[She]] なので、[[has]]。{{already}} は [[has]] と [[watched]] のあいだです。",
         },
         {
           type: "write",
           ja: "あなたはもう昼食を食べましたか？",
           answers: ["Have you eaten lunch yet?", "Have you had lunch yet?"],
           hint: "eat（食べる）→ 過去分詞は eaten\nlunch（昼食）",
-          why: "疑問文なので [[Have]] を前に。「もう」は文の最後の {{yet}} です。",
+          why: "疑問文なので、[[Have]] を前に。「もう」は文の最後の {{yet}} です。",
         },
         {
           type: "write",
