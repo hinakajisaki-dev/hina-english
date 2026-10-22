@@ -16,7 +16,7 @@ import {
   weekTitle,
 } from "./phrases/book.js";
 import { findMistakes, normalizeWords } from "./mistakes.js";
-import { lessonDayLabel, lessonList, noteDayLabel, noteHtml as memoHtml, noteProblems } from "./notes/format.js";
+import { lessonDayLabel, lessonList, noteDayLabel, noteHtml as memoHtml, notePages, noteProblems } from "./notes/format.js";
 import {
   allTime, appMinutes, bindPanels, formatMinutes, monthPanel, monthStart, startStudyClock, studySplit, summary, timeHtml,
   today, totalMinutes, totalPanel, weekDays, weekPanel, weekStart,
@@ -437,17 +437,52 @@ async function renderNote(id) {
     }
     if (location.hash !== `#/notes/${id}`) return;
   }
+  renderNotePage(note, state.notePage?.id === note.id ? state.notePage.index : 0);
+}
+
+// A memo a page at a time (a "## " section each), so it doesn't read as one
+// long page; the last page leads on to the 復習問題. An 英作文 is a card:
+// the student says it in English, then taps to see the answer.
+function renderNotePage(note, index) {
+  const pages = notePages(note.body, { speak: icons.speaker });
   const problems = noteProblems(note.body);
-  const quizButton = problems.length
-    ? `<button type="button" class="btn block quiz-start" data-quiz>内容を元に復習する（${problems.length}こ）</button>`
-    : "";
+  if (!pages.length) pages.push({ title: "", html: "" });
+  index = Math.max(0, Math.min(pages.length - 1, index));
+  state.notePage = { id: note.id, index };
+  const page = pages[index];
+  const last = index === pages.length - 1;
+  const quiz = (cls, label) => `<button type="button" class="${cls}" data-quiz>${label}（${problems.length}こ）</button>`;
   app.innerHTML = `${topbar(noteDayLabel(note.day), "#/notes")}
     <main class="wrap stack note-page">
-      ${note.title ? `<h2 class="week-theme">${esc(note.title)}</h2>` : ""}
-      ${quizButton}
-      <article class="card note-body">${memoHtml(note.body)}</article>
-      ${quizButton}
+      ${note.title && index === 0 ? `<h2 class="week-theme">${esc(note.title)}</h2>` : ""}
+      ${pages.length > 1 ? `<div class="lesson-progress" role="progressbar" aria-valuemin="1" aria-valuemax="${pages.length}" aria-valuenow="${index + 1}">
+        <div class="bar"><i style="width:${Math.round(((index + 1) / pages.length) * 100)}%"></i></div>
+        <span class="counter">${index + 1} / ${pages.length}</span>
+      </div>` : ""}
+      <article class="card note-body">
+        ${page.title ? `<h3>${page.title}</h3>` : ""}
+        ${page.html}
+      </article>
+      ${pages.length > 1 ? `<div class="lesson-nav">
+        ${index ? `<button type="button" class="btn secondary" data-page="${index - 1}">前へ</button>` : "<span></span>"}
+        ${last ? "" : `<button type="button" class="btn" data-page="${index + 1}">次へ</button>`}
+      </div>` : ""}
+      ${last && problems.length ? `<section class="card stack note-end">
+        <p><b>おつかれさまでした！</b>最後に、内容を元に復習しましょう。</p>
+        ${quiz("btn block quiz-start", "内容を元に復習する")}
+      </section>` : ""}
+      ${!last && index === 0 && problems.length ? quiz("btn ghost block", "復習問題だけする") : ""}
     </main>`;
+  app.querySelectorAll("[data-page]").forEach((button) => button.addEventListener("click", () => {
+    renderNotePage(note, Number(button.dataset.page));
+    window.scrollTo(0, 0);
+  }));
+  app.querySelectorAll("[data-flip]").forEach((front) => front.addEventListener("click", () => {
+    const open = front.getAttribute("aria-expanded") !== "true";
+    front.setAttribute("aria-expanded", open);
+    front.nextElementSibling.hidden = !open;
+    front.querySelector(".say-hint").textContent = open ? "タップして答えをかくす" : "英語で言ってみてから、タップして答えを見る";
+  }));
   app.querySelectorAll("[data-quiz]").forEach((button) => button.addEventListener("click", () => openQuiz(note, problems)));
 }
 

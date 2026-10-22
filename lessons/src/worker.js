@@ -13,7 +13,7 @@ import { findMistakes } from "../public/mistakes.js";
 import { bookSentences, bookWord, setKey, vocabBooks, weekWords, wordSets } from "../public/vocab/words.js";
 import { findPhrase, pronMonths } from "../public/pron/phrases.js";
 import { phraseByKey, phraseSentences, phraseSetKey, phraseSets, testSize } from "../public/phrases/book.js";
-import { noteProblems } from "../public/notes/format.js";
+import { noteProblems, noteSentences } from "../public/notes/format.js";
 import { NOTES_FOR_STUDENTS } from "../public/course.js";
 import { MENUS } from "../public/menus.js";
 import {
@@ -380,14 +380,14 @@ async function speech(env, student, text) {
       return SPOKEN_FIELDS[row.kind].some((field) => data[field] === text);
     });
   }
-  // The answers of the 復習問題 in the student's published 授業メモ.
+  // The English of the student's published 授業メモ: its 復習問題 and the answers of its 英作文.
   if (!allowed && text && NOTES_FOR_STUDENTS) {
     const notes = await all(
       env.DB,
       `SELECT body FROM lesson_notes WHERE student_id = ? AND published_at IS NOT NULL AND instr(body, ?) > 0`,
       student.id, text,
     );
-    allowed = notes.some((row) => noteProblems(row.body).some((p) => p.en === text));
+    allowed = notes.some((row) => noteSentences(row.body).has(text));
   }
   if (!text || !allowed) throw new HttpError(404, "見つかりません。");
   try {

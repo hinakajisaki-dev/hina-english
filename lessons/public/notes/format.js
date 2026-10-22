@@ -7,9 +7,11 @@
 //   | 表 | 表 | with | --- | --- | as its second row
 //   ---                            a line
 //   a blank line between paragraphs
-// ✗ and ○ are coloured. The last section, "## 復習問題", holds a | 英語 | 意味 | 解説 |
-// table; it is not shown as a table but becomes cards like 単語カード (the
-// English, then a tap shows the meaning and the 解説), behind a button.
+// ✗ and ○ are coloured. The last section, "## 復習問題", holds tables of
+// cards (noteProblems); it is not shown as a table but becomes cards like
+// 単語カード, behind a button. The student reads the memo a "## " section a
+// page (notePages), with each 英作文 (**問題**：… / **答え**：…) as a card
+// that turns over.
 
 const ESCAPES = { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" };
 const esc = (value) => String(value ?? "").replace(/[&<>"']/g, (c) => ESCAPES[c]);
@@ -148,11 +150,51 @@ function tableHtml(rows) {
 
 // The memo as HTML, without its 復習問題 section.
 export function noteHtml(body) {
-  const lines = split(body).memo;
+  return linesHtml(split(body).memo);
+}
+
+// The memo for the student, a page for each "## " section (with what comes
+// before the first one on the first page): [{ title, html }]. In these pages an
+// 英作文 (a "**問題**：…" line and its "**答え**：…") is a card: the Japanese,
+// then a tap shows the answer, ほかの言い方 and the points. speak is the 🔊
+// icon for the answers' buttons.
+export function notePages(body, { speak = "" } = {}) {
+  const pages = [];
+  for (const line of split(body).memo) {
+    const heading = line.match(HEADING);
+    if (heading && heading[1].length <= 2) pages.push({ title: heading[2].trim(), lines: [] });
+    else if (pages.length) pages.at(-1).lines.push(line);
+    else if (line.trim()) pages.push({ title: "", lines: [line] });
+  }
+  return pages.map((page) => ({ title: inline(page.title), html: linesHtml(page.lines, { cards: true, speak }) }));
+}
+
+// An 英作文 starts with "**問題**：日本語" (a card that turns over) or
+// "**例**：日本語" (shown with its answer, as a worked example); its lines
+// "**答え**：…" and "**ほかの言い方**：…" are the English. "**ポイント**：…"
+// is the page's 大事なポイント, in a box.
+const START = /^\s*\*\*(問題|例)\*\*\s*[：:]\s*(.+)$/;
+const FIELD = /^\s*\*\*(答え|ほかの言い方)\*\*\s*[：:]\s*(.+)$/;
+const POINT = /^\s*\*\*(?:大事な)?ポイント\*\*\s*[：:]\s*(.*)$/;
+
+// Every English sentence of a memo the app may voice: its 復習問題 and the
+// answers of its 英作文.
+export function noteSentences(body) {
+  const texts = new Set(noteProblems(body).map((p) => p.en));
+  for (const line of split(body).memo) {
+    const field = line.match(FIELD);
+    if (field) texts.add(unbold(field[2]));
+  }
+  return texts;
+}
+
+function linesHtml(lines, options = {}) {
   const out = [];
   let para = [];
   let list = [];
   let table = [];
+  // Examples (**例**) one after another go together under one 例.
+  let examples = [];
   const flush = () => {
     if (para.length) out.push(`<p>${para.map(inline).join("<br>")}</p>`);
     if (list.length) out.push(listHtml(list));
@@ -161,9 +203,40 @@ export function noteHtml(body) {
     list = [];
     table = [];
   };
-  for (const line of lines) {
+  const flushExamples = () => {
+    if (examples.length) out.push(`<div class="note-examples"><p class="note-examples-tag">例</p>${examples.join("")}</div>`);
+    examples = [];
+  };
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
     if (!line.trim()) {
       flush();
+      continue;
+    }
+    // An 英作文 or a 大事なポイント runs to the next blank line, heading or 英作文.
+    // (A 問題 is a card only in the student's pages; the teacher sees it as written.)
+    let end = i + 1;
+    while (end < lines.length && lines[end].trim() && !HEADING.test(lines[end]) && !START.test(lines[end])) end++;
+    const start = line.match(START);
+    const block = lines.slice(i, end);
+    if (start?.[1] === "例" && block.some((l) => FIELD.test(l))) {
+      flush();
+      examples.push(exampleHtml(block, options.speak));
+      i = end - 1;
+      continue;
+    }
+    flushExamples();
+    if (start && options.cards && block.some((l) => FIELD.test(l))) {
+      flush();
+      out.push(problemCardHtml(block, options.speak));
+      i = end - 1;
+      continue;
+    }
+    const point = line.match(POINT);
+    if (point) {
+      flush();
+      out.push(`<div class="note-point"><p class="note-point-tag">大事なポイント</p>${linesHtml([point[1], ...lines.slice(i + 1, end)])}</div>`);
+      i = end - 1;
       continue;
     }
     if (TABLE.test(line)) {
@@ -200,7 +273,52 @@ export function noteHtml(body) {
     para.push(line.trim());
   }
   flush();
+  flushExamples();
   return out.join("\n");
+}
+
+// An 英作文's Japanese, its English ({ label, en }: 答え / ほかの言い方) and the rest (its points).
+function problemParts(block) {
+  const answers = [];
+  const rest = [];
+  for (const line of block.slice(1)) {
+    const field = line.match(FIELD);
+    if (field) answers.push({ label: field[1], en: unbold(field[2]) });
+    else rest.push(line);
+  }
+  return { ja: block[0].match(START)[2], answers, rest };
+}
+
+const sayButton = (speak, en) =>
+  speak ? `<button type="button" class="speak icon-only" data-say="${esc(en)}" aria-label="聞く">${speak}</button>` : "";
+
+// An example (**例**), small and open: the English (🔊), the Japanese under
+// it, then ほかの言い方 and the points.
+function exampleHtml(block, speak) {
+  const { ja, answers, rest } = problemParts(block);
+  const [main, ...others] = answers;
+  return `<div class="note-example">
+    <div class="ex-en"><p lang="en">${esc(main.en)}</p>${sayButton(speak, main.en)}</div>
+    <p class="ex-ja">${inline(ja)}</p>
+    ${others.map((a) => `<p class="ex-alt"><span>${a.label}</span> <span lang="en">${esc(a.en)}</span></p>`).join("")}
+    ${rest.length ? `<div class="ex-note">${linesHtml(rest)}</div>` : ""}
+  </div>`;
+}
+
+// An 英作文 as a card that turns over: the Japanese and a hint, then the
+// 答え and ほかの言い方 (with 🔊) and the points under them.
+function problemCardHtml(block, speak) {
+  const { ja, answers, rest } = problemParts(block);
+  const back = `${answers.map((a) => `<div class="say-answer"><span class="say-tag">${a.label}</span><p lang="en">${esc(a.en)}</p>${sayButton(speak, a.en)}</div>`).join("")}
+      ${linesHtml(rest)}`;
+  return `<div class="say-card">
+    <button type="button" class="say-front" data-flip aria-expanded="false">
+      <span class="say-kind">英作文</span>
+      <span class="say-ja">${inline(ja)}</span>
+      <span class="say-hint">英語で言ってみてから、タップして答えを見る</span>
+    </button>
+    <div class="say-back" hidden>${back}</div>
+  </div>`;
 }
 
 // Every lesson so far, oldest first and numbered from 1: the days the teacher

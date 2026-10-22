@@ -341,6 +341,48 @@ a.week:hover { border-color: var(--sky); }
 .note-table th, .note-table td { border: 1px solid var(--line); padding: 6px 8px; text-align: left; vertical-align: top; }
 .note-table th { background: var(--sky-soft); font-weight: 700; }
 .quiz-start { min-height: 52px; }
+/* A memo a page at a time; the last page leads on to the 復習問題. */
+.note-page .note-body h3:first-child { font-size: 19px; }
+.note-end { text-align: center; background: var(--accent-soft); border-color: transparent; }
+/* An 英作文 in a memo: the Japanese, then a tap shows the answer. */
+.say-card { border: 1px solid var(--line); border-radius: 14px; background: var(--card); overflow: hidden; }
+/* Worked examples (**例**), small and open: the English (🔊), the Japanese, the points. */
+.note-examples { border-left: 3px solid var(--sky); padding: 2px 0 2px 12px; display: grid; gap: 10px; }
+.note-examples-tag { font-size: 12px; font-weight: 700; color: var(--ink-2); }
+.note-example { display: grid; gap: 1px; }
+.ex-en { display: flex; align-items: center; gap: 8px; }
+.ex-en p { flex: 1; min-width: 0; font-family: var(--en); font-size: 16px; font-weight: 800; line-height: 1.45; }
+.ex-en .speak.icon-only { width: 32px; min-height: 32px; }
+.ex-en .speak svg { width: 16px; height: 16px; }
+.ex-ja, .ex-alt { font-size: 13.5px; color: var(--ink-2); line-height: 1.5; }
+.ex-alt span:first-child { font-size: 12px; font-weight: 700; }
+.ex-note { font-size: 13px; color: var(--ink-2); }
+.note-body .ex-note ul { padding-left: 1.1em; }
+/* The page's 大事なポイント (**ポイント**：…) */
+.note-point { border-radius: 14px; padding: 12px 14px; background: var(--cream); border-left: 5px solid var(--yellow); }
+.note-point > * + * { margin-top: 6px; }
+.note-point-tag { font-size: 12px; font-weight: 700; color: var(--accent-text); }
+.note-point p:not(.note-point-tag) { font-weight: 700; }
+.note-body .say-card + .say-card { margin-top: 12px; }
+.say-front {
+  width: 100%; display: grid; gap: 4px; padding: 12px 14px; margin: 0; border: 0; background: var(--bg);
+  font: inherit; color: inherit; text-align: left; cursor: pointer;
+}
+.say-kind {
+  justify-self: start; padding: 1px 10px; border-radius: 999px; background: var(--accent-soft);
+  color: var(--accent-text); font-size: 12px; font-weight: 700;
+}
+.say-ja { font-size: 17px; font-weight: 800; line-height: 1.6; }
+.say-hint { font-size: 13px; font-weight: 700; color: var(--accent-text); }
+.say-front[aria-expanded="true"] .say-hint { color: var(--muted); }
+.say-back { padding: 12px 14px; display: grid; gap: 8px; border-top: 1px dashed var(--line); }
+.say-back[hidden] { display: none; }
+/* 答え / ほかの言い方 above its English, 🔊 beside them */
+.say-answer { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; column-gap: 10px; }
+.say-answer .speak { grid-column: 2; grid-row: 1 / span 2; }
+.say-tag { font-size: 12px; font-weight: 700; color: var(--accent-text); }
+.say-answer p { font-family: var(--en); font-size: 17px; font-weight: 800; line-height: 1.45; }
+.say-back ul { font-size: 14.5px; color: var(--ink-2); }
 
 .note-quiz {
   position: fixed; left: 0; right: 0; bottom: 0; z-index: 20;
