@@ -21,9 +21,10 @@
 import { BE } from "./be.js";
 import { TENSE } from "./tense.js";
 import { PERFECT } from "./perfect.js";
+import { CONJUNCTIONS } from "./conjunctions.js";
 import { ARTICLES } from "./articles.js";
 
-export const UNITS = [BE, TENSE, PERFECT, ARTICLES];
+export const UNITS = [BE, TENSE, PERFECT, CONJUNCTIONS, ARTICLES];
 
 export function findLesson(lessonId) {
   for (const unit of UNITS) {
