@@ -551,7 +551,11 @@ async function saveVocabTest(request, env, student, weekParam, number) {
   const week = weekParam === "other" ? "other" : Number(weekParam);
   const items = (await all(env.DB, `SELECT * FROM items WHERE student_id = ? AND kind = 'vocab'`, student.id)).map(itemRow);
   const books = await studentSetting(env.DB, student, "vocab_books");
-  const set = wordSets(weekWords(week, items, books), week).find((s) => s.number === number);
+  // Which of the student's 単語帳 are still in sets of ten (words.js) depends on their saved tests.
+  const tests = Object.fromEntries(
+    (await all(env.DB, `SELECT set_key FROM vocab_tests WHERE student_id = ?`, student.id)).map((r) => [r.set_key, true]),
+  );
+  const set = wordSets(weekWords(week, items, books), week, tests).find((s) => s.number === number);
   if (!set) throw new HttpError(404, "見つかりません。");
   const total = set.words.length;
   const { score } = await readJson(request);
@@ -562,7 +566,7 @@ async function saveVocabTest(request, env, student, weekParam, number) {
      VALUES (?1, ?2, ?3, ?3, ?4, 1, ?5)
      ON CONFLICT (student_id, set_key) DO UPDATE SET
        best_score = MAX(best_score, ?3), last_score = ?3, total = ?4, times = times + 1, updated_at = ?5`,
-    student.id, setKey(week, number, books), clean, total, now(),
+    student.id, setKey(week, number, books, tests), clean, total, now(),
   );
   return json({ ok: true });
 }

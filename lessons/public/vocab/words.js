@@ -84,17 +84,21 @@ export function weekWords(week, items = [], books = null) {
 export const bookWeeks = (books = null) =>
   [...new Set(BOOKS.map((b) => b.week))].filter((week) => weekBook(week, books)).sort((a, b) => a - b);
 
-// From Week 2, a week with a 単語帳 is split into 7 days (Day 1〜Day 7; 100
-// words are 15, 15 and then 14 a day) instead of sets of ten.
-const DAYS_FROM_WEEK = 2;
+// A week with a 単語帳 is split into 7 days (Day 1〜Day 7; 100 words are 15,
+// 15 and then 14 a day). A student who already took a test of that 単語帳 in
+// sets of ten (a saved "w1/s3": Week 1 was in sets of ten before) keeps it in
+// sets of ten, so their scores stay; tests is the student's vocabTests. A week
+// with only the teacher's words is in sets of ten.
 const DAYS = 7;
-const byDays = (week, hasBook) => week !== "other" && Number(week) >= DAYS_FROM_WEEK && hasBook;
+const inSets = (book, tests) => Object.keys(tests || {}).some((key) => key.startsWith(`${book}/s`));
+const byDays = (week, book, tests) => week !== "other" && !!book && !inSets(book, tests);
 
-// A week's words in sets (sets of ten, or days); each set ends with a test.
+// A week's words in sets (days, or sets of ten); each set ends with a test.
 // Titles name the slide groups it covers (動詞 ①・②); label is what the
-// screens call the set ("1. 動詞 ①・②", or "Day 1").
-export function wordSets(words, week) {
-  const days = byDays(week, words.some((w) => !w.key.startsWith("item/")));
+// screens call the set ("Day 1", or "1. 動詞 ①・②").
+export function wordSets(words, week, tests = null) {
+  const book = words.find((w) => !w.key.startsWith("item/"))?.key.split("/")[0];
+  const days = byDays(week, book, tests);
   const chunks = [];
   if (days) {
     for (let day = 0, at = 0; day < DAYS && at < words.length; day++) {
@@ -122,11 +126,11 @@ function setTitle(groups) {
   return named.map((g) => (g.numbers.length ? `${g.base} ${g.numbers.join("・")}` : g.base)).join(" / ");
 }
 
-// A set's test results are kept under its book ("w1/s3", "ielts1/s3"; a day
-// is "w2/d3"); a week with only the teacher's words uses "w{week}".
-export function setKey(week, number, books = null) {
+// A set's test results are kept under its book ("w2/d3" for a day, "w1/s3"
+// for a set of ten); a week with only the teacher's words uses "w{week}".
+export function setKey(week, number, books = null, tests = null) {
   const book = week !== "other" && weekBook(week, books);
-  return `${book || `w${week}`}/${byDays(week, !!book) ? "d" : "s"}${number}`;
+  return `${book || `w${week}`}/${byDays(week, book, tests) ? "d" : "s"}${number}`;
 }
 
 // Every 単語帳 text the app may voice: the words and their example sentences.
