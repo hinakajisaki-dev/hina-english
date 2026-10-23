@@ -430,6 +430,11 @@ a.week:hover { border-color: var(--sky); }
 .say-tag { font-size: 12px; font-weight: 700; color: var(--accent-text); }
 .say-answer p { font-family: var(--en); font-size: 17px; font-weight: 800; line-height: 1.45; }
 .say-back ul { font-size: 14.5px; color: var(--ink-2); }
+/* A sentence to read (**英語**・**意味**): the English (🔊) → tap for the meaning. */
+.read-en { display: flex; align-items: center; gap: 10px; }
+.read-en > span { flex: 1; min-width: 0; font-family: var(--en); font-size: 17px; font-weight: 800; line-height: 1.45; }
+.read-meaning { display: grid; gap: 2px; }
+.read-meaning p { font-size: 17px; font-weight: 800; line-height: 1.6; }
 
 .note-quiz {
   position: fixed; left: 0; right: 0; bottom: 0; z-index: 20;

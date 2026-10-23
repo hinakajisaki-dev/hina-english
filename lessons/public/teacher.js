@@ -378,7 +378,7 @@ const PROBLEM_KIND = { write: "瞬間英作文", order: "並び替え" };
 function notePreviewHtml(body) {
   const problems = noteProblems(body);
   const pages = notePages(body).length;
-  return `${pages > 1 ? `<p class="muted small">生徒の画面では「## 」の見出しごとに ${pages} ページに分かれ、「次へ」で進みます。英作文（**問題**・**答え**）は、日本語 → タップで答えのカードになります。</p>` : ""}
+  return `${pages > 1 ? `<p class="muted small">生徒の画面では「## 」の見出しごとに ${pages} ページに分かれ、「次へ」で進みます。英作文（**問題**・**答え**）は、日本語 → タップで答えのカードに、英文（**英語**・**意味**）は、英語 → タップで意味のカードになります。</p>` : ""}
     <div class="note-body">${noteHtml(body)}</div>
     <div class="note-problems stack">
       <p><b>復習 ${problems.length} こ</b><span class="muted small">（生徒には「内容を元に復習する」ボタンで、カードが1枚ずつ出ます。英語 → タップで意味と解説。瞬間英作文は日本語 → 英語、並び替えは日本語と単語 → 英文）</span></p>

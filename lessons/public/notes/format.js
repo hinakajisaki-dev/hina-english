@@ -12,8 +12,8 @@
 // ✗ and ○ are coloured. The last section, "## 復習問題", holds tables of
 // cards (noteProblems); it is not shown as a table but becomes cards like
 // 単語カード, behind a button. The student reads the memo a "## " section a
-// page (notePages), with each 英作文 (**問題**：… / **答え**：…) as a card
-// that turns over.
+// page (notePages), with each 英作文 (**問題**：… / **答え**：…) and each
+// sentence to read (**英語**：… / **意味**：…) as a card that turns over.
 
 const ESCAPES = { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" };
 const esc = (value) => String(value ?? "").replace(/[&<>"']/g, (c) => ESCAPES[c]);
@@ -167,8 +167,10 @@ export function noteHtml(body) {
 // The memo for the student, a page for each "## " section (with what comes
 // before the first one on the first page): [{ title, html }]. In these pages an
 // 英作文 (a "**問題**：…" line and its "**答え**：…") is a card: the Japanese,
-// then a tap shows the answer, ほかの言い方 and the points. speak is the 🔊
-// icon for the answers' buttons.
+// then a tap shows the answer, ほかの言い方 and the points. A sentence to read
+// (a "**英語**：…" line and its "**意味**：…") is a card the other way round:
+// the English (🔊), then a tap shows the meaning, ほかの言い方 and the points.
+// speak is the 🔊 icon for the English's buttons.
 export function notePages(body, { speak = "" } = {}) {
   const pages = [];
   for (const line of split(body).memo) {
@@ -186,15 +188,19 @@ export function notePages(body, { speak = "" } = {}) {
 // is the page's 大事なポイント, in a box.
 const START = /^\s*\*\*(問題|例)\*\*\s*[：:]\s*(.+)$/;
 const FIELD = /^\s*\*\*(答え|ほかの言い方)\*\*\s*[：:]\s*(.+)$/;
+// A sentence to read starts with "**英語**：…"; "**意味**：…" is its Japanese
+// (and "**ほかの言い方**：…" more English, as in an 英作文).
+const READ = /^\s*\*\*英語\*\*\s*[：:]\s*(.+)$/;
+const MEANING = /^\s*\*\*意味\*\*\s*[：:]\s*(.+)$/;
 const POINT = /^\s*\*\*(?:大事な)?ポイント\*\*\s*[：:]\s*(.*)$/;
 
-// Every English sentence of a memo the app may voice: its 復習問題 and the
-// answers of its 英作文.
+// Every English sentence of a memo the app may voice: its 復習問題, the
+// answers of its 英作文 and its sentences to read.
 export function noteSentences(body) {
   const texts = new Set(noteProblems(body).map((p) => p.en));
   for (const line of split(body).memo) {
-    const field = line.match(FIELD);
-    if (field) texts.add(clean(field[2]));
+    const field = line.match(FIELD) || line.match(READ);
+    if (field) texts.add(clean(field.at(-1)));
   }
   return texts;
 }
@@ -224,10 +230,11 @@ function linesHtml(lines, options = {}) {
       flush();
       continue;
     }
-    // An 英作文 or a 大事なポイント runs to the next blank line, heading or 英作文.
-    // (A 問題 is a card only in the student's pages; the teacher sees it as written.)
+    // An 英作文, a sentence to read or a 大事なポイント runs to the next blank
+    // line, heading, 英作文 or sentence to read. (A 問題 and a sentence to read
+    // are cards only in the student's pages; the teacher sees them as written.)
     let end = i + 1;
-    while (end < lines.length && lines[end].trim() && !HEADING.test(lines[end]) && !START.test(lines[end])) end++;
+    while (end < lines.length && lines[end].trim() && !HEADING.test(lines[end]) && !START.test(lines[end]) && !READ.test(lines[end])) end++;
     const start = line.match(START);
     const block = lines.slice(i, end);
     if (start?.[1] === "例" && block.some((l) => FIELD.test(l))) {
@@ -240,6 +247,12 @@ function linesHtml(lines, options = {}) {
     if (start && options.cards && block.some((l) => FIELD.test(l))) {
       flush();
       out.push(problemCardHtml(block, options.speak));
+      i = end - 1;
+      continue;
+    }
+    if (READ.test(line) && options.cards && block.some((l) => MEANING.test(l))) {
+      flush();
+      out.push(readCardHtml(block, options.speak));
       i = end - 1;
       continue;
     }
@@ -325,12 +338,41 @@ function problemCardHtml(block, speak) {
   const back = `${answers.map((a) => `<div class="say-answer"><span class="say-tag">${a.label}</span><p lang="en">${enHtml(a.en)}</p>${sayButton(speak, a.en)}</div>`).join("")}
       ${linesHtml(rest)}`;
   return `<div class="say-card">
-    <button type="button" class="say-front" data-flip aria-expanded="false">
+    <button type="button" class="say-front" data-flip aria-expanded="false" data-hint="英語で言ってみてから、タップして答えを見る" data-hint-open="タップして答えをかくす">
       <span class="say-kind">英作文</span>
       <span class="say-ja">${inline(ja)}</span>
       <span class="say-hint">英語で言ってみてから、タップして答えを見る</span>
     </button>
     <div class="say-back" hidden>${back}</div>
+  </div>`;
+}
+
+// A sentence to read as a card that turns over: the English (🔊) and a hint,
+// then its meaning, ほかの言い方 (with 🔊) and the points. The front is not a
+// <button>, since its 🔊 is one.
+function readCardHtml(block, speak) {
+  const en = unbold(block[0].match(READ)[1]);
+  const meanings = [];
+  const others = [];
+  const rest = [];
+  for (const line of block.slice(1)) {
+    const meaning = line.match(MEANING);
+    const field = line.match(FIELD);
+    if (meaning) meanings.push(meaning[1]);
+    else if (field) others.push({ label: field[1], en: unbold(field[2]) });
+    else rest.push(line);
+  }
+  return `<div class="say-card read-card">
+    <div class="say-front" data-flip role="button" tabindex="0" aria-expanded="false" data-hint="意味を考えてから、タップして見る" data-hint-open="タップして意味をかくす">
+      <span class="say-kind">英文</span>
+      <span class="read-en"><span lang="en">${enHtml(en)}</span>${sayButton(speak, en)}</span>
+      <span class="say-hint">意味を考えてから、タップして見る</span>
+    </div>
+    <div class="say-back" hidden>
+      ${meanings.map((ja) => `<div class="read-meaning"><span class="say-tag">意味</span><p>${inline(ja)}</p></div>`).join("")}
+      ${others.map((a) => `<div class="say-answer"><span class="say-tag">${a.label}</span><p lang="en">${enHtml(a.en)}</p>${sayButton(speak, a.en)}</div>`).join("")}
+      ${linesHtml(rest)}
+    </div>
   </div>`;
 }
 
