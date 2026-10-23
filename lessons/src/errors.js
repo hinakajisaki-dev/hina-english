@@ -41,7 +41,8 @@ export async function recordError(db, { kind, message, detail = "", studentId = 
     const old = new Date(Date.now() - KEEP_DONE_DAYS * 86400e3).toISOString();
     await run(db, `DELETE FROM app_errors WHERE done_at IS NOT NULL AND done_at < ?`, old);
   } catch (error) {
-    console.error("could not record the error", error?.message);
+    // The log keeps both: what went wrong first, and why it couldn't be kept.
+    console.error("could not record the error", { kind, message: String(message ?? "").slice(0, 500), because: error?.message ?? String(error) });
   }
 }
 

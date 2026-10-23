@@ -200,7 +200,8 @@ function renderLogin() {
     error.hidden = true;
     try {
       await api("/api/login", { method: "POST", body: { code: form.code.value } });
-      await load();
+      // A server that can't answer shows its message, not the sign-in form again.
+      if (!(await load())) return;
       startClock();
       location.hash = "#/";
       render();
