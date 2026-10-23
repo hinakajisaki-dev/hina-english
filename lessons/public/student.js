@@ -1102,23 +1102,28 @@ function renderReview(level) {
           <span class="label">Level 2</span><b>例文に単語を入れる</b>
           <span class="muted small">例文の空いているところに、合う単語を入れよう</span>
         </a>` : ""}
-        <section class="card stack">
-          <h3>復習カード</h3>
-          <p class="muted small">単語をタップすると、意味と例文が出ます。</p>
-          <ul class="review-list open-list">${words.map((w) => `<li>
-            <div class="review-row">
-              <button type="button" class="review-word" data-open aria-expanded="false">
-                <b lang="en">${esc(w.word)}</b><span class="review-chev" aria-hidden="true">▾</span>
-              </button>
-              <span class="badge ${w.source === "test" ? "teacher" : ""}">${w.source === "test" ? "テスト" : "チェック"}</span>
-              <button type="button" class="btn ghost small-btn" data-remove="${esc(w.key)}">外す</button>
-            </div>
-            <div class="review-detail" hidden>
+        <section class="stack">
+          <div>
+            <h3>復習カード</h3>
+            <p class="muted small">単語をタップすると、意味と例文が出ます。</p>
+          </div>
+          <ul class="word-list">${words.map((w) => `<li class="word-item">
+            <button type="button" class="word-item-head" data-open aria-expanded="false">
+              <span class="word-main">
+                <b lang="en">${esc(w.word)}</b>
+                <span class="word-open"><span class="when-closed">例文を見る ▾</span><span class="when-open">とじる ▴</span></span>
+              </span>
+              <span class="word-tag ${w.source === "test" ? "test" : ""}">${w.source === "test" ? "テスト" : "チェック"}</span>
+            </button>
+            <div class="word-item-body" hidden>
               <div class="detail-head">
                 <div>${w.pos ? `<span class="pill">${esc(w.pos)}</span>` : ""}<p class="meaning">${noteHtml(w.meaning)}</p></div>
                 ${sayIcon(speakable(w.word))}
               </div>
               ${wordExamplesHtml(w)}
+              <div class="word-item-foot">
+                <button type="button" class="btn ghost small-btn" data-remove="${esc(w.key)}">この単語を復習から外す</button>
+              </div>
             </div>
           </li>`).join("")}</ul>
         </section>`
@@ -1133,9 +1138,11 @@ function renderReview(level) {
   );
   app.querySelectorAll("[data-open]").forEach((button) =>
     button.addEventListener("click", () => {
-      const detail = button.closest("li").querySelector(".review-detail");
-      detail.hidden = !detail.hidden;
-      button.setAttribute("aria-expanded", String(!detail.hidden));
+      const item = button.closest(".word-item");
+      const body = item.querySelector(".word-item-body");
+      body.hidden = !body.hidden;
+      item.classList.toggle("open", !body.hidden);
+      button.setAttribute("aria-expanded", String(!body.hidden));
     }),
   );
 }
