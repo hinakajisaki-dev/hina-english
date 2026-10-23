@@ -1108,9 +1108,11 @@ function renderReview(level) {
           </div>
           <ul class="word-list">${words.map((w) => `<li class="word-item">
             <button type="button" class="word-item-head" data-open aria-expanded="false">
-              <b lang="en">${esc(w.word)}</b>
+              <span class="word-main">
+                <b lang="en">${esc(w.word)}</b>
+                <span class="word-open"><span class="when-closed">例文を見る ▾</span><span class="when-open">とじる ▴</span></span>
+              </span>
               <span class="word-tag ${w.source === "test" ? "test" : ""}">${w.source === "test" ? "テスト" : "チェック"}</span>
-              <span class="word-chev" aria-hidden="true">▾</span>
             </button>
             <div class="word-item-body" hidden>
               <div class="detail-head">
