@@ -718,7 +718,7 @@ function renderStudyEdit(day) {
 // Where the student stopped in each 単語カード / フレーズ set, kept on this phone
 // so the set opens there again, even after the app was closed:
 // { "<name>|phrase:p1/s2": { week, number, index, of: "3 / 8", at } }.
-// Finishing the set (on to its test) clears it.
+// おわり on a set's last card clears it.
 const RESUME_KEY = "hina-resume";
 
 function resumePlaces() {
@@ -756,7 +756,8 @@ const resumeCard = (href, where, of) => `<a class="lesson-card resume-card" href
 // ---------- vocab cards ----------
 // A week is the student's 単語帳 (the shared one, or another the teacher gave
 // them: vocab/words.js) plus the teacher's words for this student, in sets of
-// ten. Each set: one card per word (with a 復習 checkbox), then a test.
+// ten (Week 2 on: Day 1〜7). Each set: a list of its words, one card per word
+// (with a 復習 checkbox) and a test in its own tab.
 // Missed words and ticked words make the 復習 list.
 
 const WEEKS = 24;
@@ -806,10 +807,13 @@ const wordExamplesHtml = (word) => (word.examples.length ? `<ul class="word-exam
   </div>
 </li>`).join("")}</ul>` : "");
 
-function renderVocab(week, setNumber, mode) {
+// #/vocab/2/1 is Day 1's words, #/vocab/2/1/card/3 its third card,
+// #/vocab/2/1/test its テスト tab and #/vocab/2/1/test/start the test itself.
+function renderVocab(week, setNumber, mode, arg) {
   const w = week === "other" ? "other" : Number(week);
-  if (week && setNumber && mode === "test") return renderVocabTest(w, Number(setNumber));
-  if (week && setNumber) return renderVocabSet(w, Number(setNumber));
+  if (week && setNumber && mode === "test") return arg === "start" ? renderVocabTest(w, Number(setNumber)) : renderVocabDay(w, Number(setNumber), "test");
+  if (week && setNumber && mode === "card") return renderVocabSet(w, Number(setNumber), Number(arg) - 1);
+  if (week && setNumber) return renderVocabDay(w, Number(setNumber), "words");
   if (week) return renderWeek(w);
 
   const weeks = Array.from({ length: WEEKS }, (_, i) => i + 1);
@@ -831,7 +835,7 @@ function renderVocab(week, setNumber, mode) {
   const lastSet = last && studentSetKey(last.week, last.number) === last.key && findSet(last.week, last.number);
   app.innerHTML = `${topbar("単語カード")}
     <main class="wrap stack">
-      ${lastSet ? resumeCard(`#/vocab/${last.week}/${last.number}`, `${weekLabel(last.week)} ・ ${esc(lastSet.label)}`, last.of) : ""}
+      ${lastSet ? resumeCard(`#/vocab/${last.week}/${last.number}/card/${last.index + 1}`, `${weekLabel(last.week)} ・ ${esc(lastSet.label)}`, last.of) : ""}
       <div class="weeks">${tiles.join("")}</div>
     </main>`;
 }
@@ -841,7 +845,7 @@ function renderWeek(week) {
   const sets = wordSets(studentWeekWords(week), week);
   app.innerHTML = `${topbar(`単語カード ・ ${weekLabel(week)}`, "#/vocab")}
     <main class="wrap stack">
-      <p class="muted">${sets[0]?.day ? "1日分ずつ（Day 1〜Day 7）覚えて" : "10語ずつ覚えて"}、最後にテストをします。まちがえた単語は「復習」に入ります。</p>
+      <p class="muted">${sets[0]?.day ? "Day" : "セット"}をえらぶと、単語の一覧が出ます。<br>テストは「テスト」タブから、いつでもできます。</p>
       ${sets.length ? "" : emptyState("この週の単語は、まだありません。")}
       ${sets.map((set) => {
         const result = testResult(week, set.number);
@@ -859,30 +863,62 @@ function findSet(week, number) {
   return wordSets(studentWeekWords(week), week).find((s) => s.number === number);
 }
 
-function renderVocabSet(week, number) {
+// A day (or set of ten): its words in a list, and its test in a tab of its own.
+function renderVocabDay(week, number, tab) {
   const set = findSet(week, number);
   if (!set) return renderWeek(week);
-  const id = studentSetKey(week, number);
-  if (state.vocab?.id !== id) {
-    const saved = resumeAt("vocab", id);
-    state.vocab = { id, index: saved && saved.index < set.words.length ? saved.index : 0 };
-  }
-  const V = state.vocab;
-  saveResume("vocab", id, V.index ? { week, number, index: V.index, of: `${V.index + 1} / ${set.words.length}` } : null);
-  const word = set.words[V.index];
-  const last = V.index === set.words.length - 1;
-  const rerender = () => {
-    renderVocabSet(week, number);
-    window.scrollTo(0, 0);
-  };
+  state.vocabTest = null;
+  const base = `#/vocab/${week}/${number}`;
+  const result = testResult(week, number);
+  const place = resumeAt("vocab", studentSetKey(week, number));
+  const tabLink = (href, label, on) => `<a href="${href}" ${on ? 'aria-current="page"' : ""}>${label}</a>`;
 
   app.innerHTML = `${topbar(`${weekLabel(week)} ・ ${set.label}`, `#/vocab/${week}`)}
     <main class="wrap stack">
-      <div class="lesson-progress" role="progressbar" aria-valuemin="1" aria-valuemax="${set.words.length}" aria-valuenow="${V.index + 1}">
-        <div class="bar"><i style="width:${Math.round(((V.index + 1) / set.words.length) * 100)}%"></i></div>
-        <span class="counter">${V.index + 1} / ${set.words.length}</span>
+      <nav class="tabs" aria-label="単語とテスト">
+        ${tabLink(base, `単語 <small>${set.words.length}</small>`, tab !== "test")}
+        ${tabLink(`${base}/test`, `テスト${result ? " <small>✓</small>" : ""}`, tab === "test")}
+      </nav>
+      ${tab === "test" ? `<section class="card stack test-intro">
+        <p class="score">${set.words.length}<small> 問</small></p>
+        <p>英語を見て、意味を<b>4つから</b>えらぼう。</p>
+        <p class="muted small">まちがえた単語は「復習」に入ります。</p>
+        ${result ? `<p><span class="badge done">ベスト ${result.best} / ${result.total}</span></p>` : ""}
+        <a class="btn block" href="${base}/test/start">テストをはじめる</a>
+      </section>`
+      : `<p class="muted small">単語をタップすると、カードが開きます。</p>
+      <ol class="vocab-list">${set.words.map((w, i) => `<li><a href="${base}/card/${i + 1}">
+        <span class="num">${i + 1}</span>
+        <b lang="en">${esc(w.word)}</b>
+        ${place?.index === i ? '<span class="badge start">つづき</span>' : ""}
+        <span class="chev" aria-hidden="true">›</span>
+      </a></li>`).join("")}</ol>`}
+    </main>`;
+}
+
+// One card of a day, opened from its list: まえ / つぎ go through the day
+// from there, 一覧 goes back to the list. A card turned over stays turned
+// while the student goes back and forth.
+function renderVocabSet(week, number, at) {
+  const set = findSet(week, number);
+  if (!set) return renderWeek(week);
+  const base = `#/vocab/${week}/${number}`;
+  const index = at >= 0 && at < set.words.length ? at : 0;
+  const id = studentSetKey(week, number);
+  if (state.vocab?.id !== id) state.vocab = { id, turned: new Set() };
+  const V = state.vocab;
+  saveResume("vocab", id, index ? { week, number, index, of: `${index + 1} / ${set.words.length}` } : null);
+  const word = set.words[index];
+  const last = index === set.words.length - 1;
+  const go = (i) => location.replace(`${base}/card/${i + 1}`);
+
+  app.innerHTML = `${topbar(`${weekLabel(week)} ・ ${set.label}`, base)}
+    <main class="wrap stack">
+      <div class="lesson-progress" role="progressbar" aria-valuemin="1" aria-valuemax="${set.words.length}" aria-valuenow="${index + 1}">
+        <div class="bar"><i style="width:${Math.round(((index + 1) / set.words.length) * 100)}%"></i></div>
+        <span class="counter">${index + 1} / ${set.words.length}</span>
       </div>
-      ${V.revealed ? `<section class="card stack word-card">
+      ${V.turned.has(index) ? `<section class="card stack word-card">
         ${word.pos ? `<p class="pos">${esc(word.pos)}</p>` : ""}
         <div class="word-row">
           <p class="word" lang="en">${esc(word.word)}</p>
@@ -904,17 +940,18 @@ function renderVocabSet(week, number) {
         </div>
         <p class="hint">タップして、意味と例文を見る</p>
       </section>`}
-      <div class="lesson-nav">
-        ${V.index > 0 ? `<button type="button" class="btn ghost" id="prev">← もどる</button>` : "<span></span>"}
-        <button type="button" class="btn" id="next">${last ? "テストへ" : "次へ"}</button>
+      <div class="card-nav">
+        ${index > 0 ? `<button type="button" class="btn ghost" id="prev">← まえ</button>` : "<span></span>"}
+        <a class="btn ghost list-btn" href="${base}">一覧</a>
+        <button type="button" class="btn" id="next">${last ? "おわり" : "つぎ →"}</button>
       </div>
     </main>`;
 
   // The card shows the English first; a tap (not on 🔊) turns it over.
   const front = document.getElementById("word-front");
   const turn = () => {
-    V.revealed = true;
-    renderVocabSet(week, number);
+    V.turned.add(index);
+    renderVocabSet(week, number, index);
   };
   front?.addEventListener("click", (event) => {
     if (!event.target.closest("[data-say]")) turn();
@@ -929,22 +966,12 @@ function renderVocabSet(week, number) {
     setReview(word.key, event.target.checked);
     toast(event.target.checked ? "復習カードに入れました" : "復習カードから外しました");
   });
-  document.getElementById("prev")?.addEventListener("click", () => {
-    V.index -= 1;
-    V.revealed = false;
-    rerender();
-  });
+  document.getElementById("prev")?.addEventListener("click", () => go(index - 1));
   document.getElementById("next").addEventListener("click", () => {
-    if (last) {
-      saveResume("vocab", id, null);
-      state.vocab = null;
-      state.vocabTest = null;
-      location.hash = `#/vocab/${week}/${number}/test`;
-      return;
-    }
-    V.index += 1;
-    V.revealed = false;
-    rerender();
+    if (!last) return go(index + 1);
+    saveResume("vocab", id, null);
+    state.vocab = null;
+    location.hash = base;
   });
 }
 
@@ -981,7 +1008,7 @@ function renderVocabTest(week, number) {
     renderVocabTest(week, number);
     window.scrollTo(0, 0);
   };
-  const back = `#/vocab/${week}`;
+  const back = `#/vocab/${week}/${number}/test`;
 
   if (T.index >= T.questions.length) return renderVocabTestResult(week, set, rerender);
 
@@ -1048,7 +1075,7 @@ function renderVocabTestResult(week, set, rerender) {
   const next = findSet(week, set.number + 1);
   const perfect = score === T.questions.length;
 
-  app.innerHTML = `${topbar(`テスト ・ ${set.label}`, `#/vocab/${week}`)}
+  app.innerHTML = `${topbar(`テスト ・ ${set.label}`, `#/vocab/${week}/${set.number}/test`)}
     <main class="wrap stack">
       <section class="card stack" style="text-align:center">
         <p style="font-size:40px">${perfect ? "🎉" : "👏"}</p>
