@@ -363,10 +363,10 @@ function readCardHtml(block, speak) {
     else rest.push(line);
   }
   return `<div class="say-card read-card">
-    <div class="say-front" data-flip role="button" tabindex="0" aria-expanded="false" data-hint="タップして意味を見る" data-hint-open="タップして意味をかくす">
+    <div class="say-front" data-flip role="button" tabindex="0" aria-expanded="false" data-hint="タップして日本語を見る" data-hint-open="タップして日本語をかくす">
       <span class="say-kind">英文</span>
       <span class="read-en"><span lang="en">${enHtml(en)}</span>${sayButton(speak, en)}</span>
-      <span class="say-hint">タップして意味を見る</span>
+      <span class="say-hint">タップして日本語を見る</span>
     </div>
     <div class="say-back" hidden>
       ${meanings.map((ja) => `<div class="read-meaning"><span class="say-tag">意味</span><p>${inline(ja)}</p></div>`).join("")}
