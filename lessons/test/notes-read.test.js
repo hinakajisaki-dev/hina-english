@@ -43,3 +43,16 @@ test("its English and ほかの言い方 may be voiced", () => {
     assert.ok(texts.has(en), en);
   }
 });
+
+test("an 英作文 of several sentences reads a sentence a line", () => {
+  const body = `## 1. a
+**問題**：駅の近くです。ビルは古いです。「はい。」と言いました。
+**答え**：It is near the station. I woke up at 6 a.m. and made breakfast. Is it old? Yes!`;
+  const html = notePages(body, { speak: "🔊" })[0].html;
+  const line = (text) => `<span class="line">${text}</span>`;
+  assert.ok(html.includes([line("駅の近くです。"), line("ビルは古いです。"), line("「はい。」と言いました。")].join("")));
+  assert.ok(html.includes([line("It is near the station."), line("I woke up at 6 a.m. and made breakfast."), line("Is it old?"), line("Yes!")].join("")));
+  // One sentence stays as it is; 🔊 still reads the whole answer.
+  assert.doesNotMatch(notePages("**問題**：駅の近くです。\n**答え**：It is near the station.")[0].html, /class="line"/);
+  assert.match(html, /data-say="It is near the station\. I woke up at 6 a\.m\. and made breakfast\. Is it old\? Yes!"/);
+});

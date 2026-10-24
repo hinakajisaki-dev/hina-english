@@ -317,6 +317,13 @@ function problemParts(block) {
 const sayButton = (speak, en) =>
   speak ? `<button type="button" class="speak icon-only" data-say="${esc(plain(en))}" aria-label="聞く">${speak}</button>` : "";
 const enHtml = (en) => colors(esc(en));
+// A passage (an 英作文 of several sentences) reads a sentence a line, with a
+// little space between, so it isn't one solid block: a new line after 。！？
+// (not before a closing 」 or tag) and after . ? ! when a capital starts the
+// next sentence (not "6 a.m. and").
+const lines = (parts) => (parts.length > 1 ? parts.map((part) => `<span class="line">${part}</span>`).join("") : parts[0]);
+const jaLines = (html) => lines(html.split(/(?<=[。！？])(?=[^\s<」』）)])/));
+const enLines = (html) => lines(html.split(/(?<=[.?!])\s+(?=[A-Z])/));
 
 // An example (**例**), small and open: the English (🔊), the Japanese under
 // it, then ほかの言い方 and the points.
@@ -324,8 +331,8 @@ function exampleHtml(block, speak) {
   const { ja, answers, rest } = problemParts(block);
   const [main, ...others] = answers;
   return `<div class="note-example">
-    <div class="ex-en"><p lang="en">${enHtml(main.en)}</p>${sayButton(speak, main.en)}</div>
-    <p class="ex-ja">${inline(ja)}</p>
+    <div class="ex-en"><p lang="en">${enLines(enHtml(main.en))}</p>${sayButton(speak, main.en)}</div>
+    <p class="ex-ja">${jaLines(inline(ja))}</p>
     ${others.map((a) => `<p class="ex-alt"><span>${a.label}</span> <span lang="en">${enHtml(a.en)}</span></p>`).join("")}
     ${rest.length ? `<div class="ex-note">${linesHtml(rest)}</div>` : ""}
   </div>`;
@@ -335,12 +342,12 @@ function exampleHtml(block, speak) {
 // 答え and ほかの言い方 (with 🔊) and the points under them.
 function problemCardHtml(block, speak) {
   const { ja, answers, rest } = problemParts(block);
-  const back = `${answers.map((a) => `<div class="say-answer"><span class="say-tag">${a.label}</span><p lang="en">${enHtml(a.en)}</p>${sayButton(speak, a.en)}</div>`).join("")}
+  const back = `${answers.map((a) => `<div class="say-answer"><span class="say-tag">${a.label}</span><p lang="en">${enLines(enHtml(a.en))}</p>${sayButton(speak, a.en)}</div>`).join("")}
       ${linesHtml(rest)}`;
   return `<div class="say-card">
     <button type="button" class="say-front" data-flip aria-expanded="false" data-hint="英語で言ってみてから、タップして答えを見る" data-hint-open="タップして答えをかくす">
       <span class="say-kind">英作文</span>
-      <span class="say-ja">${inline(ja)}</span>
+      <span class="say-ja">${jaLines(inline(ja))}</span>
       <span class="say-hint">英語で言ってみてから、タップして答えを見る</span>
     </button>
     <div class="say-back" hidden>${back}</div>

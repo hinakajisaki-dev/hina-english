@@ -430,6 +430,9 @@ a.week:hover { border-color: var(--sky); }
 .say-tag { font-size: 12px; font-weight: 700; color: var(--accent-text); }
 .say-answer p { font-family: var(--en); font-size: 17px; font-weight: 800; line-height: 1.45; }
 .say-back ul { font-size: 14.5px; color: var(--ink-2); }
+/* A passage, a sentence a line (notes/format.js jaLines / enLines) */
+.note-body .line { display: block; }
+.note-body .line + .line { margin-top: 6px; }
 /* A sentence to read (**英語**・**意味**): the English (🔊) → tap for the meaning. */
 .read-en { display: flex; align-items: center; gap: 10px; }
 .read-en > span { flex: 1; min-width: 0; font-family: var(--en); font-size: 17px; font-weight: 800; line-height: 1.45; }
