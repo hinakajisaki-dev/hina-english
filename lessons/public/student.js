@@ -443,7 +443,8 @@ async function renderNote(id) {
 
 // A memo a page at a time (a "## " section each), so it doesn't read as one
 // long page; the last page leads on to the 復習問題. An 英作文 is a card:
-// the student says it in English, then taps to see the answer.
+// the student says it in English, then taps to see the answer. A sentence to
+// read is a card the other way: the English, then a tap for its meaning.
 function renderNotePage(note, index) {
   const pages = notePages(note.body, { speak: icons.speaker });
   const problems = noteProblems(note.body);
@@ -478,12 +479,25 @@ function renderNotePage(note, index) {
     renderNotePage(note, Number(button.dataset.page));
     window.scrollTo(0, 0);
   }));
-  app.querySelectorAll("[data-flip]").forEach((front) => front.addEventListener("click", () => {
-    const open = front.getAttribute("aria-expanded") !== "true";
-    front.setAttribute("aria-expanded", open);
-    front.nextElementSibling.hidden = !open;
-    front.querySelector(".say-hint").textContent = open ? "タップして答えをかくす" : "英語で言ってみてから、タップして答えを見る";
-  }));
+  // A card that turns over: an 英作文 (a <button>) or a sentence to read (its
+  // front holds a 🔊, so it is not a button and needs its own keys).
+  app.querySelectorAll("[data-flip]").forEach((front) => {
+    const flip = () => {
+      const open = front.getAttribute("aria-expanded") !== "true";
+      front.setAttribute("aria-expanded", open);
+      front.nextElementSibling.hidden = !open;
+      front.querySelector(".say-hint").textContent = open ? front.dataset.hintOpen : front.dataset.hint;
+    };
+    front.addEventListener("click", (event) => {
+      if (!event.target.closest("[data-say]")) flip();
+    });
+    if (front.tagName !== "BUTTON") front.addEventListener("keydown", (event) => {
+      if (event.target === front && (event.key === "Enter" || event.key === " ")) {
+        event.preventDefault();
+        flip();
+      }
+    });
+  });
   app.querySelectorAll("[data-quiz]").forEach((button) => button.addEventListener("click", () => openQuiz(note, problems)));
 }
 

@@ -387,7 +387,8 @@ async function speech(env, student, text) {
       return SPOKEN_FIELDS[row.kind].some((field) => data[field] === text);
     });
   }
-  // The English of the student's published 授業メモ: its 復習問題 and the answers of its 英作文.
+  // The English of the student's published 授業メモ: its 復習問題, the answers of its 英作文
+  // and its sentences to read (**英語**).
   // (Every memo is read: with colour marks, {赤:I graduated}, an answer isn't in the body as voiced.)
   if (!allowed && text && NOTES_FOR_STUDENTS) {
     const notes = await all(
