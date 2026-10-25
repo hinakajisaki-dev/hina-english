@@ -16,16 +16,20 @@
 //   order:   ja, words (in the right order), end (final punctuation), why
 //   write:   ja, answers (accepted English sentences), hint, why
 //
+// A lesson may have theme { icon, name, words }: the unit's list then shows the
+// theme and its words (in red) instead of the title (前置詞; plain: true shows
+// the words in grey).
+//
 // Each unit lives in its own file and follows a chapter of the teacher's
 // 中学文法 document. The order here is the order students see.
 import { BE } from "./be.js";
 import { TENSE } from "./tense.js";
+import { ARTICLES } from "./articles.js";
 import { PERFECT } from "./perfect.js";
 import { CONJUNCTIONS } from "./conjunctions.js";
-import { ARTICLES } from "./articles.js";
 import { PREPOSITIONS } from "./prepositions.js";
 
-export const UNITS = [BE, TENSE, PERFECT, CONJUNCTIONS, ARTICLES, PREPOSITIONS];
+export const UNITS = [BE, TENSE, ARTICLES, PERFECT, CONJUNCTIONS, PREPOSITIONS];
 
 export function findLesson(lessonId) {
   for (const unit of UNITS) {
