@@ -104,17 +104,9 @@ export const PERFECT = {
             ],
           },
           examples: [
-            { en: "I [[have]] {{never}} [[played]] golf.", ja: "私は一度もゴルフをしたことがありません。" },
-            { en: "I [[have been]] to Hokkaido {{once}}.", ja: "私は北海道に1回行ったことがあります。" },
+            { en: "We [[have met]] him {{before}}.", ja: "私たちは以前、彼に会ったことがあります。" },
+            { en: "I [[have read]] this book {{twice}}.", ja: "私はこの本を2回読んだことがあります。" },
           ],
-          key: ["「〜に行ったことがある」は", "[[have been]] to 〜"],
-        },
-        {
-          type: "order",
-          ja: "私は一度もお寿司を食べたことがありません。",
-          words: ["I", "have", "never", "eaten", "sushi"],
-          end: ".",
-          why: "{{never}} は [[have]] と [[過去分詞]] のあいだに入ります。",
         },
         {
           type: "order",
@@ -122,6 +114,38 @@ export const PERFECT = {
           words: ["I", "have", "visited", "Kyoto", "before"],
           end: ".",
           why: "{{before}}（以前に）は文の最後です。",
+        },
+        {
+          type: "explain",
+          title: "[[have been]] to 〜：〜に行ったことがある",
+          text: ["「〜に行ったことがある」は、**[[have been]] to 〜** と言います。"],
+          examples: [
+            { en: "I [[have been]] to Hokkaido {{once}}.", ja: "私は北海道に1回行ったことがあります。" },
+            { en: "My mother [[has been]] to Korea {{twice}}.", ja: "母は韓国に2回行ったことがあります。" },
+          ],
+          key: "[[have been]] to ＋ 場所",
+        },
+        {
+          type: "choice",
+          q: "I have ___ to Okinawa twice.",
+          ja: "私は沖縄に2回行ったことがあります。",
+          choices: ["been", "went"],
+          answer: "been",
+          why: "「〜に行ったことがある」は [[have been]] to 〜 です。",
+        },
+        {
+          type: "explain",
+          title: "{{never}}：一度も〜したことがない",
+          text: ["{{never}} は、**[[have]] と [[過去分詞]] の間**に入れます。"],
+          examples: [{ en: "I [[have]] {{never}} [[played]] golf.", ja: "私は一度も、ゴルフをしたことがありません。" }],
+          key: "[[have]] + {{never}} + [[過去分詞]]",
+        },
+        {
+          type: "order",
+          ja: "私は一度もお寿司を食べたことがありません。",
+          words: ["I", "have", "never", "eaten", "sushi"],
+          end: ".",
+          why: "{{never}} は [[have]] と [[過去分詞]] のあいだに入ります。",
         },
         {
           type: "explain",
