@@ -2854,8 +2854,10 @@ function renderTeacherProblems() {
 }
 
 // ---------- 言い換え問題 ----------
-// 瞬間英作文 for the grammar each student is weak at: the teacher's problems for
-// them (items of kind rephrase: group, ja, en, hint). A round takes problems at
+// 瞬間英作文 of everyday English (what the student would say in a conversation
+// or write in a diary: about themselves, their day, their plans), in the grammar
+// each student is weak at: the teacher's problems for them (items of kind
+// rephrase: group, ja, en, hint). A round takes problems at
 // random, the ones never done or last got wrong first. The student writes the
 // English, and it is corrected like a journal (the student's sentence, with only
 // what has to change fixed), with the model answer to hear. Ten a day is
@@ -2920,7 +2922,7 @@ function renderRephrase(page) {
     <main class="wrap stack">
       <section class="card stack rephrase-hero ${cleared ? "cleared" : ""}">
         <h2>${rephraseTitle}</h2>
-        <p class="muted">日本語を見て、英語で書いてみよう。書いた文には<b>添削</b>がつきます。</p>
+        <p class="muted">会話や日記で使う英語（<b>自分のこと・今日のこと・これからのこと</b>）を練習しよう。書いた文には添削がつきます。</p>
         <div class="lesson-progress">
           <div class="bar"><i style="width:${Math.min(100, Math.round((done / REPHRASE_GOAL) * 100))}%"></i></div>
           <span class="counter">${cleared ? `クリア！ 今日 ${done} 問` : `今日 ${done} / ${REPHRASE_GOAL}`}</span>

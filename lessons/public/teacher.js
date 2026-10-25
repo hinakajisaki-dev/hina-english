@@ -637,7 +637,7 @@ function renderItems(panel, kind) {
       ${weekPicker}
       ${bookInfo ? `<p class="notice">${weekName} には、${bookInfo.shared ? "全員共通の単語帳" : `この生徒の単語帳「${esc(bookInfo.title)}」`}（${bookInfo.count} 語）が入っています。ここで足した単語は、この生徒の ${weekName} の最後に加わります。</p>` : ""}
       <h3>${week ? `${weekName} に` : ""}${kind === "grammar" ? "先生からの問題（この生徒だけ）" : esc(spec.tab)}を追加</h3>
-      ${kind === "rephrase" ? `<p class="muted small">この生徒の弱い文法を、日本語 → 英語で練習します。毎回ランダムに出て、1日10問でクリア（おかわりもできます）。書いた文は AI が添削します。</p>` : ""}
+      ${kind === "rephrase" ? `<p class="muted small">会話や日記で使う英語（自分のこと・今日のこと・これからのこと）を、この生徒の弱い文法で、日本語 → 英語で練習します。毎回ランダムに出て、1日10問でクリア（おかわりもできます）。書いた文は AI が添削します。</p>` : ""}
       <p class="format">1行に1つ。区切りは <code>|</code>（またはスプレッドシートからそのまま貼りつけ）<br>${esc(spec.format)}</p>
       <form id="bulk" class="stack">
         <textarea class="bulk" name="lines" lang="en" placeholder="${esc(spec.example)}"></textarea>
