@@ -3,13 +3,13 @@
 //
 // Students sign in with a personal code (kept in an HttpOnly cookie).
 // The teacher signs in with TEACHER_PASSWORD; the cookie holds an HMAC of it.
-import { AiError, correctJournal, judgeAnswer } from "./ai.js";
+import { AiError, correctJournal, correctSentence, judgeAnswer } from "./ai.js";
 import { SpeechError, speechFor } from "./speech.js";
 import {
   closeErrors, journalErrorKey, listErrors, markErrorDone, markErrorsSeen, noteStuckJournals, recordError,
 } from "./errors.js";
 import { findLesson, lessonExampleSentences, plain, questionCount } from "../public/grammar/lessons.js";
-import { findMistakes } from "../public/mistakes.js";
+import { findMistakes, normalizeWords } from "../public/mistakes.js";
 import { bookSentences, bookWord, setKey, vocabBooks, weekWords, wordSets } from "../public/vocab/words.js";
 import { findPhrase, pronMonths } from "../public/pron/phrases.js";
 import { phraseByKey, phraseSentences, phraseSetKey, phraseSets, testSize } from "../public/phrases/book.js";
@@ -17,7 +17,7 @@ import { noteProblems, noteSentences } from "../public/notes/format.js";
 import { NOTES_FOR_STUDENTS } from "../public/course.js";
 import { MENUS } from "../public/menus.js";
 import {
-  all, ensureSchema, first, isDbBusy, itemRow, japanDay, journalRow, noteRow, now, run, studentBundle,
+  all, ensureSchema, first, isDbBusy, itemRow, japanDay, journalRow, noteRow, now, rephraseRow, run, studentBundle,
 } from "./db.js";
 
 const STUDENT_COOKIE = "hl_student";
@@ -31,10 +31,14 @@ const KINDS = {
   pron: { fields: ["text", "tip"], required: 1 },
   grammar: { fields: ["question", "answer", "choices", "explanation"], required: 2 },
   topic: { fields: ["prompt"], required: 1 },
+  // 言い換え問題 (瞬間英作文): the grammar it practises, the Japanese, the English
+  // (two or more right answers split by /) and a hint.
+  rephrase: { fields: ["group", "ja", "en", "hint"], required: 3 },
 };
 const WEEKS = 24;
 const FIELD_NAMES = {
   word: "単語", meaning: "意味", text: "文", question: "問題", answer: "答え", prompt: "テーマ",
+  group: "文法", ja: "日本語", en: "英語",
 };
 
 class HttpError extends Error {
@@ -115,6 +119,10 @@ async function route(request, env, url, who) {
     if (NOTES_FOR_STUDENTS && parts[0] === "notes" && parts.length === 2 && method === "GET") {
       return studentNote(env, student, id(1));
     }
+    if (path === "/api/rephrase" && method === "POST") return answerRephrase(request, env, student);
+    if (parts[0] === "rephrase" && parts[2] === "correct" && parts.length === 3 && method === "POST") {
+      return retryRephrase(env, student, id(1));
+    }
     if (path === "/api/journals" && method === "POST") return newJournal(request, env, student);
     if (parts[0] === "journals" && parts[2] === "correct" && parts.length === 3 && method === "POST") {
       return retryCorrection(env, student, id(1));
@@ -166,7 +174,10 @@ async function route(request, env, url, who) {
     if (method === "GET") {
       const notes = (await all(db, `SELECT * FROM lesson_notes WHERE student_id = ? ORDER BY day DESC, id DESC`, student.id))
         .map((row) => noteRow(row));
-      return json({ student, ...(await studentBundle(db, student.id)), notes, ai: aiEnabled(env) });
+      // The latest 言い換え問題 answers with their sentences and corrections.
+      const rephrased = (await all(db, `SELECT * FROM rephrase_answers WHERE student_id = ? ORDER BY id DESC LIMIT 60`, student.id))
+        .map((row) => rephraseRow(row));
+      return json({ student, ...(await studentBundle(db, student.id)), notes, rephraseAnswers: rephrased, ai: aiEnabled(env) });
     }
     if (method === "PATCH") return updateStudent(request, db, student);
     if (method === "DELETE") {
@@ -369,7 +380,7 @@ async function newJournal(request, env, student) {
 // sentences and 授業メモ), the 単語帳, the フレーズ or the grammar lessons'
 // examples, so the endpoint can't be used to voice anything else.
 // (The pronunciation months play the teacher's own recordings instead.)
-const SPOKEN_FIELDS = { vocab: ["word", "example"], pron: ["text"] };
+const SPOKEN_FIELDS = { vocab: ["word", "example"], pron: ["text"], rephrase: ["en"] };
 const LESSON_SENTENCES = lessonExampleSentences();
 const BOOK_SENTENCES = bookSentences();
 const PHRASE_SENTENCES = phraseSentences();
@@ -379,11 +390,12 @@ async function speech(env, student, text) {
   if (!allowed) {
     const rows = await all(
       env.DB,
-      `SELECT kind, data FROM items WHERE student_id = ? AND kind IN ('vocab', 'pron')`,
+      `SELECT kind, data FROM items WHERE student_id = ? AND kind IN ('vocab', 'pron', 'rephrase')`,
       student.id,
     );
     allowed = rows.some((row) => {
       const data = JSON.parse(row.data);
+      if (row.kind === "rephrase") return rephraseAnswers(data.en).includes(text);
       return SPOKEN_FIELDS[row.kind].some((field) => data[field] === text);
     });
   }
@@ -651,6 +663,110 @@ async function correctOnce(env, student, journalId) {
   }
   const row = await first(env.DB, `SELECT * FROM journals WHERE id = ?`, journalId);
   return json({ journal: journalRow(row), ai_error: aiError });
+}
+
+// ---------- 言い換え問題 ----------
+// The student writes the English of one of their problems (items of kind
+// rephrase). The sentence is kept, then corrected by the AI like a journal. A
+// sentence that is one of the right answers needs no AI, and the same sentence
+// for the same problem gets the correction it had before. skip (答えを見る) only
+// keeps that the problem was done.
+
+const REPHRASE_CORRECTED_PER_DAY = 100;
+const rephraseAnswers = (en) => String(en).split(/\/|／/).map((a) => a.trim()).filter(Boolean);
+const rephraseErrorKey = (answerId) => `rephrase|${answerId}`;
+const sameWords = (a, b) => normalizeWords(a).join(" ") === normalizeWords(b).join(" ");
+
+async function answerRephrase(request, env, student) {
+  const input = await readJson(request);
+  const item = await first(
+    env.DB, `SELECT * FROM items WHERE id = ? AND student_id = ? AND kind = 'rephrase'`, Number(input.item), student.id,
+  );
+  if (!item) throw new HttpError(404, "その問題は見つかりません。");
+  const data = JSON.parse(item.data);
+  const skip = input.skip === true;
+  const given = skip ? "" : String(input.given || "").trim().replace(/\s+/g, " ");
+  if (!skip && !given) throw new HttpError(400, "英語の文を書いてから送ってください。");
+  if (given.length > 300) throw new HttpError(400, "長すぎます。300文字以内にしてください。");
+
+  const empty = { corrected: given, corrections: [], spelling: [], comment: "" };
+  let correction = null;
+  if (skip) correction = { ...empty, skipped: true, ok: false };
+  else if (rephraseAnswers(data.en).some((a) => sameWords(a, given))) correction = { ...empty, exact: true, ok: true };
+  else {
+    const before = await first(
+      env.DB,
+      `SELECT correction FROM rephrase_answers WHERE student_id = ? AND prompt = ? AND model = ? AND given = ? AND ok IS NOT NULL
+       AND json_extract(correction, '$.skipped') IS NULL ORDER BY id DESC LIMIT 1`,
+      student.id, data.ja, data.en, given,
+    );
+    if (before) {
+      // Without the AI's name, so it doesn't count toward the day's AI corrections.
+      const { model, ...kept } = JSON.parse(before.correction);
+      correction = kept;
+    }
+  }
+  const { meta } = await run(
+    env.DB,
+    `INSERT INTO rephrase_answers (student_id, item_id, grammar, prompt, model, given, correction, ok, created_at)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    student.id, item.id, data.group, data.ja, data.en, given,
+    correction && JSON.stringify(correction), correction ? (correction.ok ? 1 : 0) : null, now(),
+  );
+  if (correction || !aiEnabled(env)) {
+    return json({ answer: rephraseRow(await first(env.DB, `SELECT * FROM rephrase_answers WHERE id = ?`, meta.last_row_id)) });
+  }
+  return correctRephrase(env, student, meta.last_row_id, data.hint);
+}
+
+// Only an answer with no correction yet (the AI failed) can be sent again.
+async function retryRephrase(env, student, answerId) {
+  const row = await first(env.DB, `SELECT * FROM rephrase_answers WHERE id = ? AND student_id = ?`, answerId, student.id);
+  if (!row) throw new HttpError(404, "見つかりません。");
+  if (row.correction || !aiEnabled(env)) return json({ answer: rephraseRow(row) });
+  const item = row.item_id && (await first(env.DB, `SELECT data FROM items WHERE id = ?`, row.item_id));
+  return correctRephrase(env, student, answerId, item ? JSON.parse(item.data).hint : "");
+}
+
+// Like a journal: the answer is saved before the AI runs, so when the AI fails
+// the student keeps their sentence and the message comes back as ai_error.
+async function correctRephrase(env, student, answerId, hint) {
+  const row = await first(env.DB, `SELECT * FROM rephrase_answers WHERE id = ?`, answerId);
+  const since = new Date(Date.parse(`${japanDay()}T00:00:00+09:00`)).toISOString();
+  const today = await first(
+    env.DB,
+    `SELECT COUNT(*) AS n FROM rephrase_answers WHERE student_id = ? AND created_at >= ? AND json_extract(correction, '$.model') IS NOT NULL`,
+    student.id, since,
+  );
+  if (today.n >= REPHRASE_CORRECTED_PER_DAY) {
+    return json({ answer: rephraseRow(row), ai_error: "今日の添削は、ここまでです。お手本とくらべてみてください。" });
+  }
+  let aiError = null;
+  try {
+    const correction = await correctSentence(env, {
+      question: { ja: row.prompt, answers: rephraseAnswers(row.model), grammar: row.grammar, hint },
+      given: row.given,
+      note: student.note,
+    });
+    await run(
+      env.DB,
+      `UPDATE rephrase_answers SET correction = ?, ok = ? WHERE id = ? AND correction IS NULL`,
+      JSON.stringify(correction), correction.ok ? 1 : 0, answerId,
+    );
+    await closeErrors(env.DB, rephraseErrorKey(answerId), "もう一度ためして、添削できた");
+  } catch (error) {
+    if (!(error instanceof AiError)) throw error;
+    aiError = error.message;
+    await recordError(env.DB, {
+      kind: "rephrase",
+      message: `言い換え問題の答え ${answerId} の添削ができなかった（生徒の画面：${error.message}）`,
+      detail: error.detail,
+      studentId: student.id,
+      ref: String(answerId),
+      key: rephraseErrorKey(answerId),
+    });
+  }
+  return json({ answer: rephraseRow(await first(env.DB, `SELECT * FROM rephrase_answers WHERE id = ?`, answerId)), ai_error: aiError });
 }
 
 // AI correction is optional: it switches on once ANTHROPIC_API_KEY is set.

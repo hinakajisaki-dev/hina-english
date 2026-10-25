@@ -27,7 +27,7 @@ watchErrors("/api/errors");
 const app = document.getElementById("app");
 const state = {
   me: null, vocab: null, vocabTest: null, review: null, pron: { which: null, index: 0 }, grammar: null, lesson: null, aiError: {},
-  study: null, notes: {}, quiz: null,
+  study: null, notes: {}, quiz: null, rephrase: null, rephraseGroup: null,
 };
 
 const asterisk = `<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><g stroke="currentColor" stroke-width="3.2" stroke-linecap="round"><path d="M12 3v18"/><path d="M4.2 7.5l15.6 9"/><path d="M4.2 16.5l15.6-9"/></g></svg>`;
@@ -59,7 +59,8 @@ function render() {
   if (screen === "pron") state.pron = { which: null, index: 0 };
   const screens = {
     vocab: renderVocab, review: renderReview, phrases: renderPhrases, "phrase-review": renderPhraseReview, pron: renderPron,
-    grammar: renderGrammar, journal: renderJournal, study: renderStudy, ...(NOTES_FOR_STUDENTS ? { notes: renderNotes } : {}),
+    grammar: renderGrammar, rephrase: renderRephrase, journal: renderJournal, study: renderStudy,
+    ...(NOTES_FOR_STUDENTS ? { notes: renderNotes } : {}),
   };
   (screens[screen] || renderHome)(...rest.map(decodeURIComponent));
 }
@@ -292,6 +293,7 @@ function todaysTasks() {
   const journal = wroteToday();
   const next = nextPhrase();
   const pron = pronDoneToday() || !next;
+  const rephrased = rephraseToday();
   return [
     { key: "journal", done: journal, href: "#/journal", title: "日記を書く", sub: journal ? "今日の日記は書けました" : "今日のお題で、英語の日記を1つ" },
     {
@@ -301,7 +303,15 @@ function todaysTasks() {
       title: "発音を1文 完了する",
       sub: pronDoneToday() ? "今日の発音はできました" : next ? `${monthLabel(myMonths(), next.month)} ・ ${next.index + 1}文目（${next.index + 1} / ${next.count}）` : "全部の Month が完了しています",
     },
-  ].filter((task) => shows(task.key));
+    // Only for a student who has 言い換え問題.
+    rephraseItems().length && {
+      key: "rephrase",
+      done: rephrased >= REPHRASE_GOAL,
+      href: "#/rephrase",
+      title: `言い換え問題を${REPHRASE_GOAL}問`,
+      sub: rephrased >= REPHRASE_GOAL ? `今日の${REPHRASE_GOAL}問はクリア！` : `今日 ${rephrased} / ${REPHRASE_GOAL}`,
+    },
+  ].filter((task) => task && shows(task.key));
 }
 
 function renderHome() {
@@ -324,6 +334,9 @@ function renderHome() {
   const latestNote = state.me.notes[0];
   const lessonCount = lessonList(state.me.lessonDays, state.me.notes).length;
   const plan = state.me.plan;
+  const rephrased = rephraseToday();
+  const rephraseDone = rephrased >= REPHRASE_GOAL;
+  const groups = rephraseGroups();
 
   app.innerHTML = `
     <header class="topbar"><div class="topbar-in">
@@ -373,6 +386,11 @@ function renderHome() {
             <span class="emoji" aria-hidden="true">🎤</span><b>発音課題</b>
             <span class="muted">${shared.length ? `${esc(monthLabel(myMonths(), pronMonth))} ・ 完了 ${pronFinished} / ${shared.length}` : "まだありません"}</span>
             ${shared.length ? `<div class="bar"><i style="width:${Math.round((pronFinished / shared.length) * 100)}%"></i></div>` : ""}` },
+          groups.length && { key: "rephrase", wide: true, cls: rephraseDone ? "done" : "", html: `
+            <span class="emoji" aria-hidden="true">${rephraseDone ? "✅" : "⚡"}</span>
+            <div><b>${rephraseTitle}</b>
+              <p class="muted">${rephraseDone ? `今日はクリア！（${rephrased} 問）おかわりもできます` : `今日 ${rephrased} / ${REPHRASE_GOAL} ・ ${esc(groups.slice(0, 3).join("・"))}${groups.length > 3 ? " など" : ""}`}</p>
+              ${rephraseDone ? "" : `<div class="bar"><i style="width:${Math.round((rephrased / REPHRASE_GOAL) * 100)}%"></i></div>`}</div>` },
           NOTES_FOR_STUDENTS && { key: "notes", wide: true, html: `
             <span class="emoji" aria-hidden="true">📝</span>
             <div><b>授業メモ</b><p class="muted">${[
@@ -2832,6 +2850,262 @@ function renderTeacherProblems() {
     g.queue.shift();
     g.answer = null;
     renderTeacherProblems();
+  });
+}
+
+// ---------- 言い換え問題 ----------
+// 瞬間英作文 for the grammar each student is weak at: the teacher's problems for
+// them (items of kind rephrase: group, ja, en, hint). A round takes problems at
+// random, the ones never done or last got wrong first. The student writes the
+// English, and it is corrected like a journal (the student's sentence, with only
+// what has to change fixed), with the model answer to hear. Ten a day is
+// クリア; after that, おかわり rounds of ten more.
+
+const REPHRASE_GOAL = 10;
+const rephraseItems = () => items("rephrase");
+const rephraseGroups = () => [...new Set(rephraseItems().map((item) => item.data.group))];
+const rephraseToday = () => {
+  const start = startOfJapanDay().getTime();
+  return state.me.rephrase.filter((a) => Date.parse(a.created_at) >= start).length;
+};
+const rephraseAnswers = (en) => en.split(/\/|／/).map((a) => a.trim()).filter(Boolean);
+const rephraseTitle = `言い換え問題<small>（瞬間英作文）</small>`;
+
+// count problems from pool: never done first, then last got wrong, then right
+// (each before the same done today), at random within each. A pool smaller than
+// the round comes round again, never the same problem twice in a row.
+function pickRephrase(pool, count) {
+  const start = startOfJapanDay().getTime();
+  const last = {};
+  for (const a of state.me.rephrase) if (a.item_id && !(a.item_id in last)) last[a.item_id] = a;
+  const rank = (item) => {
+    const a = last[item.id];
+    if (!a) return 0;
+    return (a.ok ? 3 : 1) + (Date.parse(a.created_at) >= start ? 1 : 0);
+  };
+  if (pool.length >= count) return shuffle(shuffle(pool).sort((a, b) => rank(a) - rank(b)).slice(0, count));
+  const picked = [];
+  while (picked.length < count) {
+    const lap = shuffle(pool);
+    if (lap.length > 1 && lap[0] === picked[picked.length - 1]) lap.push(lap.shift());
+    picked.push(...lap.slice(0, count - picked.length));
+  }
+  return picked;
+}
+
+function startRephrase() {
+  const group = rephraseGroups().includes(state.rephraseGroup) ? state.rephraseGroup : null;
+  const pool = rephraseItems().filter((item) => !group || item.data.group === group);
+  const done = rephraseToday();
+  const extra = done >= REPHRASE_GOAL;
+  const size = extra ? REPHRASE_GOAL : REPHRASE_GOAL - done;
+  state.rephrase = { group, extra, before: done, questions: pickRephrase(pool, size), index: 0, answers: [] };
+}
+
+function renderRephrase(page) {
+  if (!rephraseItems().length) {
+    app.innerHTML = `${topbar("言い換え問題")}<main class="wrap stack">${emptyState("先生が、問題を用意しています。")}</main>`;
+    return;
+  }
+  if (page === "play") return renderRephrasePlay();
+  const groups = rephraseGroups();
+  const done = rephraseToday();
+  const cleared = done >= REPHRASE_GOAL;
+  const R = state.rephrase;
+  const going = R && R.index < R.questions.length && R.answers.length;
+  const count = (group) => rephraseItems().filter((item) => item.data.group === group).length;
+  const chosen = groups.includes(state.rephraseGroup) ? state.rephraseGroup : null;
+
+  app.innerHTML = `${topbar("言い換え問題")}
+    <main class="wrap stack">
+      <section class="card stack rephrase-hero ${cleared ? "cleared" : ""}">
+        <h2>${rephraseTitle}</h2>
+        <p class="muted">日本語を見て、英語で書いてみよう。書いた文には<b>添削</b>がつきます。</p>
+        <div class="lesson-progress">
+          <div class="bar"><i style="width:${Math.min(100, Math.round((done / REPHRASE_GOAL) * 100))}%"></i></div>
+          <span class="counter">${cleared ? `クリア！ 今日 ${done} 問` : `今日 ${done} / ${REPHRASE_GOAL}`}</span>
+        </div>
+      </section>
+      ${groups.length > 1 ? `<section class="stack">
+        <p class="label">文法をえらぶ</p>
+        <div class="group-pick" role="group" aria-label="文法">
+          <button type="button" data-group="" aria-pressed="${!chosen}">ぜんぶ<small>${rephraseItems().length}</small></button>
+          ${groups.map((g) => `<button type="button" data-group="${esc(g)}" aria-pressed="${g === chosen}">${esc(g)}<small>${count(g)}</small></button>`).join("")}
+        </div>
+      </section>` : `<p class="muted small">文法：<b>${esc(groups[0])}</b>（${rephraseItems().length} 問）</p>`}
+      ${going ? `<a class="btn block" href="#/rephrase/play">つづける（${R.index + 1}問目から）</a>` : ""}
+      <button type="button" class="btn ${going ? "secondary" : ""} block" id="start">${cleared ? `おかわり（もう ${REPHRASE_GOAL} 問）` : done ? `はじめる（あと ${REPHRASE_GOAL - done} 問でクリア）` : `はじめる（${REPHRASE_GOAL} 問）`}</button>
+    </main>`;
+
+  app.querySelectorAll("[data-group]").forEach((button) => button.addEventListener("click", () => {
+    state.rephraseGroup = button.dataset.group || null;
+    renderRephrase();
+  }));
+  document.getElementById("start").addEventListener("click", () => {
+    startRephrase();
+    location.hash = "#/rephrase/play";
+  });
+}
+
+// The answer is sent at once and corrected on the server; the student sees the
+// model answer while it is corrected, and can go on before it comes back. Sent
+// again (もう一度ためす) after a failure, a kept answer is only corrected again.
+async function sendRephrase(R, i, body) {
+  const old = R.answers[i];
+  const entry = old || { given: body.given || "", skipped: !!body.skip };
+  Object.assign(entry, { pending: true, error: null });
+  R.answers[i] = entry;
+  const redraw = () => {
+    if (state.rephrase !== R || location.hash !== "#/rephrase/play") return;
+    if (R.index === i || R.index >= R.questions.length) renderRephrasePlay();
+  };
+  redraw();
+  try {
+    const result = entry.answer
+      ? await api(`/api/rephrase/${entry.answer.id}/correct`, { method: "POST", body: {} })
+      : await api("/api/rephrase", { method: "POST", body: { item: R.questions[i].id, ...body } });
+    entry.answer = result.answer;
+    entry.error = result.ai_error || null;
+    const { id, item_id, ok, created_at } = result.answer;
+    const kept = state.me.rephrase.find((a) => a.id === id);
+    if (kept) kept.ok = ok;
+    else state.me.rephrase.unshift({ id, item_id, ok, created_at });
+  } catch (error) {
+    entry.error = error.message;
+  }
+  entry.pending = false;
+  redraw();
+}
+
+function modelHtml(item) {
+  const [first, ...others] = rephraseAnswers(item.data.en);
+  return `<div class="model-answer">
+    <div class="model-head"><span class="tag">お手本</span>${sayIcon(first)}</div>
+    <p lang="en">${esc(first)}</p>
+    ${others.length ? `<p class="muted small">ほかの言い方：<span lang="en">${others.map(esc).join(" / ")}</span></p>` : ""}
+  </div>`;
+}
+
+// What the student wrote, corrected: right (⭕, with a word of praise), or the
+// sentence with its changes (like the journal) and what was fixed and why.
+function rephraseResultHtml(entry, { short = false } = {}) {
+  const c = entry.answer?.correction;
+  if (entry.skipped) return short ? `<p class="muted small">答えを見ました</p>` : "";
+  if (!c) {
+    const mine = `<p class="journal-text" lang="en">${esc(entry.given)}</p>`;
+    if (entry.pending) return `${short ? "" : `<p class="verdict judging"><span class="spinner" aria-hidden="true"></span>添削中…</p>`}${mine}`;
+    if (!entry.error) return mine;
+    return `${mine}<p class="notice bad">${esc(short ? "添削できませんでした" : entry.error)}</p>`;
+  }
+  if (c.ok) {
+    return `${short ? "" : `<p class="verdict right">⭕ 正解！</p>`}
+      <p class="journal-text" lang="en">${short ? "⭕ " : ""}${esc(entry.given)}</p>
+      ${!short && c.comment ? `<p class="ai-comment praise">${esc(c.comment)}</p>` : ""}`;
+  }
+  const spelling = spellingMap(c);
+  const points = shownPoints(c);
+  return `${short ? "" : `<p class="verdict fixed">✏️ 添削</p>`}
+    <p class="journal-text diff" lang="en">${diffHtml(entry.given, c.corrected, spelling)}</p>
+    ${short ? "" : `${points.map((fix) => `<div class="fix">
+        <p class="change" lang="en"><del>${esc(fix.before)}</del><span class="arrow" aria-label="を">→</span><ins>${esc(fix.after)}</ins></p>
+        <p>${esc(fix.why)}</p>
+      </div>`).join("")}
+      ${spelling.size ? `<p class="muted small"><ins class="spell">青い字</ins>は、つづりを直したところです。</p>` : ""}`}`;
+}
+
+function renderRephrasePlay() {
+  if (!state.rephrase) startRephrase();
+  const R = state.rephrase;
+  if (R.index >= R.questions.length) return renderRephraseResult();
+  const item = R.questions[R.index];
+  const entry = R.answers[R.index];
+  const n = R.index + 1;
+  const size = R.questions.length;
+  const counter = R.extra ? `おかわり ${n} / ${size}` : `${R.before + n} / ${REPHRASE_GOAL}`;
+  const last = R.index === size - 1;
+
+  app.innerHTML = `${topbar("言い換え問題", "#/rephrase")}
+    <main class="wrap stack">
+      <div class="lesson-progress" role="progressbar" aria-valuemin="1" aria-valuemax="${size}" aria-valuenow="${n}">
+        <div class="bar"><i style="width:${Math.round(((R.extra ? R.index : R.before + R.index) / (R.extra ? size : REPHRASE_GOAL)) * 100)}%"></i></div>
+        <span class="counter">${counter}</span>
+      </div>
+      <section class="card stack">
+        <div class="q-head"><p class="label">英語にしよう</p><span class="pill">${esc(item.data.group)}</span></div>
+        <p class="question-ja">${esc(item.data.ja)}</p>
+        ${item.data.hint && !entry ? `<details class="hint-box"><summary>ヒントを見る</summary><p>${noteHtml(item.data.hint)}</p></details>` : ""}
+        ${entry ? "" : `<form id="write" class="stack">
+          <textarea name="answer" rows="2" lang="en" autocomplete="off" autocapitalize="sentences" spellcheck="false" enterkeyhint="send" placeholder="英語で書いてみよう"></textarea>
+          <button class="btn block" type="submit">添削してもらう</button>
+          <button class="btn ghost block" type="button" id="give-up">わからない（答えを見る）</button>
+        </form>`}
+      </section>
+      ${entry ? `<section class="card stack" id="verdict" aria-live="polite">
+        ${entry.skipped ? "" : rephraseResultHtml(entry)}
+        ${!entry.pending && entry.error ? `<button type="button" class="btn secondary block" id="retry">もう一度ためす</button>` : ""}
+        ${modelHtml(item)}
+      </section>
+      <div class="lesson-nav"><span></span><button type="button" class="btn" id="next">${last ? "結果を見る" : "つぎへ →"}</button></div>` : ""}
+    </main>`;
+
+  if (entry) {
+    document.getElementById("retry")?.addEventListener("click", () => {
+      sendRephrase(R, R.index, entry.skipped ? { skip: true } : { given: entry.given });
+    });
+    document.getElementById("next").addEventListener("click", () => {
+      R.index += 1;
+      renderRephrasePlay();
+      window.scrollTo(0, 0);
+    });
+    return;
+  }
+  const form = document.getElementById("write");
+  const send = () => {
+    const given = form.answer.value.trim();
+    if (!given) return form.answer.focus();
+    sendRephrase(R, R.index, { given });
+    document.getElementById("verdict")?.scrollIntoView({ block: "nearest" });
+  };
+  form.answer.focus();
+  form.addEventListener("submit", (event) => {
+    event.preventDefault();
+    send();
+  });
+  // Enter sends (Shift+Enter, or Enter while choosing kanji, doesn't).
+  form.answer.addEventListener("keydown", (event) => {
+    if (event.key === "Enter" && !event.shiftKey && !event.isComposing) {
+      event.preventDefault();
+      send();
+    }
+  });
+  document.getElementById("give-up").addEventListener("click", () => sendRephrase(R, R.index, { skip: true }));
+}
+
+function renderRephraseResult() {
+  const R = state.rephrase;
+  const right = R.answers.filter((a) => a.answer?.correction?.ok).length;
+  const cleared = !R.extra;
+  app.innerHTML = `${topbar("言い換え問題", "#/rephrase")}
+    <main class="wrap stack">
+      <section class="card stack rephrase-done" style="text-align:center">
+        <p style="font-size:40px">${cleared ? "🎉" : "👏"}</p>
+        <h2>${cleared ? "クリア！" : "おかわり、おつかれさま！"}</h2>
+        <p>${cleared ? `今日の ${REPHRASE_GOAL} 問ができました。` : `${R.questions.length} 問ができました。`}正解 <b>${right}</b> 問</p>
+      </section>
+      <section class="card stack">
+        <h3>書いた文</h3>
+        ${R.questions.map((item, i) => `<div class="fix rephrase-row">
+          <p class="muted small">${esc(item.data.ja)}</p>
+          ${rephraseResultHtml(R.answers[i] || { skipped: true }, { short: true })}
+        </div>`).join("")}
+      </section>
+      <button type="button" class="btn block" id="again">おかわり（もう ${REPHRASE_GOAL} 問）</button>
+      <a class="btn secondary block" href="#/">ホームにもどる</a>
+    </main>`;
+  document.getElementById("again").addEventListener("click", () => {
+    startRephrase();
+    renderRephrasePlay();
+    window.scrollTo(0, 0);
   });
 }
 

@@ -41,6 +41,13 @@ const KINDS = {
     format: "問題（空欄は ___ ） | 答え | 選択肢を / で区切る（なくてもOK） | 解説（なくてもOK）",
     example: "I ___ to Osaka last week. | went | go / went / gone | 先週のことなので過去形\nShe has lived here ___ 2019. | since | | 「〜からずっと」は since",
   },
+  rephrase: {
+    tab: "言い換え問題",
+    columns: ["group", "ja", "en", "hint"],
+    required: 3,
+    format: "文法 | 日本語 | 英語（正解が2つ以上は / で区切る） | ヒント（なくてもOK）",
+    example: "過去形 | 昨日、友だちと映画を見ました。 | I watched a movie with my friend yesterday. / I saw a movie with my friend yesterday.\n三単現 | 姉は毎朝コーヒーを飲みます。 | My sister drinks coffee every morning. | 姉＝my sister",
+  },
   topic: {
     tab: "日記のテーマ",
     columns: ["prompt"],
@@ -51,6 +58,7 @@ const KINDS = {
 };
 const COLUMN_NAMES = {
   word: "単語", meaning: "意味", text: "文", question: "問題", answer: "答え", prompt: "テーマ",
+  group: "文法", ja: "日本語", en: "英語",
 };
 
 // ---------- boot and routing ----------
@@ -557,6 +565,11 @@ function rowHtml(kind, item, progress) {
     const key = `item/${item.id}`;
     if (state.current.pronDone?.[key]) pill = `<span class="pill good">完了</span>`;
     if (state.current.pronDone?.[key]?.sent_at) extra = recordingPlayer(key);
+  } else if (kind === "rephrase") {
+    main = d.ja;
+    sub = [d.en, d.hint && `ヒント：${d.hint}`].filter(Boolean).join(" ・ ");
+    const tries = (state.current.rephrase || []).filter((a) => a.item_id === item.id);
+    if (tries.length) pill = `<span class="pill">${tries.length}回 ・ ⭕${tries.filter((a) => a.ok).length}</span>`;
   } else if (kind === "grammar") {
     main = d.question;
     sub = [`答え：${d.answer}`, d.choices?.length ? `選択肢：${d.choices.join(" / ")}` : "", d.explanation].filter(Boolean).join(" ・ ");
@@ -565,10 +578,10 @@ function rowHtml(kind, item, progress) {
     sub = "";
     main = d.prompt;
   }
-  const mainLang = kind === "topic" ? "" : 'lang="en"';
+  const japanese = kind === "topic" || kind === "rephrase";
   return `<li data-id="${item.id}">
     <div class="main">
-      <div class="${kind === "topic" ? "" : "en-main"}" ${mainLang}>${esc(main)} ${pill}</div>
+      <div class="${japanese ? "" : "en-main"}" ${japanese ? "" : 'lang="en"'}>${esc(main)} ${pill}</div>
       ${sub ? `<div class="sub">${esc(sub)}</div>` : ""}
       ${extra}
     </div>
@@ -603,6 +616,15 @@ function renderItems(panel, kind) {
     list = list.filter((item) => weekOf(item) === week);
   }
   const weekName = week === "other" ? "そのほか" : `Week ${week}`;
+  // 言い換え問題 are listed by grammar, in the order each grammar was first added.
+  let rows = list.map((item) => rowHtml(kind, item, progress));
+  if (kind === "rephrase") {
+    const groups = [...new Set([...list].reverse().map((item) => item.data.group))];
+    rows = groups.flatMap((group) => {
+      const inGroup = list.filter((item) => item.data.group === group);
+      return [`<li class="group-head"><b>${esc(group)}</b><span class="muted small">${inGroup.length} 問</span></li>`, ...inGroup.map((item) => rowHtml(kind, item, progress))];
+    });
+  }
 
   const bookId = kind === "vocab" && week !== "other" ? weekBook(week, state.current.vocabBooks) : null;
   const bookInfo = bookId && vocabBooks().find((b) => b.id === bookId);
@@ -610,10 +632,12 @@ function renderItems(panel, kind) {
     ${kind === "grammar" ? lessonResultsHtml() : ""}
     ${kind === "vocab" ? vocabResultsHtml() : ""}
     ${kind === "pron" ? pronRecordingsHtml() : ""}
+    ${kind === "rephrase" ? rephraseResultsHtml() : ""}
     <section class="card stack">
       ${weekPicker}
       ${bookInfo ? `<p class="notice">${weekName} には、${bookInfo.shared ? "全員共通の単語帳" : `この生徒の単語帳「${esc(bookInfo.title)}」`}（${bookInfo.count} 語）が入っています。ここで足した単語は、この生徒の ${weekName} の最後に加わります。</p>` : ""}
       <h3>${week ? `${weekName} に` : ""}${kind === "grammar" ? "先生からの問題（この生徒だけ）" : esc(spec.tab)}を追加</h3>
+      ${kind === "rephrase" ? `<p class="muted small">この生徒の弱い文法を、日本語 → 英語で練習します。毎回ランダムに出て、1日10問でクリア（おかわりもできます）。書いた文は AI が添削します。</p>` : ""}
       <p class="format">1行に1つ。区切りは <code>|</code>（またはスプレッドシートからそのまま貼りつけ）<br>${esc(spec.format)}</p>
       <form id="bulk" class="stack">
         <textarea class="bulk" name="lines" lang="en" placeholder="${esc(spec.example)}"></textarea>
@@ -624,7 +648,7 @@ function renderItems(panel, kind) {
       ${kind === "topic" ? `<p class="muted small">日記のページで、毎日この中から順番に1つが「今日のテーマ」になります。生徒は別のテーマや、テーマなしも選べます。</p>` : ""}
     </section>
     <section class="card">
-      ${list.length ? `<ul class="rows" id="item-rows">${list.map((item) => rowHtml(kind, item, progress)).join("")}</ul>` : `<p class="empty">まだありません。</p>`}
+      ${list.length ? `<ul class="rows" id="item-rows">${rows.join("")}</ul>` : `<p class="empty">まだありません。</p>`}
     </section>
   </div>`;
 
@@ -664,7 +688,7 @@ function renderItems(panel, kind) {
     renderItems(panel, kind);
   });
 
-  panel.querySelectorAll("#item-rows > li").forEach((row) => {
+  panel.querySelectorAll("#item-rows > li[data-id]").forEach((row) => {
     const item = items.find((i) => i.id === Number(row.dataset.id));
     row.querySelector("[data-delete]").addEventListener("click", async () => {
       if (!confirm("削除しますか？")) return;
@@ -701,6 +725,39 @@ function renderItems(panel, kind) {
       });
     });
   });
+}
+
+// The student's latest 言い換え問題 answers, with the AI's corrections (shown on
+// the 言い換え問題 tab).
+function rephraseResultsHtml() {
+  const answers = state.current.rephraseAnswers || [];
+  const all = state.current.rephrase || [];
+  const start = startOfJapanDay().getTime();
+  const weekAgo = start - 6 * 86400e3;
+  const week = all.filter((a) => Date.parse(a.created_at) >= weekAgo);
+  const done = week.filter((a) => a.ok !== null);
+  const fixesHtml = (c) => shownPoints(c).map((fix) => `<div class="fix">
+    <p class="change" lang="en"><del>${esc(fix.before)}</del><span class="arrow">→</span><ins>${esc(fix.after)}</ins></p>
+    <p>${esc(fix.why)}</p>
+  </div>`).join("");
+  return `<section class="card stack">
+    <h3>答えと添削</h3>
+    <p class="muted small">今日 ${all.filter((a) => Date.parse(a.created_at) >= start).length} 問 ・ この7日 ${week.length} 問${done.length ? ` ・ 正解 ${Math.round((done.filter((a) => a.ok).length / done.length) * 100)}%` : ""}</p>
+    ${answers.length ? `<div class="stack">${answers.slice(0, 20).map((a, i) => {
+      const c = a.correction;
+      const mark = !c ? `<span class="badge waiting">添削なし</span>` : c.skipped ? `<span class="badge">答えを見た</span>` : c.ok ? `<span class="pill good">⭕ 正解</span>` : `<span class="pill">✏️ 添削</span>`;
+      return `${i === 5 ? `<details class="more-answers"><summary>もっと見る（${Math.min(answers.length, 20) - 5} こ）</summary><div class="stack">` : ""}<details class="rephrase-answer">
+        <summary><span class="muted small">${esc(formatDateTime(a.created_at))} ・ ${esc(a.grammar)}</span> ${mark}<br>
+          <span>${esc(a.prompt)}</span><br>
+          <span class="journal-text diff" lang="en">${c?.skipped ? "" : c && !c.ok ? diffHtml(a.given, c.corrected, spellingMap(c)) : esc(a.given)}</span></summary>
+        <div class="stack" style="margin-top:8px">
+          ${c && !c.ok && !c.skipped ? fixesHtml(c) : ""}
+          ${c?.comment ? `<p class="muted small">AI：${esc(c.comment)}</p>` : ""}
+          <p class="muted small">お手本：<span lang="en">${esc(a.model)}</span></p>
+        </div>
+      </details>`;
+    }).join("")}${answers.length > 5 ? "</div></details>" : ""}</div>` : `<p class="empty">まだ答えはありません。</p>`}
+  </section>`;
 }
 
 // How the student did in each grammar lesson (shown on the 文法 tab).

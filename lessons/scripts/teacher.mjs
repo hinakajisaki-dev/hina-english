@@ -12,6 +12,7 @@
 // node scripts/teacher.mjs add なおみ pron lines.txt               (読む文 | コツ)
 // node scripts/teacher.mjs add なおみ grammar lines.txt            (問題 | 答え | 選択肢 a / b | 解説)
 // node scripts/teacher.mjs add なおみ topic lines.txt              (テーマ)
+// node scripts/teacher.mjs add なおみ rephrase lines.txt           (言い換え問題: 文法 | 日本語 | 英語 a / b | ヒント)
 // node scripts/teacher.mjs edit-item なおみ 12 "borrow | 借りる | Can I borrow your pen?"
 // node scripts/teacher.mjs delete-item なおみ 12
 // node scripts/teacher.mjs note なおみ --day 2026-10-12 --title "When I 〜" memo.md [--publish]
@@ -21,6 +22,8 @@
 // node scripts/teacher.mjs plan なおみ [plan.md | --clear]      (今週の勉強範囲: see, set or clear)
 // node scripts/teacher.mjs menu なおみ [--only 日記,発音課題,勉強時間 | --all]   (what the home screen shows)
 // node scripts/teacher.mjs journals なおみ diaries.md [--dry]   (past diaries, no AI correction)
+// node scripts/teacher.mjs diaries なおみ [--days 7]           (the latest diaries and their corrections: weak grammar)
+// node scripts/teacher.mjs rephrase なおみ [--days 7]          (言い換え問題: what the student wrote and its corrections)
 // node scripts/teacher.mjs study-days なおみ days.txt [--dry | --replace | --undo]   (past study time: "2026-09-02 55")
 // node scripts/teacher.mjs pron-months なおみ [--set "1=Month 2" | --default]   (発音 months and their names)
 // node scripts/teacher.mjs pron-done なおみ (--month 1 | --keys m1/01,m1/02) [--day 2026-09-30] [--dry | --undo]
@@ -60,6 +63,7 @@ const KINDS = {
   pron: { name: "発音", columns: ["text", "tip"], required: 1 },
   grammar: { name: "文法", columns: ["question", "answer", "choices", "explanation"], required: 2 },
   topic: { name: "日記のテーマ", columns: ["prompt"], required: 1 },
+  rephrase: { name: "言い換え問題", columns: ["group", "ja", "en", "hint"], required: 3 },
 };
 
 class Stop extends Error {}
@@ -210,6 +214,9 @@ function pronProgress(done = {}) {
 // Japan's date, offset by whole days ("2026-10-14").
 const japanDay = (offset = 0) => new Date(Date.now() + 9 * 3600e3 + offset * 86400e3).toISOString().slice(0, 10);
 
+// The Japan date of a saved time ("2026-10-14").
+const japanDate = (iso) => new Date(Date.parse(iso) + 9 * 3600e3).toISOString().slice(0, 10);
+
 // "Week 1：IELTS 語彙 Week 1（ielts1・100 語）" for each week the app has a 単語帳 for.
 function bookLine(books) {
   const all = vocabBooks();
@@ -235,7 +242,7 @@ function japanTime(iso) {
   return `${d.getUTCMonth() + 1}/${d.getUTCDate()} ${two(d.getUTCHours())}:${two(d.getUTCMinutes())}`;
 }
 
-const ERROR_KINDS = { journal: "日記の添削", judge: "AI の判定", speech: "音声", server: "サーバー", browser: "画面" };
+const ERROR_KINDS = { journal: "日記の添削", judge: "AI の判定", rephrase: "言い換え問題の添削", speech: "音声", server: "サーバー", browser: "画面" };
 
 function errorLines(e) {
   const when = e.count > 1 ? `${japanTime(e.first_at)} 〜 ${japanTime(e.last_at)}（${e.count} 回）` : japanTime(e.last_at);
@@ -440,6 +447,49 @@ const commands = {
       body: { days, replace: !!options.replace },
     });
     console.log(`${student.name}さんに過去の勉強時間を入れました（アプリ以外の勉強として）：新しく ${added} 日分${replaced ? `、上書き ${replaced} 日分` : ""}${skipped.length ? `。もう記録があった ${skipped.length} 日分（${skipped.join("、")}）は、とばしました（上書きするときは --replace）` : ""}。`);
+  },
+
+  // The diaries of the last days (7 unless --days), with the AI's corrections and
+  // the teacher's comment: where the student's weak grammar shows (言い換え問題).
+  async diaries([name], options) {
+    const data = await studentData(await findStudent(name));
+    const days = Number(options.days) || 7;
+    const since = japanDay(-(days - 1));
+    const list = data.journals.filter((j) => japanDate(j.created_at) >= since).reverse();
+    console.log(`# ${data.student.name}さんの日記（${since} から ${list.length} こ）`);
+    for (const j of list) {
+      console.log(`\n## 日記 ${j.id}　${japanTime(j.created_at)}${j.topic ? `　お題：${j.topic}` : ""}${j.imported ? "（アプリの前）" : ""}`);
+      console.log(j.body);
+      const c = j.correction;
+      if (c) {
+        console.log(`\n直した文：${c.corrected}`);
+        for (const fix of c.corrections || []) console.log(`- ${fix.before} → ${fix.after}：${fix.why}`);
+        if (c.spelling?.length) console.log(`- つづり：${c.spelling.map((f) => `${f.wrong} → ${f.right}`).join("、")}`);
+      }
+      if (j.teacher_comment) console.log(`先生のコメント：${j.teacher_comment}`);
+    }
+  },
+
+  // The 言い換え問題 the student wrote in the last days (7 unless --days, at most
+  // the latest 60), with the AI's corrections.
+  async rephrase([name], options) {
+    const data = await studentData(await findStudent(name));
+    const days = Number(options.days) || 7;
+    const since = japanDay(-(days - 1));
+    const list = data.rephraseAnswers.filter((a) => japanDate(a.created_at) >= since).reverse();
+    const problems = data.items.filter((i) => i.kind === "rephrase");
+    console.log(`# ${data.student.name}さんの言い換え問題（問題 ${problems.length}・${since} から 答え ${list.length}）`);
+    for (const a of list) {
+      const c = a.correction;
+      const mark = !c ? "添削なし" : c.skipped ? "答えを見た" : c.ok ? "⭕" : "✏️";
+      console.log(`\n[${japanTime(a.created_at)}] ${a.grammar}・${a.prompt}　${mark}`);
+      if (c?.skipped) continue;
+      console.log(`書いた文：${a.given}`);
+      if (c && !c.ok) {
+        console.log(`直した文：${c.corrected}`);
+        for (const fix of c.corrections || []) console.log(`- ${fix.before} → ${fix.after}：${fix.why}`);
+      }
+    }
   },
 
   async "pron-done"([name], options) {

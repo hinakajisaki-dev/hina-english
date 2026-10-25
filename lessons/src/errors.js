@@ -2,7 +2,7 @@
 // couldn't be made, a bug on the server or in a student's browser), kept so the
 // teacher's error chat can see and fix them (docs/error-chat.md).
 //
-// kind: journal | judge | speech | server | browser. The same problem again,
+// kind: journal | judge | rephrase | speech | server | browser. The same problem again,
 // while it is still open, adds to its count instead of making a new row.
 // A row is open until it is marked done (by the error chat, or by the app
 // itself when a diary's correction works on a later try).
