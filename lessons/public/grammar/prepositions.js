@@ -8,6 +8,7 @@ export const PREPOSITIONS = {
   lessons: [
     {
       id: "prep-place",
+      theme: { icon: "📍", name: "場所", words: "in・on・at" },
       title: "場所の in / on / at",
       subtitle: "中・面・地点",
       steps: [
@@ -138,6 +139,7 @@ export const PREPOSITIONS = {
     },
     {
       id: "prep-position",
+      theme: { icon: "📦", name: "位置", words: "under・behind・in front of・next to・between" },
       title: "位置：under など",
       subtitle: "下・後ろ・前・となり・間",
       steps: [
@@ -246,6 +248,7 @@ export const PREPOSITIONS = {
     },
     {
       id: "prep-direction",
+      theme: { icon: "➡️", name: "方向", words: "to・into・from・out of・across" },
       title: "方向：to / into など",
       subtitle: "〜へ・〜の中へ・〜から",
       steps: [
@@ -367,6 +370,7 @@ export const PREPOSITIONS = {
     },
     {
       id: "prep-time",
+      theme: { icon: "🕒", name: "時間", words: "at・on・in・by・until" },
       title: "時間：at / on / in など",
       subtitle: "時刻・曜日・月・までに・まで",
       steps: [
@@ -492,6 +496,7 @@ export const PREPOSITIONS = {
     },
     {
       id: "prep-means",
+      theme: { icon: "🚃", name: "方法・相手", words: "by・with・to・for・about" },
       title: "by / with / to / for",
       subtitle: "方法・相手（電車で・ナイフで・〜へ・〜のため）",
       steps: [
@@ -631,3 +636,22 @@ export const PREPOSITIONS = {
     },
   ],
 };
+
+// まぜて練習: questions from every theme, one theme after another, so the
+// student has to think which preposition fits. The last two choices and the
+// last write of each theme; the order stays fixed (the server finds a step by
+// its index).
+const THEMES = PREPOSITIONS.lessons;
+const pick = (lesson) => {
+  const choices = lesson.steps.filter((s) => s.type === "choice").slice(-2);
+  const write = lesson.steps.filter((s) => s.type === "write").slice(-1);
+  return [...choices, ...write];
+};
+const picked = THEMES.map(pick);
+PREPOSITIONS.lessons.push({
+  id: "prep-mix",
+  title: "まぜて練習",
+  subtitle: "5つのテーマから",
+  theme: { icon: "🔀", name: "まぜて練習", words: `${THEMES.length}つのテーマから ${picked.flat().length}問`, plain: true },
+  steps: [0, 1, 2].flatMap((round) => picked.map((steps) => steps[round])),
+});

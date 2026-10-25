@@ -219,6 +219,9 @@ a.week:hover { border-color: var(--sky); }
 .lesson-card b { font-size: 17px; }
 .lesson-card .badge { flex: none; white-space: nowrap; }
 .lesson-card.soon { opacity: .6; box-shadow: none; }
+/* 前置詞: a lesson shown as its theme and the prepositions it teaches. */
+.theme-card b { font-size: 19px; }
+.theme-words { color: var(--bad); font-weight: 700; font-family: var(--en); margin-top: 4px; }
 /* つづきから: the set the student stopped in last. */
 .lesson-card.resume-card { border: 2px solid var(--accent); }
 /* A lesson with no 授業メモ: listed, not tappable. */
