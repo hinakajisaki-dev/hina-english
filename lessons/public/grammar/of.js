@@ -8,8 +8,8 @@ export const OF = {
   lessons: [
     {
       id: "of-order",
-      title: "「〜の」の of と 's",
-      subtitle: "AのB ＝ B of A・ケンのバッグ",
+      title: "レッスン 1",
+      subtitle: "「〜の」の of と 's（AのB ＝ B of A・ケンのバッグ）",
       steps: [
         {
           type: "explain",
@@ -125,8 +125,8 @@ export const OF = {
     },
     {
       id: "of-amount",
-      title: "量・入れ物の of",
-      subtitle: "a cup of・a piece of・a pair of",
+      title: "レッスン 2",
+      subtitle: "量・入れ物の of（a cup of・a piece of・a pair of）",
       steps: [
         {
           type: "explain",
@@ -267,8 +267,8 @@ export const OF = {
     },
     {
       id: "of-part",
-      title: "「〜のうちの」の of",
-      subtitle: "one of・some of・most of・all of",
+      title: "レッスン 3",
+      subtitle: "「〜のうちの」の of（one of・some of・most of・all of）",
       steps: [
         {
           type: "explain",
@@ -387,8 +387,8 @@ export const OF = {
     },
     {
       id: "of-best",
-      title: "いちばんの of と in",
-      subtitle: "the tallest of the three・in my class",
+      title: "レッスン 4",
+      subtitle: "いちばんの of と in（the tallest of the three・in my class）",
       steps: [
         {
           type: "explain",
@@ -491,8 +491,8 @@ export const OF = {
     },
     {
       id: "of-set",
-      title: "セットで覚える of",
-      subtitle: "a friend of mine・made of・be proud of",
+      title: "レッスン 5",
+      subtitle: "セットで覚える of（a friend of mine・made of・be proud of）",
       steps: [
         {
           type: "explain",
