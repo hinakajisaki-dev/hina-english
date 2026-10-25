@@ -15,32 +15,49 @@ export const PREPOSITIONS = {
         {
           type: "explain",
           title: "前置詞とは？",
-          text: ["**名詞の前**に置いて、場所・時間・方法などを表すことばです。"],
+          text: ["**名詞の前**に置いて、場所・方向・時間・方法などを表すことばです。"],
           examples: [
             { en: "The book is [[on]] the table.", ja: "その本はテーブルの上にあります。" },
             { en: "She lives [[in]] Osaka.", ja: "彼女は大阪に住んでいます。" },
           ],
           key: "前置詞のあとは**名詞**",
+          note: ["例：[[in]] Tokyo・[[with]] my friend・[[for]] you"],
+        },
+        {
+          type: "explain",
+          title: "前置詞は「位置関係のカメラ」",
+          text: ["人や物の**関係**を、イメージで表します。"],
+          table: {
+            head: ["聞きたいこと", "例"],
+            rows: [
+              ["どこにある？", "[[on]] the table"],
+              ["どこへ動く？", "[[to]] the station"],
+              ["いつ？", "[[at]] 7:00"],
+              ["どうやって？", "[[by]] train"],
+            ],
+          },
         },
         {
           type: "explain",
           title: "場所の [[in]] / [[on]] / [[at]]",
           text: ["日本語ではどれも「〜に」ですが、**イメージ**がちがいます。"],
           table: {
-            head: ["ことば", "イメージ"],
+            head: ["ことば", "イメージ", "使う場面"],
             rows: [
-              ["[[in]]", "中に入っている"],
-              ["[[on]]", "面にくっついている"],
-              ["[[at]]", "一点・地点"],
+              ["[[in]]", "中に包まれている", "範囲・空間の中\nin Tokyo"],
+              ["[[on]]", "面にくっついている", "表面にふれている\non the table"],
+              ["[[at]]", "一点を指す", "地点として見る\nat the station"],
             ],
           },
         },
         {
           type: "explain",
           title: "[[in]]：中に入っている",
+          text: ["箱や空間の中に、**すっぽり入っている**イメージです。"],
           examples: [
             { en: "They are [[in]] the park.", ja: "彼らは公園にいます。" },
             { en: "She is [[in]] the kitchen.", ja: "彼女はキッチンにいます。" },
+            { en: "The kids are [[in]] the classroom.", ja: "子どもたちは教室にいます。" },
           ],
           key: "都市・国・部屋・公園など → [[in]]",
         },
@@ -55,9 +72,11 @@ export const PREPOSITIONS = {
         {
           type: "explain",
           title: "[[on]]：面にくっついている",
+          text: ["**表面にふれている**イメージです。", "上だけでなく、**横（壁）や下（天井）**でも [[on]]。"],
           examples: [
             { en: "The book is [[on]] the desk.", ja: "本は机の上にあります。" },
             { en: "A picture is [[on]] the wall.", ja: "壁に絵がかかっています。" },
+            { en: "A fly is [[on]] the ceiling.", ja: "天井にハエがとまっています。" },
           ],
           key: "テーブル・壁・天井など、**面にふれている** → [[on]]",
         },
@@ -72,9 +91,11 @@ export const PREPOSITIONS = {
         {
           type: "explain",
           title: "[[at]]：一点・地点",
+          text: ["地図の**ピン📍**のように、場所を**一点**として見るイメージです。"],
           examples: [
             { en: "He is [[at]] the airport.", ja: "彼は空港にいます。" },
             { en: "We are [[at]] the entrance.", ja: "私たちは入り口にいます。" },
+            { en: "She is [[at]] work.", ja: "彼女は仕事中です。" },
           ],
           key: "待ち合わせ場所のような**地点** → [[at]]",
         },
@@ -93,6 +114,13 @@ export const PREPOSITIONS = {
           note: ["場所の大きさではなく、**どう見ているか**で決まります。"],
         },
         {
+          type: "explain",
+          title: "よくあるまちがい：都市・国に [[at]]",
+          text: ["都市や国は「範囲」なので、[[in]] です。"],
+          examples: [{ en: "I'm staying [[in]] Kyoto.", ja: "私は京都に泊まっています。" }],
+          note: ["✗ I'm staying at Kyoto."],
+        },
+        {
           type: "choice",
           q: "My sister lives ___ Canada.",
           ja: "姉はカナダに住んでいます。",
@@ -107,6 +135,28 @@ export const PREPOSITIONS = {
           choices: ["in", "on", "at"],
           answer: "on",
           why: "テーブルの面にふれているので、[[on]] です。",
+        },
+        {
+          type: "explain",
+          title: "そのまま覚えたい言い方",
+          text: ["**the をつけない**決まった言い方です。"],
+          table: {
+            head: ["英語", "意味"],
+            rows: [
+              ["[[at]] home", "家で"],
+              ["[[at]] work", "職場で・仕事中"],
+              ["[[at]] school", "学校で"],
+              ["[[in]] bed", "ベッドの中で"],
+            ],
+          },
+        },
+        {
+          type: "choice",
+          q: "I'm ___ home now.",
+          ja: "私は今、家にいます。",
+          choices: ["in", "on", "at"],
+          answer: "at",
+          why: "「家で・家に」は [[at]] home です。",
         },
         {
           type: "write",
