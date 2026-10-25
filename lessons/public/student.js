@@ -877,6 +877,10 @@ function findSet(week, number) {
   return wordSets(studentWeekWords(week), week).find((s) => s.number === number);
 }
 
+// Two tabs at the top of a list (練習 / テスト): [{ href, label, on }].
+const tabsHtml = (name, tabs) => `<nav class="tabs" aria-label="${esc(name)}">${tabs
+  .map((t) => `<a href="${t.href}" ${t.on ? 'aria-current="page"' : ""}>${t.label}</a>`).join("")}</nav>`;
+
 // A day (or set of ten): its words in a list, and its test in a tab of its own.
 function renderVocabDay(week, number, tab) {
   const set = findSet(week, number);
@@ -885,14 +889,13 @@ function renderVocabDay(week, number, tab) {
   const base = `#/vocab/${week}/${number}`;
   const result = testResult(week, number);
   const place = resumeAt("vocab", studentSetKey(week, number));
-  const tabLink = (href, label, on) => `<a href="${href}" ${on ? 'aria-current="page"' : ""}>${label}</a>`;
 
   app.innerHTML = `${topbar(`${weekLabel(week)} ・ ${set.label}`, `#/vocab/${week}`)}
     <main class="wrap stack">
-      <nav class="tabs" aria-label="単語とテスト">
-        ${tabLink(base, `単語 <small>${set.words.length}</small>`, tab !== "test")}
-        ${tabLink(`${base}/test`, `テスト${result ? " <small>✓</small>" : ""}`, tab === "test")}
-      </nav>
+      ${tabsHtml("単語とテスト", [
+        { href: base, label: `単語 <small>${set.words.length}</small>`, on: tab !== "test" },
+        { href: `${base}/test`, label: `テスト${result ? " <small>✓</small>" : ""}`, on: tab === "test" },
+      ])}
       ${tab === "test" ? `<section class="card stack test-intro">
         <p class="score">${set.words.length}<small> 問</small></p>
         <p>英語を見て、意味を<b>4つから</b>えらぼう。</p>
@@ -1402,7 +1405,10 @@ function phraseTestCount(weeks) {
   return { done: sets.filter((s) => phraseTestResult(s.week, s.number)).length, total: sets.length };
 }
 
+// #/phrases/1 is Week 1's 練習 tab, #/phrases/1/test its テスト tab,
+// #/phrases/1/2 a set to practise and #/phrases/1/2/test that set's test.
 function renderPhrases(week, setNumber, mode) {
+  if (week && setNumber === "test") return renderPhraseWeek(Number(week), "test");
   if (week && setNumber && mode === "test") return renderPhraseTest(Number(week), Number(setNumber));
   if (week && setNumber) return renderPhraseSet(Number(week), Number(setNumber));
   if (week) return renderPhraseWeek(Number(week));
@@ -1430,25 +1436,40 @@ function dayRange(sets) {
   return low === high ? `${low}` : `${low}〜${high}`;
 }
 
-function renderPhraseWeek(week) {
+// A week: its sets to practise, and their tests in a tab of their own, for a
+// student who wants to test themselves straight away.
+function renderPhraseWeek(week, tab) {
   state.phraseTest = null;
   const sets = phraseSets(week);
   const byDay = sets.length && sets[0].phrases[0].day;
+  const sub = (set) => (byDay ? `${setNumbers(set)} ・ ${esc(setScenes(set))}` : `<span lang="en">${set.phrases.map((p) => esc(p.en)).join(" ・ ")}</span>`);
+  const testSets = sets.filter(testSize);
   app.innerHTML = `${topbar(`フレーズ ・ Week ${week}`, "#/phrases")}
     <main class="wrap stack">
       ${weekTitle(week) ? `<h2 class="week-theme">${esc(weekTitle(week))}</h2>` : ""}
-      <p class="muted">${byDay ? `1日${dayRange(sets)}フレーズずつ` : "10フレーズずつ"}、意味と使い方を見て、瞬間英作文をします。最後にテスト（${TEST_SIZE}問）。まちがえたフレーズは「フレーズ復習」に入ります。</p>
+      ${testSets.length ? tabsHtml("練習とテスト", [
+        { href: `#/phrases/${week}`, label: "練習", on: tab !== "test" },
+        { href: `#/phrases/${week}/test`, label: "テスト", on: tab === "test" },
+      ]) : ""}
+      ${tab === "test" && testSets.length ? `<p class="muted">練習をとばして、すぐテスト（${TEST_SIZE}問）。まちがえたフレーズは「フレーズ復習」に入ります。</p>
+      ${testSets.map((set) => {
+        const result = phraseTestResult(week, set.number);
+        return `<a class="lesson-card" href="#/phrases/${week}/${set.number}/test">
+          <div><b>${esc(set.title)}</b><span class="muted small">${sub(set)}</span></div>
+          ${result ? `<span class="badge">✓ ${result.best} / ${result.total}</span>` : `<span class="badge start">テスト</span>`}
+        </a>`;
+      }).join("")}`
+      : `<p class="muted">${byDay ? `1日${dayRange(sets)}フレーズずつ` : "10フレーズずつ"}、意味と使い方を見て、瞬間英作文をします。${testSets.length ? "テストは「テスト」タブから、すぐできます。" : ""}</p>
       ${sets.length ? "" : emptyState("この週のフレーズは、まだありません。")}
       ${sets.map((set) => {
         const result = phraseTestResult(week, set.number);
-        const sub = byDay ? `${setNumbers(set)} ・ ${esc(setScenes(set))}` : `<span lang="en">${set.phrases.map((p) => esc(p.en)).join(" ・ ")}</span>`;
         const place = resumeAt("phrase", phraseSetKey(week, set.number));
         return `<a class="lesson-card" href="#/phrases/${week}/${set.number}">
-          <div><b>${esc(set.title)}</b><span class="muted small">${sub}</span></div>
+          <div><b>${esc(set.title)}</b><span class="muted small">${sub(set)}</span></div>
           ${place ? `<span class="badge start">つづきから ${esc(place.of)}</span>`
             : result ? `<span class="badge">✓ ${result.best} / ${result.total}</span>` : `<span class="badge start">はじめる</span>`}
         </a>`;
-      }).join("")}
+      }).join("")}`}
     </main>`;
 }
 
@@ -1691,7 +1712,7 @@ function renderPhraseTest(week, number) {
   const { phrase, drill, step } = T.questions[T.index];
   const answer = T.answers[T.index];
   const settled = answer && !answer.judging;
-  app.innerHTML = `${topbar(title, `#/phrases/${week}`)}
+  app.innerHTML = `${topbar(title, `#/phrases/${week}/test`)}
     <main class="wrap stack">
       <div class="lesson-progress" role="progressbar" aria-valuemin="1" aria-valuemax="${T.questions.length}" aria-valuenow="${T.index + 1}">
         <div class="bar"><i style="width:${Math.round((T.index / T.questions.length) * 100)}%"></i></div>
@@ -1737,7 +1758,7 @@ function renderPhraseTestResult(week, set, title, again) {
   }
   const next = findPhraseSet(week, set.number + 1);
   const perfect = score === T.questions.length;
-  app.innerHTML = `${topbar(title, `#/phrases/${week}`)}
+  app.innerHTML = `${topbar(title, `#/phrases/${week}/test`)}
     <main class="wrap stack">
       <section class="card stack" style="text-align:center">
         <p style="font-size:40px">${perfect ? "🎉" : "👏"}</p>
@@ -2225,10 +2246,14 @@ function phrased(text, format = fmt) {
   }).join("<br>");
 }
 
-function renderGrammar(unitId, lessonId) {
+// #/grammar/tense is a unit's レッスン tab, #/grammar/tense/test its テスト tab,
+// #/grammar/tense/past-simple a lesson and #/grammar/tense/past-simple/test
+// that lesson's questions only (no explanations).
+function renderGrammar(unitId, lessonId, mode) {
   if (unitId === "teacher") return renderTeacherProblems();
   const unit = UNITS.find((u) => u.id === unitId);
-  if (unit && lessonId) return renderLesson(unit, lessonId);
+  if (unit && lessonId === "test") return renderUnit(unit, "test");
+  if (unit && lessonId) return renderLesson(unit, lessonId, mode === "test");
   if (unit) return renderUnit(unit);
 
   const own = items("grammar").length;
@@ -2252,10 +2277,23 @@ function renderGrammar(unitId, lessonId) {
     </main>`;
 }
 
-function renderUnit(unit) {
+function renderUnit(unit, tab) {
+  const ready = unit.lessons.filter((lesson) => lesson.steps && questionCount(lesson));
   app.innerHTML = `${topbar(unit.title, "#/grammar")}
     <main class="wrap stack">
-      <p class="muted">${esc(unit.subtitle)}</p>
+      ${ready.length ? tabsHtml("レッスンとテスト", [
+        { href: `#/grammar/${unit.id}`, label: "レッスン", on: tab !== "test" },
+        { href: `#/grammar/${unit.id}/test`, label: "テスト", on: tab === "test" },
+      ]) : ""}
+      ${tab === "test" && ready.length ? `<p class="muted">説明をとばして、問題だけをします。</p>
+      ${ready.map((lesson) => {
+        const result = state.me.lessons?.[lesson.id];
+        return `<a class="lesson-card" href="#/grammar/${unit.id}/${lesson.id}/test">
+          <div><b>${esc(lesson.title)}</b><span class="muted small">問題 ${questionCount(lesson)}こ</span></div>
+          ${result ? `<span class="badge">✓ ${result.best} / ${result.total}</span>` : `<span class="badge start">テスト</span>`}
+        </a>`;
+      }).join("")}`
+      : `<p class="muted">${esc(unit.subtitle)}</p>
       ${unit.lessons.map((lesson) => {
         if (!lesson.steps) {
           return `<div class="lesson-card soon"><div><b>${esc(lesson.title)}</b><span class="muted small">${esc(lesson.subtitle)}</span></div><span class="badge waiting">準備中</span></div>`;
@@ -2265,28 +2303,34 @@ function renderUnit(unit) {
           <div><b>${esc(lesson.title)}</b><span class="muted small">${esc(lesson.subtitle)}</span></div>
           ${result ? `<span class="badge">✓ ${result.best} / ${result.total}</span>` : `<span class="badge start">はじめる</span>`}
         </a>`;
-      }).join("")}
+      }).join("")}`}
     </main>`;
 }
 
 // ---------- grammar lesson player ----------
 // One step per screen: read an explanation, then answer questions right away.
+// As a テスト, only the questions (L.index stays the step's own number, which
+// the server uses to find the question for the AI's judging).
 
-function startLesson(lessonId) {
-  state.lesson = { id: lessonId, index: 0, answers: {}, saved: false };
+const shownSteps = (lesson, testOnly) =>
+  lesson.steps.map((step, i) => (testOnly && step.type === "explain" ? -1 : i)).filter((i) => i >= 0);
+
+function startLesson(lesson, testOnly = false) {
+  state.lesson = { id: lesson.id, index: shownSteps(lesson, testOnly)[0] ?? 0, answers: {}, saved: false, testOnly };
 }
 
-function renderLesson(unit, lessonId) {
+function renderLesson(unit, lessonId, testOnly = false) {
   const found = findLesson(lessonId);
   if (!found?.lesson.steps) return renderUnit(unit);
   const { lesson } = found;
-  if (state.lesson?.id !== lessonId) startLesson(lessonId);
+  if (state.lesson?.id !== lessonId || state.lesson.testOnly !== testOnly) startLesson(lesson, testOnly);
   const L = state.lesson;
   const steps = lesson.steps;
+  const shown = shownSteps(lesson, testOnly);
   const total = questionCount(lesson);
-  const back = `#/grammar/${unit.id}`;
+  const back = `#/grammar/${unit.id}${testOnly ? "/test" : ""}`;
   const rerender = () => {
-    renderLesson(unit, lessonId);
+    renderLesson(unit, lessonId, testOnly);
     window.scrollTo(0, 0);
   };
 
@@ -2294,30 +2338,32 @@ function renderLesson(unit, lessonId) {
 
   const step = steps[L.index];
   const answer = L.answers[L.index];
-  const percent = Math.round((L.index / steps.length) * 100);
+  const at = shown.indexOf(L.index);
+  const percent = Math.round((at / shown.length) * 100);
   let body;
   if (step.type === "explain") body = explainHtml(step);
   else body = questionStepHtml(step, answer);
 
   app.innerHTML = `${topbar(lesson.title, back)}
     <main class="wrap stack">
-      <div class="lesson-progress" role="progressbar" aria-valuemin="0" aria-valuemax="${steps.length}" aria-valuenow="${L.index + 1}">
+      <div class="lesson-progress" role="progressbar" aria-valuemin="0" aria-valuemax="${shown.length}" aria-valuenow="${at + 1}">
+        ${testOnly ? '<span class="badge start">テスト</span>' : ""}
         <div class="bar"><i style="width:${percent}%"></i></div>
-        <span class="counter">${L.index + 1} / ${steps.length}</span>
+        <span class="counter">${at + 1} / ${shown.length}</span>
       </div>
       ${body}
       <div class="lesson-nav">
-        ${L.index > 0 ? `<button type="button" class="btn ghost" id="prev">← もどる</button>` : "<span></span>"}
-        ${step.type === "explain" || (answer && !answer.judging) ? `<button type="button" class="btn" id="next">${L.index === steps.length - 1 ? "おわり" : "次へ"}</button>` : ""}
+        ${at > 0 ? `<button type="button" class="btn ghost" id="prev">← もどる</button>` : "<span></span>"}
+        ${step.type === "explain" || (answer && !answer.judging) ? `<button type="button" class="btn" id="next">${at === shown.length - 1 ? "おわり" : "次へ"}</button>` : ""}
       </div>
     </main>`;
 
   document.getElementById("prev")?.addEventListener("click", () => {
-    L.index -= 1;
+    L.index = shown[at - 1];
     rerender();
   });
   document.getElementById("next")?.addEventListener("click", () => {
-    L.index += 1;
+    L.index = shown[at + 1] ?? steps.length;
     rerender();
   });
   if (answer) {
@@ -2327,7 +2373,7 @@ function renderLesson(unit, lessonId) {
 
   const record = (given, right) => {
     L.answers[L.index] = { given, right };
-    renderLesson(unit, lessonId);
+    renderLesson(unit, lessonId, testOnly);
     document.getElementById("verdict")?.scrollIntoView({ block: "nearest" });
   };
 
@@ -2366,7 +2412,7 @@ function renderLesson(unit, lessonId) {
   if (step.type === "write") {
     bindWriteForm((given) => {
       const source = { lesson: lessonId, step: L.index };
-      const redraw = () => renderLesson(unit, lessonId);
+      const redraw = () => renderLesson(unit, lessonId, testOnly);
       if (!given) return record("", false);
       L.answers[L.index] = checkTyped(given, step.answers, source, { redraw });
       redraw();
@@ -2656,11 +2702,12 @@ function renderLessonResult(unit, lesson, total, rerender) {
   }
   const wrongSteps = lesson.steps.map((s, i) => [s, L.answers[i]]).filter(([s, a]) => s.type !== "explain" && !a?.right);
 
-  app.innerHTML = `${topbar(lesson.title, `#/grammar/${unit.id}`)}
+  const back = `#/grammar/${unit.id}${L.testOnly ? "/test" : ""}`;
+  app.innerHTML = `${topbar(lesson.title, back)}
     <main class="wrap stack">
       <div class="card empty stack">
         <p style="font-size:40px">${right === total ? "🎉" : "👏"}</p>
-        <p><b>${esc(lesson.title)} のレッスン、おつかれさま！</b></p>
+        <p><b>${esc(lesson.title)} の${L.testOnly ? "テスト" : "レッスン"}、おつかれさま！</b></p>
         <p class="score">${right} / ${total}<small> 問正解</small></p>
       </div>
       ${wrongSteps.length ? `<section class="card stack">
@@ -2668,10 +2715,10 @@ function renderLessonResult(unit, lesson, total, rerender) {
         ${wrongSteps.map(([s]) => `<div class="fix"><p class="muted small">${esc(s.ja || "")}</p><p lang="en"><b>${esc(correctAnswer(s))}</b></p>${s.why ? `<p class="muted small">${fmt(s.why)}</p>` : ""}</div>`).join("")}
       </section>` : ""}
       <button type="button" class="btn block" id="restart">もう一度やる</button>
-      <a class="btn secondary block" href="#/grammar/${unit.id}">${esc(unit.title)} にもどる</a>
+      <a class="btn secondary block" href="${back}">${esc(unit.title)} にもどる</a>
     </main>`;
   document.getElementById("restart").addEventListener("click", () => {
-    startLesson(lesson.id);
+    startLesson(lesson, L.testOnly);
     rerender();
   });
 }
