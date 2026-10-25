@@ -46,7 +46,7 @@ const KINDS = {
     columns: ["group", "ja", "en", "hint"],
     required: 3,
     format: "文法 | 日本語 | 英語（正解が2つ以上は / で区切る） | ヒント（なくてもOK）",
-    example: "過去形 | 昨日、友だちと映画を見ました。 | I watched a movie with my friend yesterday. / I saw a movie with my friend yesterday.\n三単現 | 姉は毎朝コーヒーを飲みます。 | My sister drinks coffee every morning. | 姉＝my sister",
+    example: "今日のこと（過去形） | 仕事のあと、スーパーに行きました。 | I went to the supermarket after work.\n自分のこと（現在形） | 姉は毎朝コーヒーを飲みます。 | My sister drinks coffee every morning. | 姉＝my sister",
   },
   topic: {
     tab: "日記のテーマ",
@@ -637,7 +637,17 @@ function renderItems(panel, kind) {
       ${weekPicker}
       ${bookInfo ? `<p class="notice">${weekName} には、${bookInfo.shared ? "全員共通の単語帳" : `この生徒の単語帳「${esc(bookInfo.title)}」`}（${bookInfo.count} 語）が入っています。ここで足した単語は、この生徒の ${weekName} の最後に加わります。</p>` : ""}
       <h3>${week ? `${weekName} に` : ""}${kind === "grammar" ? "先生からの問題（この生徒だけ）" : esc(spec.tab)}を追加</h3>
-      ${kind === "rephrase" ? `<p class="muted small">会話や日記で使う英語（自分のこと・今日のこと・これからのこと）を、この生徒の弱い文法で、日本語 → 英語で練習します。毎回ランダムに出て、1日10問でクリア（おかわりもできます）。書いた文は AI が添削します。</p>` : ""}
+      ${kind === "rephrase" ? `<p class="muted small">会話や日記で使う英語（自分のこと・今日のこと・これからのこと）を、この生徒の弱い文法で、日本語 → 英語で練習します。毎回ランダムに出て、1日10問でクリア（おかわりもできます）。書いた文は AI が添削します。</p>
+        ${state.current.ai ? `<form id="ai-make" class="ai-make stack">
+          <b>AI で問題を作る</b>
+          <div class="inline-form">
+            <input type="text" name="grammar" list="rephrase-groups" maxlength="60" required placeholder="練習したい文法（例：これまでの経験（現在完了形））">
+            <select name="count" aria-label="問題の数"><option value="10">10 問</option><option value="20">20 問</option></select>
+            <button class="btn" type="submit">作る</button>
+          </div>
+          <datalist id="rephrase-groups">${[...new Set(list.map((item) => item.data.group))].map((g) => `<option value="${esc(g)}">`).join("")}</datalist>
+          <p class="muted small">この生徒の最近の日記から、日常の文で作ります。下の欄に入るので、見て直してから「追加」を押してください。</p>
+        </form>` : ""}` : ""}
       <p class="format">1行に1つ。区切りは <code>|</code>（またはスプレッドシートからそのまま貼りつけ）<br>${esc(spec.format)}</p>
       <form id="bulk" class="stack">
         <textarea class="bulk" name="lines" lang="en" placeholder="${esc(spec.example)}"></textarea>
@@ -680,6 +690,28 @@ function renderItems(panel, kind) {
       error.hidden = false;
       done(button);
     }
+  });
+
+  // 言い換え問題: the AI's drafts go in the box above, to read and fix before 追加.
+  const make = document.getElementById("ai-make");
+  make?.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const button = make.querySelector("button");
+    busy(button, "作成中…（30秒ほど）");
+    try {
+      const { grammar, problems } = await api(`/api/teacher/students/${student.id}/rephrase-draft`, {
+        method: "POST",
+        body: { grammar: make.grammar.value, count: Number(make.count.value) },
+      });
+      const lines = problems.map((p) => toLine(kind, { group: grammar, ja: p.ja, en: p.answers.join(" / "), hint: p.hint }));
+      form.lines.value = [form.lines.value.trim(), ...lines].filter(Boolean).join("\n");
+      form.lines.style.height = `${Math.min(600, form.lines.scrollHeight + 4)}px`;
+      form.lines.scrollIntoView({ block: "center" });
+      toast(`${lines.length} 問つくりました。見て直してから「追加」を押してください`);
+    } catch (error) {
+      toast(error.message);
+    }
+    done(button);
   });
 
   document.getElementById("week")?.addEventListener("change", (event) => {

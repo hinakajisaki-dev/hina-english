@@ -3,7 +3,7 @@
 //
 // Students sign in with a personal code (kept in an HttpOnly cookie).
 // The teacher signs in with TEACHER_PASSWORD; the cookie holds an HMAC of it.
-import { AiError, correctJournal, correctSentence, judgeAnswer } from "./ai.js";
+import { AiError, correctJournal, correctSentence, judgeAnswer, makeRephraseProblems } from "./ai.js";
 import { SpeechError, speechFor } from "./speech.js";
 import {
   closeErrors, journalErrorKey, listErrors, markErrorDone, markErrorsSeen, noteStuckJournals, recordError,
@@ -219,6 +219,10 @@ async function route(request, env, url, who) {
   }
   if (parts[1] === "students" && parts[3] === "lesson-days" && parts.length === 4 && method === "POST") {
     return saveLessonDays(request, db, await findStudent(db, id(2)));
+  }
+  if (parts[1] === "students" && parts[3] === "rephrase-draft" && parts.length === 4 && method === "POST") {
+    if (!aiEnabled(env)) throw new HttpError(400, "ANTHROPIC_API_KEY がないので、AI で作れません。");
+    return draftRephrase(request, env, await findStudent(db, id(2)));
   }
   if (parts[1] === "students" && parts[3] === "journals" && parts.length === 4 && method === "POST") {
     return importJournals(request, db, await findStudent(db, id(2)));
@@ -767,6 +771,40 @@ async function correctRephrase(env, student, answerId, hint) {
     });
   }
   return json({ answer: rephraseRow(await first(env.DB, `SELECT * FROM rephrase_answers WHERE id = ?`, answerId)), ai_error: aiError });
+}
+
+// The teacher types the grammar to practise, and the AI drafts problems from the
+// student's latest diaries. Nothing is saved: the drafts go in the teacher's
+// box to read and fix, then are added like any other line.
+async function draftRephrase(request, env, student) {
+  const input = await readJson(request);
+  const grammar = String(input.grammar || "").trim().slice(0, 60);
+  if (!grammar) throw new HttpError(400, "練習したい文法を入れてください。");
+  const count = Math.min(20, Math.max(5, Number(input.count) || 10));
+  const [journals, items] = await Promise.all([
+    all(env.DB, `SELECT body FROM journals WHERE student_id = ? ORDER BY created_at DESC, id DESC LIMIT 5`, student.id),
+    all(env.DB, `SELECT data FROM items WHERE student_id = ? AND kind = 'rephrase'`, student.id),
+  ]);
+  try {
+    const problems = await makeRephraseProblems(env, {
+      grammar,
+      count,
+      note: student.note,
+      diaries: journals.map((j) => j.body.slice(0, 1500)),
+      existing: items.map((row) => JSON.parse(row.data).ja),
+    });
+    return json({ grammar, problems });
+  } catch (error) {
+    if (!(error instanceof AiError)) throw error;
+    await recordError(env.DB, {
+      kind: "rephrase",
+      message: `言い換え問題を AI で作れなかった（先生ページ：${error.message}）`,
+      detail: error.detail,
+      studentId: student.id,
+      ref: grammar,
+    });
+    throw new HttpError(503, error.message);
+  }
 }
 
 // AI correction is optional: it switches on once ANTHROPIC_API_KEY is set.

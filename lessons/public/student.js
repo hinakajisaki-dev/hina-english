@@ -293,7 +293,6 @@ function todaysTasks() {
   const journal = wroteToday();
   const next = nextPhrase();
   const pron = pronDoneToday() || !next;
-  const rephrased = rephraseToday();
   return [
     { key: "journal", done: journal, href: "#/journal", title: "日記を書く", sub: journal ? "今日の日記は書けました" : "今日のお題で、英語の日記を1つ" },
     {
@@ -303,15 +302,7 @@ function todaysTasks() {
       title: "発音を1文 完了する",
       sub: pronDoneToday() ? "今日の発音はできました" : next ? `${monthLabel(myMonths(), next.month)} ・ ${next.index + 1}文目（${next.index + 1} / ${next.count}）` : "全部の Month が完了しています",
     },
-    // Only for a student who has 言い換え問題.
-    rephraseItems().length && {
-      key: "rephrase",
-      done: rephrased >= REPHRASE_GOAL,
-      href: "#/rephrase",
-      title: `言い換え問題を${REPHRASE_GOAL}問`,
-      sub: rephrased >= REPHRASE_GOAL ? `今日の${REPHRASE_GOAL}問はクリア！` : `今日 ${rephrased} / ${REPHRASE_GOAL}`,
-    },
-  ].filter((task) => task && shows(task.key));
+  ].filter((task) => shows(task.key));
 }
 
 function renderHome() {
@@ -389,7 +380,7 @@ function renderHome() {
           groups.length && { key: "rephrase", wide: true, cls: rephraseDone ? "done" : "", html: `
             <span class="emoji" aria-hidden="true">${rephraseDone ? "✅" : "⚡"}</span>
             <div><b>${rephraseTitle}</b>
-              <p class="muted">${rephraseDone ? `今日はクリア！（${rephrased} 問）おかわりもできます` : `今日 ${rephrased} / ${REPHRASE_GOAL} ・ ${esc(groups.slice(0, 3).join("・"))}${groups.length > 3 ? " など" : ""}`}</p>
+              <p class="muted">${rephraseDone ? `今日はクリア！（${rephrased} 問）おかわりもできます` : `今日 ${rephrased} / ${REPHRASE_GOAL}`}</p>
               ${rephraseDone ? "" : `<div class="bar"><i style="width:${Math.round((rephrased / REPHRASE_GOAL) * 100)}%"></i></div>`}</div>` },
           NOTES_FOR_STUDENTS && { key: "notes", wide: true, html: `
             <span class="emoji" aria-hidden="true">📝</span>
