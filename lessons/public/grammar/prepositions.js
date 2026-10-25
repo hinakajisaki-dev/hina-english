@@ -4,13 +4,13 @@
 export const PREPOSITIONS = {
   id: "prepositions",
   title: "前置詞",
-  subtitle: "in / on / at / to / by / with …",
+  subtitle: "in / at / on / to / by / with …",
   lessons: [
     {
       id: "prep-place",
-      theme: { icon: "📍", name: "場所", words: "in・on・at" },
-      title: "場所の in / on / at",
-      subtitle: "中・面・地点",
+      theme: { icon: "📍", name: "場所", words: "in・at・on" },
+      title: "場所の in / at / on",
+      subtitle: "中・地点・面",
       steps: [
         {
           type: "explain",
@@ -39,21 +39,21 @@ export const PREPOSITIONS = {
         },
         {
           type: "explain",
-          title: "場所の [[in]] / [[on]] / [[at]]",
+          title: "場所の [[in]] / [[at]] / [[on]]",
           text: ["日本語ではどれも「〜に」ですが、**イメージ**がちがいます。"],
           table: {
             head: ["ことば", "イメージ", "使う場面"],
             rows: [
-              ["[[in]]", "中に包まれている", "範囲・空間の中\nin Tokyo"],
-              ["[[on]]", "面にくっついている", "表面にふれている\non the table"],
+              ["[[in]]", "中に包まれている", "広い範囲・空間の中\nin Tokyo"],
               ["[[at]]", "一点を指す", "地点として見る\nat the station"],
+              ["[[on]]", "面にくっついている", "表面にふれている\non the table"],
             ],
           },
         },
         {
           type: "explain",
           title: "[[in]]：中に入っている",
-          text: ["箱や空間の中に、**すっぽり入っている**イメージです。"],
+          text: ["箱や空間の中に、**すっぽり入っている**イメージです。", "都市・国など、**広い範囲**で使うことが多いです。"],
           examples: [
             { en: "They are [[in]] the park.", ja: "彼らは公園にいます。" },
             { en: "She is [[in]] the kitchen.", ja: "彼女はキッチンにいます。" },
@@ -68,25 +68,6 @@ export const PREPOSITIONS = {
           choices: ["in", "on", "at"],
           answer: "in",
           why: "車の中に入っているので、[[in]] です。",
-        },
-        {
-          type: "explain",
-          title: "[[on]]：面にくっついている",
-          text: ["**表面にふれている**イメージです。", "上だけでなく、**横（壁）や下（天井）**でも [[on]]。"],
-          examples: [
-            { en: "The book is [[on]] the desk.", ja: "本は机の上にあります。" },
-            { en: "A picture is [[on]] the wall.", ja: "壁に絵がかかっています。" },
-            { en: "A fly is [[on]] the ceiling.", ja: "天井にハエがとまっています。" },
-          ],
-          key: "テーブル・壁・天井など、**面にふれている** → [[on]]",
-        },
-        {
-          type: "choice",
-          q: "There is a clock ___ the wall.",
-          ja: "壁に時計がかかっています。",
-          choices: ["in", "on", "at"],
-          answer: "on",
-          why: "壁の面にくっついているので、[[on]] です。",
         },
         {
           type: "explain",
@@ -127,6 +108,25 @@ export const PREPOSITIONS = {
           choices: ["in", "on", "at"],
           answer: "in",
           why: "カナダという国（範囲の中）なので、[[in]] です（✗ at Canada）。",
+        },
+        {
+          type: "explain",
+          title: "[[on]]：面にくっついている",
+          text: ["**表面にふれている**イメージです。", "上だけでなく、**横（壁）や下（天井）**でも [[on]]。"],
+          examples: [
+            { en: "The book is [[on]] the desk.", ja: "本は机の上にあります。" },
+            { en: "A picture is [[on]] the wall.", ja: "壁に絵がかかっています。" },
+            { en: "A fly is [[on]] the ceiling.", ja: "天井にハエがとまっています。" },
+          ],
+          key: "テーブル・壁・天井など、**面にふれている** → [[on]]",
+        },
+        {
+          type: "choice",
+          q: "There is a clock ___ the wall.",
+          ja: "壁に時計がかかっています。",
+          choices: ["in", "on", "at"],
+          answer: "on",
+          why: "壁の面にくっついているので、[[on]] です。",
         },
         {
           type: "choice",
@@ -195,21 +195,30 @@ export const PREPOSITIONS = {
       steps: [
         {
           type: "explain",
-          title: "位置を表すことば",
+          title: "位置を表す前置詞",
+          text: ["**何かを基準にして**、どこにあるかを表します。"],
           table: {
             head: ["ことば", "意味"],
             rows: [
               ["[[under]]", "〜の下に"],
               ["[[behind]]", "〜の後ろに"],
               ["[[in front of]]", "〜の前に"],
-              ["[[next to]]", "〜のとなりに"],
+              ["[[next to]]", "〜のすぐとなりに"],
               ["[[near]]", "〜の近くに"],
+              ["[[between]]", "2つのものの間に"],
             ],
           },
+        },
+        {
+          type: "explain",
+          title: "[[under]] / [[behind]] / [[in front of]]",
+          text: ["基準のものの**下・後ろ・前**です。"],
           examples: [
             { en: "The shoes are [[under]] the bed.", ja: "くつはベッドの下にあります。" },
             { en: "The ball is [[behind]] the box.", ja: "ボールは箱の後ろにあります。" },
+            { en: "A car is [[in front of]] my house.", ja: "家の前に車があります。" },
           ],
+          key: "[[in front of]] は3語で1つのかたまり",
         },
         {
           type: "choice",
@@ -228,6 +237,21 @@ export const PREPOSITIONS = {
           why: "「〜の前に」は [[in front of]] です。",
         },
         {
+          type: "explain",
+          title: "[[next to]] と [[near]]",
+          text: ["どちらも「近い」ですが、**近さ**がちがいます。"],
+          compare: {
+            labels: ["すぐとなり", "近く（少しはなれていてもOK）"],
+            rows: [
+              [
+                { en: "Ken sat [[next to]] me.", ja: "ケンは私のすぐとなりに座りました。" },
+                { en: "There is a park [[near]] my house.", ja: "家の近くに公園があります。" },
+              ],
+            ],
+          },
+          note: ["[[next to]] も2語で1つのかたまりです。"],
+        },
+        {
           type: "choice",
           q: "My house is ___ the station.",
           ja: "私の家は駅の近くにあります。",
@@ -244,8 +268,27 @@ export const PREPOSITIONS = {
         },
         {
           type: "explain",
-          title: "[[between]] A and B：「AとBの間」",
-          examples: [{ en: "The library is [[between]] the park and the school.", ja: "図書館は公園と学校の間にあります。" }],
+          title: "[[between]]：2つの間",
+          text: ["**2つのものの間**にあるときに使います。"],
+          examples: [
+            { en: "The ball is [[between]] the boxes.", ja: "ボールは箱と箱の間にあります。" },
+            { en: "The library is [[between]] the park and the school.", ja: "図書館は公園と学校の間にあります。" },
+          ],
+          key: "[[between]] A and B ＝ AとBの間",
+        },
+        {
+          type: "explain",
+          title: "上と下：[[on]] / [[above]] / [[over]] / [[below]]",
+          text: ["**ふれているか**、**真上か**で使い分けます。"],
+          table: {
+            head: ["ことば", "イメージ"],
+            rows: [
+              ["[[on]]", "上にふれている"],
+              ["[[above]]", "〜より上に\n（ふれていない）"],
+              ["[[over]]", "〜の真上に\n（おおうように）"],
+              ["[[below]]", "〜より下に"],
+            ],
+          },
         },
         {
           type: "explain",
@@ -259,7 +302,10 @@ export const PREPOSITIONS = {
               ],
             ],
           },
-          note: ["反対の「〜より下に」は [[below]] です。"],
+          examples: [
+            { en: "There is a bridge [[over]] the river.", ja: "川の上に橋がかかっています。" },
+            { en: "The sun went [[below]] the mountains.", ja: "太陽が山の下にしずみました。" },
+          ],
         },
         {
           type: "choice",
@@ -304,21 +350,38 @@ export const PREPOSITIONS = {
       steps: [
         {
           type: "explain",
-          title: "動きを表すことば",
+          title: "方向・移動を表す前置詞",
+          text: ["**どこへ・どこから動くか**を表します。"],
           table: {
             head: ["ことば", "意味"],
             rows: [
               ["[[to]]", "〜へ"],
-              ["[[into]]", "〜の中へ"],
               ["[[from]]", "〜から"],
+              ["[[into]]", "〜の中へ"],
               ["[[out of]]", "〜から外へ"],
               ["[[across]]", "〜を横切って"],
               ["[[through]]", "〜を通りぬけて"],
+              ["[[toward]]", "〜の方へ"],
             ],
           },
+        },
+        {
+          type: "explain",
+          title: "[[to]]：目的地への矢印 →",
+          text: ["**どこへ向かうか**（目的地）を表します。"],
           examples: [
-            { en: "I went [[to]] the gym.", ja: "私はジムに行きました。" },
+            { en: "She goes [[to]] school every day.", ja: "彼女は毎日学校へ行きます。" },
+            { en: "This train goes [[from]] Tokyo [[to]] Osaka.", ja: "この電車は東京から大阪へ行きます。" },
+          ],
+          key: ["go [[to]] ＋ 場所 ＝ 〜へ行く", "[[from]] A [[to]] B ＝ AからBへ"],
+        },
+        {
+          type: "explain",
+          title: "[[into]] と [[out of]]",
+          text: ["**外 → 中**が [[into]]、**中 → 外**が [[out of]] です。"],
+          examples: [
             { en: "The cat jumped [[into]] the box.", ja: "猫は箱の中へ飛びこみました。" },
+            { en: "She ran [[out of]] the house.", ja: "彼女は家から走って出ていきました。" },
           ],
         },
         {
@@ -338,6 +401,23 @@ export const PREPOSITIONS = {
           why: "部屋の「中から外へ」なので、[[out of]] です。",
         },
         {
+          type: "explain",
+          title: "[[across]] / [[through]] / [[toward]]",
+          table: {
+            head: ["ことば", "イメージ"],
+            rows: [
+              ["[[across]]", "道や川など、平らなところを\n横切る"],
+              ["[[through]]", "トンネルや森など、\n中を通りぬける"],
+              ["[[toward]]", "〜の方へ\n（着くとはかぎらない）"],
+            ],
+          },
+          examples: [
+            { en: "The cat ran [[across]] the road.", ja: "猫が道を横切って走りました。" },
+            { en: "We walked [[through]] the forest.", ja: "私たちは森を通りぬけました。" },
+            { en: "He walked [[toward]] me.", ja: "彼は私の方へ歩いてきました。" },
+          ],
+        },
+        {
           type: "choice",
           q: "We walked ___ the tunnel.",
           ja: "私たちはトンネルを通りぬけました。",
@@ -348,12 +428,13 @@ export const PREPOSITIONS = {
         {
           type: "explain",
           title: "[[home]] / [[there]] / [[abroad]]：to はつけない",
-          text: ["この3つは、それだけで「〜へ」の意味があります。"],
+          text: ["この3つは、それだけで**「〜へ」の意味**があります。"],
           examples: [
             { en: "I went [[home]].", ja: "私は家に帰りました。" },
+            { en: "I went [[there]].", ja: "私はそこへ行きました。" },
             { en: "I went [[abroad]].", ja: "私は海外へ行きました。" },
           ],
-          note: ["✗ I went to home. → ○ I went [[home]]."],
+          note: ["✗ I went to home."],
         },
         {
           type: "choice",
@@ -366,7 +447,7 @@ export const PREPOSITIONS = {
         {
           type: "explain",
           title: "[[arrive]] は [[at]] / [[in]]",
-          text: ["arrive（着く）には、**to をつけません**。"],
+          text: ["go は「向かう」ので to。", "arrive は「着く」なので、**to ではなく** [[at]] / [[in]] です。"],
           table: {
             head: ["形", "使うとき"],
             rows: [
@@ -378,6 +459,7 @@ export const PREPOSITIONS = {
             { en: "We [[arrived at]] the station.", ja: "私たちは駅に着きました。" },
             { en: "I [[arrived in]] Tokyo.", ja: "私は東京に着きました。" },
           ],
+          note: ["✗ I arrived to the station.", "家に着くときは [[arrive home]]（前置詞なし）"],
         },
         {
           type: "choice",
@@ -420,18 +502,30 @@ export const PREPOSITIONS = {
     },
     {
       id: "prep-time",
-      theme: { icon: "🕒", name: "時間", words: "at・on・in・by・until" },
+      theme: { icon: "🕒", name: "時間", words: "at・on・in・for・since・by・until" },
       title: "時間：at / on / in など",
       subtitle: "時刻・曜日・月・までに・まで",
       steps: [
         {
           type: "explain",
           title: "時間の [[at]] / [[on]] / [[in]]",
-          text: ["場所と同じイメージで使います。"],
-          chips: [
-            { label: "[[at]]：時刻（時間の一点）", tone: "plain", items: ["at 7:00", "at noon", "at night"] },
-            { label: "[[on]]：曜日・日付（カレンダーの1日）", tone: "plain", items: ["on Monday", "on Friday night", "on my birthday"] },
-            { label: "[[in]]：月・年・季節（大きな時間の箱）", tone: "plain", items: ["in August", "in 2026", "in summer"] },
+          text: ["場所と同じイメージで使います。", "**小さい時間 → 大きい時間**の順です。"],
+          table: {
+            head: ["ことば", "イメージ", "使うとき"],
+            rows: [
+              ["[[at]]", "時間の一点", "時刻\nat 7:00"],
+              ["[[on]]", "カレンダーの1日", "曜日・日付\non Monday"],
+              ["[[in]]", "大きな時間の箱", "月・年・季節\nin August"],
+            ],
+          },
+        },
+        {
+          type: "explain",
+          title: "[[at]]：時間の一点",
+          text: ["時計の針がさす**一点**のイメージです。"],
+          examples: [
+            { en: "Let's meet [[at]] noon.", ja: "正午に会いましょう。" },
+            { en: "The movie starts [[at]] 8:30.", ja: "映画は8時30分に始まります。" },
           ],
         },
         {
@@ -443,12 +537,30 @@ export const PREPOSITIONS = {
           why: "時刻（時間の一点）なので、[[at]] です。",
         },
         {
+          type: "explain",
+          title: "[[on]]：カレンダーの1日",
+          text: ["カレンダーの**1日を指さす**イメージです。", "曜日・日付・誕生日などに使います。"],
+          examples: [
+            { en: "We had a party [[on]] Friday night.", ja: "金曜の夜にパーティーをしました。" },
+            { en: "I'll see you [[on]] my birthday.", ja: "誕生日に会いましょう。" },
+          ],
+        },
+        {
           type: "choice",
           q: "I have a meeting ___ Monday.",
           ja: "月曜日に会議があります。",
           choices: ["at", "on", "in"],
           answer: "on",
           why: "曜日（カレンダーの1日）なので、[[on]] です。",
+        },
+        {
+          type: "explain",
+          title: "[[in]]：大きな時間の箱",
+          text: ["**月・年・季節**など、長い時間の中のイメージです。"],
+          examples: [
+            { en: "The store opens [[in]] 2026.", ja: "その店は2026年にオープンします。" },
+            { en: "It is hot [[in]] summer.", ja: "夏は暑いです。" },
+          ],
         },
         {
           type: "choice",
@@ -460,12 +572,69 @@ export const PREPOSITIONS = {
         },
         {
           type: "explain",
-          title: "[[by]] と [[until]]：どちらも「〜まで」？",
+          title: "そのまま覚えたい言い方",
           table: {
-            head: ["ことば", "意味"],
+            head: ["英語", "意味"],
             rows: [
-              ["[[by]]", "〜までに（しめきり）"],
-              ["[[until]]", "〜までずっと（続く）"],
+              ["[[in]] the morning", "朝に"],
+              ["[[in]] the afternoon", "午後に"],
+              ["[[in]] the evening", "夕方・夜に"],
+              ["[[at]] night", "夜に"],
+              ["[[on]] the weekend", "週末に"],
+            ],
+          },
+          note: ["夜だけ [[at]] night です。"],
+        },
+        {
+          type: "choice",
+          q: "It is quiet ___ night.",
+          ja: "夜は静かです。",
+          choices: ["at", "on", "in"],
+          answer: "at",
+          why: "「夜に」は [[at]] night です。",
+        },
+        {
+          type: "explain",
+          title: "[[for]] / [[since]] / [[during]]",
+          table: {
+            head: ["ことば", "イメージ", "意味"],
+            rows: [
+              ["[[for]]", "時間の長さ", "〜の間\nfor two hours"],
+              ["[[since]]", "スタート地点", "〜から（今まで）\nsince 2020"],
+              ["[[during]]", "期間の中", "〜の間に\nduring lunch"],
+            ],
+          },
+          examples: [
+            { en: "We waited [[for]] a long time.", ja: "私たちは長い間待ちました。" },
+            { en: "She has been busy [[since]] morning.", ja: "彼女は朝から忙しいです。" },
+            { en: "We chatted [[during]] lunch.", ja: "ランチの間に私たちは話しました。" },
+          ],
+        },
+        {
+          type: "choice",
+          q: "I have lived here ___ 2020.",
+          ja: "私は2020年からここに住んでいます。",
+          choices: ["for", "since"],
+          answer: "since",
+          why: "2020年がスタート地点なので、[[since]] です。",
+        },
+        {
+          type: "choice",
+          q: "I fell asleep ___ the movie.",
+          ja: "映画の間に寝てしまいました。",
+          choices: ["for", "during"],
+          answer: "during",
+          why: "「映画の間に」なので、[[during]] です。for のあとは時間の長さです。",
+        },
+        {
+          type: "explain",
+          title: "[[by]] と [[until]]：どちらも「〜まで」？",
+          text: ["日本語は同じ「〜まで」でも、**イメージがまったくちがいます**。"],
+          table: {
+            head: ["ことば", "イメージ", "意味"],
+            rows: [
+              ["[[by]]", "─────●\nしめきりの「点」", "〜までに"],
+              ["[[until]]", "─────→\nそこまで続く「線」", "〜までずっと"],
             ],
           },
           examples: [
@@ -489,23 +658,6 @@ export const PREPOSITIONS = {
           choices: ["by", "until"],
           answer: "until",
           why: "戻るまでずっと待つので、[[until]] です。",
-        },
-        {
-          type: "explain",
-          title: "[[for]] / [[since]] / [[during]]",
-          chips: [
-            { label: "[[for]]：時間の長さ（〜の間）", tone: "plain", items: ["for two hours", "for a week"] },
-            { label: "[[since]]：スタート地点（〜から）", tone: "plain", items: ["since 2020", "since morning"] },
-            { label: "[[during]]：期間の中（〜の間に）", tone: "plain", items: ["during the movie", "during lunch"] },
-          ],
-        },
-        {
-          type: "choice",
-          q: "I fell asleep ___ the movie.",
-          ja: "映画の間に寝てしまいました。",
-          choices: ["for", "during"],
-          answer: "during",
-          why: "「映画の間に」なので、[[during]] です。for のあとは時間の長さです。",
         },
         {
           type: "write",
@@ -552,12 +704,14 @@ export const PREPOSITIONS = {
       steps: [
         {
           type: "explain",
-          title: "[[by]] と [[with]]",
-          chips: [
-            { label: "[[by]]：どういう方法で？", tone: "plain", items: ["by train", "by car", "by email"] },
-            { label: "[[with]]：何を使って？ 誰と？", tone: "plain", items: ["with a knife", "with a pen", "with my friend"] },
+          title: "[[by]]：どういう方法で？",
+          text: ["**手段・方法**を表します。"],
+          examples: [
+            { en: "We went there [[by]] car.", ja: "私たちは車でそこへ行きました。" },
+            { en: "I sent it [[by]] email.", ja: "メールでそれを送りました。" },
           ],
-          note: ["※歩いて行くときは [[on foot]] です。\n（✗ by foot）"],
+          key: "[[by]] train / [[by]] bus / [[by]] car（a や the はつけない）",
+          note: ["歩いて行くときは [[on foot]] です（✗ by foot）。"],
         },
         {
           type: "choice",
@@ -566,6 +720,16 @@ export const PREPOSITIONS = {
           choices: ["by", "with"],
           answer: "by",
           why: "電車という方法なので、[[by]] です。",
+        },
+        {
+          type: "explain",
+          title: "[[with]]：何を使って？ 誰と？",
+          text: ["**道具**と、**一緒にいる人**を表します。"],
+          examples: [
+            { en: "Please write [[with]] a pen.", ja: "ペンで書いてください。" },
+            { en: "I went to the park [[with]] my dog.", ja: "私は犬と公園に行きました。" },
+          ],
+          key: ["道具 → [[with]] a knife", "人 → [[with]] my friend"],
         },
         {
           type: "choice",
@@ -586,11 +750,21 @@ export const PREPOSITIONS = {
         {
           type: "explain",
           title: "[[to]] と [[for]]",
-          examples: [
-            { en: "I gave a present [[to]] her.", ja: "彼女にプレゼントを渡しました。" },
-            { en: "This present is [[for]] her.", ja: "このプレゼントは彼女のためのものです。" },
-          ],
-          key: ["[[to]] → どこへ？ 誰へ？（届く）", "[[for]] → 誰のため？ 何のため？"],
+          text: ["まちがえやすいので、**イメージ**で覚えましょう。"],
+          compare: {
+            labels: ["[[to]]：相手・場所に届く", "[[for]]：誰か・何かのため"],
+            rows: [
+              [
+                { en: "I gave a present [[to]] her.", ja: "彼女にプレゼントを渡しました。" },
+                { en: "This present is [[for]] her.", ja: "このプレゼントは彼女のためのものです。" },
+              ],
+              [
+                { en: "I went [[to]] the store.", ja: "お店へ行きました。" },
+                { en: "I went to the store [[for]] some milk.", ja: "牛乳を買うためにお店へ行きました。" },
+              ],
+            ],
+          },
+          key: ["[[to]] → どこへ？ 誰へ？", "[[for]] → 誰のため？ 何のため？"],
         },
         {
           type: "choice",
@@ -611,18 +785,20 @@ export const PREPOSITIONS = {
         {
           type: "explain",
           title: "[[listen to]] と hear",
+          text: ["listen は**意識して耳を向ける**ので、向ける先に [[to]] をつけます。"],
           table: {
             head: ["ことば", "意味"],
             rows: [
-              ["[[listen to]]", "意識して聴く"],
-              ["hear", "自然に聞こえる"],
+              ["[[listen to]]", "意識して「聴く」"],
+              ["hear", "自然に「聞こえる」\n（to はつけない）"],
             ],
           },
           examples: [
             { en: "I [[listen to]] music.", ja: "私は音楽を聴きます。" },
+            { en: "Listen [[to]] me.", ja: "私の話を聞いて。" },
             { en: "I heard a strange noise.", ja: "変な音が聞こえました。" },
           ],
-          note: ["✗ I listen music. → ○ I [[listen to]] music."],
+          note: ["✗ I listen music."],
         },
         {
           type: "choice",
@@ -639,14 +815,25 @@ export const PREPOSITIONS = {
             head: ["ことば", "意味"],
             rows: [
               ["[[about]]", "〜について"],
+              ["[[from]]", "〜から（どこから来たか）"],
               ["[[without]]", "〜なしで"],
               ["[[around]]", "〜の周りに・〜ごろ"],
             ],
           },
           examples: [
             { en: "Tell me [[about]] yourself.", ja: "あなたのことを教えてください。" },
+            { en: "This letter is [[from]] my uncle.", ja: "この手紙はおじからです。" },
+            { en: "Don't go out [[without]] an umbrella.", ja: "傘なしで外に出ないでください。" },
             { en: "Let's meet [[around]] five.", ja: "5時ごろに会いましょう。" },
           ],
+        },
+        {
+          type: "choice",
+          q: "I can't sleep ___ my pillow.",
+          ja: "私は枕なしでは眠れません。",
+          choices: ["with", "without", "about"],
+          answer: "without",
+          why: "「〜なしで」は [[without]] です。",
         },
         {
           type: "write",
