@@ -28,8 +28,9 @@ import { ARTICLES } from "./articles.js";
 import { PERFECT } from "./perfect.js";
 import { CONJUNCTIONS } from "./conjunctions.js";
 import { PREPOSITIONS } from "./prepositions.js";
+import { OF } from "./of.js";
 
-export const UNITS = [BE, TENSE, ARTICLES, PERFECT, CONJUNCTIONS, PREPOSITIONS];
+export const UNITS = [BE, TENSE, ARTICLES, PERFECT, CONJUNCTIONS, PREPOSITIONS, OF];
 
 export function findLesson(lessonId) {
   for (const unit of UNITS) {
