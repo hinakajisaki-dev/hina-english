@@ -809,24 +809,21 @@ async function correctRephrase(env, student, answerId, hint) {
   return json({ answer: rephraseRow(await first(env.DB, `SELECT * FROM rephrase_answers WHERE id = ?`, answerId)), ai_error: aiError });
 }
 
-// The teacher types the grammar to practise, and the AI drafts problems from the
-// student's latest diaries. Nothing is saved: the drafts go in the teacher's
-// box to read and fix, then are added like any other line.
+// The teacher types the grammar to practise, and the AI drafts problems:
+// ordinary diary-like sentences (not about the student's own diaries). Nothing
+// is saved: the drafts go in the teacher's box to read and fix, then are added
+// like any other line.
 async function draftRephrase(request, env, student) {
   const input = await readJson(request);
   const grammar = String(input.grammar || "").trim().slice(0, 60);
   if (!grammar) throw new HttpError(400, "練習したい文法を入れてください。");
   const count = Math.min(20, Math.max(5, Number(input.count) || 10));
-  const [journals, items] = await Promise.all([
-    all(env.DB, `SELECT body FROM journals WHERE student_id = ? ORDER BY created_at DESC, id DESC LIMIT 5`, student.id),
-    all(env.DB, `SELECT data FROM items WHERE student_id = ? AND kind = 'rephrase'`, student.id),
-  ]);
+  const items = await all(env.DB, `SELECT data FROM items WHERE student_id = ? AND kind = 'rephrase'`, student.id);
   try {
     const problems = await makeRephraseProblems(env, {
       grammar,
       count,
       note: student.note,
-      diaries: journals.map((j) => j.body.slice(0, 1500)),
       existing: items.map((row) => JSON.parse(row.data).ja),
     });
     return json({ grammar, problems });

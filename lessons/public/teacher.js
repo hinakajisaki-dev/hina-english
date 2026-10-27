@@ -650,7 +650,7 @@ function renderItems(panel, kind) {
             <button class="btn" type="submit">作る</button>
           </div>
           <datalist id="rephrase-groups">${[...new Set(list.map((item) => item.data.group))].map((g) => `<option value="${esc(g)}">`).join("")}</datalist>
-          <p class="muted small">この生徒の最近の日記から、日常の文で作ります。下の欄に入るので、見て直してから「追加」を押してください。</p>
+          <p class="muted small">日記に書くような、日常英会話のふつうの文で作ります。下の欄に入るので、見て直してから「追加」を押してください。</p>
         </form>` : ""}` : ""}
       <p class="format">1行に1つ。区切りは <code>|</code>（またはスプレッドシートからそのまま貼りつけ）<br>${esc(spec.format)}</p>
       <form id="bulk" class="stack">
