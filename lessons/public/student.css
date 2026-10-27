@@ -507,3 +507,7 @@ body.quiz-open .wrap { padding-bottom: 62vh; }
 .rephrase-row .journal-text { font-size: 16px; line-height: 1.7; }
 .rephrase-done h2 { font-size: 24px; font-weight: 900; }
 .ai-comment.praise { background: var(--good-soft); }
+
+/* 自分の単語 */
+.mine-card { border: 2px dashed var(--sky); }
+.word-form .field small { font-weight: 400; }

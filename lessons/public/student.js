@@ -5,7 +5,7 @@ import {
   SPEEDS, getSpeed, setSpeed, speak, startOfJapanDay, stopSpeaking, toast, watchErrors,
 } from "./common.js";
 import { UNITS, findLesson, plain, questionCount } from "./grammar/lessons.js";
-import { bookWeeks, setKey, speakable, splitOnForm, weekWords, wordSets } from "./vocab/words.js";
+import { bookWeeks, itemWeek, setKey, speakable, splitOnForm, weekWords, wordSets } from "./vocab/words.js";
 import { MONTHS, currentMonth, monthLabel, monthPhrases, studentMonths } from "./pron/phrases.js";
 import { CURRENT_WEEK, NOTES_FOR_STUDENTS } from "./course.js";
 import { MENUS } from "./menus.js";
@@ -784,7 +784,7 @@ const resumeCard = (href, where, of) => `<a class="lesson-card resume-card" href
 // Missed words and ticked words make the 復習 list.
 
 const WEEKS = 24;
-const weekLabel = (week) => (week === "other" ? "そのほか" : `Week ${week}`);
+const weekLabel = (week) => (week === "other" ? "そのほか" : week === "mine" ? "自分の単語" : `Week ${week}`);
 const studentWeekWords = (week) => weekWords(week, state.me.items, state.me.vocabBooks);
 const studentSetKey = (week, number) => setKey(week, number, state.me.vocabBooks);
 const inReview = (key) => state.me.review.some((r) => r.key === key);
@@ -792,7 +792,7 @@ const testResult = (week, number) => state.me.vocabTests[studentSetKey(week, num
 
 // Every word this student has, by key, so the 復習 list can find its words.
 function wordsByKey() {
-  const weeks = new Set([...bookWeeks(state.me.vocabBooks), ...items("vocab").map((v) => v.data.week || "other")]);
+  const weeks = new Set([...bookWeeks(state.me.vocabBooks), ...items("vocab").map(itemWeek)]);
   const map = new Map();
   for (const week of weeks) for (const w of studentWeekWords(week)) map.set(w.key, { ...w, week });
   return map;
@@ -833,14 +833,14 @@ const wordExamplesHtml = (word) => (word.examples.length ? `<ul class="word-exam
 // #/vocab/2/1 is Day 1's words, #/vocab/2/1/card/3 its third card,
 // #/vocab/2/1/test its テスト tab and #/vocab/2/1/test/start the test itself.
 function renderVocab(week, setNumber, mode, arg) {
-  const w = week === "other" ? "other" : Number(week);
+  const w = week === "other" || week === "mine" ? week : Number(week);
   if (week && setNumber && mode === "test") return arg === "start" ? renderVocabTest(w, Number(setNumber)) : renderVocabDay(w, Number(setNumber), "test");
   if (week && setNumber && mode === "card") return renderVocabSet(w, Number(setNumber), Number(arg) - 1);
   if (week && setNumber) return renderVocabDay(w, Number(setNumber), "words");
   if (week) return renderWeek(w);
 
   const weeks = Array.from({ length: WEEKS }, (_, i) => i + 1);
-  if (items("vocab").some((v) => !v.data.week)) weeks.push("other");
+  if (items("vocab").some((v) => itemWeek(v) === "other")) weeks.push("other");
   const tiles = weeks.map((week) => {
     const words = studentWeekWords(week);
     if (!words.length) return `<div class="week empty-week"><b>${weekLabel(week)}</b><span>まだありません</span></div>`;
@@ -859,17 +859,49 @@ function renderVocab(week, setNumber, mode, arg) {
   app.innerHTML = `${topbar("単語カード")}
     <main class="wrap stack">
       ${lastSet ? resumeCard(`#/vocab/${last.week}/${last.number}/card/${last.index + 1}`, `${weekLabel(last.week)} ・ ${esc(lastSet.label)}`, last.of) : ""}
+      ${mineCard()}
       <div class="weeks">${tiles.join("")}</div>
     </main>`;
 }
 
+// 自分の単語 at the top of 単語カード: words the student adds themselves.
+function mineCard() {
+  const words = studentWeekWords("mine");
+  const sets = wordSets(words, "mine");
+  const tested = sets.filter((s) => testResult("mine", s.number)).length;
+  return `<a class="lesson-card mine-card" href="#/vocab/mine">
+    <div><b>自分の単語</b><span class="muted small">${words.length ? `${words.length} 語 ・ テスト ${tested} / ${sets.length}` : "勉強したい単語を、自分で追加できます"}</span></div>
+    <span class="badge start">＋ 追加</span>
+  </a>`;
+}
+
+// The form for one of 自分の単語: empty to add one, or with the word to change it.
+function wordFormHtml(word) {
+  const example = word?.examples[0]?.en || "";
+  return `<form id="word-form" class="stack word-form">
+    <label class="field"><span>英語</span><input type="text" name="word" lang="en" maxlength="60" autocapitalize="off" spellcheck="false" required value="${esc(word?.word || "")}" placeholder="例：borrow"></label>
+    <label class="field"><span>意味</span><input type="text" name="meaning" maxlength="100" required value="${esc(word?.meaning || "")}" placeholder="例：借りる"></label>
+    <label class="field"><span>例文 <small class="muted">（なくてもOK）</small></span><input type="text" name="example" lang="en" maxlength="200" value="${esc(example)}" placeholder="例：Can I borrow your pen?"></label>
+    ${word ? `<div class="btn-row"><button class="btn" type="submit">保存</button><button class="btn secondary" type="button" id="word-cancel">やめる</button></div>
+      <button class="btn ghost block" type="button" id="word-delete">この単語を消す</button>`
+      : `<button class="btn block" type="submit">追加</button>`}
+  </form>`;
+}
+
+const wordFormData = (form) => ({ word: form.word.value, meaning: form.meaning.value, example: form.example.value });
+
 function renderWeek(week) {
   state.vocabTest = null;
   const sets = wordSets(studentWeekWords(week), week);
+  const mine = week === "mine";
   app.innerHTML = `${topbar(`単語カード ・ ${weekLabel(week)}`, "#/vocab")}
     <main class="wrap stack">
-      <p class="muted">${sets[0]?.day ? "Day" : "セット"}をえらぶと、単語の一覧が出ます。<br>テストは「テスト」タブから、いつでもできます。</p>
-      ${sets.length ? "" : emptyState("この週の単語は、まだありません。")}
+      ${mine ? `<section class="card stack">
+        <h3>単語を追加</h3>
+        ${wordFormHtml(null)}
+      </section>` : ""}
+      ${sets.length ? `<p class="muted">${sets[0].day ? "Day" : "セット"}をえらぶと、単語の一覧が出ます。<br>テストは「テスト」タブから、いつでもできます。</p>` : ""}
+      ${sets.length ? "" : mine ? `<p class="muted small" style="text-align:center">追加した単語は、10 語ずつのセットになって、カードとテストで練習できます。</p>` : emptyState("この週の単語は、まだありません。")}
       ${sets.map((set) => {
         const result = testResult(week, set.number);
         const place = resumeAt("vocab", studentSetKey(week, set.number));
@@ -880,6 +912,23 @@ function renderWeek(week) {
         </a>`;
       }).join("")}
     </main>`;
+
+  const form = document.getElementById("word-form");
+  form?.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const button = form.querySelector("button[type=submit]");
+    button.disabled = true;
+    try {
+      const { item } = await api("/api/vocab/words", { method: "POST", body: wordFormData(form) });
+      state.me.items.push(item);
+      toast(`「${item.data.word}」を追加しました`);
+      renderWeek(week);
+      document.querySelector("#word-form input[name=word]").focus();
+    } catch (error) {
+      toast(error.message);
+      button.disabled = false;
+    }
+  });
 }
 
 function findSet(week, number) {
@@ -957,7 +1006,8 @@ function renderVocabSet(week, number, at) {
           <input type="checkbox" id="review-check" ${inReview(word.key) ? "checked" : ""}>
           <span>復習カードに入れる</span>
         </label>
-      </section>`
+      </section>
+      ${word.mine ? `<div id="word-edit"><button type="button" class="btn ghost block" id="word-edit-open">この単語を直す・消す</button></div>` : ""}`
       : `<section class="card word-card word-front" id="word-front" role="button" tabindex="0" aria-label="意味と例文を見る">
         ${word.pos ? `<p class="pos">${esc(word.pos)}</p>` : ""}
         <div class="word-row center-row">
@@ -992,6 +1042,40 @@ function renderVocabSet(week, number, at) {
     setReview(word.key, event.target.checked);
     toast(event.target.checked ? "復習カードに入れました" : "復習カードから外しました");
   });
+  // 自分の単語 can be changed or deleted from its card.
+  document.getElementById("word-edit-open")?.addEventListener("click", () => {
+    const box = document.getElementById("word-edit");
+    box.className = "card stack";
+    box.innerHTML = `<h3>単語を直す</h3>${wordFormHtml(word)}`;
+    const form = document.getElementById("word-form");
+    const item = state.me.items.find((i) => i.id === word.id);
+    document.getElementById("word-cancel").addEventListener("click", () => renderVocabSet(week, number, index));
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      try {
+        const result = await api(`/api/vocab/words/${word.id}`, { method: "PUT", body: wordFormData(form) });
+        item.data = result.item.data;
+        toast("直しました");
+        renderVocabSet(week, number, index);
+      } catch (error) {
+        toast(error.message);
+      }
+    });
+    document.getElementById("word-delete").addEventListener("click", async () => {
+      if (!confirm(`「${word.word}」を消しますか？`)) return;
+      try {
+        await api(`/api/vocab/words/${word.id}`, { method: "DELETE" });
+        state.me.items = state.me.items.filter((i) => i.id !== word.id);
+        state.me.review = state.me.review.filter((r) => r.key !== word.key);
+        saveResume("vocab", id, null);
+        state.vocab = null;
+        toast(`「${word.word}」を消しました`);
+        location.hash = "#/vocab/mine";
+      } catch (error) {
+        toast(error.message);
+      }
+    });
+  });
   document.getElementById("prev")?.addEventListener("click", () => go(index - 1));
   document.getElementById("next").addEventListener("click", () => {
     if (!last) return go(index + 1);
@@ -1020,7 +1104,9 @@ function renderVocabTest(week, number) {
   if (!set) return renderWeek(week);
   const id = studentSetKey(week, number);
   if (state.vocabTest?.id !== id) {
+    // A short list (自分の単語 with a few words) borrows wrong choices from the first 単語帳.
     const pool = studentWeekWords(week);
+    if (pool.length < 4) pool.push(...studentWeekWords(bookWeeks(state.me.vocabBooks)[0] ?? 1));
     state.vocabTest = {
       id,
       questions: shuffle(set.words).map((word) => ({ word, choices: meaningChoices(word, pool) })),

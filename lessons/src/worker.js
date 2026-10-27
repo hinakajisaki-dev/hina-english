@@ -101,6 +101,17 @@ async function route(request, env, url, who) {
       return saveLessonResult(request, env, student, parts[1]);
     }
     if (path === "/api/vocab/review" && method === "POST") return saveReview(request, env, student);
+    if (path === "/api/vocab/words" && method === "POST") return saveOwnWord(request, env, student, null);
+    if (parts[0] === "vocab" && parts[1] === "words" && parts.length === 3 && (method === "PUT" || method === "DELETE")) {
+      const row = await first(env.DB, `SELECT * FROM items WHERE id = ? AND student_id = ? AND kind = 'vocab'`, id(2), student.id);
+      if (!row || !JSON.parse(row.data).mine) throw new HttpError(404, "その単語は見つかりません。");
+      if (method === "PUT") return saveOwnWord(request, env, student, row);
+      await env.DB.batch([
+        env.DB.prepare(`DELETE FROM items WHERE id = ?`).bind(row.id),
+        env.DB.prepare(`DELETE FROM vocab_review WHERE student_id = ? AND word_key = ?`).bind(student.id, `item/${row.id}`),
+      ]);
+      return json({ ok: true });
+    }
     if (path === "/api/pron/done" && method === "POST") {
       return finishPhrase(request, env, student, url.searchParams.get("key"), url.searchParams.get("seconds"));
     }
@@ -571,9 +582,34 @@ async function requireWordKey(db, student, key) {
   throw new HttpError(404, "見つかりません。");
 }
 
+// 自分の単語: a word the student adds (row null) or changes, kept like the
+// teacher's words (kind vocab) with mine, so its cards, tests and 復習 work the same.
+const OWN_WORDS = 500;
+
+async function saveOwnWord(request, env, student, row) {
+  const input = await readJson(request);
+  const text = (value, n) => String(value ?? "").trim().replace(/\s+/g, " ").slice(0, n);
+  const data = { word: text(input.word, 60), meaning: text(input.meaning, 100), example: text(input.example, 200), mine: true };
+  if (!data.word) throw new HttpError(400, "英語の単語を入れてください。");
+  if (!data.meaning) throw new HttpError(400, "意味を入れてください。");
+  const clean = cleanItem("vocab", data);
+  if (row) {
+    await run(env.DB, `UPDATE items SET data = ? WHERE id = ?`, JSON.stringify(clean), row.id);
+    return json({ item: itemRow({ ...row, data: JSON.stringify(clean) }) });
+  }
+  const { n } = await first(
+    env.DB, `SELECT COUNT(*) AS n FROM items WHERE student_id = ? AND kind = 'vocab' AND json_extract(data, '$.mine') = 1`, student.id,
+  );
+  if (n >= OWN_WORDS) throw new HttpError(400, `単語は ${OWN_WORDS} 語までです。`);
+  const { meta } = await run(
+    env.DB, `INSERT INTO items (student_id, kind, data, created_at) VALUES (?, 'vocab', ?, ?)`, student.id, JSON.stringify(clean), now(),
+  );
+  return json({ item: itemRow(await first(env.DB, `SELECT * FROM items WHERE id = ?`, meta.last_row_id)) });
+}
+
 // The score of a set's test (ten words, or a day's). The total is the set's size, worked out here.
 async function saveVocabTest(request, env, student, weekParam, number) {
-  const week = weekParam === "other" ? "other" : Number(weekParam);
+  const week = weekParam === "other" || weekParam === "mine" ? weekParam : Number(weekParam);
   const items = (await all(env.DB, `SELECT * FROM items WHERE student_id = ? AND kind = 'vocab'`, student.id)).map(itemRow);
   const books = await studentSetting(env.DB, student, "vocab_books");
   const set = wordSets(weekWords(week, items, books), week).find((s) => s.number === number);
@@ -1032,10 +1068,12 @@ function cleanItem(kind, data) {
   if (kind === "grammar" && clean.choices.length && !clean.choices.includes(clean.answer)) {
     clean.choices.push(clean.answer);
   }
-  // Words are grouped into Week 1–24; words without a week show as そのほか.
+  // Words are grouped into Week 1–24; words without a week show as そのほか, and
+  // the words a student added themselves (mine) as 自分の単語.
   if (kind === "vocab") {
     const week = Number(data.week);
     clean.week = Number.isInteger(week) && week >= 1 && week <= WEEKS ? week : null;
+    if (data.mine === true) Object.assign(clean, { mine: true, week: null });
   }
   return clean;
 }
