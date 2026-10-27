@@ -2302,14 +2302,17 @@ function renderUnit(unit, tab) {
           ${result ? `<span class="badge">✓ ${result.best} / ${result.total}</span>` : `<span class="badge start">テスト</span>`}
         </a>`;
       }).join("")}`
-      : `<p class="muted">${esc(unit.subtitle)}</p>
+      : `<p class="muted">${unit.lessons.some((l) => l.theme) ? "テーマを選んでください" : esc(unit.subtitle)}</p>
       ${unit.lessons.map((lesson) => {
         if (!lesson.steps) {
           return `<div class="lesson-card soon"><div><b>${esc(lesson.title)}</b><span class="muted small">${esc(lesson.subtitle)}</span></div><span class="badge waiting">準備中</span></div>`;
         }
         const result = state.me.lessons?.[lesson.id];
-        return `<a class="lesson-card" href="#/grammar/${unit.id}/${lesson.id}">
-          <div><b>${esc(lesson.title)}</b><span class="muted small">${esc(lesson.subtitle)}</span></div>
+        const theme = lesson.theme;
+        return `<a class="lesson-card${theme ? " theme-card" : ""}" href="#/grammar/${unit.id}/${lesson.id}">
+          ${theme
+            ? `<div><b>${esc(theme.icon)} ${esc(theme.name)}</b><span class="${theme.plain ? "muted small" : "theme-words"}" lang="en">${esc(theme.words)}</span></div>`
+            : `<div><b>${esc(lesson.title)}</b><span class="muted small">${esc(lesson.subtitle)}</span></div>`}
           ${result ? `<span class="badge">✓ ${result.best} / ${result.total}</span>` : `<span class="badge start">はじめる</span>`}
         </a>`;
       }).join("")}`}
