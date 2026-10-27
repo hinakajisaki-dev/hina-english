@@ -785,6 +785,8 @@ const resumeCard = (href, where, of) => `<a class="lesson-card resume-card" href
 
 const WEEKS = 24;
 const weekLabel = (week) => (week === "other" ? "そのほか" : week === "mine" ? "自分の単語" : `Week ${week}`);
+// "Week 1 ・ 1. 動詞 ①・②", or just "My vocabs" for 自分の単語.
+const setName = (week, set) => (week === "mine" ? set.label : `${weekLabel(week)} ・ ${set.label}`);
 const studentWeekWords = (week) => weekWords(week, state.me.items, state.me.vocabBooks);
 const studentSetKey = (week, number) => setKey(week, number, state.me.vocabBooks);
 const inReview = (key) => state.me.review.some((r) => r.key === key);
@@ -858,7 +860,7 @@ function renderVocab(week, setNumber, mode, arg) {
   const lastSet = last && studentSetKey(last.week, last.number) === last.key && findSet(last.week, last.number);
   app.innerHTML = `${topbar("単語カード")}
     <main class="wrap stack">
-      ${lastSet ? resumeCard(`#/vocab/${last.week}/${last.number}/card/${last.index + 1}`, `${weekLabel(last.week)} ・ ${esc(lastSet.label)}`, last.of) : ""}
+      ${lastSet ? resumeCard(`#/vocab/${last.week}/${last.number}/card/${last.index + 1}`, esc(setName(last.week, lastSet)), last.of) : ""}
       ${mineCard()}
       <div class="weeks">${tiles.join("")}</div>
     </main>`;
@@ -948,7 +950,7 @@ function renderVocabDay(week, number, tab) {
   const result = testResult(week, number);
   const place = resumeAt("vocab", studentSetKey(week, number));
 
-  app.innerHTML = `${topbar(`${weekLabel(week)} ・ ${set.label}`, `#/vocab/${week}`)}
+  app.innerHTML = `${topbar(setName(week, set), `#/vocab/${week}`)}
     <main class="wrap stack">
       ${tabsHtml("単語とテスト", [
         { href: base, label: `単語 <small>${set.words.length}</small>`, on: tab !== "test" },
@@ -987,7 +989,7 @@ function renderVocabSet(week, number, at) {
   const last = index === set.words.length - 1;
   const go = (i) => location.replace(`${base}/card/${i + 1}`);
 
-  app.innerHTML = `${topbar(`${weekLabel(week)} ・ ${set.label}`, base)}
+  app.innerHTML = `${topbar(setName(week, set), base)}
     <main class="wrap stack">
       <div class="lesson-progress" role="progressbar" aria-valuemin="1" aria-valuemax="${set.words.length}" aria-valuenow="${index + 1}">
         <div class="bar"><i style="width:${Math.round(((index + 1) / set.words.length) * 100)}%"></i></div>

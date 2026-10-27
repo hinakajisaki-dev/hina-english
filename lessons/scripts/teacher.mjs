@@ -9,6 +9,7 @@
 // node scripts/teacher.mjs students
 // node scripts/teacher.mjs show なおみ
 // node scripts/teacher.mjs add なおみ vocab --week 2 words.txt     (単語 | 意味 | 例文)
+// node scripts/teacher.mjs add なおみ vocab --mine words.txt       (into the student's 自分の単語 / My vocabs)
 // node scripts/teacher.mjs add なおみ pron lines.txt               (読む文 | コツ)
 // node scripts/teacher.mjs add なおみ grammar lines.txt            (問題 | 答え | 選択肢 a / b | 解説)
 // node scripts/teacher.mjs add なおみ topic lines.txt              (テーマ)
@@ -106,6 +107,7 @@ function parseArgs(args) {
     else if (arg === "--undo") options.undo = true;
     else if (arg === "--peek") options.peek = true;
     else if (arg === "--replace") options.replace = true;
+    else if (arg === "--mine") options.mine = true;
     else if (arg.startsWith("--")) options[arg.slice(2)] = args[++i];
     else rest.push(arg);
   }
@@ -305,13 +307,15 @@ const commands = {
     const bad = parsed.map((p, i) => (p.missing ? `${i + 1}行目：${lines[i]}` : null)).filter(Boolean);
     if (bad.length) stop(`足りない列がある行があります（${KINDS[kind].columns.slice(0, KINDS[kind].required).join("・")} は必須）\n${bad.join("\n")}`);
     let week = null;
-    if (kind === "vocab") {
+    // --mine puts the words in the student's own list (自分の単語), as if they had added them.
+    const mine = kind === "vocab" && options.mine === true;
+    if (kind === "vocab" && !mine) {
       week = Number(options.week);
-      if (!Number.isInteger(week) || week < 1 || week > 24) stop("単語は --week 1〜24 で週を指定してください。");
+      if (!Number.isInteger(week) || week < 1 || week > 24) stop("単語は --week 1〜24 で週を指定してください（生徒の「自分の単語」に入れるときは --mine）。");
     }
-    const items = parsed.map((p) => (week ? { ...p.data, week } : p.data));
+    const items = parsed.map((p) => (week ? { ...p.data, week } : mine ? { ...p.data, mine } : p.data));
     const { added } = await api(`/api/teacher/students/${student.id}/items`, { method: "POST", body: { kind, items } });
-    console.log(`${student.name}さんに${KINDS[kind].name}を ${added} こ追加しました${week ? `（Week ${week}）` : ""}。`);
+    console.log(`${student.name}さんに${KINDS[kind].name}を ${added} こ追加しました${week ? `（Week ${week}）` : mine ? "（自分の単語）" : ""}。`);
   },
 
   async "edit-item"([name, id, line]) {

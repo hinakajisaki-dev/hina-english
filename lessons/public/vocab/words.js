@@ -113,9 +113,12 @@ export function wordSets(words, week) {
   } else {
     for (let i = 0; i < words.length; i += SET_SIZE) chunks.push(words.slice(i, i + SET_SIZE));
   }
-  return chunks.filter((chunk) => chunk.length).map((chunk, i) => {
+  const sets = chunks.filter((chunk) => chunk.length);
+  // 自分の単語 are "My vocabs" ("My vocabs 1", "My vocabs 2" … once there are more than ten).
+  const mine = (i) => (sets.length > 1 ? `My vocabs ${i + 1}` : "My vocabs");
+  return sets.map((chunk, i) => {
     const title = setTitle([...new Set(chunk.map((w) => w.group))]);
-    const label = days ? `Day ${i + 1}` : week === "mine" ? `セット ${i + 1}` : `${i + 1}. ${title}`;
+    const label = days ? `Day ${i + 1}` : week === "mine" ? mine(i) : `${i + 1}. ${title}`;
     return { number: i + 1, words: chunk, title, label, day: days };
   });
 }
