@@ -60,24 +60,32 @@ export function bookWord(key) {
   return bookWords(id).find((w) => w.key === key) || null;
 }
 
-// A word the teacher added for one student (kind "vocab"): one example at most.
+// Where a word added for one student (kind "vocab") is listed: its week (1–24),
+// "mine" (自分の単語: the student added it themselves) or "other" (the teacher's,
+// with no week: そのほか).
+export const itemWeek = (item) => (item.data.mine ? "mine" : item.data.week || "other");
+
+// A word added for one student, by the teacher or by the student (mine, with its
+// id so the student can change it): one example at most.
 export function itemWord(item) {
-  const { word, meaning, example } = item.data;
+  const { word, meaning, example, mine } = item.data;
   const form = example ? findForm(example, word) : null;
   return {
     key: `item/${item.id}`,
     word,
     meaning,
     pos: "",
-    group: "先生が追加した単語",
+    group: mine ? "自分で追加した単語" : "先生が追加した単語",
     examples: example ? [{ en: example, ja: "", note: "", form }] : [],
+    ...(mine ? { mine: true, id: item.id } : {}),
   };
 }
 
 // All words of a week for one student: their 単語帳 first, then the teacher's.
+// "mine" is the words the student added, in the order they added them.
 export function weekWords(week, items = [], books = null) {
-  const own = items.filter((item) => item.kind === "vocab" && (item.data.week || "other") === week).map(itemWord);
-  const book = week === "other" ? null : weekBook(week, books);
+  const own = items.filter((item) => item.kind === "vocab" && itemWeek(item) === week).map(itemWord);
+  const book = week === "other" || week === "mine" ? null : weekBook(week, books);
   return [...(book ? bookWords(book) : []), ...own];
 }
 
@@ -107,7 +115,8 @@ export function wordSets(words, week) {
   }
   return chunks.filter((chunk) => chunk.length).map((chunk, i) => {
     const title = setTitle([...new Set(chunk.map((w) => w.group))]);
-    return { number: i + 1, words: chunk, title, label: days ? `Day ${i + 1}` : `${i + 1}. ${title}`, day: days };
+    const label = days ? `Day ${i + 1}` : week === "mine" ? `セット ${i + 1}` : `${i + 1}. ${title}`;
+    return { number: i + 1, words: chunk, title, label, day: days };
   });
 }
 

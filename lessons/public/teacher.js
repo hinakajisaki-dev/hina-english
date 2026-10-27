@@ -3,7 +3,7 @@
 // their journals with the AI corrections.
 import { ApiError, api, diffHtml, esc, formatDateTime, icons, startOfJapanDay, toast, watchErrors } from "./common.js";
 import { UNITS } from "./grammar/lessons.js";
-import { bookWeeks, setKey, vocabBooks, weekBook, weekWords, wordSets } from "./vocab/words.js";
+import { bookWeeks, itemWeek, setKey, vocabBooks, weekBook, weekWords, wordSets } from "./vocab/words.js";
 import { USUAL_MONTHS, currentMonth, monthLabel, monthPhrases, pronMonths, studentMonths } from "./pron/phrases.js";
 import { CURRENT_WEEK, NOTES_FOR_STUDENTS } from "./course.js";
 import { MENUS } from "./menus.js";
@@ -601,7 +601,7 @@ function renderItems(panel, kind) {
   let week = null;
   let weekPicker = "";
   if (kind === "vocab") {
-    const weekOf = (item) => item.data.week || "other";
+    const weekOf = itemWeek;
     const count = (w) => list.filter((item) => weekOf(item) === w).length;
     if (state.vocabWeek?.student !== student.id) {
       const used = list.map((item) => item.data.week).filter(Boolean);
@@ -610,12 +610,15 @@ function renderItems(panel, kind) {
     week = state.vocabWeek.week;
     const options = Array.from({ length: WEEKS }, (_, i) => i + 1);
     if (count("other")) options.push("other");
+    if (count("mine")) options.push("mine");
     weekPicker = `<label class="field"><span>Week をえらぶ</span>
-      <select id="week">${options.map((w) => `<option value="${w}" ${w === week ? "selected" : ""}>${w === "other" ? "そのほか（Week なし）" : `Week ${w}`}（${count(w)} 語）</option>`).join("")}</select>
+      <select id="week">${options.map((w) => `<option value="${w}" ${w === week ? "selected" : ""}>${w === "other" ? "そのほか（Week なし）" : w === "mine" ? "生徒が追加した単語" : `Week ${w}`}（${count(w)} 語）</option>`).join("")}</select>
     </label>`;
     list = list.filter((item) => weekOf(item) === week);
   }
   const weekName = week === "other" ? "そのほか" : `Week ${week}`;
+  // The words the student added themselves are only listed here (to fix or delete).
+  const studentWords = week === "mine";
   // 言い換え問題 are listed by grammar, in the order each grammar was first added.
   let rows = list.map((item) => rowHtml(kind, item, progress));
   if (kind === "rephrase") {
@@ -626,7 +629,7 @@ function renderItems(panel, kind) {
     });
   }
 
-  const bookId = kind === "vocab" && week !== "other" ? weekBook(week, state.current.vocabBooks) : null;
+  const bookId = kind === "vocab" && week !== "other" && !studentWords ? weekBook(week, state.current.vocabBooks) : null;
   const bookInfo = bookId && vocabBooks().find((b) => b.id === bookId);
   panel.innerHTML = `<div class="stack">
     ${kind === "grammar" ? lessonResultsHtml() : ""}
@@ -636,6 +639,7 @@ function renderItems(panel, kind) {
     <section class="card stack">
       ${weekPicker}
       ${bookInfo ? `<p class="notice">${weekName} には、${bookInfo.shared ? "全員共通の単語帳" : `この生徒の単語帳「${esc(bookInfo.title)}」`}（${bookInfo.count} 語）が入っています。ここで足した単語は、この生徒の ${weekName} の最後に加わります。</p>` : ""}
+      ${studentWords ? `<p class="notice">生徒が単語カードの「自分の単語」で追加した単語です。ここで直したり消したりもできます。</p>` : `
       <h3>${week ? `${weekName} に` : ""}${kind === "grammar" ? "先生からの問題（この生徒だけ）" : esc(spec.tab)}を追加</h3>
       ${kind === "rephrase" ? `<p class="muted small">会話や日記で使う英語（自分のこと・今日のこと・これからのこと）を、この生徒の弱い文法で、日本語 → 英語で練習します。毎回ランダムに出て、1日10問でクリア（おかわりもできます）。書いた文は AI が添削します。</p>
         ${state.current.ai ? `<form id="ai-make" class="ai-make stack">
@@ -654,6 +658,7 @@ function renderItems(panel, kind) {
         <p class="notice bad" id="bulk-error" role="alert" hidden></p>
         <button class="btn" type="submit">追加</button>
       </form>
+      `}
       ${kind === "grammar" ? `<p class="muted small">選択肢がない問題は、生徒が答えを入力します。正解が2つ以上あるときは、答えを <code>I'm / I am</code> のように / で区切ってください。</p>` : ""}
       ${kind === "topic" ? `<p class="muted small">日記のページで、毎日この中から順番に1つが「今日のテーマ」になります。生徒は別のテーマや、テーマなしも選べます。</p>` : ""}
     </section>
@@ -663,7 +668,7 @@ function renderItems(panel, kind) {
   </div>`;
 
   const form = document.getElementById("bulk");
-  form.addEventListener("submit", async (event) => {
+  form?.addEventListener("submit", async (event) => {
     event.preventDefault();
     const error = document.getElementById("bulk-error");
     const lines = form.lines.value.split("\n").map((l) => l.trim()).filter(Boolean);
@@ -716,7 +721,7 @@ function renderItems(panel, kind) {
 
   document.getElementById("week")?.addEventListener("change", (event) => {
     const value = event.target.value;
-    state.vocabWeek.week = value === "other" ? "other" : Number(value);
+    state.vocabWeek.week = value === "other" || value === "mine" ? value : Number(value);
     renderItems(panel, kind);
   });
 
@@ -832,7 +837,7 @@ function vocabBooksForm() {
 // Every set this student has (sets of ten, or days; their 単語帳 and own words), with its key.
 function vocabSetList(data) {
   const books = data.vocabBooks;
-  const weeks = [...new Set([...bookWeeks(books), ...data.items.filter((i) => i.kind === "vocab").map((i) => i.data.week || "other")])];
+  const weeks = [...new Set([...bookWeeks(books), ...data.items.filter((i) => i.kind === "vocab").map(itemWeek)])];
   return weeks.flatMap((week) =>
     wordSets(weekWords(week, data.items, books), week).map((set) => ({ week, ...set, key: setKey(week, set.number, books) })),
   );
@@ -848,7 +853,7 @@ function vocabResultsHtml() {
     <ul class="rows">${vocabSetList(state.current).map((set) => {
       const r = results[set.key];
       return `<li><div class="main">
-        <div><b>${set.week === "other" ? "そのほか" : `Week ${set.week}`} ・ ${esc(set.label)}</b></div>
+        <div><b>${set.week === "other" ? "そのほか" : set.week === "mine" ? "生徒が追加した単語" : `Week ${set.week}`} ・ ${esc(set.label)}</b></div>
         <div class="sub">${r
           ? `ベスト ${r.best} / ${r.total}　前回 ${r.last} / ${r.total}　${r.times} 回　（${esc(formatDateTime(r.updated_at))}）`
           : "まだやっていません"}</div>

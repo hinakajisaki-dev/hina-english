@@ -281,10 +281,11 @@ const commands = {
       const items = data.items.filter((i) => i.kind === kind);
       console.log(`\n## ${spec.name}（${items.length}）`);
       if (kind === "vocab") {
-        const weeks = [...new Set(items.map((i) => i.data.week || "そのほか"))];
+        const weekOf = (i) => (i.data.mine ? "生徒が追加" : i.data.week || "そのほか");
+        const weeks = [...new Set(items.map(weekOf))];
         for (const week of weeks) {
-          console.log(week === "そのほか" ? "### そのほか（Week なし）" : `### Week ${week}`);
-          for (const i of items.filter((i) => (i.data.week || "そのほか") === week)) console.log(`[${i.id}] ${itemLine(kind, i.data)}`);
+          console.log(week === "そのほか" ? "### そのほか（Week なし）" : week === "生徒が追加" ? "### 生徒が自分で追加した単語" : `### Week ${week}`);
+          for (const i of items.filter((i) => weekOf(i) === week)) console.log(`[${i.id}] ${itemLine(kind, i.data)}`);
         }
       } else {
         for (const i of items) console.log(`[${i.id}] ${itemLine(kind, i.data)}`);
