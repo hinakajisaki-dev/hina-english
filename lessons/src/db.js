@@ -179,6 +179,26 @@ const SCHEMA = [
     updated_at TEXT NOT NULL,
     PRIMARY KEY (student_id, name)
   )`,
+  // 言い換え問題 (瞬間英作文): each sentence the student wrote for one of their
+  // problems (items of kind rephrase), with the problem as it was then (grammar,
+  // prompt: the Japanese, model: the right answers), so the answer keeps its
+  // meaning when the problem is changed or deleted. correction is shaped like a
+  // journal's ({ corrected, corrections, spelling }, with comment, and exact for
+  // a model answer, skipped for 答えを見る); ok is 1 when nothing had to change.
+  // Both stay null until the AI has corrected it.
+  `CREATE TABLE IF NOT EXISTS rephrase_answers (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    student_id INTEGER NOT NULL REFERENCES students(id) ON DELETE CASCADE,
+    item_id INTEGER REFERENCES items(id) ON DELETE SET NULL,
+    grammar TEXT NOT NULL DEFAULT '',
+    prompt TEXT NOT NULL,
+    model TEXT NOT NULL,
+    given TEXT NOT NULL,
+    correction TEXT,
+    ok INTEGER,
+    created_at TEXT NOT NULL
+  )`,
+  `CREATE INDEX IF NOT EXISTS rephrase_answers_student ON rephrase_answers(student_id, created_at)`,
   // Problems the app ran into, for the teacher's error chat (src/errors.js).
   // dedupe: what makes two problems the same one; seen_at: when the error chat
   // last looked at it; done_at/done_note: when and how it was fixed.
@@ -270,6 +290,20 @@ export function journalRow(row) {
   };
 }
 
+export function rephraseRow(row) {
+  return {
+    id: row.id,
+    item_id: row.item_id,
+    grammar: row.grammar,
+    prompt: row.prompt,
+    model: row.model,
+    given: row.given,
+    correction: row.correction ? JSON.parse(row.correction) : null,
+    ok: row.ok === null ? null : !!row.ok,
+    created_at: row.created_at,
+  };
+}
+
 export function noteRow(row) {
   return {
     id: row.id,
@@ -283,11 +317,12 @@ export function noteRow(row) {
 
 // Everything one student's screen needs: items, progress, lesson results, the 復習 list,
 // set test results, finished pronunciation phrases, study time, recent journals,
-// this week's 勉強範囲 and the parts of the home screen hidden from them.
+// this week's 勉強範囲, the parts of the home screen hidden from them and their
+// latest 言い換え問題 answers (without the sentences).
 export async function studentBundle(db, studentId) {
   const [
     items, progress, lessonRows, reviewRows, testRows, phraseReviewRows, phraseTestRows, pronRows, studyRows, journals, plan,
-    menus, settings, lessonDays,
+    menus, settings, lessonDays, rephraseRows,
   ] = await Promise.all([
     all(db, `SELECT * FROM items WHERE student_id = ? ORDER BY id`, studentId),
     all(db, `SELECT * FROM progress WHERE student_id = ?`, studentId),
@@ -308,6 +343,12 @@ export async function studentBundle(db, studentId) {
       db,
       `SELECT day FROM lesson_days WHERE student_id = ?1 UNION SELECT day FROM lesson_notes WHERE student_id = ?1 AND day <= ?2 ORDER BY day`,
       studentId, japanDay(),
+    ),
+    // Enough of the latest 言い換え問題 answers to count today's and pick the next problems.
+    all(
+      db,
+      `SELECT id, item_id, ok, created_at FROM rephrase_answers WHERE student_id = ? ORDER BY id DESC LIMIT 300`,
+      studentId,
     ),
   ]);
   const setting = (name) => {
@@ -354,5 +395,6 @@ export async function studentBundle(db, studentId) {
     pronMonths: setting("pron_months"),
     vocabBooks: setting("vocab_books"),
     lessonDays: lessonDays.map((r) => r.day),
+    rephrase: rephraseRows.map((r) => ({ id: r.id, item_id: r.item_id, ok: r.ok === null ? null : !!r.ok, created_at: r.created_at })),
   };
 }

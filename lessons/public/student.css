@@ -483,3 +483,27 @@ body.quiz-open .wrap { padding-bottom: 62vh; }
 .plan-body { margin-top: 6px; font-size: 15px; }
 
 .tile.solo { grid-column: 1 / -1; }
+
+/* 言い換え問題 */
+.tile b small, .rephrase-hero h2 small { font-size: 12px; font-weight: 700; color: var(--muted); margin-left: 2px; }
+.rephrase-hero h2 { font-size: 20px; font-weight: 900; }
+.rephrase-hero.cleared { background: var(--good-soft); border-color: transparent; }
+.rephrase-hero.cleared .counter { color: var(--good); font-weight: 900; }
+.group-pick { display: flex; flex-wrap: wrap; gap: 8px; }
+.group-pick button {
+  border: 2px solid var(--line); background: var(--card); color: var(--ink-2); border-radius: 999px;
+  padding: 6px 14px; font-weight: 700; font-size: 15px; cursor: pointer;
+}
+.group-pick button small { font-family: var(--en); font-size: 12px; margin-left: 6px; color: var(--muted); }
+.group-pick button[aria-pressed="true"] { border-color: var(--ink); background: var(--ink); color: #fff; }
+.group-pick button[aria-pressed="true"] small { color: #fff; }
+.q-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.verdict.fixed { color: var(--accent-text); }
+.model-answer { background: var(--sky-soft); border-radius: 14px; padding: 10px 14px; display: grid; gap: 4px; }
+.model-answer > p[lang="en"] { font-family: var(--en); font-weight: 700; font-size: 17px; line-height: 1.6; }
+.model-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.model-head .speak { background: var(--card); }
+.tag { font-size: 12px; font-weight: 700; padding: 1px 10px; border-radius: 99px; background: var(--card); color: var(--ink-2); }
+.rephrase-row .journal-text { font-size: 16px; line-height: 1.7; }
+.rephrase-done h2 { font-size: 24px; font-weight: 900; }
+.ai-comment.praise { background: var(--good-soft); }

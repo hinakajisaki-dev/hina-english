@@ -12,6 +12,7 @@ export const MENUS = [
   { key: "phrases", name: "フレーズ" },
   { key: "phrase-review", name: "フレーズ復習" },
   { key: "grammar", name: "文法" },
+  { key: "rephrase", name: "言い換え問題" },
   { key: "pron", name: "発音課題" },
   { key: "notes", name: "授業メモ" },
   { key: "study", name: "勉強時間" },
