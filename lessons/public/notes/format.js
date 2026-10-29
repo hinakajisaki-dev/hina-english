@@ -345,10 +345,10 @@ function problemCardHtml(block, speak) {
   const back = `${answers.map((a) => `<div class="say-answer"><span class="say-tag">${a.label}</span><p lang="en">${enLines(enHtml(a.en))}</p>${sayButton(speak, a.en)}</div>`).join("")}
       ${linesHtml(rest)}`;
   return `<div class="say-card">
-    <button type="button" class="say-front" data-flip aria-expanded="false" data-hint="英語で言うか書いてから、タップして答えを見る" data-hint-open="タップして答えをかくす">
+    <button type="button" class="say-front" data-flip aria-expanded="false" data-hint="英語で言えるか確かめて、タップする" data-hint-open="タップして答えをかくす">
       <span class="say-kind">英作文</span>
       <span class="say-ja">${jaLines(inline(ja))}</span>
-      <span class="say-hint">英語で言うか書いてから、タップして答えを見る</span>
+      <span class="say-hint">英語で言えるか確かめて、タップする</span>
     </button>
     <div class="say-back" hidden>${back}</div>
   </div>`;
