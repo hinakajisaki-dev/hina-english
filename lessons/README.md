@@ -359,6 +359,8 @@ API キーを入れると、そのあとに送られた日記から、AI が 1 �
 | 🔊 の声が、自然な声でなく機械っぽい声になる | その日の音声の無料枠を使いきったか、音声が作れなかった。Cloudflare の Worker の「Logs」で `tts error` を探す |
 | 生徒の添削で「AI の設定に問題があります」 | `ANTHROPIC_API_KEY` が正しいか、Anthropic のクレジットが残っているか。本当の原因は `node scripts/teacher.mjs errors` の「くわしく」に出る |
 | デプロイでデータベースのエラー | Cloudflare の「Storage & Databases」→「D1」で `hina-lessons` を作り、その ID を `wrangler.jsonc` の `d1_databases` に `"database_id"` として書く |
+| 生徒の画面や先生ページで「ただいまサーバーが混み合っています」 | データベース（D1）が答えていない。まず https://www.cloudflarestatus.com/ で D1 の障害を見る（2026-10-29 の夜に数時間あった）。障害なら、直るのを待つだけでよい（データは消えない）。障害がないときは、Worker の「Logs」で `D1_ERROR` の文を見る |
+| 本番に出した（マージした）のに、画面が変わらない | Worker の「Builds」で、いちばん新しいビルドが失敗していないか見る。Cloudflare の障害中に失敗したビルドは、自動ではやり直されないので「Retry」を押す（次に何かを本番に出したときも、いっしょに入る） |
 
 ## ファイル
 
