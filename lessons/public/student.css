@@ -511,3 +511,23 @@ body.quiz-open .wrap { padding-bottom: 62vh; }
 /* 自分の単語 */
 .mine-card { border: 2px dashed var(--sky); }
 .word-form .field small { font-weight: 400; }
+
+/* 単語のペース（1週間 40 語など） */
+.pace-card > div { flex: 1; min-width: 0; }
+.pace-card .bar { margin-top: 6px; }
+.pace-range { font-weight: 700; color: var(--ink-2); }
+
+/* 書く練習（★） */
+.word-examples li > .star-btn { margin-left: auto; }
+.star-btn {
+  flex: none; border: 0; background: transparent; cursor: pointer; font-size: 24px; line-height: 1;
+  color: var(--muted); padding: 6px; min-width: 40px; min-height: 40px;
+}
+.star-btn[aria-pressed="true"] { color: #E0A100; }
+.star-note { font-size: 12px; font-weight: 700; color: #9A6B00; margin-top: 2px; }
+.write-word .word { font-family: var(--en); font-size: 26px; font-weight: 800; }
+.write-example { display: flex; gap: 10px; align-items: flex-start; background: var(--cream); border-radius: 14px; padding: 10px 12px; }
+.write-example .en { font-family: var(--en); font-weight: 700; line-height: 1.6; }
+.write-example .ja { font-size: 14px; color: var(--ink-2); }
+.write-hints { display: grid; gap: 6px; background: var(--sky-soft); border-radius: 12px; padding: 10px 12px; font-size: 15px; }
+.write-hints [lang="en"] { font-family: var(--en); font-weight: 700; }

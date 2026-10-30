@@ -5,7 +5,7 @@ import {
   SPEEDS, getSpeed, setSpeed, speak, startOfJapanDay, stopSpeaking, toast, watchErrors,
 } from "./common.js";
 import { UNITS, findLesson, plain, questionCount } from "./grammar/lessons.js";
-import { bookWeeks, itemWeek, setKey, speakable, splitOnForm, weekWords, wordSets } from "./vocab/words.js";
+import { bookWeeks, isPaceWeek, itemWeek, paceWeeks, setKey, speakable, splitOnForm, weekWords, wordSets } from "./vocab/words.js";
 import { MONTHS, currentMonth, monthLabel, monthPhrases, studentMonths } from "./pron/phrases.js";
 import { CURRENT_WEEK, NOTES_FOR_STUDENTS } from "./course.js";
 import { MENUS } from "./menus.js";
@@ -27,7 +27,7 @@ watchErrors("/api/errors");
 const app = document.getElementById("app");
 const state = {
   me: null, vocab: null, vocabTest: null, review: null, pron: { which: null, index: 0 }, grammar: null, lesson: null, aiError: {},
-  study: null, notes: {}, quiz: null, rephrase: null, rephraseGroup: null,
+  study: null, notes: {}, quiz: null, rephrase: null, rephraseGroup: null, write: null,
 };
 
 const asterisk = `<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><g stroke="currentColor" stroke-width="3.2" stroke-linecap="round"><path d="M12 3v18"/><path d="M4.2 7.5l15.6 9"/><path d="M4.2 16.5l15.6-9"/></g></svg>`;
@@ -307,7 +307,7 @@ function todaysTasks() {
 
 function renderHome() {
   // Progress counts this week's 単語 and フレーズ (course.js) and this month's 発音.
-  const sets = wordSets(studentWeekWords(CURRENT_WEEK), CURRENT_WEEK).map((s) => studentSetKey(CURRENT_WEEK, s.number));
+  const sets = studentSets(CURRENT_WEEK).map((s) => studentSetKey(CURRENT_WEEK, s.number));
   const tested = sets.filter((key) => state.me.vocabTests[key]).length;
   const review = reviewWords().length;
   const phraseTests = phraseTestCount(phraseWeeks().includes(CURRENT_WEEK) ? [CURRENT_WEEK] : []);
@@ -784,17 +784,32 @@ const resumeCard = (href, where, of) => `<a class="lesson-card resume-card" href
 // Missed words and ticked words make the 復習 list.
 
 const WEEKS = 24;
-const weekLabel = (week) => (week === "other" ? "そのほか" : week === "mine" ? "自分の単語" : `Week ${week}`);
+// A student's own pace (vocab_pace, words.js): fewer words a week, in weeks "p1", "p2" ….
+const myPace = () => state.me.vocabPace || null;
+const myPaceWeeks = () => paceWeeks(state.me.items, state.me.vocabBooks, myPace());
+const paceWeek = (week) => myPaceWeeks().find((p) => p.week === week);
+const weekLabel = (week) => (week === "other" ? "そのほか" : week === "mine" ? "自分の単語"
+  : isPaceWeek(week) ? paceWeek(week)?.label || "" : `Week ${week}`);
 // "Week 1 ・ 1. 動詞 ①・②", or just "My vocabs" for 自分の単語.
 const setName = (week, set) => (week === "mine" ? set.label : `${weekLabel(week)} ・ ${set.label}`);
-const studentWeekWords = (week) => weekWords(week, state.me.items, state.me.vocabBooks);
-const studentSetKey = (week, number) => setKey(week, number, state.me.vocabBooks);
+const studentWeekWords = (week) => weekWords(week, state.me.items, state.me.vocabBooks, myPace());
+const studentSets = (week) => wordSets(studentWeekWords(week), week, myPace());
+const studentSetKey = (week, number) => setKey(week, number, state.me.vocabBooks, myPace());
+// The weeks this student studies: Week 1〜24 (and そのほか), or with a pace, the
+// weeks up to its week and then the pace weeks.
+function studyWeeks() {
+  const pace = myPace();
+  const weeks = Array.from({ length: pace ? pace.week : WEEKS }, (_, i) => i + 1);
+  if (pace) weeks.push(...myPaceWeeks().map((p) => p.week));
+  if (items("vocab").some((v) => itemWeek(v) === "other")) weeks.push("other");
+  return weeks;
+}
 const inReview = (key) => state.me.review.some((r) => r.key === key);
 const testResult = (week, number) => state.me.vocabTests[studentSetKey(week, number)];
 
 // Every word this student has, by key, so the 復習 list can find its words.
 function wordsByKey() {
-  const weeks = new Set([...bookWeeks(state.me.vocabBooks), ...items("vocab").map(itemWeek)]);
+  const weeks = new Set([...studyWeeks(), "mine"]);
   const map = new Map();
   for (const week of weeks) for (const w of studentWeekWords(week)) map.set(w.key, { ...w, week });
   return map;
@@ -822,31 +837,33 @@ const noteHtml = (note) => esc(note).replace(/\n/g, "<br>");
 const exTag = (ex) => (ex.tag ? `<span class="ex-tag">${esc(ex.tag)}</span>` : "");
 
 // A word's example sentences (🔊, the word in red, the Japanese and the note):
-// on the back of its card and when it is opened in 単語復習.
-const wordExamplesHtml = (word) => (word.examples.length ? `<ul class="word-examples">${word.examples.map((ex) => `<li>
+// on the back of its card and when it is opened in 単語復習. With stars (書く練習,
+// in 単語復習), each has a ☆ that puts it in 書く練習 (★).
+const wordExamplesHtml = (word, { stars = false } = {}) => (word.examples.length ? `<ul class="word-examples">${word.examples.map((ex) => `<li>
   ${sayIcon(ex.en)}
   <div>
     ${exTag(ex)}<p class="en" lang="en">${exampleHtml(ex)}</p>
     ${ex.ja ? `<p class="ja">${esc(ex.ja)}</p>` : ""}
     ${ex.note ? `<p class="word-note">${noteHtml(ex.note)}</p>` : ""}
+    ${stars ? `<p class="star-note" ${starOf(word.key, ex.en) ? "" : "hidden"}>★ 書く練習に入っています</p>` : ""}
   </div>
+  ${stars ? starButton(word.key, ex.en) : ""}
 </li>`).join("")}</ul>` : "");
 
 // #/vocab/2/1 is Day 1's words, #/vocab/2/1/card/3 its third card,
 // #/vocab/2/1/test its テスト tab and #/vocab/2/1/test/start the test itself.
 function renderVocab(week, setNumber, mode, arg) {
-  const w = week === "other" || week === "mine" ? week : Number(week);
+  const w = week === "other" || week === "mine" || isPaceWeek(week) ? week : Number(week);
   if (week && setNumber && mode === "test") return arg === "start" ? renderVocabTest(w, Number(setNumber)) : renderVocabDay(w, Number(setNumber), "test");
   if (week && setNumber && mode === "card") return renderVocabSet(w, Number(setNumber), Number(arg) - 1);
   if (week && setNumber) return renderVocabDay(w, Number(setNumber), "words");
   if (week) return renderWeek(w);
 
-  const weeks = Array.from({ length: WEEKS }, (_, i) => i + 1);
-  if (items("vocab").some((v) => itemWeek(v) === "other")) weeks.push("other");
-  const tiles = weeks.map((week) => {
+  const weeks = studyWeeks();
+  const tiles = weeks.filter((week) => !isPaceWeek(week)).map((week) => {
     const words = studentWeekWords(week);
     if (!words.length) return `<div class="week empty-week"><b>${weekLabel(week)}</b><span>まだありません</span></div>`;
-    const sets = wordSets(words, week);
+    const sets = studentSets(week);
     const tested = sets.filter((s) => testResult(week, s.number)).length;
     return `<a class="week ${tested === sets.length ? "done" : ""}" href="#/vocab/${week}">
       <b>${weekLabel(week)}</b>
@@ -863,7 +880,25 @@ function renderVocab(week, setNumber, mode, arg) {
       ${lastSet ? resumeCard(`#/vocab/${last.week}/${last.number}/card/${last.index + 1}`, esc(setName(last.week, lastSet)), last.of) : ""}
       ${mineCard()}
       <div class="weeks">${tiles.join("")}</div>
+      ${myPace() ? paceCards() : ""}
     </main>`;
+}
+
+// The pace weeks, under Week 1〜: "Week 3 ①　1〜40語 ・ テスト 0 / 7".
+function paceCards() {
+  const weeks = myPaceWeeks();
+  return `<section class="stack">
+    <p class="label">1週間 ${myPace().size} 語</p>
+    ${weeks.length ? weeks.map((p) => {
+      const sets = studentSets(p.week);
+      const tested = sets.filter((s) => testResult(p.week, s.number)).length;
+      return `<a class="lesson-card pace-card ${tested === sets.length ? "done" : ""}" href="#/vocab/${p.week}">
+        <div><b>${esc(p.label)}</b><span class="muted small">${esc(p.range)} ・ テスト ${tested} / ${sets.length}</span>
+          <div class="bar"><i style="width:${Math.round((tested / sets.length) * 100)}%"></i></div></div>
+        <span class="chev" aria-hidden="true">›</span>
+      </a>`;
+    }).join("") : `<p class="muted small">つぎの単語は、先生が用意します。</p>`}
+  </section>`;
 }
 
 // 自分の単語 at the top of 単語カード: words the student adds themselves.
@@ -894,7 +929,7 @@ const wordFormData = (form) => ({ word: form.word.value, meaning: form.meaning.v
 
 function renderWeek(week) {
   state.vocabTest = null;
-  const sets = wordSets(studentWeekWords(week), week);
+  const sets = studentSets(week);
   const mine = week === "mine";
   app.innerHTML = `${topbar(`単語カード ・ ${weekLabel(week)}`, "#/vocab")}
     <main class="wrap stack">
@@ -902,6 +937,7 @@ function renderWeek(week) {
         <h3>単語を追加</h3>
         ${wordFormHtml(null)}
       </section>` : ""}
+      ${isPaceWeek(week) ? `<p class="pace-range">${esc(paceWeek(week)?.range || "")}</p>` : ""}
       ${sets.length ? `<p class="muted">${sets[0].day ? "Day" : "セット"}をえらぶと、単語の一覧が出ます。<br>テストは「テスト」タブから、いつでもできます。</p>` : ""}
       ${sets.length ? "" : mine ? `<p class="muted small" style="text-align:center">追加した単語は、10 語ずつのセットになって、カードとテストで練習できます。</p>` : emptyState("この週の単語は、まだありません。")}
       ${sets.map((set) => {
@@ -934,7 +970,7 @@ function renderWeek(week) {
 }
 
 function findSet(week, number) {
-  return wordSets(studentWeekWords(week), week).find((s) => s.number === number);
+  return studentSets(week).find((s) => s.number === number);
 }
 
 // Two tabs at the top of a list (練習 / テスト): [{ href, label, on }].
@@ -1227,7 +1263,9 @@ const blankable = (word) => word.examples.filter((ex) => ex.form);
 
 function renderReview(level) {
   if (level === "1" || level === "2") return renderReviewSession(Number(level));
+  if (level === "write" && state.me.writePractice) return renderWritePractice();
   state.review = null;
+  state.write = null;
   const words = reviewWords();
   const level2 = words.filter((w) => blankable(w).length).length;
 
@@ -1242,6 +1280,10 @@ function renderReview(level) {
         ${level2 ? `<a class="unit-card" href="#/review/2">
           <span class="label">Level 2</span><b>例文に単語を入れる</b>
           <span class="muted small">例文の空いているところに、合う単語を入れよう</span>
+        </a>` : ""}
+        ${state.me.writePractice ? `<a class="unit-card write-card" href="#/review/write">
+          <span class="label">書く練習</span><b>★ の例文と似た文を書く</b>
+          <span class="muted small">${state.me.stars.length ? `★ ${state.me.stars.length} 文 ・ 紙に英語で書いて、答えをチェック` : "下の例文の ☆ を押すと、ここで練習できます"}</span>
         </a>` : ""}
         <section class="stack">
           <div>
@@ -1261,7 +1303,7 @@ function renderReview(level) {
                 <div>${w.pos ? `<span class="pill">${esc(w.pos)}</span>` : ""}<p class="meaning">${noteHtml(w.meaning)}</p></div>
                 ${sayIcon(speakable(w.word))}
               </div>
-              ${wordExamplesHtml(w)}
+              ${wordExamplesHtml(w, { stars: state.me.writePractice })}
               <div class="word-item-foot">
                 <button type="button" class="btn ghost small-btn" data-remove="${esc(w.key)}">この単語を復習から外す</button>
               </div>
@@ -1277,6 +1319,7 @@ function renderReview(level) {
       renderReview();
     }),
   );
+  bindStars(app);
   app.querySelectorAll("[data-open]").forEach((button) =>
     button.addEventListener("click", () => {
       const item = button.closest(".word-item");
@@ -1286,6 +1329,208 @@ function renderReview(level) {
       button.setAttribute("aria-expanded", String(!body.hidden));
     }),
   );
+}
+
+// ---------- 書く練習 ----------
+// For a student with write_practice: a ☆ on each example of a 復習 word puts it
+// in 書く練習 (★, "it doesn't stick"); the AI makes two お題 like it. In 書く練習
+// the student sees the word and the ★ example, writes each お題 in English on
+// paper (hints: the word, the shape, the first words), looks at the answer and
+// marks it ○ or ×. Examples with a × come first the next time. A ★ stays until
+// the student takes it away (☆ again, or 覚えた！ in 書く練習).
+
+const starOf = (key, en) => state.me.stars.find((s) => s.key === key && s.example === en);
+
+const starButton = (key, en) => {
+  const on = !!starOf(key, en);
+  return `<button type="button" class="star-btn" data-star data-key="${esc(key)}" data-example="${esc(en)}" aria-pressed="${on}" aria-label="${on ? "書く練習から外す" : "書く練習に入れる"}">${on ? "★" : "☆"}</button>`;
+};
+
+async function setStar(key, en, on) {
+  const before = state.me.stars;
+  if (on && !starOf(key, en)) {
+    const word = wordsByKey().get(key);
+    const ex = word?.examples.find((e) => e.en === en);
+    state.me.stars = [...before, { key, example: en, word: word?.word || "", meaning: word?.meaning || "", ja: ex?.ja || "", prompts: null }];
+  }
+  if (!on) state.me.stars = before.filter((s) => !(s.key === key && s.example === en));
+  try {
+    const result = await api("/api/stars", { method: "POST", body: { key, example: en, on } });
+    if (result.star) state.me.stars = state.me.stars.map((s) => (s.key === key && s.example === en ? result.star : s));
+    return true;
+  } catch (error) {
+    state.me.stars = before;
+    toast(error.message);
+    return false;
+  }
+}
+
+// ☆ / ★ on the examples in 単語復習 change in place (the opened words stay open).
+function bindStars(root) {
+  root.querySelectorAll("[data-star]").forEach((button) => button.addEventListener("click", async () => {
+    const { key, example } = button.dataset;
+    const on = button.getAttribute("aria-pressed") !== "true";
+    const show = (value) => {
+      button.setAttribute("aria-pressed", String(value));
+      button.setAttribute("aria-label", value ? "書く練習から外す" : "書く練習に入れる");
+      button.textContent = value ? "★" : "☆";
+      button.closest("li").querySelector(".star-note").hidden = !value;
+    };
+    const count = () => {
+      const card = document.querySelector(".write-card .muted");
+      if (card) card.textContent = state.me.stars.length ? `★ ${state.me.stars.length} 文 ・ 紙に英語で書いて、答えをチェック` : "下の例文の ☆ を押すと、ここで練習できます";
+    };
+    show(on);
+    const saving = setStar(key, example, on);
+    count();
+    if (!(await saving)) show(!on);
+    else toast(on ? "書く練習に入れました" : "書く練習から外しました");
+    count();
+  }));
+}
+
+// The order to practise: a × last time first, then ones never done, then the rest.
+function writeQueue() {
+  const rank = (s) => {
+    const marks = (s.prompts || []).map((p) => p.last);
+    return marks.includes("ng") ? 0 : marks.some((m) => !m) ? 1 : 2;
+  };
+  return [...state.me.stars].sort((a, b) => rank(a) - rank(b)).map((s) => ({ key: s.key, example: s.example }));
+}
+
+function renderWritePractice() {
+  if (!state.write) state.write = { queue: writeQueue(), index: 0, ok: 0, ng: 0, shown: {} };
+  const W = state.write;
+  const back = "#/review";
+  if (!W.queue.length) {
+    app.innerHTML = `${topbar("書く練習", back)}<main class="wrap stack">${emptyState("★ の例文がありません。<br>単語復習で、例文の ☆ を押してください。")}</main>`;
+    return;
+  }
+  if (W.index >= W.queue.length) return renderWriteDone();
+  const at = W.queue[W.index];
+  const star = starOf(at.key, at.example);
+  if (!star) {
+    W.queue.splice(W.index, 1);
+    return renderWritePractice();
+  }
+  const word = wordsByKey().get(star.key);
+  // Hints come one at a time: the word, then the shape, then the first words.
+  const hintRows = (p) => [["使う単語", p.word], ["文の形", p.form], ["最初", p.start ? `${p.start} …` : ""]].filter(([, text]) => text);
+  const prompts = star.prompts || [];
+  const order = prompts.map((p, n) => ({ p, n })).sort((a, b) => (b.p.last === "ng") - (a.p.last === "ng"));
+  const done = order.every(({ n }) => W.shown[`${W.index}/${n}`]?.mark);
+
+  app.innerHTML = `${topbar("書く練習", back)}
+    <main class="wrap stack">
+      <div class="lesson-progress">
+        <div class="bar"><i style="width:${Math.round((W.index / W.queue.length) * 100)}%"></i></div>
+        <span class="counter">★ ${W.index + 1} / ${W.queue.length}</span>
+      </div>
+      <section class="card stack write-word">
+        <div class="detail-head">
+          <div><b class="word" lang="en">${esc(star.word)}</b><p class="meaning">${noteHtml(star.meaning)}</p></div>
+          ${sayIcon(speakable(star.word))}
+        </div>
+        <div class="write-example">
+          ${sayIcon(star.example)}
+          <div><p class="en" lang="en">★ ${word ? exampleHtml(word.examples.find((e) => e.en === star.example) || { en: star.example }) : esc(star.example)}</p>
+          ${star.ja ? `<p class="ja">${esc(star.ja)}</p>` : ""}</div>
+        </div>
+      </section>
+      <p class="muted small">この例文と同じ形で、下のお題を<b>紙に英語で</b>書いてから、「答え」を見よう。</p>
+      ${prompts.length ? order.map(({ p, n }, i) => {
+        const S = W.shown[`${W.index}/${n}`] || { hints: 0 };
+        const rows = hintRows(p).slice(0, S.hints);
+        return `<section class="card stack write-prompt" data-n="${n}">
+          <div class="q-head"><p class="label">お題 ${i + 1}</p>${p.last === "ng" ? `<span class="pill">前回 ×</span>` : ""}</div>
+          <p class="question-ja">${esc(p.ja)}</p>
+          ${rows.length ? `<div class="write-hints">${rows.map(([label, text]) => `<p><span class="hint-tag">${label}</span> <span lang="en">${esc(text)}</span></p>`).join("")}</div>` : ""}
+          ${S.answer ? `<div class="model-answer"><div class="model-head"><span class="tag">答え</span>${sayIcon(p.en)}</div><p lang="en">${esc(p.en)}</p></div>
+            ${S.mark ? `<p class="verdict ${S.mark === "ok" ? "right" : "wrong"}">${S.mark === "ok" ? "○ できた" : "× できない"}</p>`
+              : `<div class="btn-row"><button type="button" class="btn" data-mark="ok">○ できた</button><button type="button" class="btn secondary" data-mark="ng">× できない</button></div>`}`
+          : `<div class="btn-row">
+              ${S.hints < hintRows(p).length ? `<button type="button" class="btn secondary" data-hint>💡 ヒント</button>` : ""}
+              <button type="button" class="btn" data-answer>答え</button>
+            </div>`}
+        </section>`;
+      }).join("") : `<section class="card stack">
+        <p class="notice ${star.error ? "bad" : ""}">${esc(star.error ? `お題を作れませんでした（${star.error}）` : "お題を作っています…")}</p>
+        <button type="button" class="btn secondary block" id="make">${star.error ? "もう一度作る" : "作れたか見る"}</button>
+      </section>`}
+      <div class="lesson-nav">
+        <button type="button" class="btn ghost" id="unstar">覚えた！ ★を外す</button>
+        <button type="button" class="btn ${done ? "" : "secondary"}" id="next">${W.index === W.queue.length - 1 ? "おわる" : "つぎへ →"}</button>
+      </div>
+    </main>`;
+
+  const redraw = () => renderWritePractice();
+  app.querySelectorAll(".write-prompt").forEach((card) => {
+    const n = Number(card.dataset.n);
+    const id = `${W.index}/${n}`;
+    const S = (W.shown[id] ||= { hints: 0 });
+    card.querySelector("[data-hint]")?.addEventListener("click", () => {
+      S.hints += 1;
+      redraw();
+    });
+    card.querySelector("[data-answer]")?.addEventListener("click", () => {
+      S.answer = true;
+      redraw();
+    });
+    card.querySelectorAll("[data-mark]").forEach((button) => button.addEventListener("click", () => {
+      S.mark = button.dataset.mark;
+      W[S.mark] += 1;
+      star.prompts[n].last = S.mark;
+      api("/api/stars/result", { method: "POST", body: { key: star.key, example: star.example, n, result: S.mark } }).catch((error) => toast(error.message));
+      redraw();
+    }));
+  });
+  // A star with no お題 yet (the AI makes them after the ☆): ask for them.
+  const make = async () => {
+    try {
+      const { star: fresh } = await api("/api/stars/make", { method: "POST", body: { key: star.key, example: star.example } });
+      Object.assign(star, fresh);
+    } catch (error) {
+      star.error = error.message;
+    }
+    if (state.write === W && location.hash === "#/review/write") redraw();
+  };
+  document.getElementById("make")?.addEventListener("click", make);
+  if (!prompts.length && !star.error && !W.asked?.[W.index]) {
+    (W.asked ||= {})[W.index] = true;
+    make();
+  }
+  document.getElementById("unstar").addEventListener("click", async () => {
+    if (!(await setStar(star.key, star.example, false))) return;
+    toast("★ を外しました");
+    W.queue.splice(W.index, 1);
+    redraw();
+    window.scrollTo(0, 0);
+  });
+  document.getElementById("next").addEventListener("click", () => {
+    W.index += 1;
+    redraw();
+    window.scrollTo(0, 0);
+  });
+}
+
+function renderWriteDone() {
+  const W = state.write;
+  app.innerHTML = `${topbar("書く練習", "#/review")}
+    <main class="wrap stack">
+      <section class="card stack" style="text-align:center">
+        <p style="font-size:40px">🎉</p>
+        <h2>おつかれさまでした！</h2>
+        <p>○ できた <b>${W.ok}</b> ・ × できない <b>${W.ng}</b></p>
+        ${W.ng ? `<p class="muted small">× の文は、次にいちばん先に出ます。</p>` : ""}
+      </section>
+      <button type="button" class="btn block" id="again">もう一度</button>
+      <a class="btn secondary block" href="#/review">単語復習にもどる</a>
+    </main>`;
+  document.getElementById("again").addEventListener("click", () => {
+    state.write = null;
+    renderWritePractice();
+    window.scrollTo(0, 0);
+  });
 }
 
 function startReview(level) {

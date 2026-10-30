@@ -3,21 +3,21 @@
 //
 // Students sign in with a personal code (kept in an HttpOnly cookie).
 // The teacher signs in with TEACHER_PASSWORD; the cookie holds an HMAC of it.
-import { AiError, correctJournal, correctSentence, judgeAnswer, makeRephraseProblems } from "./ai.js";
+import { AiError, correctJournal, correctSentence, judgeAnswer, makeRephraseProblems, makeStarPrompts } from "./ai.js";
 import { SpeechError, speechFor } from "./speech.js";
 import {
   closeErrors, journalErrorKey, listErrors, markErrorDone, markErrorsSeen, noteStuckJournals, recordError,
 } from "./errors.js";
 import { findLesson, lessonExampleSentences, plain, questionCount } from "../public/grammar/lessons.js";
 import { findMistakes, normalizeWords } from "../public/mistakes.js";
-import { bookSentences, bookWord, setKey, vocabBooks, weekWords, wordSets } from "../public/vocab/words.js";
+import { bookSentences, bookWord, isPaceWeek, itemWord, setKey, vocabBooks, weekWords, wordSets } from "../public/vocab/words.js";
 import { findPhrase, pronMonths } from "../public/pron/phrases.js";
 import { phraseByKey, phraseSentences, phraseSetKey, phraseSets, testSize } from "../public/phrases/book.js";
 import { noteProblems, noteSentences } from "../public/notes/format.js";
 import { NOTES_FOR_STUDENTS } from "../public/course.js";
 import { MENUS } from "../public/menus.js";
 import {
-  all, ensureSchema, first, isDbBusy, itemRow, japanDay, journalRow, noteRow, now, rephraseRow, run, studentBundle,
+  all, ensureSchema, first, isDbBusy, itemRow, japanDay, journalRow, noteRow, now, rephraseRow, run, starRow, studentBundle,
 } from "./db.js";
 
 const STUDENT_COOKIE = "hl_student";
@@ -55,7 +55,7 @@ export default {
     const who = {}; // the student, once the request is known to be theirs
     try {
       await ensureSchema(env.DB);
-      return await route(request, env, url, who);
+      return await route(request, env, url, who, ctx);
     } catch (error) {
       if (error instanceof HttpError) return json({ error: error.message }, error.status);
       console.error(error);
@@ -79,7 +79,7 @@ export default {
   },
 };
 
-async function route(request, env, url, who) {
+async function route(request, env, url, who, ctx) {
   const method = request.method;
   const path = url.pathname.replace(/\/+$/, "");
   const parts = path.split("/").slice(2); // ["teacher", "students", "3"]
@@ -131,6 +131,9 @@ async function route(request, env, url, who) {
       return studentNote(env, student, id(1));
     }
     if (path === "/api/rephrase" && method === "POST") return answerRephrase(request, env, student);
+    if (path === "/api/stars" && method === "POST") return saveStar(request, env, student, ctx);
+    if (path === "/api/stars/make" && method === "POST") return remakeStar(request, env, student);
+    if (path === "/api/stars/result" && method === "POST") return saveStarResult(request, env, student);
     if (parts[0] === "rephrase" && parts[2] === "correct" && parts.length === 3 && method === "POST") {
       return retryRephrase(env, student, id(1));
     }
@@ -227,6 +230,18 @@ async function route(request, env, url, who) {
   }
   if (parts[1] === "students" && parts[3] === "vocab-books" && parts.length === 4 && method === "PUT") {
     return saveVocabBooks(request, db, await findStudent(db, id(2)));
+  }
+  if (parts[1] === "students" && parts[3] === "vocab-pace" && parts.length === 4 && method === "PUT") {
+    return saveVocabPace(request, db, await findStudent(db, id(2)));
+  }
+  if (parts[1] === "students" && parts[3] === "write-practice" && parts.length === 4 && method === "PUT") {
+    const student = await findStudent(db, id(2));
+    const { on } = await readJson(request);
+    await saveSetting(db, student, "write_practice", on === true ? true : null);
+    return json({ on: on === true });
+  }
+  if (parts[1] === "students" && parts[3] === "stars" && parts.length === 4 && method === "PUT") {
+    return editStar(request, db, await findStudent(db, id(2)));
   }
   if (parts[1] === "students" && parts[3] === "lesson-days" && parts.length === 4 && method === "POST") {
     return saveLessonDays(request, db, await findStudent(db, id(2)));
@@ -425,6 +440,11 @@ async function speech(env, student, text) {
     );
     allowed = notes.some((row) => noteSentences(row.body).has(text));
   }
+  // The answers of the student's 書く練習 お題.
+  if (!allowed && text) {
+    const stars = await all(env.DB, `SELECT prompts FROM example_stars WHERE student_id = ? AND prompts IS NOT NULL`, student.id);
+    allowed = stars.some((row) => JSON.parse(row.prompts).some((p) => p.en === text));
+  }
   if (!text || !allowed) throw new HttpError(404, "見つかりません。");
   try {
     const audio = await speechFor(env, text);
@@ -609,10 +629,11 @@ async function saveOwnWord(request, env, student, row) {
 
 // The score of a set's test (ten words, or a day's). The total is the set's size, worked out here.
 async function saveVocabTest(request, env, student, weekParam, number) {
-  const week = weekParam === "other" || weekParam === "mine" ? weekParam : Number(weekParam);
+  const week = weekParam === "other" || weekParam === "mine" || isPaceWeek(weekParam) ? weekParam : Number(weekParam);
   const items = (await all(env.DB, `SELECT * FROM items WHERE student_id = ? AND kind = 'vocab'`, student.id)).map(itemRow);
   const books = await studentSetting(env.DB, student, "vocab_books");
-  const set = wordSets(weekWords(week, items, books), week).find((s) => s.number === number);
+  const pace = await studentSetting(env.DB, student, "vocab_pace");
+  const set = wordSets(weekWords(week, items, books, pace), week, pace).find((s) => s.number === number);
   if (!set) throw new HttpError(404, "見つかりません。");
   const total = set.words.length;
   const { score } = await readJson(request);
@@ -623,7 +644,7 @@ async function saveVocabTest(request, env, student, weekParam, number) {
      VALUES (?1, ?2, ?3, ?3, ?4, 1, ?5)
      ON CONFLICT (student_id, set_key) DO UPDATE SET
        best_score = MAX(best_score, ?3), last_score = ?3, total = ?4, times = times + 1, updated_at = ?5`,
-    student.id, setKey(week, number, books), clean, total, now(),
+    student.id, setKey(week, number, books, pace), clean, total, now(),
   );
   return json({ ok: true });
 }
@@ -838,6 +859,124 @@ async function draftRephrase(request, env, student) {
     });
     throw new HttpError(503, error.message);
   }
+}
+
+// ---------- 書く練習 ----------
+// A student with write_practice stars (★) an example sentence of a word in their
+// 復習 list; the AI then makes two お題 in the same pattern (with hints), kept
+// with the star. The student writes them on paper, looks at the answer and marks
+// it ○ or ×. A star stays until the student takes it away.
+
+const STARS_MADE_PER_DAY = 60;
+
+// The word and example a star is for, from the student's own words.
+async function starredExample(db, student, key, example) {
+  let word = null;
+  const item = String(key).match(/^item\/(\d+)$/);
+  if (item) {
+    const row = await first(db, `SELECT * FROM items WHERE id = ? AND student_id = ? AND kind = 'vocab'`, Number(item[1]), student.id);
+    word = row && itemWord(itemRow(row));
+  } else {
+    word = bookWord(String(key));
+  }
+  const ex = word?.examples.find((e) => e.en === example);
+  if (!ex) throw new HttpError(404, "その例文は見つかりません。");
+  return { word, ex };
+}
+
+// { key, example, on }: on puts the star (and has the お題 made after answering), off takes it away.
+async function saveStar(request, env, student, ctx) {
+  if (!(await studentSetting(env.DB, student, "write_practice"))) throw new HttpError(404, "見つかりません。");
+  const { key, example, on } = await readJson(request);
+  if (!on) {
+    await run(env.DB, `DELETE FROM example_stars WHERE student_id = ? AND word_key = ? AND example = ?`, student.id, String(key), String(example));
+    return json({ ok: true });
+  }
+  const { word, ex } = await starredExample(env.DB, student, key, String(example));
+  const at = now();
+  await run(
+    env.DB,
+    `INSERT INTO example_stars (student_id, word_key, example, word, meaning, ja, created_at, updated_at)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT (student_id, word_key, example) DO NOTHING`,
+    student.id, word.key, ex.en, word.word, word.meaning, ex.ja || "", at, at,
+  );
+  const made = makeStar(env, student, word.key, ex.en);
+  if (ctx?.waitUntil) ctx.waitUntil(made);
+  else await made;
+  return json({ star: starRow(await first(env.DB, `SELECT * FROM example_stars WHERE student_id = ? AND word_key = ? AND example = ?`, student.id, word.key, ex.en)) });
+}
+
+// Makes the お題 of a star that has none yet. Never throws: a failure is kept
+// in error (and the error log), and the 書く練習 screen can ask again.
+async function makeStar(env, student, key, example) {
+  const row = await first(env.DB, `SELECT * FROM example_stars WHERE student_id = ? AND word_key = ? AND example = ?`, student.id, key, example);
+  if (!row || row.prompts || !aiEnabled(env)) return;
+  const since = new Date(Date.parse(`${japanDay()}T00:00:00+09:00`)).toISOString();
+  const today = await first(
+    env.DB, `SELECT COUNT(*) AS n FROM example_stars WHERE student_id = ? AND prompts IS NOT NULL AND updated_at >= ?`, student.id, since,
+  );
+  try {
+    if (today.n >= STARS_MADE_PER_DAY) throw new AiError("今日はここまでです。明日また作ります。", "1日の上限");
+    const ex = bookWord(key)?.examples.find((e) => e.en === example);
+    const prompts = await makeStarPrompts(env, { word: row.word, meaning: row.meaning, example, ja: row.ja || ex?.ja || "", note: student.note });
+    await run(
+      env.DB, `UPDATE example_stars SET prompts = ?, error = NULL, updated_at = ? WHERE student_id = ? AND word_key = ? AND example = ?`,
+      JSON.stringify(prompts.map((p) => ({ ...p, last: null }))), now(), student.id, key, example,
+    );
+  } catch (error) {
+    if (!(error instanceof AiError)) throw error;
+    await run(
+      env.DB, `UPDATE example_stars SET error = ? WHERE student_id = ? AND word_key = ? AND example = ?`,
+      error.message, student.id, key, example,
+    );
+    if (error.detail !== "1日の上限") {
+      await recordError(env.DB, {
+        kind: "rephrase", message: `書く練習のお題を作れなかった（${row.word}）`, detail: error.detail, studentId: student.id, ref: `${key} ${example}`.slice(0, 200),
+      });
+    }
+  }
+}
+
+// The 書く練習 screen asks again for a star that has no お題 (made one at a time).
+async function remakeStar(request, env, student) {
+  const { key, example } = await readJson(request);
+  await makeStar(env, student, String(key), String(example));
+  const row = await first(env.DB, `SELECT * FROM example_stars WHERE student_id = ? AND word_key = ? AND example = ?`, student.id, String(key), String(example));
+  if (!row) throw new HttpError(404, "見つかりません。");
+  return json({ star: starRow(row) });
+}
+
+// The student's own mark for one お題: { key, example, n, result: "ok" | "ng" }.
+async function saveStarResult(request, env, student) {
+  const { key, example, n, result } = await readJson(request);
+  const row = await first(env.DB, `SELECT * FROM example_stars WHERE student_id = ? AND word_key = ? AND example = ?`, student.id, String(key), String(example));
+  const prompts = row?.prompts && JSON.parse(row.prompts);
+  if (!prompts?.[n] || !["ok", "ng"].includes(result)) throw new HttpError(404, "見つかりません。");
+  prompts[n].last = result;
+  await run(
+    env.DB, `UPDATE example_stars SET prompts = ? WHERE student_id = ? AND word_key = ? AND example = ?`,
+    JSON.stringify(prompts), student.id, row.word_key, row.example,
+  );
+  return json({ ok: true });
+}
+
+// The teacher's own お題 for a star: { key, example, prompts: [{ ja, en, word, form, start }] }.
+async function editStar(request, db, student) {
+  const { key, example, prompts } = await readJson(request);
+  const row = await first(db, `SELECT * FROM example_stars WHERE student_id = ? AND word_key = ? AND example = ?`, student.id, String(key), String(example));
+  if (!row) throw new HttpError(404, "見つかりません。");
+  const old = row.prompts ? JSON.parse(row.prompts) : [];
+  const text = (value, n) => String(value ?? "").replace(/\s+/g, " ").trim().slice(0, n);
+  const clean = (Array.isArray(prompts) ? prompts : []).slice(0, 4).map((p, i) => ({
+    ja: text(p.ja, 200), en: text(p.en, 200), word: text(p.word, 60), form: text(p.form, 100), start: text(p.start, 60),
+    last: old[i]?.last ?? null,
+  })).filter((p) => p.ja && p.en);
+  if (!clean.length) throw new HttpError(400, "お題（日本語と英語）を入れてください。");
+  await run(
+    db, `UPDATE example_stars SET prompts = ?, error = NULL, updated_at = ? WHERE student_id = ? AND word_key = ? AND example = ?`,
+    JSON.stringify(clean), now(), student.id, row.word_key, row.example,
+  );
+  return json({ star: starRow({ ...row, prompts: JSON.stringify(clean), error: null }) });
 }
 
 // AI correction is optional: it switches on once ANTHROPIC_API_KEY is set.
@@ -1225,6 +1364,36 @@ async function saveLessonDays(request, db, student) {
   if (statements.length) await db.batch(statements);
   const days = (await all(db, `SELECT day FROM lesson_days WHERE student_id = ? ORDER BY day`, student.id)).map((r) => r.day);
   return json({ days });
+}
+
+// One of the student's settings (student_settings); null takes it away.
+async function saveSetting(db, student, name, value) {
+  if (value === null) {
+    await run(db, `DELETE FROM student_settings WHERE student_id = ? AND name = ?`, student.id, name);
+    return;
+  }
+  await run(
+    db,
+    `INSERT INTO student_settings (student_id, name, value, updated_at) VALUES (?1, ?2, ?3, ?4)
+     ON CONFLICT (student_id, name) DO UPDATE SET value = ?3, updated_at = ?4`,
+    student.id, name, JSON.stringify(value), now(),
+  );
+}
+
+// A student's own pace for 単語 (public/vocab/words.js): { week: 2, days: 4, size: 40 },
+// or { off: true } to go back to the usual weeks.
+async function saveVocabPace(request, db, student) {
+  const input = await readJson(request);
+  if (input.off === true) {
+    await saveSetting(db, student, "vocab_pace", null);
+    return json({ pace: null });
+  }
+  const pace = { week: Number(input.week), days: Number(input.days), size: Number(input.size) };
+  if (!Number.isInteger(pace.week) || pace.week < 2 || pace.week > WEEKS) throw new HttpError(400, "week は 2〜24 です。");
+  if (!Number.isInteger(pace.days) || pace.days < 0 || pace.days > 7) throw new HttpError(400, "days は 0〜7（もう終わった Day の数）です。");
+  if (!Number.isInteger(pace.size) || pace.size < 7 || pace.size > 100) throw new HttpError(400, "size は 7〜100（1週間の語数）です。");
+  await saveSetting(db, student, "vocab_pace", pace);
+  return json({ pace });
 }
 
 async function studentSetting(db, student, name) {
