@@ -199,6 +199,26 @@ const SCHEMA = [
     created_at TEXT NOT NULL
   )`,
   `CREATE INDEX IF NOT EXISTS rephrase_answers_student ON rephrase_answers(student_id, created_at)`,
+  // 書く練習: example sentences of review words the student starred (★: "it doesn't
+  // stick"), for students with write_practice on. word_key is the word ("w2/spend",
+  // "item/12"), example the sentence's English; word, meaning and ja are kept as
+  // they were. prompts is what the AI made for it (the teacher can change them):
+  // JSON [{ ja, en, word, form, start, last }] (two お題 in the same pattern, with
+  // hints: the word, the sentence's shape, its first words; last is "ok" or "ng",
+  // the student's own mark the last time). null until made; error says why not.
+  `CREATE TABLE IF NOT EXISTS example_stars (
+    student_id INTEGER NOT NULL REFERENCES students(id) ON DELETE CASCADE,
+    word_key TEXT NOT NULL,
+    example TEXT NOT NULL,
+    word TEXT NOT NULL,
+    meaning TEXT NOT NULL DEFAULT '',
+    ja TEXT NOT NULL DEFAULT '',
+    prompts TEXT,
+    error TEXT,
+    created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL,
+    PRIMARY KEY (student_id, word_key, example)
+  )`,
   // Problems the app ran into, for the teacher's error chat (src/errors.js).
   // dedupe: what makes two problems the same one; seen_at: when the error chat
   // last looked at it; done_at/done_note: when and how it was fixed.
@@ -304,6 +324,19 @@ export function rephraseRow(row) {
   };
 }
 
+export function starRow(row) {
+  return {
+    key: row.word_key,
+    example: row.example,
+    word: row.word,
+    meaning: row.meaning,
+    ja: row.ja,
+    prompts: row.prompts ? JSON.parse(row.prompts) : null,
+    error: row.error,
+    created_at: row.created_at,
+  };
+}
+
 export function noteRow(row) {
   return {
     id: row.id,
@@ -322,7 +355,7 @@ export function noteRow(row) {
 export async function studentBundle(db, studentId) {
   const [
     items, progress, lessonRows, reviewRows, testRows, phraseReviewRows, phraseTestRows, pronRows, studyRows, journals, plan,
-    menus, settings, lessonDays, rephraseRows,
+    menus, settings, lessonDays, rephraseRows, starRows,
   ] = await Promise.all([
     all(db, `SELECT * FROM items WHERE student_id = ? ORDER BY id`, studentId),
     all(db, `SELECT * FROM progress WHERE student_id = ?`, studentId),
@@ -350,6 +383,7 @@ export async function studentBundle(db, studentId) {
       `SELECT id, item_id, ok, created_at FROM rephrase_answers WHERE student_id = ? ORDER BY id DESC LIMIT 300`,
       studentId,
     ),
+    all(db, `SELECT * FROM example_stars WHERE student_id = ? ORDER BY created_at`, studentId),
   ]);
   const setting = (name) => {
     const row = settings.find((r) => r.name === name);
@@ -396,5 +430,8 @@ export async function studentBundle(db, studentId) {
     vocabBooks: setting("vocab_books"),
     lessonDays: lessonDays.map((r) => r.day),
     rephrase: rephraseRows.map((r) => ({ id: r.id, item_id: r.item_id, ok: r.ok === null ? null : !!r.ok, created_at: r.created_at })),
+    vocabPace: setting("vocab_pace"),
+    writePractice: !!setting("write_practice"),
+    stars: starRows.map(starRow),
   };
 }

@@ -3,7 +3,7 @@
 // their journals with the AI corrections.
 import { ApiError, api, diffHtml, esc, formatDateTime, icons, startOfJapanDay, toast, watchErrors } from "./common.js";
 import { UNITS } from "./grammar/lessons.js";
-import { bookWeeks, itemWeek, setKey, vocabBooks, weekBook, weekWords, wordSets } from "./vocab/words.js";
+import { bookWeeks, itemWeek, paceWeeks, setKey, vocabBooks, weekBook, weekWords, wordSets } from "./vocab/words.js";
 import { USUAL_MONTHS, currentMonth, monthLabel, monthPhrases, pronMonths, studentMonths } from "./pron/phrases.js";
 import { CURRENT_WEEK, NOTES_FOR_STUDENTS } from "./course.js";
 import { MENUS } from "./menus.js";
@@ -633,6 +633,7 @@ function renderItems(panel, kind) {
   const bookInfo = bookId && vocabBooks().find((b) => b.id === bookId);
   panel.innerHTML = `<div class="stack">
     ${kind === "grammar" ? lessonResultsHtml() : ""}
+    ${kind === "vocab" && (state.current.writePractice || state.current.stars?.length) ? starsHtml() : ""}
     ${kind === "vocab" ? vocabResultsHtml() : ""}
     ${kind === "pron" ? pronRecordingsHtml() : ""}
     ${kind === "rephrase" ? rephraseResultsHtml() : ""}
@@ -697,6 +698,7 @@ function renderItems(panel, kind) {
     }
   });
 
+  bindStars(panel);
   // 言い換え問題: the AI's drafts go in the box above, to read and fix before 追加.
   const make = document.getElementById("ai-make");
   make?.addEventListener("submit", async (event) => {
@@ -835,12 +837,23 @@ function vocabBooksForm() {
 }
 
 // Every set this student has (sets of ten, or days; their 単語帳 and own words), with its key.
+// With a pace of their own (vocab_pace), the weeks after its week are its pace weeks.
 function vocabSetList(data) {
   const books = data.vocabBooks;
-  const weeks = [...new Set([...bookWeeks(books), ...data.items.filter((i) => i.kind === "vocab").map(itemWeek)])];
+  const pace = data.vocabPace;
+  let weeks = [...new Set([...bookWeeks(books), ...data.items.filter((i) => i.kind === "vocab").map(itemWeek)])];
+  if (pace) weeks = [...weeks.filter((w) => typeof w !== "number" || w <= pace.week), ...paceWeeks(data.items, books, pace).map((p) => p.week)];
   return weeks.flatMap((week) =>
-    wordSets(weekWords(week, data.items, books), week).map((set) => ({ week, ...set, key: setKey(week, set.number, books) })),
+    wordSets(weekWords(week, data.items, books, pace), week, pace).map((set) => ({ week, ...set, key: setKey(week, set.number, books, pace) })),
   );
+}
+
+// "Week 2", "そのほか", "生徒が追加した単語", or a pace week's "Week 3 ①".
+function vocabWeekName(data, week) {
+  if (week === "other") return "そのほか";
+  if (week === "mine") return "生徒が追加した単語";
+  if (typeof week === "string") return paceWeeks(data.items, data.vocabBooks, data.vocabPace).find((p) => p.week === week)?.label || week;
+  return `Week ${week}`;
 }
 
 function vocabResultsHtml() {
@@ -849,17 +862,67 @@ function vocabResultsHtml() {
   const fromTests = review.filter((r) => r.source === "test").length;
   return `<section class="card stack">
     <h3>単語テストの結果</h3>
+    ${state.current.vocabPace ? `<p class="notice">この生徒の単語のペース：Week ${state.current.vocabPace.week} は Day ${state.current.vocabPace.days} までそのまま、残りを7日に。そのあとは1週間 ${state.current.vocabPace.size} 語（単語帳をまたいで）</p>` : ""}
     <p class="muted small">復習カード：${review.length} 語（テストでまちがえた ${fromTests} 語、自分でチェックした ${review.length - fromTests} 語）</p>
     <ul class="rows">${vocabSetList(state.current).map((set) => {
       const r = results[set.key];
       return `<li><div class="main">
-        <div><b>${set.week === "other" ? "そのほか" : set.week === "mine" ? "生徒が追加した単語" : `Week ${set.week}`} ・ ${esc(set.label)}</b></div>
+        <div><b>${esc(vocabWeekName(state.current, set.week))} ・ ${esc(set.label)}</b></div>
         <div class="sub">${r
           ? `ベスト ${r.best} / ${r.total}　前回 ${r.last} / ${r.total}　${r.times} 回　（${esc(formatDateTime(r.updated_at))}）`
           : "まだやっていません"}</div>
       </div></li>`;
     }).join("")}</ul>
   </section>`;
+}
+
+// 書く練習: the examples the student starred (★) and the お題 the AI made for
+// them, which the teacher can change (one line each: 日本語 | 英語 | 使う単語 | 文の形 | 最初の語).
+const starLine = (p) => [p.ja, p.en, p.word, p.form, p.start].join(" | ").replace(/(\s\|\s*)+$/, "");
+
+function starsHtml() {
+  const stars = state.current.stars || [];
+  return `<section class="card stack">
+    <h3>★ 書く練習（${stars.length} 文）</h3>
+    <p class="muted small">生徒が単語復習で ★ をつけた例文と、AI が作ったお題（○ × は生徒がつけた前回の結果）。お題は直せます：1行に1つ「日本語 | 英語 | 使う単語 | 文の形 | 最初の語」</p>
+    ${stars.length ? `<div class="stack">${stars.map((s, i) => `<details class="star-item" data-i="${i}">
+      <summary><b lang="en">${esc(s.word)}</b> <span class="muted small">${esc(s.meaning)}</span><br>
+        <span lang="en">★ ${esc(s.example)}</span>
+        ${(s.prompts || []).map((p) => (p.last === "ok" ? " ○" : p.last === "ng" ? " ×" : "")).join("")}
+        ${s.prompts ? "" : `<span class="badge waiting">${s.error ? "お題なし" : "お題を作成中"}</span>`}</summary>
+      <form class="star-edit stack">
+        <textarea name="lines" lang="en" rows="3">${esc((s.prompts || []).map(starLine).join("\n"))}</textarea>
+        <button class="btn small-btn" type="submit" style="align-self:flex-start">お題を保存</button>
+      </form>
+    </details>`).join("")}</div>` : `<p class="empty">まだ ★ はありません。</p>`}
+  </section>`;
+}
+
+function bindStars(panel) {
+  panel.querySelectorAll(".star-item").forEach((item) => {
+    const star = state.current.stars[Number(item.dataset.i)];
+    const form = item.querySelector("form");
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const prompts = form.lines.value.split("\n").map((l) => l.trim()).filter(Boolean).map((line) => {
+        const [ja, en, word, form_, start] = line.split(/\||｜/).map((f) => f.trim());
+        return { ja, en, word, form: form_, start };
+      });
+      if (prompts.some((p) => !p.ja || !p.en)) return toast("日本語と英語は、どの行にも入れてください");
+      const button = form.querySelector("button");
+      busy(button, "保存中…");
+      try {
+        const result = await api(`/api/teacher/students/${state.current.student.id}/stars`, {
+          method: "PUT", body: { key: star.key, example: star.example, prompts },
+        });
+        Object.assign(star, result.star);
+        toast("お題を保存しました");
+      } catch (error) {
+        toast(error.message);
+      }
+      done(button);
+    });
+  });
 }
 
 // Every フレーズ set that ends with a test, with its key.

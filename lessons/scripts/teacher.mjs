@@ -30,6 +30,9 @@
 // node scripts/teacher.mjs pron-done なおみ (--month 1 | --keys m1/01,m1/02) [--day 2026-09-30] [--dry | --undo]
 //                                                                 (発音 finished before the app, as 完了 with no recording)
 // node scripts/teacher.mjs vocab-books なおみ [--set "1=ielts1" | --default]   (単語帳 per week instead of the shared one)
+// node scripts/teacher.mjs vocab-pace なおみ [--week 2 --days 4 --size 40 | --off]   (fewer words a week, across the 単語帳)
+// node scripts/teacher.mjs write-practice なおみ [--on | --off]   (★ on 復習 examples and 書く練習)
+// node scripts/teacher.mjs stars なおみ                           (the ★ examples and their お題)
 // node scripts/teacher.mjs lesson-days なおみ [--add 2026-08-03,2026-08-16] [--remove 2026-08-03]   (the numbered lessons)
 //
 // For the error chat (docs/error-chat.md):
@@ -108,6 +111,8 @@ function parseArgs(args) {
     else if (arg === "--peek") options.peek = true;
     else if (arg === "--replace") options.replace = true;
     else if (arg === "--mine") options.mine = true;
+    else if (arg === "--on") options.on = true;
+    else if (arg === "--off") options.off = true;
     else if (arg.startsWith("--")) options[arg.slice(2)] = args[++i];
     else rest.push(arg);
   }
@@ -563,6 +568,46 @@ const commands = {
     }
     const result = await api(`/api/teacher/students/${student.id}/vocab-books`, { method: "PUT", body: { books } });
     console.log(`${student.name}さんの単語帳を変えました：\n${bookLine(result.books)}`);
+  },
+
+  // A student's own pace: the words of Week <week> after its first <days> days go
+  // into 7 more days, then <size> words a week across the later 単語帳.
+  async "vocab-pace"([name], options) {
+    const student = await findStudent(name);
+    if (options.off) {
+      await api(`/api/teacher/students/${student.id}/vocab-pace`, { method: "PUT", body: { off: true } });
+      return console.log(`${student.name}さんの単語のペースを、ふつうにもどしました（1週間に単語帳1冊）。`);
+    }
+    if (options.week === undefined) {
+      const { vocabPace: pace } = await studentData(student);
+      return console.log(pace ? `${student.name}さんの単語のペース：Week ${pace.week} は Day ${pace.days} までそのまま、残りを7日に。そのあとは1週間 ${pace.size} 語（単語帳をまたいで）` : `${student.name}さんの単語のペース：ふつう（1週間に単語帳1冊）`);
+    }
+    const { pace } = await api(`/api/teacher/students/${student.id}/vocab-pace`, {
+      method: "PUT", body: { week: Number(options.week), days: Number(options.days), size: Number(options.size) },
+    });
+    console.log(`${student.name}さんの単語のペースを変えました：Week ${pace.week} は Day ${pace.days} までそのまま、残りを7日に。そのあとは1週間 ${pace.size} 語（単語帳をまたいで）。Week ${pace.week + 1} からの単語帳は vocab-books で出してください。`);
+  },
+
+  async "write-practice"([name], options) {
+    const student = await findStudent(name);
+    if (!options.on && !options.off) {
+      const { writePractice } = await studentData(student);
+      return console.log(`${student.name}さんの ★ と書く練習：${writePractice ? "あり" : "なし"}`);
+    }
+    await api(`/api/teacher/students/${student.id}/write-practice`, { method: "PUT", body: { on: !!options.on } });
+    console.log(`${student.name}さんの ★ と書く練習を${options.on ? "出しました（単語復習の例文に ☆、復習の画面に「書く練習」）" : "やめました（★ は残ります）"}。`);
+  },
+
+  async stars([name]) {
+    const { student, stars } = await studentData(await findStudent(name));
+    console.log(`# ${student.name}さんの ★（${stars.length}）`);
+    for (const s of stars) {
+      console.log(`\n## ${s.word}（${s.meaning}）\n★ ${s.example}${s.ja ? `（${s.ja}）` : ""}`);
+      if (!s.prompts) console.log(s.error ? `お題：まだありません（${s.error}）` : "お題：作っています");
+      for (const p of s.prompts || []) {
+        console.log(`- ${p.ja} → ${p.en}　［${p.word}｜${p.form}｜${p.start}］${p.last === "ok" ? " ○" : p.last === "ng" ? " ×" : ""}`);
+      }
+    }
   },
 
   async "lesson-days"([name], options) {

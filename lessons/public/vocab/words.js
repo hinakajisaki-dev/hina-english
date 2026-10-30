@@ -83,8 +83,10 @@ export function itemWord(item) {
 }
 
 // All words of a week for one student: their 単語帳 first, then the teacher's.
-// "mine" is the words the student added, in the order they added them.
-export function weekWords(week, items = [], books = null) {
+// "mine" is the words the student added, in the order they added them, and
+// "p1", "p2" … a week of a student's own pace (paceWeeks below).
+export function weekWords(week, items = [], books = null, pace = null) {
+  if (isPaceWeek(week)) return paceWeeks(items, books, pace).find((p) => p.week === week)?.words || [];
   const own = items.filter((item) => item.kind === "vocab" && itemWeek(item) === week).map(itemWord);
   const book = week === "other" || week === "mine" ? null : weekBook(week, books);
   return [...(book ? bookWords(book) : []), ...own];
@@ -100,17 +102,65 @@ const DAYS_FROM_WEEK = 2;
 const DAYS = 7;
 const byDays = (week, hasBook) => week !== "other" && Number(week) >= DAYS_FROM_WEEK && hasBook;
 
+// Words over 7 days, the bigger days first (100: 15, 15, 14 …; 40: 6 × 5, 5, 5).
+function inDays(words) {
+  const chunks = [];
+  for (let day = 0, at = 0; day < DAYS && at < words.length; day++) {
+    const size = Math.floor(words.length / DAYS) + (day < words.length % DAYS ? 1 : 0);
+    chunks.push(words.slice(at, (at += size)));
+  }
+  return chunks;
+}
+
+// ---------- a student's own pace ----------
+// A student can study fewer words a week (student_settings vocab_pace, set by
+// the teacher): { week: 2, days: 4, size: 40 }. In Week 2 the first 4 days stay
+// as they were (done already), and the rest of its words are spread over 7 more
+// days (Day 5〜11). From the next week on, the words of all later 単語帳 run on in
+// order, 40 a week across the books ("p1", "p2" …, each in 7 days): Week 3's
+// 1〜40, 41〜80, then its 81〜100 with Week 4's 1〜20, and so on.
+
+export const isPaceWeek = (week) => /^p\d+$/.test(String(week));
+
+// Every pace week of a student: [{ week: "p1", words, label: "Week 3 ①", range: "1〜40語" }].
+export function paceWeeks(items, books, pace) {
+  if (!pace) return [];
+  const later = [...new Set([
+    ...bookWeeks(books),
+    ...items.filter((item) => item.kind === "vocab").map(itemWeek).filter((w) => typeof w === "number"),
+  ])].filter((w) => w > pace.week).sort((a, b) => a - b);
+  const stream = later.flatMap((week) => weekWords(week, items, books).map((word, i) => ({ word, week, n: i + 1 })));
+  const weeks = [];
+  const started = {};
+  for (let at = 0; at < stream.length; at += pace.size) {
+    const part = stream.slice(at, at + pace.size);
+    const first = part[0].week;
+    started[first] = (started[first] || 0) + 1;
+    // "1〜40語", or "81〜100語 ＋ Week 4 の 1〜20語" when it runs into the next book.
+    const range = [...new Set(part.map((p) => p.week))].map((week, i) => {
+      const ns = part.filter((p) => p.week === week).map((p) => p.n);
+      return `${i ? `Week ${week} の ` : ""}${ns[0]}〜${ns.at(-1)}語`;
+    }).join(" ＋ ");
+    weeks.push({ week: `p${weeks.length + 1}`, words: part.map((p) => p.word), label: `Week ${first} ${"①②③④⑤⑥⑦⑧⑨⑩"[started[first] - 1] || started[first]}`, range });
+  }
+  return weeks;
+}
+
 // A week's words in sets (sets of ten, or days); each set ends with a test.
 // Titles name the slide groups it covers (動詞 ①・②); label is what the
-// screens call the set ("1. 動詞 ①・②", or "Day 1").
-export function wordSets(words, week) {
-  const days = byDays(week, words.some((w) => !w.key.startsWith("item/")));
-  const chunks = [];
-  if (days) {
-    for (let day = 0, at = 0; day < DAYS && at < words.length; day++) {
-      const size = Math.floor(words.length / DAYS) + (day < words.length % DAYS ? 1 : 0);
-      chunks.push(words.slice(at, (at += size)));
-    }
+// screens call the set ("1. 動詞 ①・②", or "Day 1"). With a pace, its week
+// keeps its first days and spreads the rest over 7 more, and a pace week is 7 days.
+export function wordSets(words, week, pace = null) {
+  const paced = isPaceWeek(week);
+  const days = paced || byDays(week, words.some((w) => !w.key.startsWith("item/")));
+  let chunks = [];
+  if (paced) {
+    chunks = inDays(words);
+  } else if (days && pace && Number(week) === pace.week) {
+    const kept = inDays(words).slice(0, pace.days);
+    chunks = [...kept, ...inDays(words.slice(kept.flat().length))];
+  } else if (days) {
+    chunks = inDays(words);
   } else {
     for (let i = 0; i < words.length; i += SET_SIZE) chunks.push(words.slice(i, i + SET_SIZE));
   }
@@ -138,8 +188,11 @@ function setTitle(groups) {
 
 // A set's test results are kept under its book ("w1/s3", "ielts1/s3"; a day
 // is "w2/d3"); a week with only the teacher's words uses "w{week}".
-export function setKey(week, number, books = null) {
+export function setKey(week, number, books = null, pace = null) {
+  if (isPaceWeek(week)) return `pace/${week}/d${number}`;
   const book = week !== "other" && weekBook(week, books);
+  // The days after the kept ones in a pace's week are new days ("w2/p5").
+  if (pace && book && Number(week) === pace.week && number > pace.days) return `${book}/p${number}`;
   return `${book || `w${week}`}/${byDays(week, !!book) ? "d" : "s"}${number}`;
 }
 
