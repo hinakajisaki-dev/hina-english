@@ -3,14 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Hina English</title>
-<meta name="description" content="書いて、話して、学んで、もう一度使う。毎月16回のZoomライブと6〜8本の講義動画、5レベル・3,000語の学習アプリで、英語を暮らしの中に。Hina English のオンラインサロンです。">
+<title>ʻOhana English 3か月コース｜英語がパッと出てくる、90日間。</title>
+<meta name="description" content="「えーっと…」を「パッ」に変える90日間。ʻOhana English（by Hina）の3か月コース。LIVE授業（Zoom）月12回程度、毎日の学習アプリ、仲間と学ぶコミュニティ型。110,000円（税込）。2026年11月16日スタート。">
 <!-- TODO: 公開するときに OGP（og:title / og:description / og:image / og:url）を追加 -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=DM+Sans:opsz,wght@9..40,500;9..40,700;9..40,800&family=Noto+Sans+JP:wght@400;500;700;900&display=swap">
 <style>
-  /* Layout: the Hina English app's own look (light-blue ground, warm-white
+  /* Layout: the app's own look (light-blue ground, warm-white
      panels, orange asterisk tile, Caveat handwriting) turned into a scrolling
      page. App screens are rebuilt in HTML as small working-looking cards. */
   :root {
@@ -682,6 +682,40 @@
     .sticky-cta p b { display: block; font-family: var(--en); font-size: 15px; color: var(--ink); }
     .sticky-cta .btn { min-height: 48px; padding: 0 20px; font-size: 15px; border-radius: 14px; box-shadow: none; }
   }
+
+  /* ---------- 3か月コース用 ---------- */
+  b { font-weight: 900; }
+  .lead b, .sub b, .price-note b, .pillar p b { color: var(--accent-text); }
+  .price-em { font-size: 20px; color: var(--ink); }
+  .pillar .mini { display: grid; gap: 4px; font-size: 16px; color: var(--ink); }
+  .pillar .mini li::before { content: "・"; color: var(--accent); font-weight: 900; }
+  .pillar .note { font-size: 15px; }
+  .pillar p { font-size: 16px; }
+  .more-title { font-weight: 900; font-size: 21px; margin-top: 48px; }
+  .more { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-top: 16px; }
+  .more li { background: var(--card); border-radius: 18px; box-shadow: var(--shadow); padding: 18px 22px; display: grid; gap: 2px; }
+  .more b { font-size: 17px; }
+  .more span { font-size: 15px; color: var(--ink-2); line-height: 1.7; }
+  .inc-gap { margin-top: 26px; }
+  .inc a, .faq .a a { color: var(--accent-text); text-underline-offset: 3px; }
+  .dates { max-width: 760px; display: grid; gap: 0; border-left: 3px solid var(--line); margin-left: 8px; }
+  .dates li { position: relative; display: grid; grid-template-columns: 150px minmax(0, 1fr); column-gap: 18px; padding: 14px 0 14px 26px; }
+  .dates li::before { content: ""; position: absolute; left: -9.5px; top: 22px; width: 16px; height: 16px; border-radius: 50%; background: var(--card); border: 3px solid var(--accent); }
+  .dates li.key::before { background: var(--accent); }
+  .dates .d { grid-row: span 2; font-family: var(--en); font-weight: 800; font-size: 17px; color: var(--accent-text); }
+  .dates b { font-size: 18px; }
+  .dates small { font-size: 15px; color: var(--ink-2); line-height: 1.7; }
+  .dates li.key b { color: var(--accent-text); font-size: 20px; }
+  .faq .a { font-size: 16px; }
+  .inc small { font-size: 15px; }
+  .price-note { font-size: 15px; }
+  @media (max-width: 900px) {
+    .more { grid-template-columns: minmax(0, 1fr); }
+  }
+  @media (max-width: 560px) {
+    .dates li { grid-template-columns: minmax(0, 1fr); }
+    .dates .d { grid-row: auto; }
+  }
 </style>
 </head>
 <body>
@@ -691,15 +725,15 @@
   <div class="wrap">
     <a class="logo" href="#top">
       <span class="mark"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5v17M3.5 12h17M6 6l12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg></span>
-      <span class="logo-name" lang="en"><b>Hina English</b><small>Learn. Write. Grow.</small></span>
+      <span class="logo-name" lang="en"><b>ʻOhana English</b><small>by Hina</small></span>
     </a>
     <nav class="site-nav" aria-label="ページ内リンク">
-      <a href="#features">サロンの中身</a>
-      <a href="#app">アプリ</a>
-      <a href="#teachers">講師</a>
+      <a href="#features">コースの中身</a>
+      <a href="#app">毎日の学習</a>
       <a href="#price">料金</a>
+      <a href="#schedule">日程</a>
       <a href="#faq">よくある質問</a>
-      <a class="btn" href="#price">参加する</a>
+      <a class="btn" href="https://my.ohana-english.app/?view=join">申し込む</a>
     </nav>
   </div>
 </header>
@@ -710,29 +744,30 @@
   <section class="hero">
     <div class="wrap">
       <div class="hero-text">
-        <p class="eyebrow"><span class="label">Online Salon</span><span class="chip">英語学習コミュニティ</span></p>
+        <p class="eyebrow"><span class="label">3-Month Course</span><span class="chip">1期生 募集中</span></p>
         <p class="script" lang="en">Small steps, big changes.</p>
-        <h1>英語を、<br>暮らしの中に。</h1>
-        <p class="lead">書いて、話して、学んで、もう一度使う。毎月16回のZoomライブと講義動画、1日約20分の学習アプリで、英語を毎日の習慣にするオンラインサロンです。</p>
+        <h1>英語がパッと<br>出てくる、90日間。</h1>
+        <p class="lead">「えーっと…」を「パッ」に変える90日間。<br><b>ʻOhana English 3か月コース</b>（1期生）</p>
         <dl class="stats">
           <div>
-            <dt>オンラインライブ</dt>
-            <dd><span class="n">16</span>回/月</dd>
-            <dd class="chip">ひなは月4回</dd>
+            <dt>LIVE授業（Zoom）</dt>
+            <dd><span class="n">12</span>回/月</dd>
+            <dd class="chip">程度・録画あり</dd>
           </div>
           <div>
-            <dt>講義動画</dt>
-            <dd><span class="n">6〜8</span>本/月</dd>
+            <dt>スタート</dt>
+            <dd><span class="n">11/16</span></dd>
+            <dd class="chip">全員一斉</dd>
           </div>
           <div>
-            <dt>単語帳</dt>
-            <dd><span class="n">3,000</span>語</dd>
-            <dd class="chip">5レベル</dd>
+            <dt>申し込み</dt>
+            <dd><span class="n">11/12</span>まで</dd>
+            <dd class="chip">（木）23:59</dd>
           </div>
         </dl>
         <div class="cta-row">
-          <a class="btn" href="#price">サロンに参加する</a>
-          <p class="cta-note">月額 ¥12,000（税込）</p>
+          <a class="btn" href="https://my.ohana-english.app/?view=join">申し込みページへ</a>
+          <p class="cta-note"><b class="price-em">110,000円（税込）</b><br>カードの分割払いもできます</p>
         </div>
       </div>
       <figure class="hero-figure">
@@ -752,13 +787,13 @@
         <h2>こんな人に来てほしい</h2>
       </header>
       <ul class="checks">
-        <li>英語を勉強したいけど、何からはじめればいいかわからない</li>
-        <li>単語やフレーズを覚えても、自分の言葉で書けない・話せない</li>
+        <li>言いたいことがあるのに、英語がすぐに出てこない</li>
+        <li>単語やフレーズを覚えても、自分の言葉で話せない</li>
         <li>ひとりだと、勉強がなかなか続かない</li>
-        <li>自分の苦手がどこなのか、よくわからない</li>
+        <li>何を、どの順番でやればいいかわからない</li>
         <li>忙しくて、まとまった勉強時間がとれない</li>
       </ul>
-      <p class="bridge">Hina English は、<em>今日の小さな一歩を、自分の言葉につなげる</em>場所です。<span>1日3分の単語カードから、月16回のライブまで。あなたのペースで続けられます。</span></p>
+      <p class="bridge">仲間と一緒に、<em>3か月を走りきる</em>コースです。<span>みんなで同じ日にはじめて、同じ日に卒業します。</span></p>
     </div>
   </section>
 
@@ -767,29 +802,52 @@
     <div class="wrap">
       <header class="sec-head">
         <p class="label">What you get</p>
-        <h2>サロンに入ると、使えるもの</h2>
+        <h2>3か月コースの中身</h2>
+        <p class="sub">みんなで学ぶ<b>コミュニティ型</b>のコースです（講師の1対1の個別指導はありません）。</p>
       </header>
       <div class="pillars">
         <article class="pillar">
           <p class="label">Live</p>
-          <p class="big">16<small>回/月</small></p>
-          <h3>オンラインライブ</h3>
-          <p>Zoomで、週4回ペースで開催。ひなが月4回、ほかの回はネイティブ講師と、TOEIC 900点以上の日本人講師が担当します。参加できなかった回はアーカイブで見られます。</p>
+          <p class="big">12<small>回/月 程度</small></p>
+          <h3>LIVE授業（Zoom）</h3>
+          <ul class="mini">
+            <li>レッスン 週2回</li>
+            <li>この期だけのホームルーム 週1回</li>
+            <li>ひなの回・月1回の質問会もあります</li>
+          </ul>
+          <p class="note"><b>録画あり</b>。カメラはオフでOK。</p>
         </article>
         <article class="pillar">
-          <p class="label">Lesson</p>
-          <p class="big">6〜8<small>本/月</small></p>
-          <h3>講義動画</h3>
-          <p>毎月6〜8本の講義動画で、使える英語をじっくり解説。アプリから、好きな時間に何度でも見返せます。</p>
+          <p class="label">Monthly</p>
+          <p class="big">1<small>回/月</small></p>
+          <h3>振り返り と テスト</h3>
+          <ul class="mini">
+            <li>月末に、その月の振り返り</li>
+            <li>次の月の目標と計画を立てる</li>
+            <li>定期テスト 月1回</li>
+          </ul>
         </article>
         <article class="pillar">
-          <p class="label">App</p>
-          <p class="big">5<small>レベル</small></p>
-          <h3>学習アプリ Hina English</h3>
-          <p>初級1から上級まで、3,000語の単語帳。ジャーナリング、AI添削、復習テストに、ライブや講義動画まで、すべてアプリで完結します。</p>
+          <p class="label">Daily</p>
+          <p class="big">毎日</p>
+          <h3>アプリで、毎日の学習</h3>
+          <ul class="mini">
+            <li>アプリを開けば、今日やることが出てくる</li>
+            <li>最初はインプット多め</li>
+            <li>3か月目はアウトプット中心へ</li>
+          </ul>
         </article>
       </div>
 
+      <h3 class="more-title">ほかにも、こんなことがあります</h3>
+      <ul class="more">
+        <li><b>朝活</b><span>月2〜3回程度（不定期）。期間の真ん中に「朝活チャレンジウィーク」を1回行う予定</span></li>
+        <li><b>study session</b><span>みんなで黙々と勉強する時間（不定期）</span></li>
+        <li><b>講義動画</b><span>期間中、見放題</span></li>
+        <li><b>録音の聞き比べ</b><span>初日と最終日に、同じお題で英語を録音して聞き比べ</span></li>
+        <li><b>会員の掲示板</b><span>会員どうしで話せる場所（11月中に始める予定）</span></li>
+        <li><b>卒業イベント</b><span>ネイティブの講師と英語で話す・修了証の授与。2027年2月13日か14日の予定</span></li>
+      </ul>
     </div>
   </section>
 
@@ -798,40 +856,22 @@
     <div class="wrap">
       <header class="sec-head">
         <p class="label">Daily habit</p>
-        <h2>1日約20分。英語を、毎日の習慣に。</h2>
-        <p class="sub">学習アプリ Hina English は、毎日同じ4ステップで進みます。やることが決まっているから、迷わず続けられます。Zoomライブの予定も講義動画も、すべてアプリの中にあります。</p>
+        <h2>毎日の学習は、アプリで。</h2>
+        <p class="sub">単語・フレーズ・復習・英語ジャーナル。<b>開けば、今日やることが出てきます。</b></p>
       </header>
-      <div class="daily">
-        <div class="daily-head">
-          <h3>おすすめの1日の流れ</h3>
-          <p class="total">合計 約<b>20</b>分</p>
-        </div>
-        <ol class="timeline" aria-label="1日の学習フロー。ジャーナリング約5分、AI相談約3分、学習約8分、復習約3分">
-          <li class="seg s1" style="--m: 5; --w: 62.5%"><span class="fill"></span><span class="t"><b>1 ジャーナリング</b><span>約5分</span></span></li>
-          <li class="seg s2" style="--m: 3; --w: 37.5%"><span class="fill"></span><span class="t"><b>2 AI相談</b><span>約3分</span></span></li>
-          <li class="seg s3" style="--m: 8; --w: 100%"><span class="fill"></span><span class="t"><b>3 学習</b><span>約8分</span></span></li>
-          <li class="seg s4" style="--m: 3; --w: 37.5%"><span class="fill"></span><span class="t"><b>4 復習</b><span>約3分</span></span></li>
-        </ol>
-        <div class="daily-notes">
-          <p><b>忙しい日は</b>単語カードだけ、約3分でもOK。毎日アプリを開くことが、いちばんの近道です。</p>
-          <p><b>余裕がある日は</b>発音・聞き取りを、もう5分。週4回のZoomライブも、アプリから参加できます。</p>
-        </div>
-      </div>
-      <p class="loop-back"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12a8 8 0 1 0 2.4-5.7M4 4v4h4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>復習した英語は、次の日のジャーナルで使ってみる</p>
 
       <div class="pair app-block">
         <div class="app-step" id="write">
           <div class="step-head">
-            <div class="step-meta"><p class="label">01 · ジャーナリング</p><span class="chip">約5分</span></div>
+            <div class="step-meta"><p class="label">英語ジャーナル</p></div>
             <h3 class="en" lang="en">Write your story.</h3>
-            <p>お題を選んで、日本語のメモから英語のひとことへ。書き出しの一文がついているので、何を書くか迷いません。</p>
+            <p>お題を選んで、英語でひとこと。書き出しの一文つきです。</p>
           </div>
-          <div class="mock" role="img" aria-label="ジャーナリング画面のイメージ。お題を選ぶと、書き出しの一文が表示される">
+          <div class="mock" role="img" aria-label="英語ジャーナルの画面のイメージ。お題を選ぶと、書き出しの一文が表示される">
             <p class="mock-title">今日、何を書きますか？</p>
             <ul class="prompts">
               <li class="on">最近行った場所で、おすすめしたいところは？</li>
               <li>今日の自分をひとことで表すと？</li>
-              <li>子どものころ好きだったものは？</li>
               <li>もし明日が休みだったら、何をしますか？</li>
             </ul>
             <div class="starter">
@@ -840,132 +880,53 @@
               <p lang="en">A place I would recommend is…</p>
             </div>
           </div>
-          <p class="callout"><b>書くほど、苦手が見えてくる</b>ジャーナルを書けば書くほど、あなたの弱いところのデータがたまっていきます。</p>
         </div>
         <div class="app-step">
           <div class="step-head">
-            <div class="step-meta"><p class="label">02 · AI相談</p><span class="chip">約3分</span></div>
-            <h3>AIが添削して、一緒に考える</h3>
-            <p>書いた英語は、AIが添削。もっと自然な言い方や、わからない英語も相談できます。</p>
+            <div class="step-meta"><p class="label">AIの添削</p></div>
+            <h3>書いた英語を、AIが直す</h3>
+            <p>もっと自然な言い方も教えてくれます。</p>
           </div>
           <div class="mock" role="img" aria-label="AI添削のイメージ。the best thing i ate today was pasta を、文頭の大文字とピリオドを直して The best thing I ate today was pasta. にする">
-            <p class="mock-title">AIに添削してもらう<span class="chip">AI相談</span></p>
+            <p class="mock-title">AIに添削してもらう</p>
             <div class="mine">
               <p class="who">あなたの英文</p>
               <p class="en" lang="en"><span class="fix"><del>t</del><ins>T</ins></span>he best thing <span class="fix"><del>i</del><ins>I</ins></span> ate today was pasta<ins class="add">.</ins></p>
             </div>
             <div class="ai">
-              <p class="who">AI相談</p>
-              <p class="ai-body">文頭を大文字にして、文の最後にピリオドを打つと、整った文章になります。<span class="en" lang="en">The best thing I ate today was pasta.</span>もう少し気持ちを込めるなら<span class="en" lang="en">The pasta I had today was amazing!</span></p>
+              <p class="who">AI</p>
+              <p class="ai-body">文頭を大文字に、最後にピリオドを。<span class="en" lang="en">The best thing I ate today was pasta.</span></p>
             </div>
           </div>
-        </div>
-      </div>
-
-      <div class="app-block">
-        <div class="step-head">
-          <div class="step-meta"><p class="label">03 · 学習</p><span class="chip">約8分</span><span class="cap">単語カード 約3分 ＋ フレーズ練習 約5分</span></div>
-          <h3 class="en" lang="en">Learn the English you want to use.</h3>
-          <p>初級1から上級まで、5つのレベル。それぞれのレベルに合った単語帳や教材で学びます。単語は、すべてひなの音声つきです。</p>
-        </div>
-        <div class="levels-wrap" role="img" aria-label="5つのレベル。初級1は600語、初級2は650語、中級1は600語、中級2は650語、上級は500語。合計3,000語">
-          <ol class="levels">
-            <li><b>初級1</b><span>600<small>語</small></span></li>
-            <li><b>初級2</b><span>650<small>語</small></span></li>
-            <li><b>中級1</b><span>600<small>語</small></span></li>
-            <li><b>中級2</b><span>650<small>語</small></span></li>
-            <li><b>上級</b><span>500<small>語</small></span></li>
-          </ol>
-          <p class="levels-cap"><span>すべての単語に、ひなの音声つき</span><b>合計 3,000語</b></p>
-        </div>
-
-        <div class="learn3">
-          <article class="learn-item">
-            <div class="mock flash">
-              <div class="mock-top">単語カード<span class="chip">1 / 5 問</span></div>
-              <div class="bar"><i></i></div>
-              <span class="chip">初級1 · 接続詞</span>
-              <p class="pos">接続詞</p>
-              <p class="word" lang="en">if</p>
-              <p class="meaning" id="flash-meaning" hidden>もし〜なら</p>
-              <button class="btn small" type="button" id="flash-btn" aria-controls="flash-meaning" aria-expanded="false">意味を見る</button>
-            </div>
-            <div class="meta">
-              <h4>単語カード<span class="chip">約3分</span></h4>
-              <p>レベルに合った単語を、1日5語ずつ。意味と例文、ひなの音声で覚えます。</p>
-            </div>
-          </article>
-          <article class="learn-item">
-            <div class="mock phrase" role="img" aria-label="フレーズ練習の画面のイメージ。I don't know how to say this in English. の意味、お手本の音声、使う場面、発音のコツが表示される">
-              <div class="mock-top">フレーズ練習<span class="chip">1 / 5 問</span></div>
-              <span class="chip">初級1 · 発音課題1</span>
-              <p class="en" lang="en">I don’t know how to say this in English.</p>
-              <p class="ja">これを英語でどう言えばいいか分からない。</p>
-              <p class="audio"><span>0:00 / 0:03</span><i></i></p>
-              <div class="tips">
-                <p class="tip"><b>使う場面・解説</b>英会話中に詰まったときの救済フレーズ。</p>
-                <p class="tip"><b>発音のコツ</b><span lang="en">how to</span> は「ハウトゥ」。<span lang="en">say this</span> は <span lang="en">th</span> を軽く。</p>
-              </div>
-            </div>
-            <div class="meta">
-              <h4>フレーズ練習<span class="chip">約5分</span></h4>
-              <p>日常のひとことを、ひなのお手本音声で。使う場面と発音のコツつきです。</p>
-            </div>
-          </article>
-          <article class="learn-item">
-            <div class="mock">
-              <div class="mock-top"><span lang="en">Listen, then build the sentence.</span></div>
-              <div class="order-line" id="order-line" data-hint="単語をタップして、文を組み立ててみよう" aria-live="polite"></div>
-              <div class="order-pool" id="order-pool"></div>
-              <div class="order-foot">
-                <p class="order-result" id="order-result" aria-live="polite"></p>
-                <button class="text-btn" type="button" id="order-reset">やりなおす</button>
-              </div>
-            </div>
-            <div class="meta">
-              <h4>発音・聞き取り<span class="chip">1回5分〜</span></h4>
-              <p>音声を聞いて、単語を正しい順番に。答えを確かめたら、ひなのコツもチェック。</p>
-              <ol class="sets">
-                <li><i>1</i><span>日常で気持ちや予定を伝える</span><em>30</em></li>
-                <li><i>2</i><span>空港・ホテル・食事・買い物で使う</span><em>31</em></li>
-                <li><i>3</i><span>文法を会話の中で使う</span><em>30</em></li>
-              </ol>
-            </div>
-          </article>
         </div>
       </div>
 
       <div class="pair app-block">
         <div class="app-step">
           <div class="step-head">
-            <div class="step-meta"><p class="label">04 · 復習</p><span class="chip">約3分</span></div>
-            <h3>苦手を、徹底的に直す</h3>
-            <p>単語は復習テストで、自分の弱いところをくり返し練習。苦手な問題がなくなるまで取り組めます。</p>
+            <div class="step-meta"><p class="label">単語・フレーズ・復習</p></div>
+            <h3>覚えて、くり返して、身につける</h3>
+            <p>まちがえたところは、復習でもう一度。</p>
           </div>
-          <div class="mock">
-            <div class="review">
-              <span class="ok-mark"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-              <b>苦手な問題は残っていません。</b>
-              <small>今日練習した問題を、もう一度確かめられます。</small>
-            </div>
-            <div class="loop-card">
-              <p>学んだ英語を、今日のジャーナルに。<small>ひとこと書けば、次に使いたい表現も見えてきます。</small></p>
-              <a class="btn small" href="#write">ジャーナルで使ってみる</a>
-            </div>
+          <div class="mock flash">
+            <div class="mock-top">単語カード<span class="chip">1 / 5 問</span></div>
+            <div class="bar"><i></i></div>
+            <p class="pos">接続詞</p>
+            <p class="word" lang="en">if</p>
+            <p class="meaning" id="flash-meaning" hidden>もし〜なら</p>
+            <button class="btn small" type="button" id="flash-btn" aria-controls="flash-meaning" aria-expanded="false">意味を見る</button>
           </div>
         </div>
         <div class="app-step">
           <div class="step-head">
-            <p class="label">学習のきろく</p>
+            <p class="label">学習の記録</p>
             <h3>続けた日が、目に見える</h3>
-            <p>連続で学習した日数、勉強時間、書いたジャーナル、正解率。毎日の積み重ねがグラフで見えるから、続けるのが楽しくなります。</p>
+            <p>勉強した日数や時間が、グラフでわかります。</p>
           </div>
-          <div class="mock" role="img" aria-label="学習のきろくの画面のイメージ。今月の勉強時間、連続で学習した日数、書いたジャーナルの数、正解率と、直近14日の勉強時間のグラフ">
+          <div class="mock" role="img" aria-label="学習の記録の画面のイメージ。今月の勉強時間、連続で学習した日数と、直近14日の勉強時間のグラフ">
             <dl class="record-tiles">
               <div><dt>今月の勉強時間</dt><dd>6<small>時間</small>40<small>分</small></dd></div>
               <div><dt>連続で学習</dt><dd>12<small>日</small></dd></div>
-              <div><dt>書いたジャーナル</dt><dd>18<small>件</small></dd></div>
-              <div><dt>正解率</dt><dd>86<small>%</small></dd></div>
             </dl>
             <p class="chart-head">毎日の勉強時間<span>直近14日</span></p>
             <div class="chart">
@@ -979,46 +940,51 @@
     </div>
   </section>
 
-  <!-- ============ teachers ============ -->
+  <!-- ============ hina ============ -->
   <section class="section blue" id="teachers">
     <div class="wrap">
-      <header class="sec-head">
-        <p class="label">Teachers</p>
-        <h2>講師</h2>
-        <p class="sub">ひなのほかに、ネイティブ講師と、TOEIC 900点以上の日本人講師がZoomライブを担当します。</p>
-      </header>
       <div class="profile">
         <div class="portrait"><img src="character.png" width="638" height="852" alt="ひなのイラスト" loading="lazy"></div>
         <div>
-          <h3>ひな<span class="script" lang="en">Hina</span><span class="chip">主宰・ライブ月4回</span></h3>
+          <h3>ひな<span class="script" lang="en">Hina</span><span class="chip">主宰</span></h3>
           <div class="profile-text">
-            <p>YouTubeで、日常でよく使う英会話フレーズを紹介しています。アプリの単語とフレーズのお手本音声は、すべてひなの声です。</p>
+            <p>YouTubeで、日常でよく使う英会話フレーズを紹介しています。</p>
+            <p>LIVE授業では、<b>ひなの回</b>もあります。</p>
           </div>
         </div>
       </div>
-      <div class="teachers">
-        <article class="teacher">
-          <div class="t-avatar native"><img src="teacher-native.svg" width="104" height="104" alt="ネイティブ講師のイラスト"></div>
-          <div>
-            <p class="label">Native</p>
-            <h4>ネイティブ講師</h4>
-            <p>ネイティブならではの自然な発音や言い回しに、Zoomライブでふれられます。</p>
-          </div>
+    </div>
+  </section>
+
+  <!-- ============ 1期生 benefits ============ -->
+  <section class="section" id="first">
+    <div class="wrap">
+      <header class="sec-head">
+        <p class="label">For the first class</p>
+        <h2>1期生だけの特典</h2>
+      </header>
+      <div class="pillars">
+        <article class="pillar">
+          <p class="label">Kick-off</p>
+          <h3>キックオフ会</h3>
+          <p><b>11/15（日）の夜</b>。ひなと1期生だけの顔合わせ。</p>
         </article>
-        <article class="teacher">
-          <div class="t-avatar japanese"><img src="teacher-japanese.svg" width="104" height="104" alt="日本人講師のイラスト"></div>
-          <div>
-            <p class="label">TOEIC 900+</p>
-            <h4>日本人講師</h4>
-            <p>TOEIC 900点以上の日本人講師。英語を学んできた日本人の目線で、つまずきやすいところを教えます。</p>
-          </div>
+        <article class="pillar">
+          <p class="label">Badge</p>
+          <h3>「1期生」の印</h3>
+          <p>アプリに、1期生の印がつきます。</p>
+        </article>
+        <article class="pillar">
+          <p class="label">After</p>
+          <h3>卒業後も、1期生価格</h3>
+          <p>卒業後の継続コミュニティ（月額・任意）を、1期生価格でご案内（金額は決まりしだい）。</p>
         </article>
       </div>
     </div>
   </section>
 
   <!-- ============ price ============ -->
-  <section class="section" id="price">
+  <section class="section blue" id="price">
     <div class="wrap">
       <header class="sec-head">
         <p class="label">Price</p>
@@ -1026,51 +992,48 @@
       </header>
       <div class="price-card">
         <div class="price-main">
-          <p class="plan">月額プラン</p>
-          <p class="price"><span class="amount">¥12,000</span><span class="per">/ 月（税込）</span></p>
-          <p class="price-note">Zoomライブだけで考えても、1回あたり750円です。</p>
-          <p class="price-note">1か月ごとの自動更新です。解約・返金については、<a href="tokushoho.html">特定商取引法に基づく表記</a>をご確認ください。</p>
-          <!-- TODO: 申し込みページが決まったら、そのURLに変える（今はアプリのトップ） -->
-          <a class="btn" href="https://hina-english-flax.vercel.app/">サロンに参加する</a>
+          <p class="plan">3か月コース（1期生）</p>
+          <p class="price"><span class="amount">110,000円</span><span class="per">（税込）</span></p>
+          <p class="price-note">税抜 100,000円 ／ <b>1日あたり 約1,200円</b></p>
+          <p class="price-note">入会金・教材費は、かかりません。</p>
+          <a class="btn" href="https://my.ohana-english.app/?view=join">申し込みページへ</a>
+          <p class="price-note">申し込みは <b>11月12日（木）23:59</b> まで</p>
         </div>
         <div class="price-inc">
-          <h3>プランに含まれるもの</h3>
+          <h3>お支払い</h3>
           <ul class="inc">
-            <li><span class="label">Live</span><span><b>Zoomライブ 月16回</b><small>ひなが月4回、ほかの回はネイティブ講師と日本人講師が担当。アーカイブあり</small></span></li>
-            <li><span class="label">Lesson</span><span><b>講義動画 毎月6〜8本</b><small>好きな時間に、何度でも</small></span></li>
-            <li><span class="label">App</span><span><b>学習アプリ Hina English</b><small>5レベル・3,000語の単語帳（すべてひなの音声つき）、ジャーナリング、AI添削とAI相談、フレーズ練習、発音・聞き取り（91フレーズ）、復習テスト、学習のきろく</small></span></li>
+            <li><span class="label">Card</span><span><b>クレジットカード</b><small>一括払い、またはカード会社の分割払い。日本のカードのみ（アメックスは分割できません）</small></span></li>
+            <li><span class="label">Bank</span><span><b>銀行振込</b><small>公式LINEに「銀行振込希望です」と送ってください（<a href="https://line.me/R/oaMessage/@039impnx/?%E9%8A%80%E8%A1%8C%E6%8C%AF%E8%BE%BC%E5%B8%8C%E6%9C%9B%E3%81%A7%E3%81%99">LINEで送る</a>）。振込手数料はご負担ください</small></span></li>
+          </ul>
+          <h3 class="inc-gap">安心して申し込めるように</h3>
+          <ul class="inc">
+            <li><span class="label">8 days</span><span><b>8日以内なら、無条件で解約・全額返金</b><small>契約書面を受け取ってから8日以内（クーリングオフ）</small></span></li>
+            <li><span class="label">Cancel</span><span><b>そのあとも、途中で解約できます</b><small>返金の計算は<a href="https://my.ohana-english.app/?view=gaiyou">概要書面</a>のとおりです</small></span></li>
           </ul>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- ============ flow ============ -->
-  <section class="section blue" id="flow">
+  <!-- ============ schedule ============ -->
+  <section class="section" id="schedule">
     <div class="wrap">
       <header class="sec-head">
-        <p class="label">Flow</p>
-        <h2>参加までの流れ</h2>
+        <p class="label">Schedule</p>
+        <h2>申し込みから卒業まで</h2>
       </header>
-      <ol class="flow">
-        <li>
-          <h3><span class="step-n">1</span>申し込む</h3>
-          <p>このページのボタンから申し込みページへ。お支払い情報を入力すれば、申し込み完了です。</p>
-        </li>
-        <li>
-          <h3><span class="step-n">2</span>アプリにログイン</h3>
-          <p>登録したアカウントで、学習アプリ Hina English に入れます。Zoomライブの予定も講義動画も、すべてアプリから見られます。</p>
-        </li>
-        <li>
-          <h3><span class="step-n">3</span>最初のひとことを書く</h3>
-          <p>ジャーナリングでお題を選んで、まずは英語でひとこと。<span class="en" lang="en">“A place I would recommend is…”</span> のような書き出しからはじめられます。</p>
-        </li>
+      <ol class="dates">
+        <li><span class="d">〜11/12（木）</span><b>申し込み</b><small>23:59 まで。お支払いのあと、すぐアプリが使えます（準備期間。この分の代金はかかりません）</small></li>
+        <li><span class="d">11/15（日）夜</span><b>キックオフ会</b><small>1期生の顔合わせ</small></li>
+        <li class="key"><span class="d">11/16（月）</span><b>全員一斉スタート</b><small>3か月コースが始まります</small></li>
+        <li><span class="d">2/13・14 ごろ</span><b>卒業イベント</b><small>会場は決まりしだいお知らせ（交通費は自己負担）</small></li>
+        <li><span class="d">2/15（月）</span><b>コース終了</b></li>
       </ol>
     </div>
   </section>
 
   <!-- ============ faq ============ -->
-  <section class="section" id="faq">
+  <section class="section blue" id="faq">
     <div class="wrap">
       <header class="sec-head">
         <p class="label">FAQ</p>
@@ -1079,43 +1042,35 @@
       <div class="faq">
         <details>
           <summary>英語に自信がなくても大丈夫ですか？</summary>
-          <p class="a">大丈夫です。初級1から上級まで5つのレベルがあるので、自分に合ったところからはじめられます。ジャーナリングには書き出しの一文がつき、書いた英語はAIが添削します。</p>
-        </details>
-        <details>
-          <summary>英語はある程度できます。物足りなくないですか？</summary>
-          <p class="a">レベルは初級1から上級まで5段階あり、上級にも専用の単語帳（500語）があります。ジャーナリングは書くほど苦手のデータがたまるので、自分の弱いところを集中して直せます。</p>
+          <p class="a">大丈夫です。最初はインプット多めで、少しずつ話す・書く練習に進みます。</p>
         </details>
         <details>
           <summary>1日にどれくらい時間が必要ですか？</summary>
-          <p class="a">おすすめの流れで、1日約20分です。忙しい日は、単語カード（約3分）だけでも続けられます。</p>
+          <p class="a">目安は1日20〜30分ほどです。アプリを開けば、その日にやることが出てきます。</p>
         </details>
         <details>
-          <summary>ライブはどれくらいありますか？</summary>
-          <p class="a">Zoomで月16回、週4回ペースで開催しています。ひなが月4回、ほかの回はネイティブ講師と、TOEIC 900点以上の日本人講師が担当します。</p>
+          <summary>LIVE授業に出られない日は？</summary>
+          <p class="a">録画があるので、あとから見られます。</p>
         </details>
         <details>
-          <summary>ライブに参加できない日はどうなりますか？</summary>
-          <p class="a">アーカイブが残るので、あとからアプリで見られます。</p>
+          <summary>顔出しは必要ですか？</summary>
+          <p class="a">必要ありません。カメラはオフでOKです。</p>
         </details>
         <details>
-          <summary>スマホだけで参加できますか？</summary>
-          <p class="a">はい。アプリはスマホで使えて、ジャーナルもスマホで保存できます。ライブもZoomなので、スマホから参加できます。</p>
+          <summary>スマホだけで大丈夫ですか？</summary>
+          <p class="a">はい。アプリもZoomも、スマホで使えます。</p>
         </details>
         <details>
-          <summary>文字が小さいと読みにくいのですが…</summary>
-          <p class="a">アプリの画面上にある「文字大きく」ボタンで、文字を大きく表示できます。</p>
+          <summary>支払い方法は？</summary>
+          <p class="a">クレジットカード（一括払い、またはカード会社の分割払い。日本のカードのみ。アメックスは分割できません）と、銀行振込です。銀行振込は、公式LINEに「銀行振込希望です」と送ってください（<a href="https://line.me/R/oaMessage/@039impnx/?%E9%8A%80%E8%A1%8C%E6%8C%AF%E8%BE%BC%E5%B8%8C%E6%9C%9B%E3%81%A7%E3%81%99">LINEで送る</a>）。</p>
         </details>
         <details>
-          <summary>ライブで顔出しは必要ですか？</summary>
-          <p class="a">必要ありません。</p>
+          <summary>途中でやめたくなったら？</summary>
+          <p class="a">契約書面を受け取ってから8日以内なら、無条件で解約・全額返金です。そのあとも途中で解約できます。くわしくは<a href="https://my.ohana-english.app/?view=gaiyou">概要書面</a>をご覧ください。</p>
         </details>
         <details>
-          <summary>支払い方法を教えてください</summary>
-          <p class="a">オンライン決済サービスの Stripe でお支払いいただけます。</p>
-        </details>
-        <details>
-          <summary>退会するときは、どうすればいいですか？</summary>
-          <p class="a">Stripe のページから、退会の手続きができます。</p>
+          <summary>いつから使えますか？</summary>
+          <p class="a">お支払いのあと、すぐ準備期間としてアプリが使えます。コースは11月16日に全員一斉スタートです。</p>
         </details>
       </div>
     </div>
@@ -1126,10 +1081,10 @@
     <div class="wrap">
       <div class="final-text">
         <p class="script" lang="en">Do you wanna join us?</p>
-        <h2>今日の小さな一歩から、<br>一緒にはじめよう。</h2>
+        <h2>「えーっと…」を「パッ」に。<br>一緒に90日、はじめよう。</h2>
         <div class="cta-row">
-          <a class="btn" href="#price">サロンに参加する</a>
-          <p class="cta-note">月額 ¥12,000（税込）</p>
+          <a class="btn" href="https://my.ohana-english.app/?view=join">申し込みページへ</a>
+          <p class="cta-note"><b class="price-em">110,000円（税込）</b><br>申し込みは11/12（木）23:59まで</p>
         </div>
       </div>
       <img src="character.png" width="638" height="852" alt="" loading="lazy">
@@ -1142,21 +1097,21 @@
   <div class="wrap">
     <a class="logo" href="#top">
       <span class="mark"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5v17M3.5 12h17M6 6l12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg></span>
-      <span class="logo-name" lang="en"><b>Hina English</b><small>Learn. Write. Grow.</small></span>
+      <span class="logo-name" lang="en"><b>ʻOhana English</b><small>by Hina</small></span>
     </a>
     <nav class="foot-links" aria-label="サイト情報">
       <a href="tokushoho.html">特定商取引法に基づく表記</a>
       <a href="privacy.html">プライバシーポリシー</a>
       <a href="mailto:hinatoeicpresent@gmail.com">お問い合わせ</a>
     </nav>
-    <p class="copy">運営：株式会社UPSTAR　© 2026 Hina English</p>
+    <p class="copy">運営：株式会社UPSTAR　© 2026 ʻOhana English</p>
   </div>
 </footer>
 
 <!-- スマホだけ画面の下に出る申し込みボタン -->
 <div class="sticky-cta">
-  <p><b>Hina English</b>月額 ¥12,000（税込）</p>
-  <a class="btn" href="#price">参加する</a>
+  <p><b>110,000円（税込）</b>3か月コース・11/12まで</p>
+  <a class="btn" href="https://my.ohana-english.app/?view=join">申し込む</a>
 </div>
 
 <script>
