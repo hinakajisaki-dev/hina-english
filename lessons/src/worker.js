@@ -12,7 +12,7 @@ import { findLesson, lessonExampleSentences, plain, questionCount } from "../pub
 import { findMistakes, normalizeWords } from "../public/mistakes.js";
 import { bookSentences, bookWord, isPaceWeek, itemWord, setKey, vocabBooks, weekWords, wordSets } from "../public/vocab/words.js";
 import { findPhrase, pronMonths } from "../public/pron/phrases.js";
-import { phraseByKey, phraseSentences, phraseSetKey, phraseSets, testSize } from "../public/phrases/book.js";
+import { phraseBooks, phraseByKey, phraseSentences, phraseSetKey, phraseSets, testSize } from "../public/phrases/book.js";
 import { noteProblems, noteSentences } from "../public/notes/format.js";
 import { NOTES_FOR_STUDENTS } from "../public/course.js";
 import { MENUS } from "../public/menus.js";
@@ -230,6 +230,16 @@ async function route(request, env, url, who, ctx) {
   }
   if (parts[1] === "students" && parts[3] === "vocab-books" && parts.length === 4 && method === "PUT") {
     return saveVocabBooks(request, db, await findStudent(db, id(2)));
+  }
+  if (parts[1] === "students" && parts[3] === "phrase-books" && parts.length === 4 && method === "PUT") {
+    const student = await findStudent(db, id(2));
+    const { books } = await readJson(request);
+    const have = phraseBooks().filter((b) => !b.shared);
+    const list = (Array.isArray(books) ? books : []).map(String).filter(Boolean);
+    const unknown = list.find((b) => !have.some((h) => h.id === b));
+    if (unknown) throw new HttpError(400, `「${unknown}」というフレーズの本はありません（あるのは ${have.map((b) => b.id).join("・")}）。`);
+    await saveSetting(db, student, "phrase_books", list.length ? list : null);
+    return json({ books: list.length ? list : null });
   }
   if (parts[1] === "students" && parts[3] === "vocab-pace" && parts.length === 4 && method === "PUT") {
     return saveVocabPace(request, db, await findStudent(db, id(2)));
@@ -671,7 +681,8 @@ async function savePhraseReview(request, env, student) {
 
 // The score of a phrase set's test. The number of questions is worked out here.
 async function savePhraseTest(request, env, student, week, number) {
-  const set = phraseSets(week).find((s) => s.number === number);
+  const books = await studentSetting(env.DB, student, "phrase_books");
+  const set = phraseSets(week, books).find((s) => s.number === number);
   if (!set || !testSize(set)) throw new HttpError(404, "見つかりません。");
   const total = testSize(set);
   const { score } = await readJson(request);
@@ -682,7 +693,7 @@ async function savePhraseTest(request, env, student, week, number) {
      VALUES (?1, ?2, ?3, ?3, ?4, 1, ?5)
      ON CONFLICT (student_id, set_key) DO UPDATE SET
        best_score = MAX(best_score, ?3), last_score = ?3, total = ?4, times = times + 1, updated_at = ?5`,
-    student.id, phraseSetKey(week, number), clean, total, now(),
+    student.id, phraseSetKey(week, number, books), clean, total, now(),
   );
   return json({ ok: true });
 }
