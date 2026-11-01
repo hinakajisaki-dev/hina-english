@@ -3,1064 +3,1033 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>ʻOhana English 3ヶ月突破コース｜英語がパッと出てくる、90日間。</title>
-<meta name="description" content="「えーっと…」を「パッ」に変える90日間。ʻOhana English（by Hina）の3ヶ月突破コース。LIVE授業（Zoom）月12回以上、毎日の学習アプリ、仲間と学ぶコミュニティ型。110,000円（税込）。2026年11月16日スタート。">
-<!-- TODO: 公開するときに OGP（og:title / og:description / og:image / og:url）を追加 -->
+<title>ʻOhana English 3ヶ月突破コース（第1期）</title>
+<meta name="description" content="「知ってる英語」を、「パッと話せる英語」に。毎日のアプリ学習・月12回以上のLIVE授業・毎月の定期テストで、3つのコツを3ヶ月実践する。ʻOhana English 3ヶ月突破コース（第1期）。2026年11/16スタート。">
+<meta property="og:type" content="website">
+<meta property="og:title" content="ʻOhana English 3ヶ月突破コース（第1期）">
+<meta property="og:description" content="「知ってる英語」を、「パッと話せる英語」に。第1期生募集・11/16スタート。">
+<meta property="og:url" content="https://ohana-english.app/">
+<meta name="theme-color" content="#EAF4FB">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=DM+Sans:opsz,wght@9..40,500;9..40,700;9..40,800&family=Noto+Sans+JP:wght@400;500;700;900&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,500;9..40,700;9..40,800&family=Noto+Sans+JP:wght@400;500;700;800;900&display=swap">
 <style>
-  /* Layout: the app's own look (light-blue ground, warm-white
-     panels, orange asterisk tile, Caveat handwriting) turned into a scrolling
-     page. App screens are rebuilt in HTML as small working-looking cards. */
+  /* 勉強会スライドと同じ色：水色の背景・白いカード・黒い文字・オレンジの強調。
+     スマホを先に作る（見出し22〜26px・カード見出し18〜20px・本文15〜16px・セクション余白40〜56px・カード内16〜24px）。
+     900px以上で PC 用に広げる。 */
   :root {
-    --bg: #EAF2FB;
-    --paper: #FFFCF8;
+    --bg: #EAF4FB;
     --card: #FFFFFF;
-    --ink: #1A2238;
-    --ink-2: #4B5569;
-    --muted: #5E6780;
-    --line: #D6E2F0;
-    --line-warm: #EFE3DA;
-
-    --accent: #F0521E;
-    --accent-2: #D63E10;
-    --accent-text: #C23B12;
-    --accent-soft: #FFE6DC;
-    --on-accent: #FFFFFF;
-
-    --pink: #FFD3DD;
-    --peach: #FF9C6E;
-    --yellow: #FFD966;
-    --sky: #A9D3F3;
-    --cream: #FFF0C4;
-
-
-    --en: "DM Sans", "Helvetica Neue", Arial, "Noto Sans JP", sans-serif;
-    --ja: "Noto Sans JP", "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif;
-    --hand: "Caveat", "Segoe Print", "Bradley Hand", cursive;
-
-    --wrap: 1100px;
-    --gutter: 20px;
-    --shadow: 0 12px 32px rgba(26, 34, 56, .07);
-    color-scheme: light;
+    --ink: #222222;
+    --ink-2: #555555;
+    --ink-3: #777777;
+    --accent: #E06410;
+    --accent-line: #F5B27A;
+    --accent-soft: #FDE6D3;
+    --red: #D32F2F;
+    --shadow: 0 4px 14px rgba(34,34,34,0.06);
+    --wrap: 1040px;
   }
-
   * { box-sizing: border-box; }
   html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
-  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
   body {
-    margin: 0;
-    background: var(--paper);
-    color: var(--ink);
-    font-family: var(--ja);
-    font-size: 16px;
-    line-height: 1.85;
-    overflow-x: hidden;
+    margin: 0; background: var(--bg); color: var(--ink);
+    font-family: "Noto Sans JP", "DM Sans", system-ui, sans-serif;
+    font-size: 15.5px; line-height: 1.75; font-weight: 500;
+    word-break: auto-phrase; line-break: strict;
+    padding-bottom: 68px;
   }
-  img { max-width: 100%; display: block; }
-  h1, h2, h3, h4, p, ul, ol, dl, dd, figure { margin: 0; padding: 0; }
-  ul, ol { list-style: none; }
+  img, video { display: block; max-width: 100%; height: auto; }
+  h1, h2, h3, h4, p, ul, ol { margin: 0; }
+  ul, ol { padding: 0; list-style: none; }
   a { color: inherit; }
-  h1, h2, h3, h4 { font-feature-settings: "palt"; }
-  h1, h2, h3, h4, .checks li, .bridge, .faq summary, .lead { word-break: auto-phrase; }
-  [lang="en"], .en { font-family: var(--en); }
-  :focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; border-radius: 8px; }
+  .wrap { width: min(var(--wrap), 100% - 32px); margin-inline: auto; }
+  .accent { color: var(--accent); }
+  .ib { display: inline-block; }
+  .center { text-align: center; }
+  .fine { font-size: 12.5px; line-height: 1.6; color: var(--ink-3); }
+  .card { background: var(--card); border-radius: 16px; box-shadow: var(--shadow); }
 
-  .wrap { max-width: var(--wrap); margin-inline: auto; padding-inline: var(--gutter); }
-  .nw { white-space: nowrap; }
+  /* ヘッダー */
+  .top-bar { position: sticky; top: 0; z-index: 20; background: rgba(234,244,251,0.95); backdrop-filter: blur(8px); border-bottom: 1px solid #D6E6F2; }
+  .top-bar .wrap { display: flex; align-items: center; justify-content: space-between; gap: 12px; height: 48px; }
+  .logo { display: flex; align-items: center; gap: 8px; text-decoration: none; }
+  .logo svg { width: 28px; height: 28px; flex-shrink: 0; }
+  .logo b { font-family: "DM Sans", sans-serif; font-size: 16px; font-weight: 800; line-height: 1.1; display: block; }
+  .logo small { display: block; font-size: 10px; color: var(--ink-2); line-height: 1; font-weight: 700; }
+  .top-bar .btn { display: none; }
 
-  /* ---------- shared pieces ---------- */
-  .label {
-    font-family: var(--en);
-    font-weight: 700;
-    font-size: 13px;
-    letter-spacing: .2em;
-    color: var(--accent-text);
-    text-transform: uppercase;
-  }
-  .script { font-family: var(--hand); font-weight: 700; color: var(--accent-text); line-height: 1.1; }
-  .chip {
-    display: inline-block;
-    font-weight: 700;
-    font-size: 13px;
-    line-height: 1.4;
-    color: var(--accent-text);
-    background: var(--accent-soft);
-    padding: 4px 12px 5px;
-    border-radius: 999px;
-    white-space: nowrap;
-  }
-  .chip.white { background: rgba(255, 255, 255, .8); color: var(--ink); }
-
-  .mark {
-    display: grid;
-    place-items: center;
-    flex: none;
-    width: 42px;
-    height: 42px;
-    border-radius: 13px;
-    background: linear-gradient(145deg, #FF6A3D, var(--accent-2));
-    color: var(--on-accent);
-    box-shadow: 0 6px 16px rgba(214, 62, 16, .25);
-  }
-  .mark svg { width: 22px; height: 22px; }
-
+  /* ボタン */
   .btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 12px;
-    min-height: 60px;
-    padding: 0 32px;
-    border-radius: 18px;
-    background: linear-gradient(135deg, var(--accent), var(--accent-2));
-    border: 0;
-    color: var(--on-accent);
-    font-family: var(--ja);
-    font-weight: 700;
-    font-size: 18px;
-    cursor: pointer;
-    letter-spacing: .03em;
-    text-decoration: none;
-    box-shadow: 0 10px 24px rgba(214, 62, 16, .28);
+    display: inline-flex; align-items: center; justify-content: center;
+    background: var(--accent); color: #FFF; text-decoration: none; text-align: center;
+    font-weight: 800; font-size: 17px; line-height: 1.3;
+    padding: 14px 22px; min-height: 54px; border-radius: 999px;
+    box-shadow: 0 6px 16px rgba(224,100,16,0.30);
     transition: transform .15s ease, box-shadow .15s ease;
   }
-  .btn::after { content: "→"; font-family: var(--en); font-weight: 500; }
-  .btn:hover { transform: translateY(-2px); box-shadow: 0 14px 28px rgba(214, 62, 16, .32); }
-  @media (prefers-reduced-motion: reduce) { .btn { transition: none; } }
+  .btn:hover { transform: translateY(-2px); box-shadow: 0 10px 22px rgba(224,100,16,0.36); }
+  .btn.block { display: flex; width: 100%; font-size: 18px; min-height: 58px; }
+  .btn .arrow { margin-left: 8px; font-size: 0.9em; }
+  .cta { display: flex; flex-direction: column; align-items: stretch; gap: 6px; }
+  .cta-note { font-size: 13px; color: var(--ink-2); text-align: center; font-weight: 700; }
+  .cta-note b { color: var(--ink); }
 
-  /* ---------- header ---------- */
-  .site-head { background: var(--bg); }
-  .site-head .wrap { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-block: 18px; }
-  .logo { display: flex; align-items: center; gap: 12px; text-decoration: none; }
-  .logo-name { display: grid; line-height: 1.15; }
-  .logo-name b { font-family: var(--en); font-weight: 700; font-size: 21px; letter-spacing: -.3px; }
-  .logo-name small { font-family: var(--en); font-weight: 500; font-size: 12px; color: var(--ink-2); }
-  .site-nav { display: flex; align-items: center; gap: 26px; font-size: 14px; font-weight: 700; }
-  .site-nav a { text-decoration: none; }
-  .site-nav a:hover { color: var(--accent-text); }
-  .site-nav .btn { min-height: 44px; padding: 0 20px; font-size: 14px; border-radius: 14px; box-shadow: none; }
-  .site-nav .btn::after { content: none; }
+  /* 札 */
+  .pill { display: inline-block; font-weight: 800; font-size: 13px; border-radius: 999px; padding: 2px 12px; line-height: 1.6; }
+  .pill.orange { background: var(--accent); color: #FFF; }
+  .pill.black { background: var(--ink); color: #FFF; }
+  .pill.red { background: var(--red); color: #FFF; }
+  .pill.soft { background: var(--accent-soft); color: var(--accent); }
+  .pill.outline { border: 2px solid var(--accent); color: var(--accent); background: #FFF; padding: 0 8px; font-size: 11px; }
+  .band { background: var(--ink); color: #FFF; font-weight: 800; border-radius: 14px; padding: 14px 16px; text-align: center; font-size: 17px; line-height: 1.55; }
+  .band .hl { color: var(--accent-line); }
+  .band .dim { color: #B5BAC1; }
 
-  /* ---------- hero ---------- */
-  .hero { position: relative; overflow: hidden; background: var(--bg); }
-  .hero .wrap {
-    display: grid;
-    grid-template-columns: minmax(0, 1.15fr) minmax(0, .85fr);
-    align-items: end;
-    gap: 32px;
-  }
-  .hero-text { padding-block: 36px 84px; min-width: 0; }
-  .eyebrow { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
-  .hero .script { font-size: clamp(34px, 4.4vw, 48px); margin-top: 22px; }
-  .hero h1 {
-    font-weight: 900;
-    font-size: clamp(34px, 5vw, 56px);
-    line-height: 1.25;
-    letter-spacing: .01em;
-    margin-top: 10px;
-    text-wrap: balance;
-  }
-  .lead { font-size: 17px; color: var(--ink-2); margin-top: 22px; max-width: 32em; }
+  /* セクション */
+  section { padding: 48px 0; }
+  .white { background: #FFF; }
+  .soft { background: var(--accent-soft); }
+  .sec-head { text-align: center; margin-bottom: 22px; display: flex; flex-direction: column; align-items: center; gap: 8px; }
+  .sec-head h2 { font-size: 24px; font-weight: 900; line-height: 1.5; }
+  .sec-head .lead { font-size: 15px; font-weight: 700; color: var(--ink-2); line-height: 1.7; }
 
-  .stats {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    margin-top: 30px;
-    max-width: 36em;
-    background: var(--card);
-    border-radius: 22px;
-    box-shadow: var(--shadow);
-  }
-  .stats > div { display: grid; align-content: start; gap: 2px; padding: 16px 20px 18px; min-width: 0; }
-  .stats > div + div { border-left: 1.5px solid var(--line); }
-  .stats dt { font-size: 12px; font-weight: 700; color: var(--muted); line-height: 1.5; }
-  .stats dd { font-weight: 900; font-size: 15px; }
-  .stats .n { font-family: var(--en); font-weight: 800; font-size: 44px; line-height: 1.05; letter-spacing: -1.5px; color: var(--accent); margin-right: 3px; }
-  .stats .chip { justify-self: start; margin-top: 4px; font-size: 12px; padding: 3px 10px 4px; }
+  /* 1. ファーストビュー */
+  .hero { padding: 22px 0 32px; overflow: hidden; }
+  .hero .wrap { display: grid; gap: 18px; }
+  .hero .label { font-size: 13px; font-weight: 800; color: var(--ink-2); letter-spacing: .02em; }
+  .hero .label b { font-family: "DM Sans", sans-serif; color: var(--ink); }
+  .hero h1 { font-size: 28px; font-weight: 900; line-height: 1.5; margin: 8px 0 8px; }
+  .hero h1 .hl { color: var(--accent); }
+  .hero .sub { font-size: 16px; font-weight: 800; color: var(--ink-2); }
+  .hero .facts { display: flex; flex-wrap: wrap; gap: 6px; margin: 14px 0 12px; }
+  .hero .facts li { display: flex; align-items: center; gap: 6px; background: #FFF; border-radius: 999px; padding: 3px 12px 3px 6px; font-weight: 800; font-size: 13px; }
+  .hero .facts li::before { content: ""; width: 16px; height: 16px; border-radius: 50%; background: var(--accent) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpath d='M18 33 L28 43 L46 23' fill='none' stroke='%23fff' stroke-width='9' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/80% no-repeat; }
+  .hero .recruit { margin-bottom: 16px; }
+  .hero .recruit .pill { font-size: 14px; padding: 3px 14px; }
+  .hero-phones { position: relative; display: flex; justify-content: center; align-items: flex-start; padding-top: 4px; }
+  .hero-phones::before { content: ""; position: absolute; width: 220px; height: 220px; border-radius: 50%; background: #FFF; top: 8px; left: 50%; margin-left: -110px; }
+  .phone { position: relative; background: var(--ink); border-radius: 22px; padding: 6px; box-shadow: 0 12px 26px rgba(34,34,34,0.18); }
+  .phone img { border-radius: 17px; width: 100%; }
+  .hero-phones .phone { width: 128px; }
+  .hero-phones .p1 { width: 112px; transform: rotate(-7deg) translate(20px, 18px); }
+  .hero-phones .p2 { transform: translateX(-12px); }
 
-  .cta-row { display: flex; flex-wrap: wrap; align-items: center; gap: 14px 22px; margin-top: 32px; }
-  .cta-note { font-size: 14px; color: var(--muted); font-weight: 500; }
+  /* 2. 共感 */
+  .pains { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .pains li { display: flex; flex-direction: column; gap: 6px; background: var(--bg); border-radius: 14px; padding: 14px 14px; font-weight: 800; font-size: 14.5px; line-height: 1.55; }
+  .pains li svg { width: 26px; height: 26px; }
+  .answer { margin-top: 22px; text-align: center; }
+  .answer h3 { font-size: 20px; font-weight: 900; line-height: 1.55; }
+  .answer p { font-size: 15.5px; font-weight: 700; margin-top: 8px; line-height: 1.75; }
+  .answer p b { color: var(--accent); }
 
-  .hero-figure { position: relative; align-self: end; justify-self: center; width: min(100%, 400px); }
-  .tile {
-    position: absolute;
-    left: 6%;
-    width: 88%;
-    top: 30%;
-    aspect-ratio: 1;
-    border-radius: 26%;
-    background: linear-gradient(145deg, #FF6A3D, var(--accent-2));
-    transform: rotate(-8deg);
-    box-shadow: 0 30px 60px rgba(214, 62, 16, .22);
-  }
-  .sticker {
-    position: absolute;
-    right: 0;
-    top: 6%;
-    z-index: 1;
-    width: 64px;
-    height: 64px;
-    border-radius: 20px;
-    transform: rotate(10deg);
-  }
-  .sticker svg { width: 32px; height: 32px; }
-  .hero-figure img { position: relative; width: 86%; height: auto; margin-inline: auto; }
-  .hello {
-    position: absolute;
-    left: -8%;
-    top: 12%;
-    background: var(--card);
-    border-radius: 18px;
-    padding: 10px 18px 12px;
-    box-shadow: var(--shadow);
-    font-family: var(--en);
-    font-weight: 700;
-    font-size: 19px;
-    line-height: 1.2;
-    white-space: nowrap;
-    transform-origin: 80% 100%;
-    animation: pop .6s cubic-bezier(.3, 1.5, .5, 1) both;
-  }
-  .hello::after {
-    content: "";
-    position: absolute;
-    right: 26px;
-    bottom: -8px;
-    width: 18px;
-    height: 18px;
-    background: var(--card);
-    transform: rotate(45deg);
-    border-radius: 3px;
-  }
-  .hello small { display: block; font-family: var(--ja); font-weight: 500; font-size: 13px; color: var(--accent-text); margin-top: 4px; }
-  @keyframes pop { from { transform: scale(.82) rotate(-4deg); } to { transform: none; } }
-  @media (prefers-reduced-motion: reduce) { .hello { animation: none; } }
+  /* 3. 問題提起・解決策 */
+  .problem { padding: 22px 18px; }
+  .problem h2 { font-size: 22px; font-weight: 900; line-height: 1.55; text-align: center; }
+  .problem h2 .red { color: var(--red); }
+  .qs { display: grid; gap: 8px; margin: 16px 0 14px; }
+  .qs li { display: flex; align-items: center; gap: 12px; background: var(--bg); border-radius: 12px; padding: 10px 14px; font-weight: 800; font-size: 15.5px; line-height: 1.5; }
+  .qs li .k { flex-shrink: 0; font-size: 11.5px; font-weight: 800; color: #FFF; background: var(--ink); border-radius: 999px; padding: 1px 9px; }
+  .problem .tough { text-align: center; font-weight: 700; font-size: 15px; color: var(--ink-2); }
+  .problem .so { text-align: center; margin-top: 10px; font-weight: 900; font-size: 17px; line-height: 1.6; }
+  .problem .so b { color: var(--accent); }
 
-  /* ---------- sections ---------- */
-  .section { padding-block: 96px; }
-  .section.blue { background: var(--bg); }
-  .sec-head { display: grid; justify-items: start; gap: 8px; margin-bottom: 44px; }
-  .sec-head h2 { font-weight: 900; font-size: clamp(26px, 3.4vw, 38px); line-height: 1.4; text-wrap: balance; }
-  .sec-head .sub { color: var(--ink-2); max-width: 38em; margin-top: 6px; }
+  /* 4. 目指す姿 */
+  .goal-grid { display: grid; gap: 8px; }
+  .goal-item { display: flex; align-items: center; gap: 12px; padding: 12px 16px; }
+  .goal-item .ico { width: 44px; height: 44px; flex-shrink: 0; border-radius: 50%; background: var(--bg); display: grid; place-items: center; }
+  .goal-item .ico svg { width: 36px; height: 36px; }
+  .goal-item .num { font-family: "DM Sans", sans-serif; color: var(--accent); font-weight: 800; font-size: 13px; line-height: 1; display: block; margin-bottom: 2px; }
+  .goal-item p { font-weight: 800; font-size: 15.5px; line-height: 1.5; }
+  .goal .band { margin-top: 16px; }
 
-  /* ---------- for you ---------- */
-  .checks {
-    background: var(--card);
-    border-radius: 24px;
-    box-shadow: var(--shadow);
-    padding: 8px 32px;
-    max-width: 780px;
-  }
-  .checks li {
-    display: grid;
-    grid-template-columns: 30px minmax(0, 1fr);
-    align-items: start;
-    gap: 16px;
-    padding-block: 18px;
-    font-size: 17px;
-    font-weight: 700;
-  }
-  .checks li + li { border-top: 1.5px solid var(--line-warm); }
-  .checks li::before {
-    content: "";
-    width: 28px;
-    height: 28px;
-    margin-top: 2px;
-    border-radius: 50%;
-    background: var(--accent-soft) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M6 12.5l4 4 8-9' fill='none' stroke='%23C23B12' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / 18px no-repeat;
-  }
-  .bridge { font-size: clamp(19px, 2.3vw, 23px); font-weight: 900; line-height: 1.7; margin-top: 44px; text-wrap: balance; }
-  .bridge em { font-style: normal; background: linear-gradient(transparent 60%, var(--accent-soft) 60%); }
-  .bridge span { display: block; text-wrap: wrap; font-size: 16px; font-weight: 500; color: var(--ink-2); margin-top: 8px; }
+  /* 5. 3つのコツ → 商品 */
+  .tips { display: grid; gap: 10px; }
+  .tip { display: grid; grid-template-columns: 56px 1fr; gap: 4px 14px; padding: 16px; align-items: start; background: var(--bg); box-shadow: none; }
+  .tip img { width: 56px; grid-row: span 3; margin-top: 2px; }
+  .tip h3 { font-size: 18px; font-weight: 900; line-height: 1.45; }
+  .tip h3 .n { font-family: "DM Sans", sans-serif; color: var(--accent); margin-right: 4px; }
+  .tip .how { font-size: 14px; font-weight: 700; color: var(--ink-2); line-height: 1.6; }
+  .tip .use { font-size: 14px; font-weight: 800; line-height: 1.6; padding-top: 6px; border-top: 1px dashed var(--accent-line); margin-top: 4px; }
+  .tip .use b { color: var(--accent); }
+  .bridge { margin-top: 18px; text-align: center; background: #FFF; border-radius: 16px; padding: 20px 16px; outline: 3px solid var(--accent); outline-offset: -3px; }
+  .bridge .pre { font-size: 14.5px; font-weight: 800; color: var(--ink-2); }
+  .bridge h3 { font-size: 24px; font-weight: 900; line-height: 1.4; margin-top: 4px; }
+  .bridge h3 small { display: block; font-family: "DM Sans", sans-serif; font-size: 15px; color: var(--ink); }
+  .bridge h3 span { color: var(--accent); }
+  .bridge p.env { font-size: 15px; font-weight: 800; margin-top: 8px; line-height: 1.65; }
+  .bridge p.env b { color: var(--accent); }
 
-  /* ---------- what you get ---------- */
-  .pillars { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; }
-  .pillar {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    background: var(--card);
-    border-radius: 24px;
-    box-shadow: var(--shadow);
-    padding: 28px 28px 30px;
-    min-width: 0;
-  }
-  .pillar .big { font-family: var(--en); font-weight: 800; font-size: 64px; line-height: 1; letter-spacing: -2px; color: var(--accent); margin-top: 6px; }
-  .pillar .big small { font-family: var(--ja); font-size: 20px; font-weight: 900; letter-spacing: 0; color: var(--ink); margin-left: 4px; }
-  .pillar h3 { font-weight: 900; font-size: 21px; line-height: 1.5; }
-  .pillar p { color: var(--ink-2); font-size: 15px; }
-  .pillar .chip { align-self: flex-start; }
-  .pillar .label, .step-head .label, .teacher .label { color: var(--accent-text); font-size: 13px; }
+  /* 6. 3つの仕組み */
+  .pillars { display: grid; gap: 10px; }
+  .pillar { padding: 18px 18px; }
+  .pillar .top { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
+  .pillar .ico { width: 44px; height: 44px; flex-shrink: 0; border-radius: 12px; background: var(--accent-soft); display: grid; place-items: center; }
+  .pillar .ico svg { width: 28px; height: 28px; }
+  .pillar .no { font-family: "DM Sans", sans-serif; font-size: 12px; font-weight: 800; color: var(--accent); display: block; line-height: 1.2; }
+  .pillar h3 { font-size: 19px; font-weight: 900; line-height: 1.35; }
+  .pillar .key { font-size: 15.5px; font-weight: 900; line-height: 1.6; }
+  .pillar .key b { color: var(--accent); }
+  .pillar p.body { font-size: 14px; color: var(--ink-2); font-weight: 700; line-height: 1.7; margin-top: 4px; }
 
-  /* ---------- the app ---------- */
-  .daily { background: var(--card); border-radius: 26px; box-shadow: var(--shadow); padding: 26px 28px 24px; }
-  .daily-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 16px; }
-  .daily-head h3 { font-weight: 900; font-size: 20px; }
-  .daily-head .chip { margin-left: 8px; vertical-align: 2px; }
-  .total { font-weight: 900; font-size: 15px; }
-  .total b { font-family: var(--en); font-weight: 800; font-size: 40px; letter-spacing: -1px; color: var(--accent); margin-inline: 2px; }
-  /* segment widths follow the minutes (flex-grow = minutes) */
-  .timeline { display: flex; gap: 6px; margin-top: 14px; }
-  .seg { flex: var(--m) 1 0; min-width: 0; }
-  .seg .fill { display: block; height: 16px; border-radius: 8px; background: var(--c); }
-  .seg .t { display: grid; margin-top: 10px; font-size: 13px; line-height: 1.5; }
-  .seg .t b { font-size: 14px; font-weight: 900; }
-  .seg .t span { color: var(--muted); font-weight: 700; }
-  .seg.s1 { --c: #FF9DB4; }
-  .seg.s2 { --c: #7DBDEB; }
-  .seg.s3 { --c: #FF8A57; }
-  .seg.s4 { --c: #FFC94A; }
-  .daily-notes { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-top: 20px; }
-  .daily-notes p { background: var(--bg); border-radius: 16px; padding: 12px 16px; font-size: 14px; line-height: 1.7; }
-  .daily-notes b { display: block; font-size: 12px; color: var(--accent-text); }
-  .step-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; }
-  .loop-back { display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 14px; font-size: 14px; font-weight: 700; color: var(--accent-text); }
-  .loop-back svg { width: 20px; height: 20px; flex: none; }
+  /* 7. アプリ機能 */
+  .group { margin-top: 26px; }
+  .group:first-of-type { margin-top: 0; }
+  .g-head { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+  .g-head .L { flex-shrink: 0; width: 32px; height: 32px; border-radius: 10px; background: var(--accent); color: #FFF; display: grid; place-items: center; font-family: "DM Sans", sans-serif; font-weight: 800; font-size: 17px; }
+  .g-head h3 { font-size: 19px; font-weight: 900; line-height: 1.4; }
+  .fgrid { display: grid; gap: 8px; }
+  .fcard { display: grid; grid-template-columns: 64px 1fr; gap: 14px; padding: 12px 16px 12px 12px; align-items: center; }
+  .thumb { background: var(--ink); border-radius: 12px; padding: 3px; aspect-ratio: 3 / 4; overflow: hidden; }
+  .thumb img, .thumb video { width: 100%; height: 100%; object-fit: cover; object-position: top; border-radius: 9px; }
+  .thumb.wide img { object-position: 8% center; }
+  .fcard h4 { font-size: 18px; font-weight: 900; line-height: 1.4; }
+  .fcard p { font-size: 14px; font-weight: 700; line-height: 1.6; color: var(--ink-2); margin-top: 2px; }
+  .fcard p b { display: block; color: var(--accent); font-weight: 800; margin-top: 2px; }
+  .feat-note { margin-top: 14px; }
 
-  .app-block { margin-top: 80px; }
-  .pair { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 28px; align-items: start; }
-  .app-step { display: flex; flex-direction: column; gap: 18px; min-width: 0; }
-  .step-head { display: grid; gap: 4px; }
-  .step-head h3 { font-weight: 900; font-size: clamp(22px, 2.4vw, 26px); line-height: 1.45; }
-  .step-head h3 .en { font-weight: 800; letter-spacing: -.5px; }
-  .step-head p { color: var(--ink-2); max-width: 40em; }
-  .callout { background: var(--accent-soft); border-radius: 18px; padding: 14px 18px 16px; font-size: 14px; line-height: 1.8; color: var(--ink-2); }
-  .callout b { display: block; font-size: 16px; font-weight: 900; color: var(--ink); }
-  .cap { font-size: 12px; color: var(--muted); }
+  /* 8. カリキュラム */
+  .months { display: grid; gap: 8px; }
+  .month { padding: 16px 16px; display: grid; grid-template-columns: 64px 1fr; gap: 2px 14px; align-items: start; }
+  .month .m { grid-row: span 2; background: var(--accent); color: #FFF; border-radius: 12px; text-align: center; font-weight: 900; padding: 6px 0; font-size: 13px; line-height: 1.3; }
+  .month .m b { display: block; font-family: "DM Sans", sans-serif; font-size: 24px; line-height: 1.1; }
+  .month h3 { font-size: 18px; font-weight: 900; line-height: 1.45; }
+  .month p { font-size: 14px; font-weight: 700; color: var(--ink-2); line-height: 1.6; }
+  .weeks { margin-top: 14px; background: #FFF; border-radius: 16px; box-shadow: var(--shadow); }
+  .weeks summary { cursor: pointer; list-style: none; padding: 14px 44px 14px 16px; font-weight: 800; font-size: 15px; position: relative; }
+  .weeks summary::-webkit-details-marker { display: none; }
+  .weeks summary::after { content: "+"; position: absolute; right: 16px; top: 9px; color: var(--accent); font-size: 22px; font-weight: 800; }
+  .weeks[open] summary::after { content: "−"; }
+  .wk { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0 8px; padding: 0 12px 14px; }
+  .wk h4 { font-size: 13px; font-weight: 900; color: var(--accent); padding: 4px 0; border-bottom: 2px solid var(--accent-soft); margin-bottom: 4px; }
+  .wk li { font-size: 13px; font-weight: 700; line-height: 1.45; padding: 4px 0; border-bottom: 1px solid #EEF3F7; }
+  .wk li:last-child { border-bottom: 0; }
+  .wk em { display: block; font-style: normal; font-family: "DM Sans", sans-serif; font-size: 10.5px; color: var(--ink-3); line-height: 1.2; }
+  .how-learn { margin-top: 14px; padding: 18px 16px; }
+  .how-learn h3 { font-size: 18px; font-weight: 900; text-align: center; margin-bottom: 12px; }
+  .combo { display: grid; grid-template-columns: 1fr auto 1fr auto 1fr; align-items: center; gap: 4px; text-align: center; }
+  .combo div { background: var(--bg); border-radius: 12px; padding: 10px 4px; font-weight: 900; font-size: 15px; line-height: 1.35; }
+  .combo div small { display: block; font-size: 11.5px; font-weight: 700; color: var(--ink-2); margin-top: 2px; line-height: 1.4; }
+  .combo i { font-style: normal; color: var(--accent); font-weight: 900; }
+  .how-learn .steps { margin-top: 12px; font-size: 14px; font-weight: 700; text-align: center; line-height: 1.65; }
+  .how-learn .steps b { color: var(--accent); }
 
-  .mock {
-    background: var(--card);
-    border: 1px solid #E6EDF6;
-    border-radius: 26px;
-    box-shadow: var(--shadow);
-    padding: 24px 24px 26px;
-    min-width: 0;
-  }
-  .mock-title { display: flex; align-items: center; justify-content: space-between; gap: 12px; font-weight: 900; font-size: 16px; }
-  .prompts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-top: 16px; }
-  .prompts li {
-    border: 1.5px solid #E3E8EF;
-    border-radius: 14px;
-    padding: 12px 14px;
-    font-size: 13px;
-    font-weight: 700;
-    line-height: 1.6;
-  }
-  .prompts li.on { border-color: var(--accent); background: #FFF1EC; color: var(--accent-text); }
-  .starter { margin-top: 14px; background: var(--cream); border-radius: 18px; padding: 14px 18px 16px; }
-  .starter b { display: block; font-family: var(--en); font-weight: 700; font-size: 15px; }
-  .starter small { display: block; font-size: 12px; color: var(--ink-2); margin-top: 4px; }
-  .starter p { font-family: var(--en); font-weight: 700; font-size: 19px; line-height: 1.35; }
+  /* 9. LIVE・テスト・交流 */
+  .live { padding: 18px 16px; }
+  .live-head { display: grid; grid-template-columns: 1fr 76px; gap: 14px; align-items: center; }
+  .live-head .pill { margin-bottom: 4px; }
+  .live-head h3 { font-size: 20px; font-weight: 900; line-height: 1.45; }
+  .live-head p { font-size: 14.5px; font-weight: 800; line-height: 1.6; margin-top: 4px; }
+  .lessons { display: grid; gap: 6px; margin-top: 14px; }
+  .lesson { display: flex; align-items: center; gap: 10px; border-radius: 12px; padding: 9px 12px; background: var(--bg); }
+  .lesson.hot { background: var(--accent-soft); }
+  .lesson .when { flex-shrink: 0; width: 56px; text-align: center; font-weight: 900; color: #FFF; background: var(--ink); border-radius: 999px; font-size: 12px; padding: 1px 0; }
+  .lesson.hot .when { background: var(--accent); }
+  .lesson b { display: block; font-size: 15px; line-height: 1.4; }
+  .lesson span { display: block; color: var(--ink-2); font-size: 12.5px; font-weight: 700; line-height: 1.5; }
+  .live .fine { margin-top: 10px; }
+  .more { display: grid; gap: 10px; margin-top: 10px; }
+  .mini { padding: 16px; display: grid; grid-template-columns: 1fr 64px; gap: 14px; align-items: center; }
+  .mini .pill { margin-bottom: 4px; }
+  .mini h3 { font-size: 18px; font-weight: 900; line-height: 1.45; }
+  .mini p { font-size: 14px; font-weight: 700; color: var(--ink-2); line-height: 1.65; margin-top: 2px; }
+  .grad { padding: 16px; text-align: center; background: var(--bg); box-shadow: none; }
+  .grad h3 { font-size: 18px; font-weight: 900; }
+  .grad p { font-size: 14px; font-weight: 800; color: var(--ink-2); }
+  .grad .pill { margin-top: 6px; font-size: 12px; }
 
-  .mine { background: var(--bg); border-radius: 18px; padding: 14px 20px 20px; margin-top: 16px; }
-  .who { font-size: 12px; font-weight: 700; color: var(--muted); }
-  .mine .en { font-weight: 700; font-size: 21px; line-height: 1.4; margin-top: 30px; }
-  .fix { position: relative; display: inline-block; }
-  .fix del { text-decoration: none; background: linear-gradient(transparent 46%, var(--accent) 46%, var(--accent) 58%, transparent 58%); }
-  .fix ins, ins.add {
-    font-family: var(--hand);
-    font-weight: 700;
-    font-size: 28px;
-    line-height: 1;
-    color: var(--accent);
-    text-decoration: none;
-  }
-  .fix ins { position: absolute; left: 50%; bottom: 74%; transform: translateX(-50%) rotate(-6deg); }
-  .ai { margin-top: 16px; display: grid; gap: 8px; }
-  .ai-body { background: var(--paper); border: 1px solid var(--line-warm); border-radius: 4px 18px 18px 18px; padding: 14px 18px 16px; font-size: 14px; line-height: 1.8; color: var(--ink-2); }
-  .ai-body .en { display: block; font-weight: 700; font-size: 17px; color: var(--ink); margin-block: 2px 8px; }
-  .ai-body .en:last-child { margin-bottom: 0; }
+  /* 10. 講師 */
+  .teacher { padding: 20px 18px; }
+  .t-top { display: grid; grid-template-columns: 72px 1fr; gap: 14px; align-items: center; }
+  .t-top .pic { width: 72px; height: 72px; border-radius: 50%; background: var(--bg); display: grid; place-items: center; overflow: hidden; }
+  .t-top .pic img { width: 92%; }
+  .t-top .name b { font-family: "DM Sans", sans-serif; font-size: 24px; line-height: 1.1; display: block; }
+  .t-top .name span { font-size: 13px; font-weight: 700; color: var(--ink-2); }
+  .t-list { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 14px; }
+  .t-list li { background: var(--bg); border-radius: 10px; padding: 8px 10px; font-weight: 800; font-size: 13.5px; line-height: 1.45; }
+  .t-list li b { color: var(--accent); }
+  .message { margin-top: 14px; border-left: 4px solid var(--accent); padding: 2px 0 2px 14px; }
+  .message p { font-size: 15px; font-weight: 700; line-height: 1.85; }
+  .message p + p { margin-top: 8px; }
+  .message strong { color: var(--accent); }
 
-  /* five levels drawn as a staircase */
-  .levels-wrap { margin-top: 24px; background: var(--card); border-radius: 26px; box-shadow: var(--shadow); padding: 24px 24px 20px; }
-  .levels { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); align-items: end; height: 230px; }
-  .levels li {
-    height: var(--h);
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-end;
-    gap: 2px;
-    min-width: 0;
-    border-radius: 0 14px 0 0;
-    padding: 12px 14px 14px;
-  }
-  .levels li:nth-child(1) { --h: 36%; background: #FFE6DC; }
-  .levels li:nth-child(2) { --h: 52%; background: #FFD0BC; }
-  .levels li:nth-child(3) { --h: 68%; background: #FFB592; }
-  .levels li:nth-child(4) { --h: 84%; background: #FF9668; }
-  .levels li:nth-child(5) { --h: 100%; background: #F76432; }
-  .levels b { font-weight: 900; font-size: 15px; line-height: 1.4; }
-  .levels span { font-family: var(--en); font-weight: 800; font-size: 24px; line-height: 1.1; letter-spacing: -.5px; }
-  .levels small { font-family: var(--ja); font-size: 12px; font-weight: 900; margin-left: 1px; }
-  .levels-cap { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px 16px; margin-top: 14px; font-size: 14px; color: var(--ink-2); }
-  .levels-cap b { color: var(--ink); font-weight: 900; }
-  .levels li:first-child { border-bottom-left-radius: 8px; }
+  /* 11. 提供内容 */
+  .inc { display: grid; gap: 8px; }
+  .inc-cat { padding: 16px; }
+  .inc-cat h3 { display: flex; align-items: center; gap: 8px; font-size: 18px; font-weight: 900; margin-bottom: 8px; }
+  .inc-cat h3 .L { width: 26px; height: 26px; border-radius: 8px; background: var(--accent); color: #FFF; display: grid; place-items: center; font-family: "DM Sans", sans-serif; font-size: 14px; }
+  .inc-cat ul { display: flex; flex-wrap: wrap; gap: 6px; }
+  .inc-cat li { background: var(--bg); border-radius: 999px; padding: 3px 12px; font-size: 13.5px; font-weight: 800; line-height: 1.6; }
 
-  .learn3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; align-items: start; margin-top: 28px; }
-  .learn-item { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
-  .meta h4 { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; font-weight: 900; font-size: 20px; line-height: 1.4; }
-  .meta p { color: var(--ink-2); font-size: 15px; margin-top: 6px; }
-  .sets { display: grid; gap: 6px; margin-top: 10px; font-size: 13px; color: var(--ink-2); }
-  .sets li { display: grid; grid-template-columns: 22px minmax(0, 1fr) auto; gap: 8px; align-items: baseline; }
-  .sets i { font-style: normal; font-family: var(--en); font-weight: 800; color: var(--accent-text); }
-  .sets em { font-style: normal; font-family: var(--en); font-weight: 700; color: var(--ink); }
+  /* 12. 料金・特典 */
+  .offer { display: grid; gap: 12px; }
+  .price-box { outline: 4px solid var(--accent); outline-offset: -4px; padding: 22px 18px; text-align: center; }
+  .price-box .course-name { font-weight: 900; font-size: 16px; }
+  .price-box .course-name .pill { margin-right: 6px; vertical-align: 2px; }
+  .price-box .yen { display: flex; align-items: baseline; justify-content: center; gap: 4px; margin-top: 4px; }
+  .price-box .yen b { font-family: "DM Sans", sans-serif; font-size: 50px; color: var(--accent); line-height: 1.1; }
+  .price-box .yen span { font-weight: 900; font-size: 17px; }
+  .price-box .tax { color: var(--ink-2); font-weight: 700; font-size: 13.5px; }
+  .price-box .chips { display: flex; justify-content: center; gap: 6px; flex-wrap: wrap; margin: 10px 0 14px; }
+  .price-box .summary { text-align: left; background: var(--bg); border-radius: 12px; padding: 12px 14px; margin-bottom: 16px; }
+  .price-box .summary p { font-size: 13px; font-weight: 800; color: var(--ink-2); margin-bottom: 4px; }
+  .price-box .summary ul { display: grid; gap: 2px; }
+  .price-box .summary li { display: flex; gap: 8px; font-size: 14.5px; font-weight: 800; line-height: 1.55; }
+  .price-box .summary li::before { content: ""; flex-shrink: 0; width: 16px; height: 16px; margin-top: 3px; border-radius: 50%; background: var(--accent) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpath d='M18 33 L28 43 L46 23' fill='none' stroke='%23fff' stroke-width='9' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/80% no-repeat; }
+  .perks { padding: 18px 16px; background: var(--ink); color: #FFF; box-shadow: none; }
+  .perks h3 { display: flex; align-items: center; gap: 8px; font-size: 18px; font-weight: 900; margin-bottom: 10px; }
+  .perks h3 .pill { background: var(--accent); color: #FFF; font-size: 12px; }
+  .perks ol { display: grid; gap: 8px; }
+  .perks li { display: grid; grid-template-columns: 26px 1fr; gap: 0 10px; align-items: start; }
+  .perks li .n { width: 26px; height: 26px; border-radius: 50%; background: var(--accent-line); color: var(--ink); display: grid; place-items: center; font-family: "DM Sans", sans-serif; font-weight: 800; font-size: 13px; grid-row: span 2; margin-top: 2px; }
+  .perks li b { font-size: 16px; line-height: 1.45; color: var(--accent-line); }
+  .perks li span { font-size: 13.5px; font-weight: 700; color: #DADDE1; line-height: 1.55; }
+  .pay { padding: 18px 16px; }
+  .pay h3 { font-size: 18px; font-weight: 900; margin-bottom: 10px; }
+  .pay dl { display: grid; grid-template-columns: auto 1fr; gap: 8px 12px; margin: 0; }
+  .pay dt { font-size: 12.5px; font-weight: 900; color: #FFF; background: var(--accent); border-radius: 8px; padding: 2px 8px; height: fit-content; text-align: center; margin-top: 2px; }
+  .pay dd { margin: 0; font-size: 14.5px; font-weight: 700; line-height: 1.6; }
+  .pay dd b { color: var(--ink); }
+  .pay dd small { display: block; font-size: 12.5px; color: var(--ink-3); line-height: 1.55; margin-top: 2px; }
+  .pay .steps { margin-top: 14px; padding-top: 12px; border-top: 1px dashed var(--accent-line); }
+  .pay .steps p { font-size: 13px; font-weight: 800; color: var(--ink-2); margin-bottom: 6px; }
+  .pay .steps ol { display: grid; gap: 6px; }
+  .pay .steps li { display: flex; gap: 10px; align-items: flex-start; font-size: 14px; font-weight: 700; line-height: 1.6; }
+  .pay .steps li b { flex-shrink: 0; width: 22px; height: 22px; border-radius: 50%; background: var(--accent); color: #FFF; display: grid; place-items: center; font-family: "DM Sans", sans-serif; font-size: 12px; margin-top: 1px; }
+  .relief { display: flex; gap: 10px; align-items: center; text-align: left; background: var(--bg); border-radius: 12px; padding: 10px 12px; margin-top: 14px; font-size: 13.5px; font-weight: 700; line-height: 1.6; }
+  .relief svg { width: 32px; height: 32px; flex-shrink: 0; }
+  .relief b { color: var(--accent); display: block; font-size: 14.5px; }
 
-  .mock-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; width: 100%; font-weight: 900; font-size: 14px; }
-  .bar { width: 100%; height: 6px; border-radius: 3px; background: var(--accent-soft); margin-top: 10px; }
-  .bar i { display: block; width: 20%; height: 100%; border-radius: 3px; background: var(--accent); }
-  .flash { display: grid; justify-items: center; text-align: center; }
-  .flash > .chip { margin-top: 18px; }
-  .flash .pos { font-size: 13px; font-weight: 700; color: var(--muted); margin-top: 6px; }
-  .flash .word { font-family: var(--en); font-weight: 800; font-size: 60px; line-height: 1.15; margin-block: 4px 6px; }
-  .flash .meaning { font-weight: 900; font-size: 20px; color: var(--accent-text); margin-bottom: 10px; }
-  .btn.small { min-height: 44px; padding: 0 22px; font-size: 15px; border-radius: 14px; box-shadow: none; }
-  .btn.small::after { content: none; }
-
-  .phrase { display: grid; gap: 12px; text-align: center; }
-  .phrase > .chip { justify-self: center; margin-top: 14px; }
-  .phrase .en { font-weight: 800; font-size: 19px; line-height: 1.35; }
-  .phrase .ja { color: var(--accent-text); font-weight: 700; font-size: 14px; line-height: 1.6; }
-  .audio { display: flex; align-items: center; gap: 10px; background: var(--bg); border-radius: 999px; padding: 9px 16px; font-family: var(--en); font-size: 13px; color: var(--ink-2); text-align: left; }
-  .audio::before { content: ""; border-left: 10px solid var(--ink); border-block: 6px solid transparent; }
-  .audio i { flex: 1; height: 4px; border-radius: 2px; background: var(--line); }
-  .tips { display: grid; gap: 8px; text-align: left; }
-  .tip { background: var(--bg); border-radius: 14px; padding: 10px 14px 12px; font-size: 13px; line-height: 1.7; }
-  .tip b { display: block; color: var(--accent-text); font-size: 12px; }
-
-  .order-line {
-    min-height: 96px;
-    margin-top: 14px;
-    border: 2px dashed var(--line);
-    border-radius: 16px;
-    background: var(--bg);
-    padding: 10px;
-    display: flex;
-    flex-wrap: wrap;
-    align-content: flex-start;
-    gap: 8px;
-  }
-  .order-line:empty::before { content: attr(data-hint); align-self: center; width: 100%; text-align: center; font-size: 13px; font-weight: 700; color: var(--muted); }
-  .order-pool { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; min-height: 40px; }
-  .word-chip {
-    font-family: var(--en);
-    font-weight: 700;
-    font-size: 16px;
-    line-height: 1.2;
-    padding: 8px 12px;
-    border-radius: 12px;
-    border: 1.5px solid #E3E8EF;
-    background: var(--card);
-    color: var(--ink);
-    cursor: pointer;
-  }
-  .word-chip:hover { border-color: var(--accent); }
-  .order-foot { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; min-height: 40px; margin-top: 10px; }
-  .order-result { flex: 1 1 12em; font-size: 14px; font-weight: 700; line-height: 1.6; }
-  .order-result .script { font-size: 28px; margin-right: 6px; }
-  .text-btn { margin-left: auto; white-space: nowrap; border: 0; background: none; padding: 6px 2px; font: 700 13px var(--ja); color: var(--accent-text); text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
-
-  .review { display: grid; justify-items: center; gap: 4px; text-align: center; padding-block: 30px 26px; }
-  .ok-mark { width: 64px; height: 64px; border-radius: 50%; display: grid; place-items: center; background: #E1F4EA; color: #24804F; margin-bottom: 8px; }
-  .ok-mark svg { width: 30px; height: 30px; }
-  .review b { font-weight: 900; font-size: 17px; }
-  .review small { font-size: 13px; color: var(--muted); }
-  .loop-card { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; background: var(--accent-soft); border-radius: 20px; padding: 16px 18px; }
-  .loop-card p { font-weight: 900; font-size: 15px; }
-  .loop-card small { display: block; font-weight: 500; font-size: 13px; color: var(--ink-2); }
-
-  .record-tiles { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
-  .record-tiles div { background: var(--bg); border-radius: 16px; padding: 12px 14px; }
-  .record-tiles dt { font-size: 12px; font-weight: 700; color: var(--muted); }
-  .record-tiles dd { font-family: var(--en); font-weight: 800; font-size: 28px; line-height: 1.15; font-variant-numeric: tabular-nums; }
-  .record-tiles dd small { font-family: var(--ja); font-size: 13px; font-weight: 900; margin-left: 2px; }
-  .chart-head { display: flex; justify-content: space-between; margin-top: 16px; font-size: 13px; font-weight: 900; }
-  .chart-head span { font-weight: 500; color: var(--muted); }
-  .chart { display: grid; grid-template-columns: repeat(14, minmax(0, 1fr)); gap: 5px; align-items: end; height: 96px; margin-top: 8px; border-bottom: 1.5px solid var(--line); }
-  .chart i { height: var(--h); background: var(--accent); border-radius: 4px 4px 1px 1px; }
-
-  /* ---------- teachers ---------- */
-  .teachers { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; margin-top: 44px; }
-  .teacher {
-    display: grid;
-    grid-template-columns: 104px minmax(0, 1fr);
-    gap: 20px;
-    align-items: start;
-    background: var(--card);
-    border-radius: 24px;
-    box-shadow: var(--shadow);
-    padding: 24px;
-    min-width: 0;
-  }
-  /* 仮のキャラクター。写真が届いたら img の src を差し替える */
-  .t-avatar {
-    width: 104px;
-    height: 104px;
-    border-radius: 50%;
-    overflow: hidden;
-    border: 4px solid var(--card);
-    box-shadow: 0 0 0 1.5px var(--line);
-  }
-  .t-avatar.native { background: #D7EAFB; }
-  .t-avatar.japanese { background: var(--accent-soft); }
-  .t-avatar img { width: 100%; height: 100%; }
-  .teacher h4 { font-weight: 900; font-size: 19px; line-height: 1.5; margin-top: 2px; }
-  .teacher p:last-child { color: var(--ink-2); font-size: 15px; margin-top: 6px; }
-
-  /* ---------- profile ---------- */
-  .profile { display: grid; grid-template-columns: 200px minmax(0, 1fr); gap: 40px; align-items: center; }
-  .portrait {
-    width: 200px; height: 200px;
-    border-radius: 50%;
-    background: var(--accent-soft);
-    overflow: hidden;
-    border: 6px solid var(--card);
-    box-shadow: var(--shadow);
-  }
-  .portrait img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 0; }
-  .profile h3 { display: flex; align-items: baseline; gap: 14px; font-weight: 900; font-size: 28px; }
-  .profile h3 { flex-wrap: wrap; }
-  .profile h3 .script { font-size: 30px; }
-  .profile h3 .chip { align-self: center; }
-  .profile-text { display: grid; gap: 14px; margin-top: 10px; color: var(--ink-2); max-width: 36em; }
-
-  /* ---------- price ---------- */
-  .price-card {
-    display: grid;
-    grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr);
-    background: var(--card);
-    border-radius: 30px;
-    box-shadow: var(--shadow);
-    overflow: hidden;
-  }
-  .price-main { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; background: var(--accent-soft); padding: 40px 40px 44px; }
-  .plan { font-weight: 900; font-size: 18px; }
-  .price { display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
-  .price .amount { font-family: var(--en); font-weight: 800; font-size: clamp(44px, 5vw, 58px); line-height: 1.1; letter-spacing: -1px; }
-  .price .per { font-size: 15px; font-weight: 700; color: var(--ink-2); }
-  .price-note { font-size: 14px; color: var(--ink-2); }
-  .price-note a { color: var(--accent-text); text-underline-offset: 3px; }
-  .price-main .btn { margin-top: 24px; }
-  .price-inc { padding: 40px 40px 44px; }
-  .price-inc h3 { font-weight: 900; font-size: 17px; }
-  .inc { margin-top: 10px; }
-  .inc > li { display: grid; grid-template-columns: 92px minmax(0, 1fr); gap: 12px; align-items: baseline; padding-block: 14px; }
-  .inc > li + li { border-top: 1.5px dashed var(--line-warm); }
-  .inc .label { font-size: 12px; }
-  .inc b { font-weight: 700; }
-  .inc small { display: block; font-size: 13px; color: var(--ink-2); line-height: 1.7; margin-top: 2px; }
-
-  /* ---------- flow ---------- */
-  .flow { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; }
-  .flow li { background: var(--card); border-radius: 24px; box-shadow: var(--shadow); padding: 24px 24px 26px; min-width: 0; }
-  .flow h3 { display: flex; align-items: center; gap: 12px; font-weight: 900; font-size: 18px; }
-  .step-n {
-    width: 34px; height: 34px; flex: none;
-    border-radius: 11px;
-    background: linear-gradient(145deg, #FF6A3D, var(--accent-2));
-    color: var(--on-accent);
-    font-family: var(--en);
-    font-weight: 800;
-    font-size: 16px;
-    display: grid;
-    place-items: center;
-  }
-  .flow p { margin-top: 10px; color: var(--ink-2); font-size: 15px; }
-
-  /* ---------- faq ---------- */
-  .faq { max-width: 840px; border-top: 1.5px solid var(--line-warm); }
-  .faq details { border-bottom: 1.5px solid var(--line-warm); }
-  .faq summary {
-    display: grid;
-    grid-template-columns: 30px minmax(0, 1fr) 24px;
-    gap: 14px;
-    align-items: baseline;
-    padding-block: 22px;
-    font-weight: 700;
-    font-size: 17px;
-    cursor: pointer;
-    list-style: none;
-  }
+  /* 13. FAQ */
+  .faq { display: grid; gap: 8px; }
+  .faq details { background: #FFF; border-radius: 14px; box-shadow: var(--shadow); padding: 2px 16px; }
+  .faq summary { cursor: pointer; font-weight: 800; font-size: 15px; padding: 13px 26px 13px 0; list-style: none; position: relative; line-height: 1.55; }
   .faq summary::-webkit-details-marker { display: none; }
-  .faq summary::before { content: "Q"; font-family: var(--en); font-weight: 800; font-size: 20px; color: var(--accent); }
-  .faq summary::after { content: "+"; font-family: var(--en); font-size: 24px; line-height: 1; color: var(--accent); justify-self: end; transition: transform .2s ease; }
-  .faq details[open] summary::after { transform: rotate(45deg); }
-  .faq .a { display: grid; grid-template-columns: 30px minmax(0, 1fr); gap: 14px; padding-bottom: 24px; color: var(--ink-2); }
-  .faq .a::before { content: "A"; font-family: var(--en); font-weight: 800; font-size: 20px; color: var(--muted); line-height: 1.5; }
+  .faq summary::before { content: "Q"; font-family: "DM Sans", sans-serif; color: var(--accent); font-weight: 800; margin-right: 8px; }
+  .faq summary::after { content: "+"; position: absolute; right: 0; top: 9px; color: var(--accent); font-size: 22px; font-weight: 800; }
+  .faq details[open] summary::after { content: "−"; }
+  .faq details p { font-size: 14.5px; padding-bottom: 14px; line-height: 1.75; }
 
-  /* ---------- final call ---------- */
-  .final { position: relative; overflow: hidden; background: var(--accent-soft); }
-  .final .wrap { display: grid; grid-template-columns: minmax(0, 1fr) 260px; align-items: end; gap: 24px; }
-  .final-text { padding-block: 84px; }
-  .final .script { font-size: clamp(32px, 4vw, 44px); }
-  .final h2 { font-weight: 900; font-size: clamp(26px, 3.4vw, 36px); line-height: 1.45; margin-top: 10px; text-wrap: balance; }
-  .final img { width: 100%; height: auto; }
+  /* 14. 最後 */
+  .final { background: var(--ink); color: #FFF; text-align: center; }
+  .final h2 { font-size: 26px; font-weight: 900; line-height: 1.45; }
+  .final h2 span { color: var(--accent-line); }
+  .final .body { font-weight: 700; font-size: 15.5px; line-height: 1.8; margin: 14px 0 22px; color: #E6E8EB; }
+  .final .body b { color: #FFF; }
+  .final .cta-note { color: #C9CDD2; }
+  .final .cta-note b { color: #FFF; }
 
-  /* ---------- footer ---------- */
-  .site-foot { background: var(--ink); color: var(--paper); font-size: 13px; }
-  .site-foot .wrap { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px 32px; padding-block: 36px; }
-  .site-foot .logo-name small { color: var(--line); }
-  .foot-links { display: flex; flex-wrap: wrap; gap: 8px 22px; }
-  .foot-links a { text-decoration: none; }
-  .foot-links a:hover { text-decoration: underline; }
-  .copy { width: 100%; color: var(--line); }
+  /* フッター */
+  .site-foot { background: #FFF; padding: 26px 0 22px; font-size: 13px; }
+  .site-foot .wrap { display: flex; flex-direction: column; gap: 12px; align-items: flex-start; }
+  .foot-links { display: flex; flex-wrap: wrap; gap: 6px 16px; }
+  .foot-links a { color: var(--ink-2); font-weight: 700; }
+  .copy { color: var(--ink-2); font-size: 12px; }
 
-  /* ---------- phone CTA bar ---------- */
-  .sticky-cta { display: none; }
+  /* スマホの下の申込バー */
+  .sticky-cta { position: fixed; left: 0; right: 0; bottom: 0; z-index: 30; display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 7px 12px calc(7px + env(safe-area-inset-bottom)); background: #FFF; box-shadow: 0 -4px 14px rgba(34,34,34,0.10); }
+  .sticky-cta p { font-size: 11.5px; line-height: 1.35; font-weight: 700; color: var(--ink-2); }
+  .sticky-cta p b { display: block; color: var(--ink); font-size: 13.5px; }
+  .sticky-cta .btn { font-size: 15px; padding: 8px 22px; min-height: 46px; flex-shrink: 0; box-shadow: none; }
 
-  /* ---------- narrow screens ---------- */
-  @media (max-width: 900px) {
-    .site-nav a:not(.btn) { display: none; }
-    .hero .wrap { grid-template-columns: minmax(0, 1fr); gap: 0; }
-    .hero-text { padding-block: 20px 8px; }
-    .hero-figure { width: min(78%, 320px); justify-self: end; margin-right: 4%; }
-    .hello { left: -22%; top: 8%; font-size: 17px; }
-    .sticker { width: 52px; height: 52px; border-radius: 16px; }
-    .sticker svg { width: 26px; height: 26px; }
-    .pillars, .pair, .learn3, .flow, .teachers { grid-template-columns: minmax(0, 1fr); }
-    .pair { gap: 64px; }
-    .price-card { grid-template-columns: minmax(0, 1fr); }
-    .final .wrap { grid-template-columns: minmax(0, 1fr) 160px; }
+  /* ===== PC（900px以上） ===== */
+  @media (min-width: 900px) {
+    body { font-size: 17px; padding-bottom: 0; }
+    .wrap { width: min(var(--wrap), 100% - 64px); }
+    section { padding: 80px 0; }
+    .sec-head { margin-bottom: 34px; gap: 10px; }
+    .sec-head h2 { font-size: 36px; }
+    .sec-head .lead { font-size: 18px; }
+    .pill { font-size: 14px; padding: 3px 16px; }
+    .fine { font-size: 13.5px; }
+    .band { font-size: 23px; padding: 16px 24px; border-radius: 16px; }
+    .card { border-radius: 20px; }
+    .top-bar .wrap { height: 60px; }
+    .logo svg { width: 36px; height: 36px; }
+    .logo b { font-size: 20px; }
+    .logo small { font-size: 11px; }
+    .top-bar .btn { display: inline-flex; font-size: 15px; padding: 8px 22px; min-height: 0; }
+    .btn.block { max-width: 480px; margin-inline: auto; font-size: 20px; min-height: 64px; }
+    .cta-note { font-size: 14px; }
+    .sticky-cta { display: none; }
+
+    .hero { padding: 60px 0 72px; }
+    .hero .wrap { grid-template-columns: 1.25fr 0.75fr; align-items: center; gap: 40px; }
+    .hero .label { font-size: 16px; }
+    .hero h1 { font-size: 46px; line-height: 1.4; margin: 14px 0 12px; }
+    .hero .sub { font-size: 21px; }
+    .hero .facts { margin: 22px 0 16px; gap: 8px; }
+    .hero .facts li { font-size: 15px; padding: 5px 16px 5px 8px; }
+    .hero .facts li::before { width: 20px; height: 20px; }
+    .hero .recruit .pill { font-size: 16px; padding: 4px 18px; }
+    .hero .recruit { margin-bottom: 22px; }
+    .hero .cta { align-items: flex-start; max-width: 480px; }
+    .hero .cta .btn.block { margin: 0; }
+    .hero .cta .cta-note { text-align: left; }
+    .hero-phones::before { width: 360px; height: 360px; margin-left: -180px; top: 16px; }
+    .hero-phones .phone { width: 210px; border-radius: 36px; padding: 10px; }
+    .hero-phones .phone img { border-radius: 27px; }
+    .hero-phones .p1 { width: 180px; transform: rotate(-7deg) translate(32px, 30px); }
+    .hero-phones .p2 { transform: translateX(-20px); }
+
+    .pains { grid-template-columns: repeat(4, 1fr); gap: 14px; }
+    .pains li { font-size: 16px; padding: 20px 18px; }
+    .answer { margin-top: 36px; }
+    .answer h3 { font-size: 28px; }
+    .answer p { font-size: 19px; }
+
+    .problem { padding: 40px 48px; max-width: 880px; margin: 0 auto; }
+    .problem h2 { font-size: 32px; }
+    .qs { max-width: 620px; margin: 24px auto 20px; gap: 10px; }
+    .qs li { font-size: 18px; padding: 12px 18px; }
+    .qs li .k { font-size: 13px; }
+    .problem .tough { font-size: 17px; }
+    .problem .so { font-size: 22px; }
+
+    .goal-grid { grid-template-columns: 1fr 1fr; gap: 14px; }
+    .goal-item { padding: 18px 22px; gap: 16px; }
+    .goal-item .ico { width: 64px; height: 64px; }
+    .goal-item .ico svg { width: 52px; height: 52px; }
+    .goal-item .num { font-size: 15px; }
+    .goal-item p { font-size: 19px; }
+    .goal .band { margin-top: 26px; }
+
+    .tips { grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    .tip { grid-template-columns: 1fr; text-align: center; justify-items: center; padding: 24px 22px; }
+    .tip img { width: 96px; grid-row: auto; }
+    .tip h3 { font-size: 22px; }
+    .tip .how { font-size: 15px; }
+    .tip .use { font-size: 15px; width: 100%; }
+    .bridge { margin-top: 28px; padding: 32px 24px; }
+    .bridge .pre { font-size: 18px; }
+    .bridge h3 { font-size: 38px; }
+    .bridge h3 small { font-size: 20px; }
+    .bridge p.env { font-size: 20px; }
+
+    .pillars { grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    .pillar { padding: 26px 24px; }
+    .pillar .ico { width: 52px; height: 52px; }
+    .pillar .ico svg { width: 32px; height: 32px; }
+    .pillar h3 { font-size: 22px; }
+    .pillar .key { font-size: 17px; }
+    .pillar p.body { font-size: 15px; }
+
+    .group { margin-top: 40px; }
+    .g-head .L { width: 40px; height: 40px; font-size: 20px; }
+    .g-head h3 { font-size: 25px; }
+    .fgrid { grid-template-columns: 1fr 1fr; gap: 12px 16px; }
+    .fcard { grid-template-columns: 84px 1fr; gap: 18px; padding: 14px 20px 14px 14px; }
+    .fcard h4 { font-size: 20px; }
+    .fcard p { font-size: 15.5px; }
+
+    .months { grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    .month { grid-template-columns: 1fr; padding: 22px; gap: 8px; }
+    .month .m { grid-row: auto; width: fit-content; padding: 4px 14px; font-size: 15px; }
+    .month .m b { display: inline; font-size: 20px; }
+    .month h3 { font-size: 21px; }
+    .month p { font-size: 15px; }
+    .weeks { margin-top: 18px; }
+    .weeks summary { font-size: 17px; padding: 16px 48px 16px 22px; }
+    .wk { padding: 0 22px 22px; gap: 0 24px; }
+    .wk h4 { font-size: 16px; }
+    .wk li { display: flex; gap: 12px; font-size: 15.5px; padding: 7px 0; }
+    .wk em { display: inline; font-size: 13px; min-width: 60px; padding-top: 2px; }
+    .how-learn { margin-top: 18px; padding: 28px 32px; }
+    .how-learn h3 { font-size: 22px; }
+    .combo { max-width: 680px; margin: 0 auto; gap: 12px; }
+    .combo div { font-size: 19px; padding: 14px 8px; }
+    .combo div small { font-size: 13.5px; }
+    .how-learn .steps { font-size: 16px; }
+
+    .lw { display: grid; grid-template-columns: 1.25fr 1fr; gap: 18px; align-items: start; }
+    .live { padding: 26px; }
+    .live-head { grid-template-columns: 1fr 120px; gap: 20px; }
+    .live-head h3 { font-size: 28px; }
+    .live-head p { font-size: 17px; }
+    .lesson { padding: 12px 16px; gap: 14px; }
+    .lesson .when { width: 70px; font-size: 14px; }
+    .lesson b { font-size: 18px; }
+    .lesson span { font-size: 14.5px; }
+    .more { margin-top: 0; gap: 16px; }
+    .mini { padding: 22px; grid-template-columns: 1fr 90px; }
+    .mini h3 { font-size: 21px; }
+    .mini p { font-size: 15px; }
+    .grad { padding: 22px; }
+    .grad h3 { font-size: 22px; }
+    .grad p { font-size: 16px; }
+
+    .teacher { padding: 36px 40px; display: grid; grid-template-columns: 0.9fr 1.1fr; gap: 36px; align-items: center; }
+    .t-top { grid-template-columns: 110px 1fr; }
+    .t-top .pic { width: 110px; height: 110px; }
+    .t-top .name b { font-size: 34px; }
+    .t-list li { font-size: 15.5px; padding: 10px 14px; }
+    .message { margin-top: 0; padding-left: 22px; }
+    .message p { font-size: 17px; }
+
+    .inc { grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    .inc-cat { padding: 22px; }
+    .inc-cat h3 { font-size: 21px; }
+    .inc-cat li { font-size: 15px; padding: 4px 14px; }
+
+    .offer { grid-template-columns: 1.1fr 0.9fr; gap: 18px; align-items: start; }
+    .offer .price-box { grid-row: span 2; padding: 32px 30px; }
+    .price-box .course-name { font-size: 20px; }
+    .price-box .yen b { font-size: 80px; }
+    .price-box .yen span { font-size: 24px; }
+    .price-box .tax { font-size: 16px; }
+    .price-box .summary li { font-size: 16px; }
+    .perks { padding: 24px; }
+    .perks h3 { font-size: 21px; }
+    .perks li b { font-size: 18px; }
+    .perks li span { font-size: 15px; }
+    .pay { padding: 24px; }
+    .pay h3 { font-size: 21px; }
+    .pay dd { font-size: 15.5px; }
+    .pay .steps li { font-size: 15px; }
+    .relief { font-size: 15px; padding: 14px 18px; }
+    .relief b { font-size: 16.5px; }
+
+    .faq { max-width: 820px; margin: 0 auto; gap: 12px; }
+    .faq summary { font-size: 18px; padding: 16px 30px 16px 0; }
+    .faq details { padding: 4px 22px; }
+    .faq details p { font-size: 16px; }
+
+    .final h2 { font-size: 44px; }
+    .final .body { font-size: 19px; margin: 20px 0 30px; }
+    .final .cta { max-width: 480px; margin: 0 auto; }
+    .site-foot { font-size: 14px; }
   }
-  @media (max-width: 640px) {
-    body { font-size: 15px; }
-    .section { padding-block: 68px; }
-    .sec-head { margin-bottom: 30px; }
-    .lead { font-size: 16px; }
-    .stats > div { padding: 14px 12px 16px; }
-    .stats { grid-template-columns: minmax(0, 1fr) minmax(0, .85fr) minmax(0, 1.2fr); }
-    .stats .n { font-size: 30px; }
-    .stats dt { font-size: 11px; }
-    .stats .chip { font-size: 11px; padding: 2px 8px 3px; }
-    .cta-row .btn { width: 100%; }
-    .checks { padding: 4px 20px; }
-    .checks li { font-size: 16px; gap: 12px; }
-    .mock { padding: 20px 18px 22px; }
-    .prompts { grid-template-columns: minmax(0, 1fr); }
-    .prompts li:nth-child(n+3) { display: none; }
-    .mine .en { font-size: 19px; }
-    .app-block { margin-top: 64px; }
-    .daily { padding: 20px 18px 18px; }
-    .timeline { flex-direction: column; gap: 10px; }
-    .seg { display: grid; grid-template-columns: 7.5em minmax(0, 1fr); align-items: center; gap: 10px; }
-    .seg .t { order: -1; margin-top: 0; }
-    .seg .fill { width: var(--w); }
-    .daily-notes { grid-template-columns: minmax(0, 1fr); }
-    .stats .n { display: block; }
-    .levels-wrap { padding: 18px 14px 16px; }
-    .levels { height: 190px; }
-    .levels li { padding: 8px 6px 10px; border-radius: 0 10px 0 0; }
-    .levels b { font-size: 12px; }
-    .levels span { font-size: 17px; }
-    .levels small { font-size: 10px; }
-    .profile { grid-template-columns: minmax(0, 1fr); gap: 20px; justify-items: start; }
-    .portrait { width: 140px; height: 140px; }
-    .teacher { grid-template-columns: 80px minmax(0, 1fr); gap: 16px; padding: 20px; }
-    .t-avatar { width: 80px; height: 80px; border-width: 3px; }
-    .price-main, .price-inc { padding: 30px 22px 32px; }
-    .price-main .btn { width: 100%; }
-    .inc > li { grid-template-columns: 76px minmax(0, 1fr); }
-    .final .wrap { grid-template-columns: minmax(0, 1fr); }
-    .final-text { padding-block: 64px 0; }
-    .final img { width: 180px; justify-self: end; }
-    .site-foot { padding-bottom: calc(76px + env(safe-area-inset-bottom, 0px)); }
-    .sticky-cta {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      position: fixed;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      z-index: 10;
-      background: var(--card);
-      box-shadow: 0 -6px 20px rgba(26, 34, 56, .08);
-      padding: 10px var(--gutter) calc(10px + env(safe-area-inset-bottom, 0px));
-    }
-    .sticky-cta p { font-size: 12px; line-height: 1.4; color: var(--ink-2); flex: 1; min-width: 0; }
-    .sticky-cta p b { display: block; font-family: var(--en); font-size: 15px; color: var(--ink); }
-    .sticky-cta .btn { min-height: 48px; padding: 0 20px; font-size: 15px; border-radius: 14px; box-shadow: none; }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } .btn { transition: none; } }
+
+  /* ===== 追加：ロードマップ・1日の流れ・日程・解約（PR #64 で追加） ===== */
+  .tip .use { border-top-style: solid; }
+  .tip .use .in { display: block; font-size: 12px; font-weight: 900; color: var(--accent); }
+  .g-head .L.n { font-size: 16px; }
+  .g-head small { display: block; font-size: 13px; font-weight: 700; color: var(--ink-2); line-height: 1.4; }
+
+  .road { display: grid; gap: 12px; }
+  .lv { padding: 14px 14px 10px; }
+  .lv-head { display: inline-block; font-weight: 900; font-size: 15px; color: #FFF; background: var(--accent); border-radius: 999px; padding: 2px 14px; margin-bottom: 8px; }
+  .lv.mid .lv-head { background: #1F78C8; }
+  .lv ol { display: grid; gap: 0; }
+  .lv li { display: grid; grid-template-columns: 64px 1fr; gap: 10px; align-items: center; padding: 8px 0; border-top: 1px dashed #D6E6F2; }
+  .lv li:first-child { border-top: 0; }
+  .lv .mo { font-size: 12.5px; font-weight: 900; color: var(--ink-2); text-align: center; background: var(--bg); border-radius: 8px; padding: 2px 0; }
+  .lv b { display: block; font-size: 16.5px; font-weight: 900; color: var(--accent); line-height: 1.4; }
+  .lv.mid b { color: #1F78C8; }
+  .lv span.d { display: block; font-size: 13.5px; font-weight: 700; color: var(--ink-2); line-height: 1.5; }
+  .road-band { margin-top: 14px; }
+
+  .units { display: grid; gap: 8px; }
+  .unit { padding: 14px 16px; }
+  .unit .uh { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; border-bottom: 2px solid var(--accent-soft); padding-bottom: 6px; margin-bottom: 6px; }
+  .unit .uh b { font-size: 16.5px; font-weight: 900; }
+  .unit .uh span { font-size: 12.5px; font-weight: 900; color: var(--accent); white-space: nowrap; }
+  .unit ol { display: flex; flex-wrap: wrap; gap: 6px; }
+  .unit li { background: var(--bg); border-radius: 999px; padding: 2px 10px; font-size: 13px; font-weight: 800; line-height: 1.6; }
+  .total { text-align: center; margin-top: 14px; font-weight: 900; font-size: 17px; line-height: 1.6; }
+  .total b { color: var(--red); }
+
+  .days { display: grid; gap: 10px; }
+  .day { padding: 16px 18px; }
+  .day .dh { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 6px; }
+  .day .dh b { font-size: 17px; font-weight: 900; color: var(--accent); }
+  .day .dh span { font-family: "DM Sans", sans-serif; font-size: 34px; font-weight: 800; color: var(--accent); line-height: 1.1; }
+  .day .dh span small { font-family: "Noto Sans JP", sans-serif; font-size: 15px; }
+  .day.busy .dh b, .day.busy .dh span { color: #1F78C8; }
+  .day li { display: grid; grid-template-columns: 92px 1fr 40px; gap: 10px; align-items: center; padding: 5px 0; border-top: 1px dotted var(--accent-line); font-size: 14.5px; font-weight: 800; }
+  .day.busy li { border-top-color: #9CC8EC; }
+  .day li i { display: block; height: 10px; border-radius: 5px; background: var(--accent-soft); position: relative; overflow: hidden; }
+  .day li i::after { content: ""; position: absolute; inset: 0 auto 0 0; width: var(--w); background: var(--accent); border-radius: 5px; }
+  .day.busy li i { background: #D6ECFA; }
+  .day.busy li i::after { background: #1F78C8; }
+  .day li em { font-style: normal; text-align: right; color: var(--accent); }
+  .day.busy li em { color: #1F78C8; }
+  .days-band { margin-top: 14px; }
+
+  .extras { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+  .extras li { background: #FFF; border-radius: 999px; padding: 3px 12px; font-size: 13px; font-weight: 800; line-height: 1.6; box-shadow: var(--shadow); }
+  .extras li small { font-size: 11.5px; color: var(--ink-3); font-weight: 700; }
+  .extras-wrap { margin-top: 10px; padding: 14px 16px; background: var(--bg); box-shadow: none; }
+  .extras-wrap h3 { font-size: 15px; font-weight: 900; }
+
+  .cancel { padding: 18px 16px; }
+  .cancel h3 { font-size: 18px; font-weight: 900; margin-bottom: 10px; }
+  .cancel ol { display: grid; gap: 8px; }
+  .cancel li { display: grid; grid-template-columns: 78px 1fr; gap: 10px; align-items: start; font-size: 14px; font-weight: 700; line-height: 1.6; }
+  .cancel li .k { font-size: 12px; font-weight: 900; text-align: center; background: var(--bg); border-radius: 8px; padding: 2px 4px; line-height: 1.5; }
+  .cancel li b { display: block; font-size: 14.5px; }
+  .cancel .fine { margin-top: 10px; }
+
+  .dates { display: grid; gap: 0; max-width: 620px; margin: 0 auto; }
+  .dates li { display: grid; grid-template-columns: 112px 1fr; gap: 14px; padding: 12px 0; border-top: 1px solid #D6E6F2; align-items: baseline; }
+  .dates li:first-child { border-top: 0; }
+  .dates .d { font-weight: 900; font-size: 14px; color: var(--ink-2); }
+  .dates b { font-size: 16.5px; font-weight: 900; display: block; line-height: 1.45; }
+  .dates small { display: block; font-size: 13px; font-weight: 700; color: var(--ink-2); line-height: 1.6; }
+  .dates li.key .d, .dates li.key b { color: var(--accent); }
+
+  @media (min-width: 900px) {
+    .g-head small { font-size: 15px; }
+    .fgrid { grid-template-columns: repeat(3, 1fr); }
+    .fcard { grid-template-columns: 72px 1fr; gap: 14px; }
+    .road { grid-template-columns: 1fr 1fr; gap: 16px; }
+    .lv { padding: 22px 24px 14px; }
+    .lv-head { font-size: 17px; }
+    .lv b { font-size: 19px; }
+    .lv span.d { font-size: 15px; }
+    .road-band { margin-top: 22px; }
+    .units { grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    .unit { padding: 20px 22px; }
+    .unit .uh b { font-size: 19px; }
+    .unit li { font-size: 14.5px; }
+    .total { font-size: 21px; margin-top: 20px; }
+    .days { grid-template-columns: 1fr 1fr; gap: 16px; }
+    .day { padding: 22px 26px; }
+    .day .dh b { font-size: 20px; }
+    .day .dh span { font-size: 44px; }
+    .day li { font-size: 16px; grid-template-columns: 110px 1fr 48px; }
+    .days-band { margin-top: 22px; }
+    .extras li { font-size: 14.5px; }
+    .extras-wrap { padding: 18px 22px; }
+    .extras-wrap h3 { font-size: 17px; }
+    .cancel { padding: 24px; }
+    .cancel h3 { font-size: 21px; }
+    .cancel li { font-size: 15px; grid-template-columns: 90px 1fr; }
+    .cancel li b { font-size: 16px; }
+    .dates li { grid-template-columns: 150px 1fr; padding: 16px 0; }
+    .dates .d { font-size: 16px; }
+    .dates b { font-size: 19px; }
+    .dates small { font-size: 15px; }
   }
 
-  /* ---------- 3か月コース用 ---------- */
-  b { font-weight: 900; }
-  .lead b, .sub b, .price-note b, .pillar p b { color: var(--accent-text); }
-  .price-em { font-size: 20px; color: var(--ink); }
-  .pillar .mini { display: grid; gap: 4px; font-size: 16px; color: var(--ink); }
-  .pillar .mini li::before { content: "・"; color: var(--accent); font-weight: 900; }
-  .pillar .note { font-size: 15px; }
-  .pillar p { font-size: 16px; }
-  .more-title { font-weight: 900; font-size: 21px; margin-top: 48px; }
-  .more { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-top: 16px; }
-  .more li { background: var(--card); border-radius: 18px; box-shadow: var(--shadow); padding: 18px 22px; display: grid; gap: 2px; }
-  .more b { font-size: 17px; }
-  .more span { font-size: 15px; color: var(--ink-2); line-height: 1.7; }
-  .inc-gap { margin-top: 26px; }
-  .inc a, .faq .a a { color: var(--accent-text); text-underline-offset: 3px; }
-  .dates { max-width: 760px; display: grid; gap: 0; border-left: 3px solid var(--line); margin-left: 8px; }
-  .dates li { position: relative; display: grid; grid-template-columns: 150px minmax(0, 1fr); column-gap: 18px; padding: 14px 0 14px 26px; }
-  .dates li::before { content: ""; position: absolute; left: -9.5px; top: 22px; width: 16px; height: 16px; border-radius: 50%; background: var(--card); border: 3px solid var(--accent); }
-  .dates li.key::before { background: var(--accent); }
-  .dates .d { grid-row: span 2; font-family: var(--en); font-weight: 800; font-size: 17px; color: var(--accent-text); }
-  .dates b { font-size: 18px; }
-  .dates small { font-size: 15px; color: var(--ink-2); line-height: 1.7; }
-  .dates li.key b { color: var(--accent-text); font-size: 20px; }
-  .faq .a { font-size: 16px; }
-  .inc small { font-size: 15px; }
-  .price-note { font-size: 15px; }
-  @media (max-width: 900px) {
-    .more { grid-template-columns: minmax(0, 1fr); }
-  }
-  @media (max-width: 560px) {
-    .dates li { grid-template-columns: minmax(0, 1fr); }
-    .dates .d { grid-row: auto; }
-  }
 </style>
 </head>
-<body>
-<div lang="ja">
+<body id="top">
 
-<header class="site-head">
+<header class="top-bar">
   <div class="wrap">
-    <a class="logo" href="#top">
-      <span class="mark"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5v17M3.5 12h17M6 6l12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg></span>
-      <span class="logo-name" lang="en"><b>ʻOhana English</b><small>by Hina</small></span>
+    <a class="logo" href="#top" aria-label="ʻOhana English トップへ">
+      <svg viewBox="0 0 100 100" aria-hidden="true"><rect width="100" height="100" rx="29" fill="#F35730"/><g fill="#FFFFFF"><circle cx="49.0" cy="31.5" r="13.2"/><circle cx="67.9" cy="43.4" r="13.2"/><circle cx="62.5" cy="65.1" r="13.2"/><circle cx="40.2" cy="66.6" r="13.2"/><circle cx="31.9" cy="45.9" r="13.2"/><circle cx="50.3" cy="50.5" r="21"/></g><path d="M51.9 48.7L64.8 33.4" stroke="#F9AB98" stroke-width="1.2" stroke-linecap="round"/><circle cx="51.9" cy="48.7" r="6.4" fill="#FED1BE"/><g fill="#FEE286"><circle cx="62.3" cy="29.6" r="1.8"/><circle cx="66.6" cy="29.5" r="1.8"/><circle cx="69" cy="34.6" r="1.8"/></g></svg>
+      <span><b>ʻOhana English</b><small>By Hina</small></span>
     </a>
-    <nav class="site-nav" aria-label="ページ内リンク">
-      <a href="#features">コースの中身</a>
-      <a href="#app">毎日の学習</a>
-      <a href="#price">料金</a>
-      <a href="#schedule">日程</a>
-      <a href="#faq">よくある質問</a>
-      <a class="btn" href="https://my.ohana-english.app/?view=join">申し込む</a>
-    </nav>
+    <a class="btn" href="#price">第1期生に申し込む</a>
   </div>
 </header>
 
-<main id="top">
 
-  <!-- ============ hero ============ -->
+<main>
+
+  <!-- 1. ファーストビュー -->
   <section class="hero">
     <div class="wrap">
-      <div class="hero-text">
-        <p class="eyebrow"><span class="label">3-Month Course</span><span class="chip">1期生 募集中</span></p>
-        <p class="script" lang="en">Small steps, big changes.</p>
-        <h1>英語がパッと<br>出てくる、90日間。</h1>
-        <p class="lead">「えーっと…」を「パッ」に変える90日間。<br><b>ʻOhana English 3ヶ月突破コース</b>（第1期）</p>
-        <dl class="stats">
-          <div>
-            <dt>LIVE授業（Zoom）</dt>
-            <dd><span class="n">12</span>回/月</dd>
-            <dd class="chip">以上・録画あり</dd>
-          </div>
-          <div>
-            <dt>スタート</dt>
-            <dd><span class="n">11/16</span></dd>
-            <dd class="chip">全員一斉</dd>
-          </div>
-          <div>
-            <dt>期間</dt>
-            <dd><span class="n">3</span>ヶ月</dd>
-            <dd class="chip">2/15まで</dd>
-          </div>
-        </dl>
-        <div class="cta-row">
-          <a class="btn" href="https://my.ohana-english.app/?view=join">申し込みページへ</a>
-          <p class="cta-note"><b class="price-em">110,000円（税込）</b><br>カードの分割払いもできます</p>
+      <div>
+        <p class="label"><b>ʻOhana English</b>｜3ヶ月突破コース</p>
+        <h1><span class="ib">「知ってる英語」を、</span><br><span class="ib">「<span class="hl">パッと話せる英語</span>」に。</span></h1>
+        <p class="sub">一人で頑張る英語学習から、<span class="ib">卒業しよう。</span></p>
+        <ul class="facts" aria-label="コースの特徴">
+          <li>毎日のアプリ学習</li><li>月12回以上のLIVE授業</li><li>毎月の定期テスト</li>
+        </ul>
+        <p class="recruit"><span class="pill red">第1期生募集｜11/16スタート</span></p>
+        <div class="cta">
+          <a class="btn block" href="#price">コース内容・参加費を見る</a>
+          <p class="cta-note">2026年11/16〜2027年2/15（92日間）</p>
         </div>
       </div>
-      <figure class="hero-figure">
-        <div class="tile"></div>
-        <span class="mark sticker"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5v17M3.5 12h17M6 6l12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg></span>
-        <img src="character.png" width="638" height="852" alt="手をふるひなのイラスト">
-        <p class="hello" lang="en">Hi, I'm Hina!<small>ひなです</small></p>
-      </figure>
+      <div class="hero-phones">
+        <div class="phone p1"><img src="img/journal-crop.webp" width="780" height="1216" alt="英語日記のAI添削の画面（見本）"></div>
+        <div class="phone p2"><img src="img/home-crop.webp" width="780" height="1216" alt="アプリのホーム画面：今日のクエストと植物（見本）"></div>
+      </div>
     </div>
   </section>
 
-  <!-- ============ for you ============ -->
-  <section class="section" id="for-you">
+  <!-- 2. 一人で続ける難しさ -->
+  <section id="problem" style="padding-top:8px;padding-bottom:0">
     <div class="wrap">
-      <header class="sec-head">
-        <p class="label">For you</p>
-        <h2>こんな人に来てほしい</h2>
-      </header>
-      <ul class="checks">
-        <li>言いたいことがあるのに、英語がすぐに出てこない</li>
-        <li>単語やフレーズを覚えても、自分の言葉で話せない</li>
-        <li>ひとりだと、勉強がなかなか続かない</li>
-        <li>何を、どの順番でやればいいかわからない</li>
-        <li>忙しくて、まとまった勉強時間がとれない</li>
-      </ul>
-      <p class="bridge">仲間と一緒に、<em>3か月を走りきる</em>コースです。<span>みんなで同じ日にはじめて、同じ日に卒業します。</span></p>
+      <div class="card problem">
+        <h2><span class="ib">正しい勉強方法を</span><span class="ib">知っていても、</span><br><span class="ib red">一人で続けるのは難しい。</span></h2>
+        <ul class="qs">
+          <li><span class="k">コツ①</span>何を、いつ復習するのか。</li>
+          <li><span class="k">コツ②</span><span><span class="ib">何をまねして、</span><span class="ib">どう使うのか。</span></span></li>
+          <li><span class="k">コツ③</span><span><span class="ib">忙しい日は、</span><span class="ib">何を優先するのか。</span></span></li>
+        </ul>
+        <p class="tough"><span class="ib">これを毎日、自分だけで</span><span class="ib">考え続けるのは大変です。</span></p>
+        <p class="so"><span class="ib">だからこそ、</span><span class="ib"><b>学習を続けられる環境</b>を</span><span class="ib">用意しました。</span></p>
+      </div>
     </div>
   </section>
 
-  <!-- ============ what you get ============ -->
-  <section class="section blue" id="features">
+  <!-- 3. 3ヶ月後に目指す姿 -->
+  <section class="goal" id="goal">
     <div class="wrap">
-      <header class="sec-head">
-        <p class="label">What you get</p>
-        <h2>3ヶ月突破コースの中身</h2>
-        <p class="sub">みんなで学ぶ<b>コミュニティ型</b>のコースです（講師の1対1の個別指導はありません）。</p>
-      </header>
-      <div class="pillars">
-        <article class="pillar">
-          <p class="label">Live</p>
-          <p class="big">12<small>回/月 以上</small></p>
-          <h3>LIVE授業（Zoom）</h3>
-          <p class="note"><b>3ヶ月で合計36回以上</b></p>
-          <ul class="mini">
-            <li>日常英会話・瞬間英作文 週2回</li>
-            <li>文法強化・第1期生ホームルーム 週1回</li>
-            <li>質問会 月1回</li>
+      <div class="sec-head">
+        <span class="pill orange">3ヶ月で目指すこと</span>
+        <h2><span class="ib">3ヶ月後、</span><br><span class="ib"><span class="accent">英語が口から出る</span>自分へ。</span></h2>
+      </div>
+      <div class="goal-grid">
+        <div class="card goal-item">
+          <div class="ico"><svg viewBox="0 0 200 200" aria-hidden="true"><circle cx="62" cy="100" r="24" fill="#E06410"/><path d="M26 172 C26 142 42 130 62 130 C82 130 98 142 98 172 Z" fill="#E06410"/><path d="M106 34 H166 Q182 34 182 50 V82 Q182 98 166 98 H124 L96 122 L106 98 H106 Q90 98 90 82 V50 Q90 34 106 34 Z" fill="#FFFFFF" stroke="#222222" stroke-width="6" stroke-linejoin="round"/><rect x="108" y="52" width="58" height="10" rx="5" fill="#E06410"/><rect x="108" y="72" width="38" height="10" rx="5" fill="#E06410"/></svg></div>
+          <div><span class="num">01</span><p>思っていることを、<span class="ib">簡単な英語で伝えられる</span></p></div>
+        </div>
+        <div class="card goal-item">
+          <div class="ico"><svg viewBox="0 0 200 200" aria-hidden="true"><circle cx="62" cy="100" r="24" fill="#E06410"/><path d="M26 172 C26 142 42 130 62 130 C82 130 98 142 98 172 Z" fill="#E06410"/><path d="M106 30 H166 Q182 30 182 46 V82 Q182 98 166 98 H124 L96 122 L106 98 H106 Q90 98 90 82 V46 Q90 30 106 30 Z" fill="#FFFFFF" stroke="#222222" stroke-width="6" stroke-linejoin="round"/><path d="M136 84 C122 74 112 66 112 55 C112 47 118 42 125 42 C130 42 134 45 136 49 C138 45 142 42 147 42 C154 42 160 47 160 55 C160 66 150 74 136 84 Z" fill="#E06410"/></svg></div>
+          <div><span class="num">02</span><p>趣味・仕事・好きなことを<span class="ib">英語で話せる</span></p></div>
+        </div>
+        <div class="card goal-item">
+          <div class="ico"><svg viewBox="0 0 200 200" aria-hidden="true"><circle cx="56" cy="116" r="20" fill="#E06410"/><path d="M26 172 C26 154 42 142 56 142 C70 142 86 154 86 172 Z" fill="#E06410"/><circle cx="144" cy="116" r="20" fill="#222222"/><path d="M114 172 C114 154 130 142 144 142 C158 142 174 154 174 172 Z" fill="#222222"/><path d="M36 22 H68 Q84 22 84 38 V64 Q84 80 68 80 H64 L58 96 L46 80 H36 Q20 80 20 64 V38 Q20 22 36 22 Z" fill="#FFFFFF" stroke="#222222" stroke-width="6" stroke-linejoin="round"/><path d="M132 22 H164 Q180 22 180 38 V64 Q180 80 164 80 H160 L142 96 L142 80 H132 Q116 80 116 64 V38 Q116 22 132 22 Z" fill="#FFFFFF" stroke="#222222" stroke-width="6" stroke-linejoin="round"/><path d="M42 40 Q42 32 52 32 Q62 32 62 41 Q62 47 56 50 Q52 52 52 57" fill="none" stroke="#E06410" stroke-width="6" stroke-linecap="round"/><circle cx="52" cy="67" r="4" fill="#E06410"/><path d="M148 34 V55" stroke="#222222" stroke-width="7" stroke-linecap="round"/><circle cx="148" cy="67" r="4.5" fill="#222222"/></svg></div>
+          <div><span class="num">03</span><p>質問に答えるだけでなく、<span class="ib">自分からも聞ける</span></p></div>
+        </div>
+        <div class="card goal-item">
+          <div class="ico"><svg viewBox="0 0 200 200" aria-hidden="true"><circle cx="56" cy="116" r="20" fill="#E06410"/><path d="M26 172 C26 154 42 142 56 142 C70 142 86 154 86 172 Z" fill="#E06410"/><circle cx="144" cy="116" r="20" fill="#222222"/><path d="M114 172 C114 154 130 142 144 142 C158 142 174 154 174 172 Z" fill="#222222"/><path d="M120 22 H174 Q190 22 190 38 V64 Q190 80 174 80 H162 L142 96 L144 80 H120 Q104 80 104 64 V38 Q104 22 120 22 Z" fill="#FFFFFF" stroke="#222222" stroke-width="6" stroke-linejoin="round"/><rect x="120" y="38" width="54" height="10" rx="5" fill="#222222"/><rect x="120" y="58" width="34" height="10" rx="5" fill="#222222"/><circle cx="56" cy="62" r="22" fill="#FFFFFF" stroke="#E06410" stroke-width="6"/><path d="M46 62 L53 69 L67 55" fill="none" stroke="#E06410" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div><span class="num">04</span><p>相手の英語が、<span class="ib">前より聞き取れる</span></p></div>
+        </div>
+      </div>
+      <p class="band"><span class="dim">「えーっと…」</span>が、<br><span class="hl">「言えた！」</span>に変わる3ヶ月。</p>
+      <p class="fine center" style="margin-top:8px">※3ヶ月で目指す姿です。成長には個人差があります。</p>
+    </div>
+  </section>
+
+  <!-- 4. 3ヶ月のロードマップ（勉強会スライド 43ef5c4c） -->
+  <section class="white" id="roadmap">
+    <div class="wrap">
+      <div class="sec-head">
+        <h2>3ヶ月の<span class="accent">ロードマップ</span></h2>
+      </div>
+      <div class="road">
+        <div class="card lv" style="background:var(--bg);box-shadow:none">
+          <span class="lv-head">初級</span>
+          <ol>
+            <li><span class="mo">1ヶ月目</span><div><b>短い英語で伝える</b><span class="d">自己紹介や自分のことを話す</span></div></li>
+            <li><span class="mo">2ヶ月目</span><div><b>パッと口から出す</b><span class="d">知っている英文を使う</span></div></li>
+            <li><span class="mo">3ヶ月目</span><div><b>会話を続ける</b><span class="d">質問・返答・聞き返し</span></div></li>
+          </ol>
+        </div>
+        <div class="card lv mid" style="background:var(--bg);box-shadow:none">
+          <span class="lv-head">中級</span>
+          <ol>
+            <li><span class="mo">1ヶ月目</span><div><b>表現を広げる</b><span class="d">理由や感想も伝える</span></div></li>
+            <li><span class="mo">2ヶ月目</span><div><b>会話への反応を速く</b><span class="d">質問返し・言い換え</span></div></li>
+            <li><span class="mo">3ヶ月目</span><div><b>会話を深める</b><span class="d">意見や経験を交えて話す</span></div></li>
+          </ol>
+        </div>
+      </div>
+      <p class="band road-band"><span class="ib">今のレベル・目標・勉強時間に合わせて、</span><span class="ib hl">教材が変わります</span></p>
+      <p class="fine center" style="margin-top:8px">※目指す成長のイメージです。成長には個人差があります。</p>
+    </div>
+  </section>
+
+  <!-- 5. 3つのコツ → このコースでは -->
+  <section id="tips">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="pill orange">話せるようになる3つのコツ</span>
+        <h2><span class="ib">勉強会で学んだ3つのコツを、</span><br><span class="ib accent">毎日の習慣に。</span></h2>
+      </div>
+      <div class="tips">
+        <div class="card tip" style="background:#FFF;box-shadow:var(--shadow)">
+          <img src="img/hina-words.webp" width="360" height="330" alt="" loading="lazy">
+          <h3><span class="n">①</span>繰り返して身につける</h3>
+          <p class="how">1回で完璧に覚えようとせず、<span class="ib">何度も思い出す。</span></p>
+          <p class="use"><span class="in">このコースでは</span><b>レベル別単語・自動復習</b></p>
+        </div>
+        <div class="card tip" style="background:#FFF;box-shadow:var(--shadow)">
+          <img src="img/hina-pronunciation.webp" width="360" height="330" alt="" loading="lazy">
+          <h3><span class="n">②</span>まねして使える英語に</h3>
+          <p class="how">聞いた音をまねして、<span class="ib">実際に口に出す。</span></p>
+          <p class="use"><span class="in">このコースでは</span><b>モデリングの課題・日記・瞬間英作文</b></p>
+        </div>
+        <div class="card tip" style="background:#FFF;box-shadow:var(--shadow)">
+          <img src="img/hina-diary.webp" width="360" height="330" alt="" loading="lazy">
+          <h3><span class="n">③</span><span class="ib">やること・</span><span class="ib">やらないを決める</span></h3>
+          <p class="how">毎日、何を勉強するか<span class="ib">迷わない。</span></p>
+          <p class="use"><span class="in">このコースでは</span><b>毎日の学習メニュー・成長記録</b></p>
+        </div>
+      </div>
+      <div class="bridge">
+        <p class="pre"><span class="ib">この3つを実践できるように</span><span class="ib">作ったのが、</span></p>
+        <h3><small>ʻOhana English</small><span>3ヶ月突破コース</span>。</h3>
+        <p class="env"><span class="ib">英語を<b>「知る・使う・続ける」</b>ための、</span><span class="ib">3ヶ月間の学習環境です。</span></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5b. アプリ（コツごと） -->
+  <section class="white" id="features">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="pill orange">アプリの中身</span>
+        <h2><span class="ib">アプリを開けば、</span><br><span class="ib">今日やることがわかる。</span></h2>
+      </div>
+
+      <div class="group">
+        <div class="g-head"><span class="L n">①</span><h3>繰り返して身につける</h3></div>
+        <div class="fgrid">
+          <article class="card fcard"><div class="thumb"><img src="img/words-tall.webp" width="720" height="1292" alt="単語カードの画面（見本）" loading="lazy"></div><div><h4>レベル別の単語</h4><p>今のレベルに合った単語を、音声つきで。<b>話すための単語にしぼる。</b></p></div></article>
+          <article class="card fcard"><div class="thumb"><img src="img/mock-menu-top.webp" width="780" height="1054" alt="きのうの単語の復習が出ている画面（イメージ）" loading="lazy"></div><div><h4>自動の復習</h4><p>忘れるころに、復習が自動で出てくる。<b>覚え直しの管理がいらない。</b></p></div></article>
+          <article class="card fcard"><div class="thumb wide"><img src="img/lecture-sample.webp" width="1100" height="605" alt="講義動画の1場面：LとRの発音のコツ" loading="lazy"></div><div><h4>文法・講義動画</h4><p>文法・発音などの解説動画（合計53本）。<b>必要な文法だけ学べる。</b></p></div></article>
+        </div>
+      </div>
+
+      <div class="group">
+        <div class="g-head"><span class="L n">②</span><h3>まねして使える英語に</h3></div>
+        <div class="fgrid">
+          <article class="card fcard"><div class="thumb"><img src="img/mock-record-big.webp" width="780" height="1040" alt="モデリングの課題の画面（イメージ）" loading="lazy"></div><div><h4>モデリングの課題</h4><p>お手本をまねして、自分の声と聞き比べ。<b>言える音が、聞き取れる音になる。</b></p></div></article>
+          <article class="card fcard"><div class="thumb"><video src="img/journal-top.mp4" poster="img/journal-still-top.webp" width="780" height="716" muted loop playsinline autoplay preload="none" aria-label="英語日記をAIが添削する動画（見本）"></video></div><div><h4>英語日記・AI添削</h4><p>書いた英語を、AIがすぐ直す。<b>言いたいことが英語になる。</b></p></div></article>
+          <article class="card fcard"><div class="thumb"><img src="img/mock-instant-top.webp" width="720" height="662" alt="瞬間英作文の画面（イメージ）" loading="lazy"></div><div><h4>瞬間英作文</h4><p>日本語を見て、パッと英語に。<b>知っている文法が口から出る。</b></p></div></article>
+        </div>
+      </div>
+
+      <div class="group">
+        <div class="g-head"><span class="L n">③</span><h3>やること・やらないを決める</h3></div>
+        <div class="fgrid">
+          <article class="card fcard"><div class="thumb"><img src="img/home-crop.webp" width="780" height="1216" alt="今日のクエストの画面（見本）" loading="lazy"></div><div><h4>毎日の学習メニュー</h4><p>今日やることが、アプリに出てくる。<b>何から始めるか迷わない。</b></p></div></article>
+          <article class="card fcard"><div class="thumb"><img src="img/progress-crop.webp" width="720" height="1122" alt="きろくの画面（見本）" loading="lazy"></div><div><h4>成長記録</h4><p>勉強時間と続いた日数を記録。<b>頑張りが目に見える。</b></p></div></article>
+          <article class="card fcard"><div class="thumb"><img src="img/progress-ranking-crop.webp" width="780" height="1216" alt="勉強時間ランキングの画面（見本）" loading="lazy" style="object-position:bottom"></div><div><h4>ランキング</h4><p>みんなの勉強時間がわかる。<b>一人で頑張らなくていい。</b></p></div></article>
+        </div>
+      </div>
+      <p class="fine center feat-note">※メニューの中身は、レベルや目標によって一人ひとり違います。画面の名前や数字は見本です。</p>
+    </div>
+  </section>
+
+  <!-- 5c. 文法カリキュラム（勉強会スライド cchange：全部で18単元） -->
+  <section id="curriculum">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="pill orange">文法カリキュラム</span>
+        <h2><span class="ib">話すために必要な</span><span class="ib accent">文法だけを厳選。</span></h2>
+      </div>
+      <div class="units">
+        <div class="card unit"><div class="uh"><b>英語の文章の土台を作る</b><span>1ヶ月目・8単元</span></div>
+          <ol><li>be動詞</li><li>名詞・代名詞・冠詞</li><li>一般動詞</li><li>否定文・疑問文・5W</li><li>現在進行形</li><li>There is / There are</li><li>過去形</li><li>前置詞</li></ol></div>
+        <div class="card unit"><div class="uh"><b>長い文章を話す</b><span>2ヶ月目・6単元</span></div>
+          <ol><li>未来表現</li><li>助動詞</li><li>不定詞（to do）</li><li>動名詞（doing）</li><li>接続詞</li><li>1〜2ヶ月目の復習・応用</li></ol></div>
+        <div class="card unit"><div class="uh"><b>会話の幅を広げる</b><span>3ヶ月目・4単元</span></div>
+          <ol><li>比較級・最上級</li><li>現在完了</li><li>関係代名詞</li><li>文法の総復習</li></ol></div>
+      </div>
+      <p class="total"><span class="ib">中学文法を全部やらなくていい。</span><span class="ib"><b>全部で18単元</b>。</span></p>
+    </div>
+  </section>
+
+  <!-- 6. 1日の流れ（勉強会スライド cdaily） -->
+  <section class="white" id="daily">
+    <div class="wrap">
+      <div class="sec-head">
+        <h2>1日の<span class="accent">勉強の例</span></h2>
+      </div>
+      <div class="days">
+        <div class="card day" style="background:var(--bg);box-shadow:none">
+          <div class="dh"><b>しっかり学ぶ日</b><span>60<small>分</small></span></div>
+          <ul>
+            <li>単語・復習<i style="--w:67%"></i><em>10分</em></li>
+            <li>文法・講義<i style="--w:100%"></i><em>15分</em></li>
+            <li>瞬間英作文<i style="--w:100%"></i><em>15分</em></li>
+            <li>モデリング<i style="--w:100%"></i><em>15分</em></li>
+            <li>英語日記<i style="--w:33%"></i><em>5分</em></li>
           </ul>
-          <p class="note">Hinaが月2〜3回、ほかは英語講師が担当。<b>録画あり</b>・カメラはオフでOK。</p>
-        </article>
-        <article class="pillar">
-          <p class="label">Monthly</p>
-          <p class="big">1<small>回/月</small></p>
-          <h3>振り返り と テスト</h3>
-          <ul class="mini">
-            <li>目標設定・振り返り会 月1回</li>
-            <li>定期テスト 月1回（合計3回）</li>
+        </div>
+        <div class="card day busy" style="background:var(--bg);box-shadow:none">
+          <div class="dh"><b>忙しい日</b><span>30<small>分</small></span></div>
+          <ul>
+            <li>単語・復習<i style="--w:33%"></i><em>5分</em></li>
+            <li>瞬間英作文<i style="--w:67%"></i><em>10分</em></li>
+            <li>モデリング<i style="--w:67%"></i><em>10分</em></li>
+            <li>英語日記<i style="--w:33%"></i><em>5分</em></li>
           </ul>
-        </article>
-        <article class="pillar">
-          <p class="label">Daily</p>
-          <p class="big">毎日</p>
-          <h3>アプリで、毎日の学習</h3>
-          <ul class="mini">
-            <li>アプリを開けば、今日やることが出てくる</li>
-            <li>最初はインプット多め</li>
-            <li>3か月目はアウトプット中心へ</li>
-          </ul>
-        </article>
+        </div>
       </div>
-
-      <h3 class="more-title">ほかにも、こんなことがあります</h3>
-      <ul class="more">
-        <li><b>朝活</b><span>月2〜3回程度（不定期）。期間中に「朝活チャレンジウィーク」を開催予定</span></li>
-        <li><b>study session</b><span>みんなで黙々と勉強する時間（不定期）</span></li>
-        <li><b>講義動画</b><span>文法・発音などの講義動画。2027年2月15日23:59まで、期間中いつでも見られます</span></li>
-        <li><b>英語の録音と振り返り</b><span>初日と最終日に英語を録音して、振り返ります</span></li>
-        <li><b>会員の掲示板</b><span>会員どうしで話せる場所（2026年11月中に提供開始予定）</span></li>
-        <li><b>卒業イベント</b><span>2027年2月頃。開催日・会場は決まりしだいお知らせ。参加費 1人3,000円（別途）</span></li>
-      </ul>
+      <p class="band days-band"><span class="ib">目標と勉強時間に合わせて、</span><span class="ib hl">あなた専用のメニューに。</span></p>
+      <p class="fine center" style="margin-top:8px">※一例です。講義の日やLIVEの日は、メニューを調整します。</p>
     </div>
   </section>
 
-  <!-- ============ the app ============ -->
-  <section class="section" id="app">
+  <!-- 7. LIVE授業・テスト・仲間・卒業イベント -->
+  <section id="live">
     <div class="wrap">
-      <header class="sec-head">
-        <p class="label">Daily habit</p>
-        <h2>毎日の学習は、アプリで。</h2>
-        <p class="sub">単語・フレーズ・復習・英語ジャーナル。<b>開けば、今日やることが出てきます。</b></p>
-      </header>
-
-      <div class="pair app-block">
-        <div class="app-step" id="write">
-          <div class="step-head">
-            <div class="step-meta"><p class="label">英語ジャーナル</p></div>
-            <h3 class="en" lang="en">Write your story.</h3>
-            <p>お題を選んで、英語でひとこと。書き出しの一文つきです。</p>
+      <div class="sec-head">
+        <h2><span class="ib">アプリだけじゃない。</span><br><span class="ib">話す時間と、続ける場所も。</span></h2>
+      </div>
+      <div class="lw">
+        <div class="card live">
+          <div class="live-head">
+            <div><span class="pill orange">LIVE授業（Zoom）</span><h3><span class="ib"><span class="accent">月12回以上</span>の</span><span class="ib">LIVE授業</span></h3><p>3ヶ月で合計36回以上</p></div>
+            <div class="thumb"><img src="img/mock-zoom.webp" width="780" height="1216" alt="LIVE授業のイメージ：ひなが今日のフレーズを画面共有で教えている" loading="lazy"></div>
           </div>
-          <div class="mock" role="img" aria-label="英語ジャーナルの画面のイメージ。お題を選ぶと、書き出しの一文が表示される">
-            <p class="mock-title">今日、何を書きますか？</p>
-            <ul class="prompts">
-              <li class="on">最近行った場所で、おすすめしたいところは？</li>
-              <li>今日の自分をひとことで表すと？</li>
-              <li>もし明日が休みだったら、何をしますか？</li>
-            </ul>
-            <div class="starter">
-              <b lang="en">Start with this</b>
-              <small>この文章ではじめて：</small>
-              <p lang="en">A place I would recommend is…</p>
-            </div>
+          <div class="lessons">
+            <div class="lesson hot"><span class="when">週2回</span><div><b>日常英会話・瞬間英作文</b><span>フレーズを教わって、実際に話す</span></div></div>
+            <div class="lesson hot"><span class="when">週1回</span><div><b>文法強化・第1期生ホームルーム</b><span>その週の文法を使う</span></div></div>
+            <div class="lesson"><span class="when">月1回</span><div><b>質問会</b><span>わからないこと、不安なことを聞ける</span></div></div>
+            <div class="lesson"><span class="when">月1回</span><div><b>目標設定・振り返り会</b><span>振り返って、次の月の目標を決める</span></div></div>
           </div>
+          <p class="fine"><b>Hinaが月2〜3回</b>、ほかは英語講師が担当。録画あり・カメラはオフでOK。1対1の個別指導はありません。</p>
         </div>
-        <div class="app-step">
-          <div class="step-head">
-            <div class="step-meta"><p class="label">AIの添削</p></div>
-            <h3>書いた英語を、AIが直す</h3>
-            <p>もっと自然な言い方も教えてくれます。</p>
+        <div class="more">
+          <div class="card mini">
+            <div><span class="pill soft">定期テスト</span><h3>月1回（合計3回）</h3><p>今できることと、次の課題を確認します。</p></div>
+            <div class="thumb"><img src="img/test-levelcheck-crop.webp" width="780" height="1216" alt="レベルチェックテストの画面（見本）" loading="lazy"></div>
           </div>
-          <div class="mock" role="img" aria-label="AI添削のイメージ。the best thing i ate today was pasta を、文頭の大文字とピリオドを直して The best thing I ate today was pasta. にする">
-            <p class="mock-title">AIに添削してもらう</p>
-            <div class="mine">
-              <p class="who">あなたの英文</p>
-              <p class="en" lang="en"><span class="fix"><del>t</del><ins>T</ins></span>he best thing <span class="fix"><del>i</del><ins>I</ins></span> ate today was pasta<ins class="add">.</ins></p>
-            </div>
-            <div class="ai">
-              <p class="who">AI</p>
-              <p class="ai-body">文頭を大文字に、最後にピリオドを。<span class="en" lang="en">The best thing I ate today was pasta.</span></p>
-            </div>
+          <div class="card mini">
+            <div><span class="pill soft">仲間</span><h3>同じ目標を持つ仲間と</h3><p>一人では続かなかった学習も、仲間と一緒に。</p></div>
+            <div class="thumb"><img src="img/progress-ranking-crop.webp" width="780" height="1216" alt="勉強時間ランキングの画面（見本）" loading="lazy" style="object-position:bottom"></div>
+          </div>
+          <div class="card grad">
+            <h3>3ヶ月の最後に、卒業イベント</h3>
+            <p>3ヶ月頑張った自分を、<span class="ib accent">みんなで祝おう！</span></p>
+            <span class="pill black">2027年2月頃<span style="color:var(--accent-line)">（日にち・会場は決まりしだいお知らせ）</span></span>
+            <p class="fine" style="margin-top:6px">参加費 1人3,000円（別途）。交通費・宿泊費は参加者負担です。</p>
           </div>
         </div>
       </div>
-
-      <div class="pair app-block">
-        <div class="app-step">
-          <div class="step-head">
-            <div class="step-meta"><p class="label">単語・フレーズ・復習</p></div>
-            <h3>覚えて、くり返して、身につける</h3>
-            <p>まちがえたところは、復習でもう一度。</p>
-          </div>
-          <div class="mock flash">
-            <div class="mock-top">単語カード<span class="chip">1 / 5 問</span></div>
-            <div class="bar"><i></i></div>
-            <p class="pos">接続詞</p>
-            <p class="word" lang="en">if</p>
-            <p class="meaning" id="flash-meaning" hidden>もし〜なら</p>
-            <button class="btn small" type="button" id="flash-btn" aria-controls="flash-meaning" aria-expanded="false">意味を見る</button>
-          </div>
-        </div>
-        <div class="app-step">
-          <div class="step-head">
-            <p class="label">学習の記録</p>
-            <h3>続けた日が、目に見える</h3>
-            <p>勉強した日数や時間が、グラフでわかります。</p>
-          </div>
-          <div class="mock" role="img" aria-label="学習の記録の画面のイメージ。今月の勉強時間、連続で学習した日数と、直近14日の勉強時間のグラフ">
-            <dl class="record-tiles">
-              <div><dt>今月の勉強時間</dt><dd>6<small>時間</small>40<small>分</small></dd></div>
-              <div><dt>連続で学習</dt><dd>12<small>日</small></dd></div>
-            </dl>
-            <p class="chart-head">毎日の勉強時間<span>直近14日</span></p>
-            <div class="chart">
-              <i style="--h: 30%"></i><i style="--h: 55%"></i><i style="--h: 40%"></i><i style="--h: 0%"></i><i style="--h: 62%"></i><i style="--h: 48%"></i><i style="--h: 75%"></i>
-              <i style="--h: 35%"></i><i style="--h: 58%"></i><i style="--h: 66%"></i><i style="--h: 44%"></i><i style="--h: 80%"></i><i style="--h: 70%"></i><i style="--h: 92%"></i>
-            </div>
-          </div>
-          <p class="cap">※ 画面のイメージです。数値は表示の例です。</p>
-        </div>
+      <div class="card extras-wrap">
+        <h3>ほかにも</h3>
+        <ul class="extras">
+          <li>朝活 <small>月2〜3回程度（不定期）</small></li>
+          <li>朝活チャレンジウィーク <small>期間中に開催予定</small></li>
+          <li>Study Session <small>不定期</small></li>
+          <li>会員の掲示板 <small>2026年11月中に提供開始予定</small></li>
+          <li>初日と最終日の英語録音・振り返り</li>
+        </ul>
       </div>
     </div>
   </section>
 
-  <!-- ============ hina ============ -->
-  <section class="section blue" id="teachers">
+  <!-- 8. 講師紹介 -->
+  <section class="soft" id="teacher">
     <div class="wrap">
-      <div class="profile">
-        <div class="portrait"><img src="character.png" width="638" height="852" alt="ひなのイラスト" loading="lazy"></div>
+      <div class="sec-head">
+        <span class="pill orange">講師紹介</span>
+        <h2><span class="ib">英語を知っている人を</span><span class="ib">増やすだけでなく、</span><br><span class="ib accent">英語を話せる人を増やしたい。</span></h2>
+      </div>
+      <div class="card teacher">
         <div>
-          <h3>ひな<span class="script" lang="en">Hina</span><span class="chip">主宰</span></h3>
-          <div class="profile-text">
-            <p>YouTubeで、日常でよく使う英会話フレーズを紹介しています。</p>
-            <p>LIVE授業は、<b>Hinaが月2〜3回</b>担当します。</p>
+          <div class="t-top">
+            <div class="pic"><img src="character.png" width="638" height="852" alt="ひなのイラスト" loading="lazy" style="width:78%"></div>
+            <div class="name"><b>Hina</b><span>梶崎 妃那</span></div>
+          </div>
+          <ul class="t-list">
+            <li><b>TOEIC満点</b>・<b>英検1級</b></li>
+            <li>YouTube登録者<br><b>48万人</b></li>
+            <li>慶應義塾大学<br>経済学部</li>
+            <li>YouTubeで約3年、<br>英語を発信</li>
+          </ul>
+        </div>
+        <div class="message">
+          <p>英語は、完璧じゃなくてもいい。<br>大切なのは、<strong>自分の言葉で伝えてみること。</strong></p>
+          <p>一度きりの人生で、「私、やればできるやん！」と思える瞬間を、英語を通じて増やしていきたい。</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 9. 含まれるもの -->
+  <section id="includes">
+    <div class="wrap">
+      <div class="sec-head">
+        <h2><span class="ib accent">3ヶ月突破コース</span><span class="ib">に含まれるもの</span></h2>
+      </div>
+      <div class="inc">
+        <div class="card inc-cat">
+          <h3><span class="L">1</span>アプリ学習</h3>
+          <ul><li>毎日の学習メニュー</li><li>レベル別の単語</li><li>自動の復習</li><li>モデリングの課題</li><li>AI添削つき英語日記</li><li>瞬間英作文</li><li>文法18単元</li><li>講義動画（合計53本）</li></ul>
+        </div>
+        <div class="card inc-cat">
+          <h3><span class="L">2</span>LIVE授業</h3>
+          <ul><li>月12回以上（3ヶ月で36回以上）</li><li>日常英会話・瞬間英作文（週2回）</li><li>文法強化・第1期生ホームルーム（週1回）</li><li>質問会（月1回）</li><li>目標設定・振り返り会（月1回）</li></ul>
+        </div>
+        <div class="card inc-cat">
+          <h3><span class="L">3</span>続ける仕組み</h3>
+          <ul><li>定期テスト（月1回・合計3回）</li><li>成長記録・ランキング</li><li>朝活・Study Session</li><li>会員の掲示板 <span class="pill outline">11月中に開始予定</span></li><li>初日と最終日の英語録音</li><li>卒業イベント <span class="pill outline">参加費別途</span></li></ul>
+        </div>
+      </div>
+      <p class="fine center" style="margin-top:10px">講義動画は2027年2月15日 23:59まで見られます。</p>
+    </div>
+  </section>
+
+  <!-- 10. 料金・支払い・解約 -->
+  <section class="white" id="price">
+    <div class="wrap">
+      <div class="sec-head">
+        <h2>第1期生のご案内</h2>
+      </div>
+      <div class="offer">
+        <div class="card price-box">
+          <p class="course-name"><span class="pill black">第1期</span>3ヶ月突破コース</p>
+          <p class="yen"><b>110,000</b><span>円（税込）</span></p>
+          <p class="tax">税抜 100,000円</p>
+          <div class="chips"><span class="pill orange">第1期生特別価格</span><span class="pill black">カードの分割OK</span></div>
+          <div class="summary">
+            <ul>
+              <li>入会金・教材費なし</li>
+              <li>自動更新・自動課金なし</li>
+              <li>2026年11/16〜2027年2/15（92日間）</li>
+            </ul>
+          </div>
+          <div class="cta">
+            <a class="btn block" href="https://my.ohana-english.app/?view=join">第1期生に申し込む<span class="arrow">→</span></a>
+            <p class="cta-note">始め方は、申し込み後にメールか公式LINEでご案内します</p>
           </div>
         </div>
-      </div>
-    </div>
-  </section>
 
-  <!-- ============ price ============ -->
-  <section class="section" id="price">
-    <div class="wrap">
-      <header class="sec-head">
-        <p class="label">Price</p>
-        <h2>料金</h2>
-      </header>
-      <div class="price-card">
-        <div class="price-main">
-          <p class="plan">3ヶ月突破コース（第1期）<span class="chip">第1期生特別価格</span></p>
-          <p class="price"><span class="amount">110,000円</span><span class="per">（税込）</span></p>
-          <p class="price-note">税抜 100,000円</p>
-          <p class="price-note">入会金・教材費は、かかりません。自動更新・自動課金はありません。</p>
-          <a class="btn" href="https://my.ohana-english.app/?view=join">申し込みページへ</a>
-        </div>
-        <div class="price-inc">
+        <div class="card pay">
           <h3>お支払い</h3>
-          <ul class="inc">
-            <li><span class="label">Card</span><span><b>クレジットカード</b><small>一括払い、またはカード会社の分割払い。日本のカードのみ（アメックスは分割できません）</small></span></li>
-            <li><span class="label">Bank</span><span><b>銀行振込</b><small>公式LINEに「銀行振込」と送ってください（<a href="https://line.me/R/oaMessage/@039impnx/?%E9%8A%80%E8%A1%8C%E6%8C%AF%E8%BE%BC">LINEで送る</a>）。振込手数料はご負担ください</small></span></li>
-          </ul>
-          <h3 class="inc-gap">解約について</h3>
-          <ul class="inc">
-            <li><span class="label">8 days</span><span><b>クーリング・オフ</b><small>特定商取引法に基づく法律上の制度です。契約書面を受け取った日を含めて8日以内</small></span></li>
-            <li><span class="label">11/15</span><span><b>11/15までの解約</b><small>解約手数料0円で、お支払い額を返金します</small></span></li>
-            <li><span class="label">Cancel</span><span><b>11/16以降の解約</b><small>提供済みサービスの対価（110,000円×経過日数÷92日）と通常損害（最大5,000円）を差し引いて返金します。くわしくは<a href="https://my.ohana-english.app/?view=gaiyou">概要書面</a>をご覧ください</small></span></li>
-          </ul>
+          <dl>
+            <dt>カード</dt><dd><b>一括・カード会社の分割</b><small>日本のカードのみ。アメックスは分割できません</small></dd>
+            <dt>振込</dt><dd><b>銀行振込</b><small><a href="https://line.me/R/oaMessage/@039impnx/?%E9%8A%80%E8%A1%8C%E6%8C%AF%E8%BE%BC">公式LINEに「銀行振込」と送ってください</a></small></dd>
+          </dl>
+        </div>
+
+        <div class="card cancel">
+          <h3>解約について</h3>
+          <ol>
+            <li><span class="k">8日以内</span><span><b>クーリング・オフ</b>特定商取引法に基づく制度。書面を受け取った日を含めて8日以内</span></li>
+            <li><span class="k">11/15まで</span><span><b>解約手数料0円で返金</b></span></li>
+            <li><span class="k">11/16以降</span><span><b>差し引いて返金</b>対価（110,000円×経過日数÷92日）と通常損害（最大5,000円）</span></li>
+          </ol>
+          <p class="fine">くわしくは<a href="https://my.ohana-english.app/?view=gaiyou">概要書面</a>をご覧ください。</p>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- ============ schedule ============ -->
-  <section class="section blue" id="schedule">
+  <!-- 11. 日程 -->
+  <section id="schedule">
     <div class="wrap">
-      <header class="sec-head">
-        <p class="label">Schedule</p>
-        <h2>申し込みから卒業まで</h2>
-      </header>
-      <ol class="dates">
-        <li><span class="d">勉強会のあと</span><b>お申し込み</b><small>始め方は、お申し込みのあとメールか公式LINEでお知らせします</small></li>
-        <li><span class="d">11/15（日）夜</span><b>キックオフ会</b><small>Hina担当・オンライン</small></li>
-        <li class="key"><span class="d">11/16（月）</span><b>全員一斉スタート</b><small>全92日間のコースが始まります</small></li>
-        <li><span class="d">2027年2月頃</span><b>卒業イベント</b><small>開催日・会場は決まりしだいお知らせ。参加費 1人3,000円（別途）、交通費・宿泊費は参加者負担</small></li>
-        <li><span class="d">2/15（月）</span><b>コース終了</b></li>
+      <div class="sec-head"><h2>日程</h2></div>
+      <ol class="dates card" style="padding:4px 18px">
+        <li><span class="d">11/15（日）夜</span><div><b>キックオフ会</b><small>Hina担当・オンライン</small></div></li>
+        <li class="key"><span class="d">11/16（月）</span><div><b>全員一斉スタート</b><small>92日間のコースが始まります</small></div></li>
+        <li><span class="d">2027年2月頃</span><div><b>卒業イベント</b><small>日にち・会場は決まりしだいお知らせ</small></div></li>
+        <li><span class="d">2/15（月）</span><div><b>コース終了</b></div></li>
       </ol>
     </div>
   </section>
 
-  <!-- ============ faq ============ -->
-  <section class="section" id="faq">
+  <!-- 12. FAQ -->
+  <section class="white" id="faq">
     <div class="wrap">
-      <header class="sec-head">
-        <p class="label">FAQ</p>
-        <h2>よくある質問</h2>
-      </header>
+      <div class="sec-head"><h2>よくある質問</h2></div>
       <div class="faq">
-        <details>
-          <summary>英語に自信がなくても大丈夫ですか？</summary>
-          <p class="a">大丈夫です。最初はインプット多めで、少しずつ話す・書く練習に進みます。</p>
-        </details>
-        <details>
-          <summary>1日にどれくらい時間が必要ですか？</summary>
-          <p class="a">目安は1日20〜30分ほどです。アプリを開けば、その日にやることが出てきます。</p>
-        </details>
-        <details>
-          <summary>LIVE授業に出られない日は？</summary>
-          <p class="a">録画があるので、あとから見られます。</p>
-        </details>
-        <details>
-          <summary>顔出しは必要ですか？</summary>
-          <p class="a">必要ありません。カメラはオフでOKです。</p>
-        </details>
-        <details>
-          <summary>スマホだけで大丈夫ですか？</summary>
-          <p class="a">はい。アプリもZoomも、スマホで使えます。</p>
-        </details>
-        <details>
-          <summary>支払い方法は？</summary>
-          <p class="a">クレジットカード（一括払い、またはカード会社の分割払い。日本のカードのみ。アメックスは分割できません）と、銀行振込です。銀行振込は、公式LINEに「銀行振込」と送ってください（<a href="https://line.me/R/oaMessage/@039impnx/?%E9%8A%80%E8%A1%8C%E6%8C%AF%E8%BE%BC">LINEで送る</a>）。</p>
-        </details>
-        <details>
-          <summary>途中でやめたくなったら？</summary>
-          <p class="a">途中で解約できます。契約書面を受け取った日を含めて8日以内は、クーリング・オフ（特定商取引法に基づく制度）ができます。11/15までの解約は、解約手数料0円で返金します。11/16以降は、提供済みサービスの対価（110,000円×経過日数÷92日）と通常損害（最大5,000円）を差し引いて返金します。解約は公式LINEかメールで。くわしくは<a href="https://my.ohana-english.app/?view=gaiyou">概要書面</a>をご覧ください。</p>
-        </details>
-        <details>
-          <summary>いつから使えますか？</summary>
-          <p class="a">コースは11月16日に全員一斉スタートです（前の晩、11/15の夜にキックオフ会）。始め方は、お申し込みのあとメールか公式LINEでお知らせします。</p>
-        </details>
+        <details><summary>英語に自信がなくても大丈夫ですか？</summary><p>大丈夫です。初級・中級に分かれていて、今のレベルに合わせて進めます。</p></details>
+        <details><summary>1日にどれくらい時間が必要ですか？</summary><p>忙しい日は30分、しっかり学ぶ日は60分が目安です。目標と時間に合わせてメニューが変わります。</p></details>
+        <details><summary>LIVE授業に出られない日は？</summary><p>録画があるので、あとから見られます。カメラはオフでも大丈夫です。</p></details>
+        <details><summary>1対1のレッスンはありますか？</summary><p>ありません。みんなで参加するLIVE授業で進めます。わからないことは月1回の質問会で聞けます。</p></details>
+        <details><summary>スマホだけで大丈夫ですか？</summary><p>はい。アプリもZoomも、スマホで使えます。</p></details>
+        <details><summary>支払い方法は？</summary><p>クレジットカード（一括、またはカード会社の分割。日本のカードのみ。アメックスは分割できません）と、銀行振込です。銀行振込は<a href="https://line.me/R/oaMessage/@039impnx/?%E9%8A%80%E8%A1%8C%E6%8C%AF%E8%BE%BC">公式LINEに「銀行振込」と送ってください</a>。</p></details>
+        <details><summary>途中でやめたくなったら？</summary><p>書面を受け取った日を含めて8日以内は、クーリング・オフ（特定商取引法に基づく制度）ができます。11/15までの解約は、解約手数料0円で返金します。11/16以降は、対価（110,000円×経過日数÷92日）と通常損害（最大5,000円）を差し引いて返金します。くわしくは<a href="https://my.ohana-english.app/?view=gaiyou">概要書面</a>をご覧ください。</p></details>
+        <details><summary>いつから始まりますか？</summary><p>11/16（月）に全員一斉スタートです（前の晩、11/15の夜にキックオフ会）。始め方は、申し込み後にメールか公式LINEでご案内します。</p></details>
       </div>
     </div>
   </section>
 
-  <!-- ============ final call ============ -->
+  <!-- 13. 最後 -->
   <section class="final">
     <div class="wrap">
-      <div class="final-text">
-        <p class="script" lang="en">Do you wanna join us?</p>
-        <h2>「えーっと…」を「パッ」に。<br>一緒に90日、はじめよう。</h2>
-        <div class="cta-row">
-          <a class="btn" href="https://my.ohana-english.app/?view=join">申し込みページへ</a>
-          <p class="cta-note"><b class="price-em">110,000円（税込）</b><br>カードの分割払い・銀行振込もできます</p>
-        </div>
+      <h2>今度こそ、<br><span>英語を話せる自分へ。</span></h2>
+      <p class="body"><b>一人で頑張らなくていい。</b><br><span class="ib">3ヶ月間、仲間と一緒に、</span><span class="ib">英語を使う練習を</span><span class="ib">重ねていきましょう。</span></p>
+      <div class="cta">
+        <a class="btn block" href="https://my.ohana-english.app/?view=join">一緒に、突破しよう！<span class="arrow">→</span></a>
+        <p class="cta-note"><span class="ib">第1期生 <b>110,000円（税込）</b></span>・<span class="ib">11/16スタート</span></p>
       </div>
-      <img src="character.png" width="638" height="852" alt="" loading="lazy">
     </div>
   </section>
 
@@ -1069,81 +1038,43 @@
 <footer class="site-foot">
   <div class="wrap">
     <a class="logo" href="#top">
-      <span class="mark"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5v17M3.5 12h17M6 6l12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg></span>
-      <span class="logo-name" lang="en"><b>ʻOhana English</b><small>by Hina</small></span>
+      <svg viewBox="0 0 100 100" aria-hidden="true"><rect width="100" height="100" rx="29" fill="#F35730"/><g fill="#FFFFFF"><circle cx="49.0" cy="31.5" r="13.2"/><circle cx="67.9" cy="43.4" r="13.2"/><circle cx="62.5" cy="65.1" r="13.2"/><circle cx="40.2" cy="66.6" r="13.2"/><circle cx="31.9" cy="45.9" r="13.2"/><circle cx="50.3" cy="50.5" r="21"/></g></svg>
+      <span><b>ʻOhana English</b><small>By Hina</small></span>
     </a>
     <nav class="foot-links" aria-label="サイト情報">
       <a href="tokushoho.html">特定商取引法に基づく表記</a>
+      <a href="https://my.ohana-english.app/?view=gaiyou">概要書面</a>
+      <a href="https://my.ohana-english.app/?view=terms">受講規約</a>
       <a href="privacy.html">プライバシーポリシー</a>
-      <a href="mailto:hinatoeicpresent@gmail.com">お問い合わせ</a>
+      <a href="https://line.me/R/ti/p/@039impnx">お問い合わせ（公式LINE）</a>
     </nav>
     <p class="copy">運営：株式会社UPSTAR　© 2026 ʻOhana English</p>
   </div>
 </footer>
 
-<!-- スマホだけ画面の下に出る申し込みボタン -->
 <div class="sticky-cta">
-  <p><b>110,000円（税込）</b>3ヶ月突破コース・11/16スタート</p>
+  <p><b>3ヶ月突破コース 第1期生</b>110,000円（税込）・11/16スタート</p>
   <a class="btn" href="https://my.ohana-english.app/?view=join">申し込む</a>
 </div>
 
 <script>
-  // 単語カード：意味を見る
+  // 動画は画面に入ったときだけ再生する（通信量と電池のため）
   (function () {
-    var btn = document.getElementById("flash-btn");
-    var meaning = document.getElementById("flash-meaning");
-    if (!btn || !meaning) return;
-    btn.addEventListener("click", function () {
-      var show = meaning.hidden;
-      meaning.hidden = !show;
-      btn.textContent = show ? "もう一度" : "意味を見る";
-      btn.setAttribute("aria-expanded", String(show));
-    });
-  })();
-
-  // 発音・聞き取り：単語を並べて文をつくる
-  (function () {
-    var answer = ["I", "don't", "know", "how", "to", "say", "this", "in", "English."];
-    var start = ["say", "I", "English.", "know", "this", "how", "don't", "in", "to"];
-    var line = document.getElementById("order-line");
-    var pool = document.getElementById("order-pool");
-    var result = document.getElementById("order-result");
-    var reset = document.getElementById("order-reset");
-    if (!line || !pool) return;
-
-    function chip(word) {
-      var b = document.createElement("button");
-      b.type = "button";
-      b.className = "word-chip";
-      b.lang = "en";
-      b.textContent = word;
-      b.addEventListener("click", function () {
-        (b.parentNode === pool ? line : pool).appendChild(b);
-        check();
+    var vids = document.querySelectorAll("video[autoplay]");
+    if (!("IntersectionObserver" in window)) return;
+    var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    vids.forEach(function (v) { v.removeAttribute("autoplay"); v.pause(); });
+    if (reduce) return;
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        var v = e.target;
+        if (e.isIntersecting) { v.preload = "auto"; var p = v.play(); if (p && p.catch) p.catch(function () {}); }
+        else { v.pause(); }
       });
-      return b;
-    }
-    function check() {
-      result.textContent = "";
-      if (pool.children.length) return;
-      var built = Array.prototype.map.call(line.children, function (c) { return c.textContent; });
-      if (built.join(" ") === answer.join(" ")) {
-        result.innerHTML = '<span class="script" lang="en">Perfect!</span>「これを英語でどう言えばいいか分からない」';
-      } else {
-        result.textContent = "おしい！ 単語をタップすると戻せます";
-      }
-    }
-    function fill() {
-      line.textContent = "";
-      pool.textContent = "";
-      result.textContent = "";
-      start.forEach(function (w) { pool.appendChild(chip(w)); });
-    }
-    reset.addEventListener("click", fill);
-    fill();
+    }, { threshold: 0.35 });
+    vids.forEach(function (v) { io.observe(v); });
   })();
 </script>
-
-</div>
 </body>
 </html>
+
