@@ -12,8 +12,8 @@ import { MENUS } from "./menus.js";
 import { TOPICS } from "./journal/topics.js";
 import { shownPoints, spellingMap } from "./journal/spelling.js";
 import {
-  TEST_SIZE, phraseByKey, phraseSetKey, phraseSets, phraseWeeks, setDrills, setNumbers, setScenes, testSize, weekPhrases,
-  weekTitle,
+  TEST_SIZE, phraseByKey, phraseSetKey as bookSetKey, phraseSets as bookSets, phraseWeeks as bookPhraseWeeks, setDrills, setNumbers,
+  setScenes, testSize, weekPhrases as bookWeekPhrases, weekTitle as bookWeekTitle,
 } from "./phrases/book.js";
 import { findMistakes, normalizeWords } from "./mistakes.js";
 import { lessonDayLabel, lessonList, noteDayLabel, noteHtml as memoHtml, notePages, noteProblems } from "./notes/format.js";
@@ -29,6 +29,14 @@ const state = {
   me: null, vocab: null, vocabTest: null, review: null, pron: { which: null, index: 0 }, grammar: null, lesson: null, aiError: {},
   study: null, notes: {}, quiz: null, rephrase: null, rephraseGroup: null, write: null,
 };
+
+// フレーズ of this student's own books (phrase_books), or スモールトーク.
+const myPhraseBooks = () => state.me?.phraseBooks || null;
+const phraseWeeks = () => bookPhraseWeeks(myPhraseBooks());
+const phraseSets = (week) => bookSets(week, myPhraseBooks());
+const phraseSetKey = (week, number) => bookSetKey(week, number, myPhraseBooks());
+const weekPhrases = (week) => bookWeekPhrases(week, myPhraseBooks());
+const weekTitle = (week) => bookWeekTitle(week, myPhraseBooks());
 
 const asterisk = `<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><g stroke="currentColor" stroke-width="3.2" stroke-linecap="round"><path d="M12 3v18"/><path d="M4.2 7.5l15.6 9"/><path d="M4.2 16.5l15.6-9"/></g></svg>`;
 

@@ -30,6 +30,7 @@
 // node scripts/teacher.mjs pron-done なおみ (--month 1 | --keys m1/01,m1/02) [--day 2026-09-30] [--dry | --undo]
 //                                                                 (発音 finished before the app, as 完了 with no recording)
 // node scripts/teacher.mjs vocab-books なおみ [--set "1=ielts1" | --default]   (単語帳 per week instead of the shared one)
+// node scripts/teacher.mjs phrase-books なおみ [--set talk1 | --default]   (フレーズ: own books instead of スモールトーク)
 // node scripts/teacher.mjs vocab-pace なおみ [--week 2 --days 4 --size 40 | --off]   (fewer words a week, across the 単語帳)
 // node scripts/teacher.mjs write-practice なおみ [--on | --off]   (★ on 復習 examples and 書く練習)
 // node scripts/teacher.mjs stars なおみ                           (the ★ examples and their お題)
@@ -47,6 +48,7 @@ import { lessonDayLabel, lessonList, noteDayLabel, noteProblems } from "../publi
 import { MENUS, menuKey } from "../public/menus.js";
 import { monthPhrases, pronMonths, studentMonths } from "../public/pron/phrases.js";
 import { vocabBooks, weekBook } from "../public/vocab/words.js";
+import { phraseBooks } from "../public/phrases/book.js";
 
 // Node's fetch only goes through the environment's proxy when asked to.
 if ((process.env.HTTPS_PROXY || process.env.https_proxy) && !process.env.NODE_USE_ENV_PROXY) {
@@ -233,6 +235,14 @@ function bookLine(books) {
   }).join("\n");
 }
 
+// "Week 1：英語の会話でそのまま使うフレーズ（talk1・35 こ）", or スモールトーク.
+function phraseBookLine(books) {
+  const all = phraseBooks();
+  const mine = (books || []).map((id) => all.find((b) => b.id === id)).filter(Boolean);
+  return (mine.length ? mine : all.filter((b) => b.shared))
+    .map((b) => `Week ${b.week}：${b.title}（${b.id}・${b.count} こ${b.shared ? "・スモールトーク・全員共通" : ""}）`).join("\n");
+}
+
 // "1. 8月3日（月）　メモなし" for every lesson so far.
 function lessonLines(data) {
   const lessons = lessonList(data.lessonDays, data.notes);
@@ -282,6 +292,7 @@ const commands = {
     console.log(`\n## 発音課題の Month\n${pronLine(data.pronMonths)}`);
     console.log(`\n## 発音課題の完了\n${pronProgress(data.pronDone)}`);
     console.log(`\n## 単語帳\n${bookLine(data.vocabBooks)}`);
+    console.log(`\n## フレーズの本\n${phraseBookLine(data.phraseBooks)}`);
     console.log(`\n## 今週の勉強範囲\n${data.plan ? data.plan.body : "（まだありません）"}`);
     console.log(`\n## これまでの授業\n${lessonLines(data)}`);
     for (const [kind, spec] of Object.entries(KINDS)) {
@@ -568,6 +579,19 @@ const commands = {
     }
     const result = await api(`/api/teacher/students/${student.id}/vocab-books`, { method: "PUT", body: { books } });
     console.log(`${student.name}さんの単語帳を変えました：\n${bookLine(result.books)}`);
+  },
+
+  // フレーズ: the student's own books instead of スモールトーク (--set talk1), or back (--default).
+  async "phrase-books"([name], options) {
+    const student = await findStudent(name);
+    if (!options.set && !options.default) {
+      const { phraseBooks: books } = await studentData(student);
+      const list = phraseBooks().map((b) => `${b.id}：Week ${b.week}・${b.title}（${b.count} こ${b.shared ? "・スモールトーク・全員共通" : ""}）`).join("\n");
+      return console.log(`${student.name}さんのフレーズ：\n${phraseBookLine(books)}\n\nアプリにあるフレーズの本：\n${list}`);
+    }
+    const books = options.default ? [] : String(options.set).split(/[,、，\s]+/).filter(Boolean);
+    const result = await api(`/api/teacher/students/${student.id}/phrase-books`, { method: "PUT", body: { books } });
+    console.log(`${student.name}さんのフレーズを変えました：\n${phraseBookLine(result.books)}`);
   },
 
   // A student's own pace: the words of Week <week> after its first <days> days go

@@ -431,6 +431,7 @@ export async function studentBundle(db, studentId) {
     lessonDays: lessonDays.map((r) => r.day),
     rephrase: rephraseRows.map((r) => ({ id: r.id, item_id: r.item_id, ok: r.ok === null ? null : !!r.ok, created_at: r.created_at })),
     vocabPace: setting("vocab_pace"),
+    phraseBooks: setting("phrase_books"),
     writePractice: !!setting("write_practice"),
     stars: starRows.map(starRow),
   };

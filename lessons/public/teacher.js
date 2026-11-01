@@ -927,8 +927,9 @@ function bindStars(panel) {
 
 // Every フレーズ set that ends with a test, with its key.
 function phraseSetList() {
-  return phraseWeeks().flatMap((week) =>
-    phraseSets(week).filter(testSize).map((set) => ({ week, ...set, key: phraseSetKey(week, set.number) })),
+  const books = state.current.phraseBooks;
+  return phraseWeeks(books).flatMap((week) =>
+    phraseSets(week, books).filter(testSize).map((set) => ({ week, ...set, key: phraseSetKey(week, set.number, books) })),
   );
 }
 
