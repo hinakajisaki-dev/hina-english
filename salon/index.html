@@ -136,7 +136,10 @@
   .not-waste b { color: var(--accent-text); }
 
   /* 03 上達の仕組み（いちばん大事） */
-  .cycle { display: grid; gap: 0; position: relative; }
+  .cycle { display: grid; gap: 0; position: relative; padding-right: 40px; }
+  .cycle::after { content: ""; position: absolute; right: 12px; top: 28px; bottom: 28px; width: 18px; border: 4px solid var(--accent); border-left: 0; border-radius: 0 16px 16px 0; }
+  .cycle::before { content: ""; position: absolute; right: 26px; top: 21px; border: 7px solid transparent; border-right: 10px solid var(--accent); border-left: 0; }
+  .cycle .back { position: absolute; right: 0; top: 50%; transform: translateY(-50%); z-index: 1; writing-mode: vertical-rl; background: var(--accent); color: #FFF; font-size: 14px; font-weight: 900; letter-spacing: .2em; padding: 12px 5px; border-radius: 999px; box-shadow: 0 0 0 4px var(--ink); }
   .cstep { position: relative; display: grid; grid-template-columns: 44px 1fr; gap: 12px; align-items: center; background: #FFF; color: var(--ink); border-radius: 14px; padding: 12px 14px 12px 12px; }
   .cstep + .cstep { margin-top: 20px; }
   .cstep + .cstep::before { content: ""; position: absolute; top: -16px; left: 32px; border: 6px solid transparent; border-top: 8px solid #FFB599; }
@@ -144,8 +147,6 @@
   .cstep.out .n { background: var(--accent); color: #FFF; }
   .cstep h3 { font-size: 16.5px; font-weight: 900; line-height: 1.4; }
   .cstep p { font-size: 13px; font-weight: 700; color: var(--ink-2); line-height: 1.55; }
-  .again { display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 16px; background: var(--accent); color: #FFF; border-radius: 999px; padding: 9px 16px; font-size: 15.5px; font-weight: 900; }
-  .again svg { width: 22px; height: 22px; }
   .legend { display: flex; justify-content: center; gap: 14px; margin-top: 16px; font-size: 12.5px; font-weight: 800; color: #C9D1E0; }
   .legend span::before { content: ""; display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 6px; background: #FFF; vertical-align: 0; }
   .legend .o::before { background: var(--accent); }
@@ -330,9 +331,11 @@
     .types li { font-size: 15.5px; }
     .not-waste { font-size: 17px; }
 
-    .cycle { grid-template-columns: repeat(5, 1fr); gap: 18px; }
-    .again { max-width: 420px; margin: 18px auto 0; font-size: 17px; }
-        .cstep { grid-template-columns: 1fr; justify-items: center; text-align: center; padding: 20px 14px; }
+    .cycle { grid-template-columns: repeat(5, 1fr); gap: 18px; padding: 0 0 60px; }
+    .cycle::after { left: 10%; right: 10%; top: auto; bottom: 18px; width: auto; height: 28px; border: 4px solid var(--accent); border-top: 0; border-radius: 0 0 20px 20px; }
+    .cycle::before { right: auto; left: calc(10% - 7px); top: auto; bottom: 44px; border: 9px solid transparent; border-bottom: 12px solid var(--accent); border-top: 0; border-left-width: 9px; border-right-width: 9px; }
+    .cycle .back { writing-mode: horizontal-tb; top: auto; bottom: 0; right: auto; left: 50%; transform: translateX(-50%); padding: 6px 26px; font-size: 17px; letter-spacing: .12em; }
+          .cstep { grid-template-columns: 1fr; justify-items: center; text-align: center; padding: 20px 14px; }
     .cstep + .cstep { margin-top: 0; }
     .cstep + .cstep::before { top: 50%; left: -16px; transform: translateY(-50%); border: 6px solid transparent; border-left: 8px solid #FFB599; }
     .cstep .n { width: 52px; height: 52px; font-size: 20px; }
@@ -470,8 +473,8 @@
         <li class="cstep out"><span class="n">3</span><div><h3>声に出して、聞き取れる状態に</h3><p>言える音は、聞き取れる音になる</p></div></li>
         <li class="cstep out"><span class="n">4</span><div><h3>毎日アウトプットする</h3><p>英語日記・瞬間英作文・LIVE</p></div></li>
         <li class="cstep"><span class="n">5</span><div><h3>苦手なところを集中復習</h3><p>自動の復習機能で、もう一度</p></div></li>
+        <li class="back" aria-hidden="true">くり返す</li>
       </ol>
-      <p class="again"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 9a8 8 0 1 0 1 5" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/><path d="M20 3v6h-6" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>1にもどって、くり返す</p>
       <p class="legend"><span>インプット・復習</span><span class="o">アウトプット</span></p>
       <div class="key-msg">
         <p><span class="ib">インプットとアウトプットを</span><span class="ib"><b>切り離さない</b>。</span></p>
