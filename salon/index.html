@@ -125,9 +125,9 @@
   .vs p { font-size: 13px; font-weight: 700; color: var(--ink-2); line-height: 1.6; margin-top: 4px; }
   .vs .ne { align-self: center; font-weight: 900; font-size: 20px; color: var(--ink-3); }
   .diff { margin-top: 18px; text-align: center; font-size: 20px; font-weight: 900; line-height: 1.5; }
-  .types-h { margin-top: 18px; text-align: center; font-size: 14px; font-weight: 800; color: var(--ink-2); }
+  .types-h { margin-top: 18px; text-align: center; font-size: 16px; font-weight: 900; color: var(--red); }
   .types { display: grid; gap: 8px; margin-top: 8px; }
-  .types li { display: grid; grid-template-columns: 34px 1fr; gap: 10px; align-items: center; border: 1.5px solid var(--line); border-radius: 14px; padding: 10px 14px; font-size: 14px; font-weight: 800; line-height: 1.55; }
+  .types li { position: relative; display: grid; grid-template-columns: 34px 1fr; gap: 10px; align-items: center; background: #EEF0F4; border-radius: 16px 16px 16px 4px; padding: 11px 14px; font-size: 14px; font-weight: 800; line-height: 1.55; }
   .types li i { font-style: normal; width: 34px; height: 34px; border-radius: 50%; background: var(--ink); color: #FFF; display: grid; place-items: center; font-family: "DM Sans", sans-serif; font-weight: 800; }
   .types li small { display: block; font-size: 12.5px; color: var(--ink-3); font-weight: 700; }
   .not-waste { margin-top: 16px; text-align: center; font-size: 15px; font-weight: 800; line-height: 1.75; }
@@ -540,6 +540,9 @@
   @media (min-width: 900px) { .price-box .notes li { font-size: 14px; } }
   .hero3 .pts .two { white-space: nowrap; line-height: 1.3; }
   @media (min-width: 900px) { .hero3 .pts .two br { display: none; } }
+  .personal { margin-top: 26px; text-align: center; font-size: 14px; font-weight: 800; line-height: 1.75; background: var(--accent-soft); border-radius: 14px; padding: 10px 12px; }
+  .personal b { color: var(--accent-text); }
+  @media (min-width: 900px) { .personal { font-size: 16px; } }
 </style>
 </head>
 <body id="top">
@@ -601,7 +604,7 @@
         <span class="ne" aria-label="と">≠</span>
         <div class="box use"><b>使える</b><p>自分で英文を作り、<br>会話で声に出せる。</p></div>
       </div>
-      <p class="types-h">よくある悩みは、3つ。</p>
+      <p class="types-h">よくある3つの原因</p>
       <ol class="types">
         <li><i>1</i><span>単語は知っていても、<span class="ib">どうつなげて英文にすればいいか</span><span class="ib">わからない</span></span></li>
         <li><i>2</i><span>覚えた単語や文法を、<span class="ib">会話で使う練習が足りない</span></span></li>
@@ -629,7 +632,6 @@
       <p class="legend"><span>インプット・復習</span><span class="o">アウトプット</span></p>
       <div class="key-msg">
         <p><span class="ib">インプットとアウトプットを切り離さず、</span><span class="ib">このサイクルを繰り返して、</span><span class="ib"><b>使える表現を増やしていきます。</b></span></p>
-        <small><span class="ib">音の特徴をまねる練習は、</span><span class="ib">聞き取りの理解にもつながります。</span></small>
       </div>
     </div>
   </section>
@@ -642,7 +644,7 @@
         <h2><span class="ib">たとえば、</span><span class="ib">過去形を学ぶ日。</span></h2>
       </div>
       <div class="lesson-day">
-        <div class="goal"><small>この日のゴール</small><b>「昨日、友達とカフェに行った」</b><em>I went to a cafe with my friend yesterday.</em></div>
+        <div class="goal"><small>この日のゴール</small><b>過去形をマスター</b><em>I went to a cafe with my friend yesterday.</em></div>
         <ol class="ls">
           <li><span class="n">1</span><div class="body"><div><h3>文法を理解する</h3><p>動画で過去形の作り方を学ぶ。</p><span class="tool">講義動画</span></div><div class="thumb wide"><img src="img/lecture-sample.webp" width="1100" height="605" alt="講義動画の1場面" loading="lazy"></div></div></li>
           <li class="out"><span class="n">2</span><div class="body"><div><h3>英文を作ってみる</h3><p>日本語を見て、自分で英語にする。</p><span class="en">I went to a cafe with my friend.</span><span class="tool">瞬間英作文</span></div><div class="thumb"><img src="img/mock-instant-top.webp" width="720" height="662" alt="瞬間英作文の画面（イメージ）" loading="lazy"></div></div></li>
@@ -650,8 +652,7 @@
           <li class="out"><span class="n">4</span><div class="body"><div><h3>LIVEで話してみる</h3><p>学んだ表現を、実際に声に出す。</p><span class="tool">LIVE授業</span></div><div class="thumb"><img src="img/mock-zoom.webp" width="780" height="1216" alt="LIVE授業のイメージ画面" loading="lazy"></div></div></li>
           <li><span class="n">5</span><div class="body"><div><h3>復習して身につける</h3><p>苦手な表現を繰り返し練習する。</p><span class="tool">自動の復習</span></div><div class="thumb"><img src="img/mock-menu-top.webp" width="780" height="1054" alt="復習が出ている学習メニューの画面（イメージ）" loading="lazy"></div></div></li>
         </ol>
-        <p class="aha"><span class="ib">たった1つの英文でも、</span><span class="ib"><b>学んで、作って、使って、復習する</b>。</span><br><span class="ib">だから、知識だけで終わらない。</span></p>
-        <p class="fine center" style="margin-top:6px">※画面は見本・イメージです。</p>
+        <p class="aha"><span class="ib">あなたに必要な文法を、</span><span class="ib"><b>学んで、作って、使って、復習する</b>。</span><br><span class="ib">決して、知識だけで終わらせない。</span></p>
       </div>
     </div>
   </section>
@@ -661,13 +662,16 @@
     <div class="wrap">
       <div class="sec-head">
         <span class="part">04 ─ EVERY DAY</span>
-        <h2><span class="ib">今日やることは、</span><span class="ib">アプリが教えてくれる。</span></h2>
+        <h2><span class="ib">今日やらないと</span><span class="ib">いけないことは、</span><br><span class="ib">アプリが教えてくれる。</span></h2>
         <p class="lead"><span class="ib">単語・文法・話す練習・復習まで。</span><br><span class="ib">毎日の学習メニューが決まっているから、</span><span class="ib">何を勉強するか迷いません。</span></p>
       </div>
       <div class="app2">
+        <div>
         <div class="phones2" aria-hidden="true">
           <div class="phone"><img src="img/home-crop.webp" width="780" height="1216" alt="" loading="lazy"></div>
           <div class="phone"><img src="img/progress-crop.webp" width="720" height="1122" alt="" loading="lazy"></div>
+        </div>
+          <p class="personal"><span class="ib">メニューは、あなたの</span><span class="ib"><b>目標・勉強時間・正答率</b>に</span><span class="ib">合わせて調整。</span><br><span class="ib">一人ひとりに合った</span><span class="ib">90日間に。</span></p>
         </div>
         <ul class="feat3">
           <li><b>今日の学習</b><span>開けば、やることが出る</span></li>
