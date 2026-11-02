@@ -127,7 +127,8 @@
   .vs p { font-size: 13px; font-weight: 700; color: var(--ink-2); line-height: 1.6; margin-top: 4px; }
   .vs .ne { align-self: center; font-weight: 900; font-size: 20px; color: var(--ink-3); }
   .diff { margin-top: 18px; text-align: center; font-size: 20px; font-weight: 900; line-height: 1.5; }
-  .types { display: grid; gap: 8px; margin-top: 16px; }
+  .types-h { margin-top: 18px; text-align: center; font-size: 14px; font-weight: 800; color: var(--ink-2); }
+  .types { display: grid; gap: 8px; margin-top: 8px; }
   .types li { display: grid; grid-template-columns: 34px 1fr; gap: 10px; align-items: center; border: 1.5px solid var(--line); border-radius: 14px; padding: 10px 14px; font-size: 14px; font-weight: 800; line-height: 1.55; }
   .types li i { font-style: normal; width: 34px; height: 34px; border-radius: 50%; background: var(--ink); color: #FFF; display: grid; place-items: center; font-family: "DM Sans", sans-serif; font-weight: 800; }
   .types li small { display: block; font-size: 12.5px; color: var(--ink-3); font-weight: 700; }
@@ -135,9 +136,7 @@
   .not-waste b { color: var(--accent-text); }
 
   /* 03 上達の仕組み（いちばん大事） */
-  .cycle { display: grid; gap: 0; position: relative; padding-right: 30px; }
-  .cycle::after { content: ""; position: absolute; right: 8px; top: 26px; bottom: 26px; width: 14px; border: 3px solid #FFB599; border-left: 0; border-radius: 0 14px 14px 0; }
-  .cycle .back { position: absolute; right: -2px; top: 50%; transform: translateY(-50%); writing-mode: vertical-rl; font-size: 11px; font-weight: 900; color: #FFB599; background: var(--ink); padding: 6px 0; letter-spacing: .1em; }
+  .cycle { display: grid; gap: 0; position: relative; }
   .cstep { position: relative; display: grid; grid-template-columns: 44px 1fr; gap: 12px; align-items: center; background: #FFF; color: var(--ink); border-radius: 14px; padding: 12px 14px 12px 12px; }
   .cstep + .cstep { margin-top: 20px; }
   .cstep + .cstep::before { content: ""; position: absolute; top: -16px; left: 32px; border: 6px solid transparent; border-top: 8px solid #FFB599; }
@@ -145,6 +144,8 @@
   .cstep.out .n { background: var(--accent); color: #FFF; }
   .cstep h3 { font-size: 16.5px; font-weight: 900; line-height: 1.4; }
   .cstep p { font-size: 13px; font-weight: 700; color: var(--ink-2); line-height: 1.55; }
+  .again { display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 16px; background: var(--accent); color: #FFF; border-radius: 999px; padding: 9px 16px; font-size: 15.5px; font-weight: 900; }
+  .again svg { width: 22px; height: 22px; }
   .legend { display: flex; justify-content: center; gap: 14px; margin-top: 16px; font-size: 12.5px; font-weight: 800; color: #C9D1E0; }
   .legend span::before { content: ""; display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 6px; background: #FFF; vertical-align: 0; }
   .legend .o::before { background: var(--accent); }
@@ -163,7 +164,10 @@
   .ls > li { position: relative; display: grid; grid-template-columns: 36px 1fr; gap: 12px; padding: 10px 0; }
   .ls .n { position: relative; z-index: 1; width: 36px; height: 36px; border-radius: 50%; background: #FFF; border: 2px solid var(--ink); display: grid; place-items: center; font-family: "DM Sans", sans-serif; font-weight: 800; font-size: 15px; }
   .ls li.out .n { background: var(--accent); border-color: var(--accent); color: #FFF; }
-  .ls .body { background: #FFF; border-radius: 14px; box-shadow: var(--shadow); padding: 12px 14px; display: grid; grid-template-columns: 1fr 64px; gap: 10px; align-items: center; }
+  .ls .body { background: #FFF; border-radius: 14px; box-shadow: var(--shadow); padding: 12px 12px 12px 14px; display: grid; grid-template-columns: 1fr 108px; gap: 10px; align-items: center; }
+  .ls p b { color: var(--accent-text); }
+  .ls .thumb { border-radius: 14px; padding: 3px; }
+  .ls .thumb img, .ls .thumb video { border-radius: 11px; }
   .ls h3 { font-size: 16px; font-weight: 900; line-height: 1.4; }
   .ls p { font-size: 13.5px; font-weight: 700; color: var(--ink-2); line-height: 1.6; margin-top: 2px; }
   .ls .en { display: block; margin-top: 4px; font-family: "DM Sans", sans-serif; font-weight: 800; font-size: 14.5px; color: var(--ink); background: var(--bg); border-radius: 8px; padding: 2px 8px; }
@@ -321,14 +325,14 @@
     .vs b { font-size: 24px; }
     .vs p { font-size: 15px; }
     .diff { font-size: 28px; }
-    .types { grid-template-columns: 1fr 1fr; }
+    .types { grid-template-columns: repeat(3, 1fr); }
+    .types li { align-items: start; }
     .types li { font-size: 15.5px; }
     .not-waste { font-size: 17px; }
 
-    .cycle { grid-template-columns: repeat(5, 1fr); gap: 18px; padding: 0 0 46px; }
-    .cycle::after { left: 10%; right: 10%; top: auto; bottom: 8px; width: auto; height: 22px; border: 3px solid #FFB599; border-top: 0; border-radius: 0 0 18px 18px; }
-    .cycle .back { writing-mode: horizontal-tb; top: auto; bottom: 0; right: auto; left: 50%; transform: translateX(-50%); padding: 0 12px; font-size: 13px; }
-    .cstep { grid-template-columns: 1fr; justify-items: center; text-align: center; padding: 20px 14px; }
+    .cycle { grid-template-columns: repeat(5, 1fr); gap: 18px; }
+    .again { max-width: 420px; margin: 18px auto 0; font-size: 17px; }
+        .cstep { grid-template-columns: 1fr; justify-items: center; text-align: center; padding: 20px 14px; }
     .cstep + .cstep { margin-top: 0; }
     .cstep + .cstep::before { top: 50%; left: -16px; transform: translateY(-50%); border: 6px solid transparent; border-left: 8px solid #FFB599; }
     .cstep .n { width: 52px; height: 52px; font-size: 20px; }
@@ -339,7 +343,7 @@
 
     .lesson-day { max-width: 820px; margin: 0 auto; }
     .lesson-day .goal b { font-size: 24px; }
-    .ls .body { grid-template-columns: 1fr 96px; padding: 16px 20px; }
+    .ls .body { grid-template-columns: 1fr 170px; padding: 18px 20px; }
     .ls h3 { font-size: 18px; }
     .ls p { font-size: 15px; }
     .aha { font-size: 19px; }
@@ -443,10 +447,12 @@
         <div class="box use"><b>使える</b><p>自分で英文を作り、<br>会話で声に出せる。</p></div>
       </div>
       <p class="diff"><span class="ib">「知っている」と「話せる」は、</span><span class="ib em">別の力。</span></p>
-      <ul class="types">
-        <li><i>A</i><span>基礎があいまいなまま<small>文の作り方が、まだはっきりしない</small></span></li>
-        <li><i>B</i><span>知っているのに、使う練習が足りない<small>頭ではわかるのに、口から出てこない</small></span></li>
-      </ul>
+      <p class="types-h">考えられる原因は、3つ。</p>
+      <ol class="types">
+        <li><i>1</i><span>文の作り方や基礎知識が、<span class="ib">正しく身についていない</span></span></li>
+        <li><i>2</i><span>知っているのに、<span class="ib">使う練習が足りない</span></span></li>
+        <li><i>3</i><span>英語を聞き取るための<span class="ib">正しいトレーニングができていない</span></span></li>
+      </ol>
       <p class="not-waste"><span class="ib">今まで頑張ってきたことは、</span><span class="ib">無駄ではありません。</span><br><span class="ib">大事なのは、<b>その知識をどう使うか</b>です。</span></p>
     </div>
   </section>
@@ -459,13 +465,13 @@
         <h2><span class="ib">「知ってる」が「話せる」に</span><span class="ib">変わる5つのステップ</span></h2>
       </div>
       <ol class="cycle">
-        <li class="cstep"><span class="n">1</span><div><h3>必要な英語を知る</h3><p>会話に必要な単語・文法を学ぶ</p></div></li>
-        <li class="cstep out"><span class="n">2</span><div><h3>自分で英文を作る</h3><p>英文の組み立て・瞬間英作文</p></div></li>
-        <li class="cstep out"><span class="n">3</span><div><h3>声に出して身につける</h3><p>発音・モデリング</p></div></li>
-        <li class="cstep out"><span class="n">4</span><div><h3>実際に使ってみる</h3><p>英語日記・LIVEでの会話</p></div></li>
-        <li class="cstep"><span class="n">5</span><div><h3>振り返って繰り返す</h3><p>復習・添削</p></div></li>
-        <li class="back" aria-hidden="true">くり返す</li>
+        <li class="cstep"><span class="n">1</span><div><h3><span class="ib">本当に必要な</span><span class="ib">英語を学ぶ</span></h3><p>目標に必要な単語・文法だけ</p></div></li>
+        <li class="cstep out"><span class="n">2</span><div><h3>作ってみる</h3><p>自分で英文を組み立てる</p></div></li>
+        <li class="cstep out"><span class="n">3</span><div><h3>声に出して、聞き取れる状態に</h3><p>言える音は、聞き取れる音になる</p></div></li>
+        <li class="cstep out"><span class="n">4</span><div><h3>毎日アウトプットする</h3><p>英語日記・瞬間英作文・LIVE</p></div></li>
+        <li class="cstep"><span class="n">5</span><div><h3>苦手なところを集中復習</h3><p>自動の復習機能で、もう一度</p></div></li>
       </ol>
+      <p class="again"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 9a8 8 0 1 0 1 5" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/><path d="M20 3v6h-6" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>1にもどって、くり返す</p>
       <p class="legend"><span>インプット・復習</span><span class="o">アウトプット</span></p>
       <div class="key-msg">
         <p><span class="ib">インプットとアウトプットを</span><span class="ib"><b>切り離さない</b>。</span></p>
@@ -485,13 +491,13 @@
       <div class="lesson-day">
         <div class="goal"><small>この日のゴール</small><b>「昨日、友達とカフェに行った」<br>を話せるようになるまで</b><em>I went to a cafe with my friend yesterday.</em></div>
         <ol class="ls">
-          <li><span class="n">1</span><div class="body"><div><h3>文法を理解する</h3><p>過去のことは過去形。go の過去形は went。</p><span class="tool">講義動画</span></div><div class="thumb wide"><img src="img/lecture-sample.webp" width="1100" height="605" alt="講義動画の1場面" loading="lazy"></div></div></li>
-          <li class="out"><span class="n">2</span><div class="body"><div><h3>自分で英文を作る</h3><p>日本語を見て、パッと英語に。</p><span class="en">I went to a cafe with my friend.</span><span class="tool">瞬間英作文</span></div><div class="thumb"><img src="img/mock-instant-top.webp" width="720" height="662" alt="瞬間英作文の画面（イメージ）" loading="lazy"></div></div></li>
-          <li class="out"><span class="n">3</span><div class="body"><div><h3>お手本を聞いて声に出す</h3><p>音とリズムをまねして、録音して聞き比べ。</p><span class="tool">モデリング</span></div><div class="thumb"><img src="img/mock-record-big.webp" width="780" height="1040" alt="モデリングの画面（イメージ）" loading="lazy"></div></div></li>
-          <li class="out"><span class="n">4</span><div class="body"><div><h3>自分の経験に置きかえる</h3><p>昨日の自分のことを英語で書く。AIがすぐ直す。</p><span class="en"><s>I go</s> → <ins>I went</ins></span><span class="tool">英語日記・AI添削</span></div><div class="thumb"><video src="img/journal-top.mp4" poster="img/journal-still-top.webp" width="780" height="716" muted loop playsinline autoplay preload="none" aria-label="英語日記をAIが添削する動画（見本）"></video></div></div></li>
-          <li><span class="n">5</span><div class="body"><div><h3>使って、また復習する</h3><p>LIVEで話してみる。言えなかった表現は、復習でもう一度。</p><span class="tool">LIVE授業・自動の復習</span></div><div class="thumb"><img src="img/mock-zoom.webp" width="780" height="1216" alt="LIVE授業のイメージ画面" loading="lazy"></div></div></li>
+          <li><span class="n">1</span><div class="body"><div><h3>文法を講義動画で理解する</h3><p>過去のことは過去形。go の過去形は went。</p><span class="tool">講義動画</span></div><div class="thumb wide"><img src="img/lecture-sample.webp" width="1100" height="605" alt="講義動画の1場面" loading="lazy"></div></div></li>
+          <li class="out"><span class="n">2</span><div class="body"><div><h3><span class="ib">自分で英文を作る</span><span class="ib">トレーニング</span></h3><p>日本語を見て、パッと英語に。<b>瞬発力</b>を鍛える。</p><span class="en">I went to a cafe with my friend.</span><span class="tool">瞬間英作文</span></div><div class="thumb"><img src="img/mock-instant-top.webp" width="720" height="662" alt="瞬間英作文の画面（イメージ）" loading="lazy"></div></div></li>
+          <li class="out"><span class="n">3</span><div class="body"><div><h3>日記で、さらにアウトプット</h3><p>昨日の自分のことを英語で。<b>自分ごと</b>にすると、もっと定着する。</p><span class="en"><s>I go</s> → <ins>I went</ins></span><span class="tool">英語日記・AI添削</span></div><div class="thumb"><video src="img/journal-top.mp4" poster="img/journal-still-top.webp" width="780" height="716" muted loop playsinline autoplay preload="none" aria-label="英語日記をAIが添削する動画（見本）"></video></div></div></li>
+          <li class="out"><span class="n">4</span><div class="body"><div><h3>LIVEでアウトプット</h3><p>授業で、実際に声に出して話してみる。</p><span class="tool">LIVE授業</span></div><div class="thumb"><img src="img/mock-zoom.webp" width="780" height="1216" alt="LIVE授業のイメージ画面" loading="lazy"></div></div></li>
+          <li><span class="n">5</span><div class="body"><div><h3><span class="ib">苦手なところは、</span><span class="ib">とことん復習</span></h3><p>くり返すことで、<b>本当に身につく</b>。</p><span class="tool">自動の復習</span></div><div class="thumb"><img src="img/mock-menu-top.webp" width="780" height="1054" alt="復習が出ている学習メニューの画面（イメージ）" loading="lazy"></div></div></li>
         </ol>
-        <p class="aha"><span class="ib">文法を教わって終わりじゃない。</span><br><span class="ib"><b>作る・声に出す・使う</b>まで、</span><span class="ib">毎回練習します。</span></p>
+        <p class="aha"><span class="ib">文法を教わって終わりじゃない。</span><br><span class="ib"><b>作る・書く・話す・復習</b>まで、</span><span class="ib">毎回練習します。</span></p>
         <p class="fine center" style="margin-top:6px">※画面は見本・イメージです。</p>
       </div>
     </div>
@@ -644,7 +650,7 @@
         <details><summary>スマホやアプリの操作が苦手でも大丈夫ですか？</summary><p>スマホのブラウザで開いて使います（インストール不要）。開くと、その日やることが表示されます。始め方は、申し込み後にメールか公式LINEでご案内します。</p></details>
         <details><summary>仕事が忙しくても続けられますか？</summary><p>忙しい日は30分、しっかり学ぶ日は60分が学習の例です。LIVE授業に出られない日は、録画であとから見られます。</p></details>
         <details><summary>3ヶ月でどれくらい話せるようになりますか？</summary><p>今の英語力や学習時間によって個人差があります。短い英文を作る、自分のことを話す、日常的な質問に答えて聞き返す、を目標に練習します。</p></details>
-        <details><summary>以前コーチングを受けても話せませんでした。何が違いますか？</summary><p>ʻOhanaは個別管理の手厚さではなく、「知る → 作る → 声に出す → 使う → 振り返る」を毎週くり返す学習設計が特徴です。1対1の個別指導はなく、わからないことは月1回の質問会で聞けます。</p></details>
+        <details><summary>以前コーチングを受けても話せませんでした。何が違いますか？</summary><p>ʻOhanaは個別管理の手厚さではなく、「学ぶ → 作る → 声に出す → アウトプット → 復習」を毎週くり返す学習設計が特徴です。1対1の個別指導はなく、わからないことは月1回の質問会で聞けます。</p></details>
         <details><summary>支払い方法は？</summary><p>クレジットカード（一括、またはカード会社の分割。日本のカードのみ、アメックスは分割できません）と銀行振込です。銀行振込は<a href="https://line.me/R/oaMessage/@039impnx/?%E9%8A%80%E8%A1%8C%E6%8C%AF%E8%BE%BC">公式LINEに「銀行振込」と送ってください</a>。</p></details>
         <details><summary>途中で解約できますか？</summary><p>できます。書面を受け取った日を含めて8日以内は、クーリング・オフ（特定商取引法に基づく制度）ができます。11/15までの解約は解約手数料0円で返金します。11/16以降は、対価（110,000円×経過日数÷92日）と通常損害（最大5,000円）を差し引いて返金します。くわしくは<a href="https://my.ohana-english.app/?view=gaiyou">概要書面</a>をご覧ください。</p></details>
       </div>
