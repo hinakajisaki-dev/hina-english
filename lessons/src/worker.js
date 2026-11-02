@@ -11,7 +11,7 @@ import {
 import { findLesson, lessonExampleSentences, plain, questionCount } from "../public/grammar/lessons.js";
 import { findMistakes, normalizeWords } from "../public/mistakes.js";
 import {
-  bookSentences, bookWord, isPaceWeek, isToeicWeek, itemWord, setKey, speakable, vocabBooks, weekWords, wordSets,
+  bookSentences, bookWord, isPaceWeek, isToeicWeek, itemWord, listenSetKey, setKey, speakable, vocabBooks, weekWords, wordSets,
 } from "../public/vocab/words.js";
 import { findPhrase, pronMonths } from "../public/pron/phrases.js";
 import { phraseBooks, phraseByKey, phraseSentences, phraseSetKey, phraseSets, testSize } from "../public/phrases/book.js";
@@ -657,7 +657,9 @@ async function saveVocabTest(request, env, student, weekParam, number) {
   const set = wordSets(weekWords(week, items, books, pace), week, pace).find((s) => s.number === number);
   if (!set) throw new HttpError(404, "見つかりません。");
   const total = set.words.length;
-  const { score } = await readJson(request);
+  // listen: TOEIC単語's 音だけ聞いてえらぶ, kept apart from the set's test.
+  const { score, listen } = await readJson(request);
+  if (listen && !isToeicWeek(week)) throw new HttpError(404, "見つかりません。");
   const clean = Math.max(0, Math.min(total, Math.round(Number(score)) || 0));
   await run(
     env.DB,
@@ -665,7 +667,7 @@ async function saveVocabTest(request, env, student, weekParam, number) {
      VALUES (?1, ?2, ?3, ?3, ?4, 1, ?5)
      ON CONFLICT (student_id, set_key) DO UPDATE SET
        best_score = MAX(best_score, ?3), last_score = ?3, total = ?4, times = times + 1, updated_at = ?5`,
-    student.id, setKey(week, number, books, pace), clean, total, now(),
+    student.id, listen ? listenSetKey(week, number) : setKey(week, number, books, pace), clean, total, now(),
   );
   return json({ ok: true });
 }

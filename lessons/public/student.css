@@ -539,3 +539,12 @@ body.quiz-open .wrap { padding-bottom: 62vh; }
 .toeic-part.done { background: var(--good-soft); border-color: transparent; }
 .toeic-part.empty-part { background: transparent; box-shadow: none; border-style: dashed; }
 .toeic-part.empty-part b { color: var(--muted); }
+.toeic-section { gap: 10px; }
+/* 音だけ聞いてえらぶ: a big 🔊 in place of the word. */
+.listen-play-row { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 6px 0; }
+.listen-play {
+  width: 88px; height: 88px; border-radius: 50%; border: none; cursor: pointer;
+  background: var(--accent); color: #fff; display: grid; place-items: center; box-shadow: var(--shadow);
+}
+.listen-play svg { width: 40px; height: 40px; }
+.listen-play.loading { opacity: .6; }

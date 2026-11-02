@@ -4,7 +4,8 @@
 import { ApiError, api, diffHtml, esc, formatDateTime, icons, startOfJapanDay, toast, watchErrors } from "./common.js";
 import { UNITS } from "./grammar/lessons.js";
 import {
-  TOEIC_PARTS, bookWeeks, isToeicWeek, itemWeek, paceWeeks, setKey, toeicPart, toeicWeek, vocabBooks, weekBook, weekWords, wordSets,
+  TOEIC_PARTS, bookWeeks, isToeicWeek, itemWeek, listenSetKey, paceWeeks, setKey, toeicPart, toeicWeek, vocabBooks, weekBook, weekWords,
+  wordSets,
 } from "./vocab/words.js";
 import { USUAL_MONTHS, currentMonth, monthLabel, monthPhrases, pronMonths, studentMonths } from "./pron/phrases.js";
 import { CURRENT_WEEK, NOTES_FOR_STUDENTS } from "./course.js";
@@ -844,14 +845,18 @@ function vocabBooksForm() {
 
 // Every set this student has (sets of ten, or days; their 単語帳 and own words), with its key.
 // With a pace of their own (vocab_pace), the weeks after its week are its pace weeks.
+// TOEIC単語's sets come twice: their test, then 音だけ聞いてえらぶ.
 function vocabSetList(data) {
   const books = data.vocabBooks;
   const pace = data.vocabPace;
   let weeks = [...new Set([...bookWeeks(books), ...data.items.filter((i) => i.kind === "vocab").map(itemWeek)])];
   if (pace) weeks = [...weeks.filter((w) => typeof w !== "number" || w <= pace.week), ...paceWeeks(data.items, books, pace).map((p) => p.week)];
-  return weeks.flatMap((week) =>
-    wordSets(weekWords(week, data.items, books, pace), week, pace).map((set) => ({ week, ...set, key: setKey(week, set.number, books, pace) })),
-  );
+  return weeks.flatMap((week) => {
+    const sets = wordSets(weekWords(week, data.items, books, pace), week, pace);
+    const list = sets.map((set) => ({ week, ...set, key: setKey(week, set.number, books, pace) }));
+    if (isToeicWeek(week)) list.push(...sets.map((set) => ({ week, ...set, label: `${set.label}（聞いてえらぶ）`, key: listenSetKey(week, set.number) })));
+    return list;
+  });
 }
 
 // "Week 2", "そのほか", "生徒が追加した単語", or a pace week's "Week 3 ①".

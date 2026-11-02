@@ -79,6 +79,8 @@ export const TOEIC_PARTS = [
 export const toeicWeek = (part) => `toeic${part}`;
 export const isToeicWeek = (week) => /^toeic[1-3]$/.test(String(week));
 export const toeicPart = (week) => TOEIC_PARTS.find((p) => toeicWeek(p.part) === String(week)) || null;
+// 音だけ聞いてえらぶ (TOEIC単語): a set's listening test is kept apart from its test ("toeic1/l2").
+export const listenSetKey = (week, number) => `${week}/l${number}`;
 
 // A word added for one student, by the teacher or by the student (mine, with its
 // id so the student can change it): one example at most (with its Japanese, example_ja).

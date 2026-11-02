@@ -6,7 +6,7 @@ import {
 } from "./common.js";
 import { UNITS, findLesson, plain, questionCount } from "./grammar/lessons.js";
 import {
-  TOEIC_PARTS, bookWeeks, isPaceWeek, isToeicWeek, itemWeek, paceWeeks, setKey, speakable, splitOnForm, toeicPart, toeicWeek,
+  TOEIC_PARTS, bookWeeks, isPaceWeek, isToeicWeek, itemWeek, listenSetKey, paceWeeks, setKey, speakable, splitOnForm, toeicPart, toeicWeek,
   weekWords, wordSets,
 } from "./vocab/words.js";
 import { MONTHS, currentMonth, monthLabel, monthPhrases, studentMonths } from "./pron/phrases.js";
@@ -810,6 +810,8 @@ const setName = (week, set) => (week === "mine" ? set.label
 // and its sets remember つづきから apart from 単語カード.
 const weekHref = (week) => (isToeicWeek(week) ? `#/toeic/${toeicPart(week).part}` : `#/vocab/${week}`);
 const resumeKind = (week) => (isToeicWeek(week) ? "toeic" : "vocab");
+// TOEIC単語's 音だけ聞いてえらぶ: #/toeic/listen/1 is Part 1's sets, #/toeic/listen/1/2 its second set.
+const listenHref = (week) => `#/toeic/listen/${toeicPart(week).part}`;
 const studentWeekWords = (week) => weekWords(week, state.me.items, state.me.vocabBooks, myPace());
 const studentSets = (week) => wordSets(studentWeekWords(week), week, myPace());
 const studentSetKey = (week, number) => setKey(week, number, state.me.vocabBooks, myPace());
@@ -1165,29 +1167,67 @@ function toeicTile() {
 }
 
 function renderToeic(part, ...rest) {
+  if (part === "listen") {
+    const [p, number] = rest;
+    if (!toeicPart(toeicWeek(p))) return renderToeic();
+    return number ? renderVocabTest(toeicWeek(p), Number(number), { listen: true }) : renderListenPart(toeicWeek(p));
+  }
   if (part && toeicPart(toeicWeek(part))) return renderVocab(toeicWeek(part), ...rest);
   state.vocabTest = null;
   const last = lastResume("toeic");
   const lastSet = last && studentSetKey(last.week, last.number) === last.key && findSet(last.week, last.number);
+  // One card a Part: words and tests (単語を覚える), or sets heard (聞いてえらぶ).
+  const partCard = (p, listen) => {
+    const week = toeicWeek(p.part);
+    const words = studentWeekWords(week);
+    const sets = studentSets(week);
+    const done = sets.filter((s) => (listen ? state.me.vocabTests[listenSetKey(week, s.number)] : testResult(week, s.number))).length;
+    const title = `<b>Part ${p.part} <small>リスニング</small></b>`;
+    if (!words.length) {
+      return `<div class="lesson-card toeic-part empty-part"><div>${title}<span class="muted small">${esc(p.sub)} ・ 準備中</span></div></div>`;
+    }
+    return `<a class="lesson-card toeic-part ${done === sets.length ? "done" : ""}" href="${listen ? listenHref(week) : weekHref(week)}">
+      <div>${title}<span class="muted small">${esc(p.sub)} ・ ${listen ? `${sets.length} セット ・ できた ${done} / ${sets.length}` : `${words.length} 語 ・ テスト ${done} / ${sets.length}`}</span>
+        <div class="bar"><i style="width:${Math.round((done / sets.length) * 100)}%"></i></div></div>
+      <span class="chev" aria-hidden="true">›</span>
+    </a>`;
+  };
   app.innerHTML = `${topbar("TOEIC単語")}
     <main class="wrap stack">
       ${lastSet ? resumeCard(`${weekHref(last.week)}/${last.number}/card/${last.index + 1}`, esc(setName(last.week, lastSet)), last.of) : ""}
-      ${TOEIC_PARTS.map((p) => {
-        const week = toeicWeek(p.part);
-        const words = studentWeekWords(week);
-        const sets = studentSets(week);
-        const tested = sets.filter((s) => testResult(week, s.number)).length;
-        const title = `<b>Part ${p.part} <small>リスニング</small></b>`;
-        if (!words.length) {
-          return `<div class="lesson-card toeic-part empty-part"><div>${title}<span class="muted small">${esc(p.sub)} ・ 準備中</span></div></div>`;
-        }
-        return `<a class="lesson-card toeic-part ${tested === sets.length ? "done" : ""}" href="${weekHref(week)}">
-          <div>${title}<span class="muted small">${esc(p.sub)} ・ ${words.length} 語 ・ テスト ${tested} / ${sets.length}</span>
-            <div class="bar"><i style="width:${Math.round((tested / sets.length) * 100)}%"></i></div></div>
-          <span class="chev" aria-hidden="true">›</span>
+      <section class="stack toeic-section">
+        <p class="label">📖 単語を覚える</p>
+        ${TOEIC_PARTS.map((p) => partCard(p, false)).join("")}
+      </section>
+      <section class="stack toeic-section">
+        <p class="label">🎧 音だけ聞いてえらぶ</p>
+        ${TOEIC_PARTS.map((p) => partCard(p, true)).join("")}
+      </section>
+    </main>`;
+}
+
+// 音だけ聞いてえらぶ of one Part: its sets (the same ten words as 単語を覚える).
+function renderListenPart(week) {
+  state.vocabTest = null;
+  const p = toeicPart(week);
+  const sets = studentSets(week);
+  app.innerHTML = `${topbar(`聞いてえらぶ ・ Part ${p.part}`, "#/toeic")}
+    <main class="wrap stack">
+      ${sets.length ? `<p class="muted">英語は出ません。<b>音だけ</b>を聞いて、意味を4つからえらぼう。</p>` : emptyState("この Part の単語は、先生が用意します。")}
+      ${sets.map((set) => {
+        const result = state.me.vocabTests[listenSetKey(week, set.number)];
+        return `<a class="lesson-card" href="${listenHref(week)}/${set.number}" data-listen="${set.number}">
+          <div><b>${esc(set.label)}</b><span class="muted small">${set.words.length} 語</span></div>
+          ${result ? `<span class="badge">✓ ${result.best} / ${result.total}</span>` : `<span class="badge start">はじめる</span>`}
         </a>`;
       }).join("")}
     </main>`;
+  app.querySelectorAll("[data-listen]").forEach((link) =>
+    link.addEventListener("click", (event) => {
+      event.preventDefault();
+      startListen(week, Number(link.dataset.listen));
+    }),
+  );
 }
 
 // ---------- set test ----------
@@ -1204,45 +1244,75 @@ function meaningChoices(word, pool) {
   return shuffle([word.meaning, ...picked]);
 }
 
-function renderVocabTest(week, number) {
+// A set's test: one question a word, its meaning from four. With listen (TOEIC単語's
+// 音だけ聞いてえらぶ), the word isn't shown: the student hears it, and sees it after answering.
+const testId = (week, number, listen) => `${studentSetKey(week, number)}${listen ? ":listen" : ""}`;
+
+function newVocabTest(week, number, listen = false) {
   const set = findSet(week, number);
-  if (!set) return renderWeek(week);
-  const id = studentSetKey(week, number);
-  if (state.vocabTest?.id !== id) {
-    // A short list (自分の単語 with a few words) borrows wrong choices from the first 単語帳.
-    const pool = studentWeekWords(week);
-    if (pool.length < 4) pool.push(...studentWeekWords(bookWeeks(state.me.vocabBooks)[0] ?? 1));
-    state.vocabTest = {
-      id,
-      questions: shuffle(set.words).map((word) => ({ word, choices: meaningChoices(word, pool) })),
-      index: 0,
-      answers: [],
-      saved: false,
-    };
-  }
+  // A short list (自分の単語 with a few words) borrows wrong choices from the first 単語帳.
+  const pool = studentWeekWords(week);
+  if (pool.length < 4) pool.push(...studentWeekWords(bookWeeks(state.me.vocabBooks)[0] ?? 1));
+  state.vocabTest = {
+    id: testId(week, number, listen),
+    listen,
+    questions: shuffle(set.words).map((word) => ({ word, choices: meaningChoices(word, pool) })),
+    index: 0,
+    answers: [],
+    saved: false,
+  };
+  return state.vocabTest;
+}
+
+// Plays the word of the question the test is on (called from a tap, so the sound may play).
+function playQuestion() {
+  const T = state.vocabTest;
+  const q = T?.listen && T.questions[T.index];
+  if (q && !T.answers[T.index]) speak(speakable(q.word.word));
+}
+
+// Starts 音だけ聞いてえらぶ for a set from a tap, with the first word playing.
+function startListen(week, number) {
+  newVocabTest(week, number, true);
+  playQuestion();
+  location.hash = `${listenHref(week)}/${number}`;
+}
+
+function renderVocabTest(week, number, { listen = false } = {}) {
+  const set = findSet(week, number);
+  if (!set) return listen ? renderListenPart(week) : renderWeek(week);
+  if (state.vocabTest?.id !== testId(week, number, listen)) newVocabTest(week, number, listen);
   const T = state.vocabTest;
   const rerender = () => {
-    renderVocabTest(week, number);
+    renderVocabTest(week, number, { listen });
     window.scrollTo(0, 0);
   };
-  const back = `${weekHref(week)}/${number}/test`;
+  const back = listen ? listenHref(week) : `${weekHref(week)}/${number}/test`;
+  const title = `${listen ? "聞いてえらぶ" : "テスト"} ・ ${set.label}`;
 
   if (T.index >= T.questions.length) return renderVocabTestResult(week, set, rerender);
 
   const { word, choices } = T.questions[T.index];
   const answer = T.answers[T.index];
-  app.innerHTML = `${topbar(`テスト ・ ${set.label}`, back)}
+  const wordRow = `<div class="word-row">
+          <p class="word" lang="en">${esc(word.word)}</p>
+          ${sayIcon(speakable(word.word))}
+        </div>`;
+  app.innerHTML = `${topbar(title, back)}
     <main class="wrap stack">
       <div class="lesson-progress" role="progressbar" aria-valuemin="1" aria-valuemax="${T.questions.length}" aria-valuenow="${T.index + 1}">
         <div class="bar"><i style="width:${Math.round((T.index / T.questions.length) * 100)}%"></i></div>
         <span class="counter">${T.index + 1} / ${T.questions.length}</span>
       </div>
       <section class="card stack">
-        <p class="muted">この単語の意味は？</p>
-        <div class="word-row">
-          <p class="word" lang="en">${esc(word.word)}</p>
-          ${sayIcon(speakable(word.word))}
-        </div>
+        ${listen ? `<p class="muted">音を聞いて、意味をえらぼう</p>
+        ${answer ? wordRow : `<div class="listen-play-row">
+          <button type="button" class="listen-play" data-say="${esc(speakable(word.word))}" aria-label="もう一度聞く">${icons.speaker}</button>
+          <span class="muted small">タップで、もう一度</span>
+        </div>`}
+        <div>${speedControl()}</div>`
+        : `<p class="muted">この単語の意味は？</p>
+        ${wordRow}`}
         <div class="choices">${choices.map((c, i) => {
           let cls = "";
           if (answer && c === word.meaning) cls = "right";
@@ -1261,6 +1331,7 @@ function renderVocabTest(week, number) {
     document.getElementById("next").addEventListener("click", () => {
       T.index += 1;
       rerender();
+      playQuestion();
     });
     document.getElementById("next").focus();
     return;
@@ -1278,21 +1349,23 @@ function renderVocabTest(week, number) {
 
 function renderVocabTestResult(week, set, rerender) {
   const T = state.vocabTest;
+  const listen = !!T.listen;
   const score = T.answers.filter((a) => a.right).length;
   const missed = T.questions.filter((_, i) => !T.answers[i].right).map((q) => q.word);
   if (!T.saved) {
     T.saved = true;
-    const key = studentSetKey(week, set.number);
+    const key = listen ? listenSetKey(week, set.number) : studentSetKey(week, set.number);
     const old = state.me.vocabTests[key];
     state.me.vocabTests[key] = {
       best: Math.max(old?.best ?? 0, score), last: score, total: T.questions.length, times: (old?.times ?? 0) + 1,
     };
-    api(`/api/vocab/tests/${week}/${set.number}`, { method: "POST", body: { score } }).catch((error) => toast(error.message));
+    api(`/api/vocab/tests/${week}/${set.number}`, { method: "POST", body: { score, ...(listen ? { listen } : {}) } }).catch((error) => toast(error.message));
   }
   const next = findSet(week, set.number + 1);
   const perfect = score === T.questions.length;
+  const nextLabel = `${next?.day ? "次の日へ" : "次の10語へ"}（${esc(next?.label || "")}）`;
 
-  app.innerHTML = `${topbar(`テスト ・ ${set.label}`, `${weekHref(week)}/${set.number}/test`)}
+  app.innerHTML = `${topbar(`${listen ? "聞いてえらぶ" : "テスト"} ・ ${set.label}`, listen ? listenHref(week) : `${weekHref(week)}/${set.number}/test`)}
     <main class="wrap stack">
       <section class="card stack" style="text-align:center">
         <p style="font-size:40px">${perfect ? "🎉" : "👏"}</p>
@@ -1303,14 +1376,17 @@ function renderVocabTestResult(week, set, rerender) {
         <h3>復習カードに入れた単語</h3>
         <ul class="plain-list">${missed.map((w) => `<li><b lang="en">${esc(w.word)}</b>　${esc(w.meaning)}</li>`).join("")}</ul>
       </section>` : ""}
-      ${next ? `<a class="btn block" href="${weekHref(week)}/${next.number}">${next.day ? "次の日へ" : "次の10語へ"}（${esc(next.label)}）</a>` : ""}
-      <button type="button" class="btn secondary block" id="again">もう一度テスト</button>
-      <a class="btn ghost block" href="${weekHref(week)}">${weekLabel(week)} にもどる</a>
+      ${next ? listen ? `<button type="button" class="btn block" id="next-set">${nextLabel}</button>`
+        : `<a class="btn block" href="${weekHref(week)}/${next.number}">${nextLabel}</a>` : ""}
+      <button type="button" class="btn secondary block" id="again">${listen ? "もう一度" : "もう一度テスト"}</button>
+      <a class="btn ghost block" href="${listen ? listenHref(week) : weekHref(week)}">${listen ? `聞いてえらぶ ・ Part ${toeicPart(week).part}` : weekLabel(week)} にもどる</a>
     </main>`;
   document.getElementById("again").addEventListener("click", () => {
+    if (listen) return startListen(week, set.number) || rerender();
     state.vocabTest = null;
     rerender();
   });
+  document.getElementById("next-set")?.addEventListener("click", () => startListen(week, next.number));
 }
 
 // ---------- review ----------
