@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>ʻOhana English 3ヶ月突破コース（第1期）</title>
-<meta name="description" content="「知ってる英語」を「パッと話せる英語」に変える90日間。毎日のアプリ学習と月12回以上のLIVE授業で、インプットからアウトプットまでを一つの流れで練習する初心者向けの3ヶ月コース。2026年11/16一斉スタート。">
+<meta name="description" content="「知ってる英語」を「パッと話せる英語」に変える90日間。毎日のアプリ学習と月12回のLIVE授業で、インプットからアウトプットまでを一つの流れで練習する初心者向けの3ヶ月コース。2026年11/16一斉スタート。">
 <meta property="og:type" content="website">
 <meta property="og:title" content="ʻOhana English 3ヶ月突破コース（第1期）">
 <meta property="og:description" content="「知ってる英語」を「パッと話せる英語」に変える90日間。11/16一斉スタート。">
@@ -575,6 +575,8 @@
   .shot { flex: 0 0 100%; scroll-snap-align: center; display: flex; justify-content: center; }
   .shot .phone { width: 210px; border-radius: 30px; padding: 7px; }
   .shot .phone img { border-radius: 24px; }
+  .shot .phone { aspect-ratio: 780 / 1216; overflow: hidden; }
+  .shot .phone img { height: 100%; object-fit: cover; object-position: top; }
   .ex3 { display: grid; grid-template-columns: repeat(3, 1fr); background: var(--off); border-radius: 16px; padding: 10px 4px; margin-top: 6px; }
   .ex3 li { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 2px; padding: 0 4px; }
   .ex3 li + li { border-left: 1px solid var(--line); }
@@ -791,7 +793,7 @@
           <li><span class="n">1</span><div class="body"><div><h3>文法を理解する</h3><p>動画で、動詞の形の基本ルールを学ぶ。</p><span class="tool">講義動画</span></div><div class="thumb wide"><img src="img/lecture-sample.webp" width="1100" height="605" alt="講義動画の1場面" loading="lazy"></div></div></li>
           <li class="out"><span class="n">2</span><div class="body"><div><h3>英文を作ってみる</h3><p>日本語を見て、<br>自分で英語にする。<br>瞬発力を鍛えます。</p><span class="en">I went to a cafe with my friend.</span><span class="tool">瞬間英作文</span></div><div class="thumb"><img src="img/mock-instant-top.webp" width="720" height="662" alt="瞬間英作文の画面（イメージ）" loading="lazy"></div></div></li>
           <li class="out"><span class="n">3</span><div class="body"><div><h3>日記で使ってみる</h3><p>書いた英語を添削してもらう。</p><span class="en"><s>I go</s> → <ins>I went</ins></span><span class="tool">英語日記</span></div><div class="thumb"><video src="img/journal-top.mp4" poster="img/journal-still-top.webp" width="780" height="716" muted loop playsinline autoplay preload="none" aria-label="英語日記をAIが添削する動画（見本）"></video></div></div></li>
-          <li class="out"><span class="n">4</span><div class="body"><div><h3>LIVEで話してみる</h3><p>学んだ表現を、<br>実際に声に出す。</p><span class="tool">LIVE授業 月12回以上</span></div><div class="thumb"><img src="img/hina-live.webp" width="510" height="490" alt="LIVE授業のHina" loading="lazy"></div></div></li>
+          <li class="out"><span class="n">4</span><div class="body"><div><h3>LIVEで話してみる</h3><p>学んだ表現を、<br>実際に声に出す。</p><span class="tool">LIVE授業 月12回</span></div><div class="thumb"><img src="img/hina-live.webp" width="510" height="490" alt="LIVE授業のHina" loading="lazy"></div></div></li>
           <li><span class="n">5</span><div class="body"><div><h3>復習して身につける</h3><p>苦手な表現を繰り返し練習する。</p><span class="tool">自動の復習</span></div><div class="thumb"><img src="img/mock-menu-top.webp" width="780" height="1054" alt="復習が出ている学習メニューの画面（イメージ）" loading="lazy"></div></div></li>
         </ol>
         <p class="aha"><span class="ib">あなたに必要な文法を、</span><span class="ib"><b>学んで、作って、使って、復習する</b>。</span><br><span class="ib">決して、知識だけで終わらせない。</span></p>
@@ -819,9 +821,9 @@
             <button type="button" role="tab" aria-selected="false" data-to="2">成長記録</button>
           </div>
           <div class="shots" tabindex="0" aria-label="アプリの画面（横にスワイプできます）">
-            <div class="shot"><p class="shot-cap">毎日迷わず、<b>やることがすでに決まっている</b></p><div class="phone"><img src="img/home-crop.webp" width="780" height="1216" alt="今日の学習の画面（見本）" loading="lazy"></div></div>
-            <div class="shot"><p class="shot-cap"><b>苦手なところを、徹底的に</b>くり返す</p><div class="phone"><img src="img/mock-menu-top.webp" width="780" height="1054" alt="きのうの単語の復習が出ている画面（見本）" loading="lazy"></div></div>
-            <div class="shot"><p class="shot-cap">毎日の<b>頑張りや成長を見える化</b></p><div class="phone"><img src="img/progress-crop.webp" width="720" height="1122" alt="成長記録の画面（見本）" loading="lazy"></div></div>
+            <div class="shot"><p class="shot-cap">毎日迷わず、<br><b>やることがすでに決まっている</b></p><div class="phone"><img src="img/home-crop.webp" width="780" height="1216" alt="今日の学習の画面（見本）" loading="lazy"></div></div>
+            <div class="shot"><p class="shot-cap"><b>苦手なところを分析して</b><br>徹底的にやる</p><div class="phone"><img src="img/mock-ai.webp" width="780" height="1350" alt="苦手分析の画面（見本）" loading="lazy"></div></div>
+            <div class="shot"><p class="shot-cap">毎日の<br><b>頑張りや成長を見える化</b></p><div class="phone"><img src="img/progress-crop.webp" width="720" height="1122" alt="成長記録の画面（見本）" loading="lazy"></div></div>
           </div>
           <ul class="ex3">
             <li><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M4 7c4-2 8-2 12 1v18c-4-3-8-3-12-1zM28 7c-4-2-8-2-12 1v18c4-3 8-3 12-1z" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round"/></svg><b>今日の学習</b><span>毎日やることが決まっている</span></li>
@@ -961,7 +963,7 @@
   <section class="s-blue" id="hina">
     <div class="wrap">
       <div class="card hina2">
-        <img src="img/hina-photo.webp" width="400" height="400" alt="Hinaの写真" loading="lazy">
+        <img src="img/hina-photo.webp" width="480" height="480" alt="Hinaの写真" loading="lazy">
         <div>
           <span class="part" style="text-align:left">MESSAGE FROM HINA</span>
           <h2>「知ってる」を「話せる」に<span class="ib">変える場所を作りたかった。</span></h2>
@@ -992,7 +994,7 @@
           <div class="inc3">
             <div><h3><i>1</i>毎日の学習</h3><ul><li>個別のカリキュラム</li><li>単語学習</li><li>フレーズ学習</li><li>文法講座</li><li>毎日の勉強メニュー</li></ul></div>
             <div><h3><i>2</i>使える英語にする練習</h3><ul><li>瞬間英作文</li><li>モデリング</li><li>毎日の英語日記課題</li></ul></div>
-            <div><h3><i>3</i>実践と振り返り</h3><ul><li>月12回以上のLIVE授業</li><li>月1回の定期テスト</li><li>自動復習</li><li>仲間との学習環境</li></ul></div>
+            <div><h3><i>3</i>実践と振り返り</h3><ul><li>月12回のLIVE授業</li><li>月1回の定期テスト</li><li>自動復習</li><li>仲間との学習環境</li></ul></div>
           </div>
           <ul class="notes"><li>文法18単元・講義動画53本</li><li>定期テストは合計3回</li><li>仲間との学習環境：朝活・Study Session・会員の掲示板など</li></ul>
           <ul class="sched"><li><span>11月15日（日）19:00〜</span>キックオフ会</li><li class="key"><span>11月16日（月）</span>第1期生 一斉スタート</li><li><span>3ヶ月後</span>卒業イベントも開催します</li></ul>
