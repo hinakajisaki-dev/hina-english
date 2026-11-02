@@ -97,182 +97,167 @@
   .sec-head .lead { margin-top: 8px; font-size: 15px; font-weight: 700; color: var(--ink-2); line-height: 1.7; }
   .s-navy .sec-head .lead { color: #C9D1E0; }
 
-  /* 1. ファーストビュー */
-  .hero { padding: 24px 0 36px; background: var(--bg); overflow: hidden; }
-  .hero .wrap { display: grid; gap: 20px; }
-  .hero .to { display: inline-block; font-size: 13px; font-weight: 800; color: var(--ink); background: #FFF; border-radius: 999px; padding: 3px 14px; }
-  .hero h1 { font-size: 27px; font-weight: 900; line-height: 1.45; margin: 12px 0 6px; letter-spacing: -0.02em; }
+  /* 01 ファーストビュー */
+  .hero { padding: 28px 0 36px; background: var(--bg); overflow: hidden; }
+  .hero .wrap { display: grid; gap: 22px; }
+  .hero .to { display: inline-block; font-size: 13px; font-weight: 800; background: #FFF; border-radius: 999px; padding: 3px 14px; }
+  .hero h1 { font-size: 26px; font-weight: 900; line-height: 1.5; margin: 14px 0 10px; letter-spacing: -0.01em; }
   .hero h1 .hl { color: var(--accent-text); }
-  .hero h1 small { display: block; font-size: 22px; font-weight: 900; margin-top: 2px; }
-  .hero .sub { font-size: 15px; font-weight: 700; color: var(--ink-2); line-height: 1.7; }
-  .hero .facts { display: flex; flex-wrap: wrap; gap: 6px; margin: 14px 0; }
-  .hero .facts li { background: #FFF; border-radius: 999px; padding: 3px 12px; font-weight: 800; font-size: 13px; }
-  .hero .facts li.hot { background: var(--accent); color: #FFF; }
-  .hero .price { display: flex; align-items: baseline; gap: 6px; margin-bottom: 12px; }
-  .hero .price span { font-size: 13px; font-weight: 800; color: var(--ink-2); }
-  .hero .price b { font-family: "DM Sans", sans-serif; font-size: 32px; font-weight: 800; line-height: 1; }
-  .hero .price small { font-size: 14px; font-weight: 800; }
-  .hero-phones { position: relative; display: flex; justify-content: center; align-items: flex-start; height: 220px; }
-  .hero-phones::before { content: ""; position: absolute; width: 210px; height: 210px; border-radius: 50%; background: #FFF; top: 10px; left: 50%; margin-left: -105px; }
+  .hero .sub { font-size: 15px; font-weight: 700; color: var(--ink-2); line-height: 1.8; }
+  .hero .course { margin-top: 14px; font-size: 14px; font-weight: 900; }
+  .hero .course span { display: inline-block; background: var(--ink); color: #FFF; border-radius: 6px; padding: 1px 8px; margin-right: 6px; font-size: 12px; }
+  .hero .go { display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 18px; background: #FFF; color: var(--ink); border: 2px solid var(--ink); border-radius: 999px; min-height: 52px; font-weight: 900; font-size: 16px; text-decoration: none; }
+  .hero .mini-cta { margin-top: 12px; text-align: center; font-size: 13px; font-weight: 700; color: var(--ink-2); line-height: 1.7; }
+  .hero .mini-cta a { color: var(--accent-text); font-weight: 900; }
+  .hero .mini-cta .deadline { display: none; }
+  .hero .mini-cta .deadline.on { display: block; }
+  .hero-pic { position: relative; display: flex; justify-content: center; }
+  .hero-pic .phone { width: 150px; transform: rotate(3deg); }
+  .hero-pic .chibi { position: absolute; left: 50%; margin-left: -150px; bottom: -6px; width: 92px; }
   .phone { position: relative; background: var(--ink); border-radius: 22px; padding: 5px; box-shadow: 0 12px 26px rgba(23,35,59,0.18); }
   .phone img { border-radius: 17px; width: 100%; }
-  .hero-phones .p2 { width: 124px; transform: translateX(-10px); }
-  .hero-phones .p1 { width: 108px; transform: rotate(-7deg) translate(22px, 22px); }
-  .hero-phones .chibi { position: absolute; right: 50%; margin-right: -150px; bottom: 0; width: 76px; }
 
-  /* 2. 勉強会のふり返り */
-  .recap { display: grid; gap: 8px; }
-  .recap li { display: grid; grid-template-columns: 52px 1fr; gap: 12px; align-items: center; background: var(--bg); border-radius: 14px; padding: 10px 14px 10px 8px; }
-  .recap img { width: 52px; height: 48px; object-fit: contain; }
-  .recap b { display: block; font-size: 16px; font-weight: 900; line-height: 1.45; }
-  .recap b .n { color: var(--accent-text); margin-right: 4px; }
-  .recap span { display: block; font-size: 13.5px; font-weight: 700; color: var(--ink-2); line-height: 1.6; }
-  .to-next { margin-top: 20px; text-align: center; }
-  .to-next p { font-size: 16px; font-weight: 900; line-height: 1.6; }
-  .to-next p + p { margin-top: 4px; font-size: 14.5px; font-weight: 700; color: var(--ink-2); }
-  .to-next .arrow { display: block; width: 2px; height: 28px; background: var(--accent); margin: 14px auto 0; position: relative; }
-  .to-next .arrow::after { content: ""; position: absolute; left: -5px; bottom: -2px; border: 6px solid transparent; border-top: 8px solid var(--accent); }
+  /* 02 原因 */
+  .vs { display: grid; grid-template-columns: 1fr auto 1fr; gap: 8px; align-items: stretch; }
+  .vs .box { border-radius: 16px; padding: 14px 12px; text-align: center; }
+  .vs .know { background: var(--bg); }
+  .vs .use { background: var(--accent-soft); }
+  .vs b { display: block; font-size: 19px; font-weight: 900; }
+  .vs .use b { color: var(--accent-text); }
+  .vs p { font-size: 13px; font-weight: 700; color: var(--ink-2); line-height: 1.6; margin-top: 4px; }
+  .vs .ne { align-self: center; font-weight: 900; font-size: 20px; color: var(--ink-3); }
+  .diff { margin-top: 18px; text-align: center; font-size: 20px; font-weight: 900; line-height: 1.5; }
+  .types { display: grid; gap: 8px; margin-top: 16px; }
+  .types li { display: grid; grid-template-columns: 34px 1fr; gap: 10px; align-items: center; border: 1.5px solid var(--line); border-radius: 14px; padding: 10px 14px; font-size: 14px; font-weight: 800; line-height: 1.55; }
+  .types li i { font-style: normal; width: 34px; height: 34px; border-radius: 50%; background: var(--ink); color: #FFF; display: grid; place-items: center; font-family: "DM Sans", sans-serif; font-weight: 800; }
+  .types li small { display: block; font-size: 12.5px; color: var(--ink-3); font-weight: 700; }
+  .not-waste { margin-top: 16px; text-align: center; font-size: 15px; font-weight: 800; line-height: 1.75; }
+  .not-waste b { color: var(--accent-text); }
 
-  /* 3. 学習設計（4ステップ） */
-  .steps { display: grid; gap: 0; position: relative; }
-  .step { position: relative; display: grid; grid-template-columns: 1fr 64px; gap: 4px 12px; align-items: center; background: #FFF; color: var(--ink); border-radius: 16px; padding: 14px 14px 14px 16px; }
-  .step + .step { margin-top: 26px; }
-  .step + .step::before { content: "↓"; position: absolute; top: -25px; left: 50%; transform: translateX(-50%); font-weight: 900; color: #FFB599; font-size: 18px; line-height: 24px; }
-  .step .no { font-family: "DM Sans", sans-serif; font-size: 12px; font-weight: 800; letter-spacing: .08em; color: var(--accent-text); }
-  .step h3 { font-size: 18px; font-weight: 900; line-height: 1.4; }
-  .step.key { box-shadow: inset 0 0 0 3px var(--accent); }
-  .step .tags { display: flex; flex-wrap: wrap; gap: 4px; margin: 6px 0 4px; }
-  .step .tags li { font-size: 12px; font-weight: 800; background: var(--bg); border-radius: 999px; padding: 1px 9px; line-height: 1.6; }
-  .step.key .tags li { background: var(--accent-soft); color: var(--accent-text); }
-  .step p { font-size: 13.5px; font-weight: 700; color: var(--ink-2); line-height: 1.6; }
-  .step .txt { grid-column: 1; }
-  .step .shot { grid-column: 2; grid-row: 1; background: var(--ink); border-radius: 10px; padding: 2px; aspect-ratio: 3/4; overflow: hidden; }
-  .step .shot img { width: 100%; height: 100%; object-fit: cover; object-position: top; border-radius: 8px; }
-  .loop { margin-top: 18px; display: flex; align-items: center; justify-content: center; gap: 10px; text-align: center; background: rgba(255,255,255,0.08); border: 1.5px dashed #FFB599; border-radius: 14px; padding: 12px 14px; }
-  .loop svg { width: 30px; height: 30px; flex-shrink: 0; }
-  .loop p { font-size: 15px; font-weight: 800; line-height: 1.55; text-align: left; }
-  .loop p b { color: #FFB599; }
+  /* 03 上達の仕組み（いちばん大事） */
+  .cycle { display: grid; gap: 0; position: relative; padding-right: 30px; }
+  .cycle::after { content: ""; position: absolute; right: 8px; top: 26px; bottom: 26px; width: 14px; border: 3px solid #FFB599; border-left: 0; border-radius: 0 14px 14px 0; }
+  .cycle .back { position: absolute; right: -2px; top: 50%; transform: translateY(-50%); writing-mode: vertical-rl; font-size: 11px; font-weight: 900; color: #FFB599; background: var(--ink); padding: 6px 0; letter-spacing: .1em; }
+  .cstep { position: relative; display: grid; grid-template-columns: 44px 1fr; gap: 12px; align-items: center; background: #FFF; color: var(--ink); border-radius: 14px; padding: 12px 14px 12px 12px; }
+  .cstep + .cstep { margin-top: 20px; }
+  .cstep + .cstep::before { content: ""; position: absolute; top: -16px; left: 32px; border: 6px solid transparent; border-top: 8px solid #FFB599; }
+  .cstep .n { width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; background: var(--bg); font-family: "DM Sans", sans-serif; font-weight: 800; font-size: 18px; color: var(--ink); }
+  .cstep.out .n { background: var(--accent); color: #FFF; }
+  .cstep h3 { font-size: 16.5px; font-weight: 900; line-height: 1.4; }
+  .cstep p { font-size: 13px; font-weight: 700; color: var(--ink-2); line-height: 1.55; }
+  .legend { display: flex; justify-content: center; gap: 14px; margin-top: 16px; font-size: 12.5px; font-weight: 800; color: #C9D1E0; }
+  .legend span::before { content: ""; display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 6px; background: #FFF; vertical-align: 0; }
+  .legend .o::before { background: var(--accent); }
+  .key-msg { margin-top: 18px; text-align: center; background: rgba(255,255,255,0.08); border-radius: 14px; padding: 14px; }
+  .key-msg p { font-size: 16px; font-weight: 900; line-height: 1.65; }
+  .key-msg p b { color: #FFB599; }
+  .key-msg small { display: block; margin-top: 4px; font-size: 13px; font-weight: 700; color: #C9D1E0; }
 
-  /* 4. ロードマップ */
-  .months { display: grid; gap: 10px; }
-  .month { display: grid; grid-template-columns: 56px 1fr; gap: 0 14px; padding: 16px; }
-  .month .m { grid-row: span 2; align-self: start; background: var(--ink); color: #FFF; border-radius: 12px; text-align: center; font-weight: 900; padding: 6px 0 8px; font-size: 11.5px; line-height: 1.2; }
-  .month .m b { display: block; font-family: "DM Sans", sans-serif; font-size: 24px; line-height: 1.1; }
-  .month.last .m { background: var(--accent); }
-  .month h3 { font-size: 17px; font-weight: 900; line-height: 1.45; }
-  .month ul { margin-top: 4px; }
-  .month li { font-size: 13.5px; font-weight: 700; color: var(--ink-2); line-height: 1.6; padding-left: 14px; position: relative; }
-  .month li::before { content: ""; position: absolute; left: 2px; top: .7em; width: 5px; height: 5px; border-radius: 50%; background: var(--accent); }
-  .month .gram { margin-top: 6px; font-size: 12px; font-weight: 800; color: var(--blue); }
-  .lvl { margin-top: 10px; background: #FFF; border-radius: 14px; box-shadow: var(--shadow); }
-  .lvl summary { cursor: pointer; list-style: none; padding: 13px 44px 13px 16px; font-weight: 800; font-size: 14.5px; position: relative; }
-  .lvl summary::-webkit-details-marker { display: none; }
-  .lvl summary::after { content: "+"; position: absolute; right: 16px; top: 8px; color: var(--accent-text); font-size: 22px; font-weight: 800; }
-  .lvl[open] summary::after { content: "−"; }
-  .lvl-grid { display: grid; gap: 10px; padding: 0 14px 14px; }
-  .lvl-grid h4 { font-size: 13px; font-weight: 900; color: #FFF; background: var(--accent); display: inline-block; border-radius: 999px; padding: 0 12px; margin-bottom: 4px; }
-  .lvl-grid .mid h4 { background: var(--blue); }
-  .lvl-grid li { font-size: 13px; font-weight: 700; line-height: 1.55; padding: 4px 0; border-top: 1px dashed var(--line); }
-  .lvl-grid li:first-child { border-top: 0; }
-  .lvl-grid li em { font-style: normal; color: var(--ink-3); font-size: 12px; margin-right: 6px; }
-  .goals-title { text-align: center; font-size: 17px; font-weight: 900; margin: 28px 0 12px; }
-  .goals { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-  .goals li { background: #FFF; border-radius: 14px; box-shadow: var(--shadow); padding: 12px; font-size: 14px; font-weight: 800; line-height: 1.5; }
-  .goals li b { display: block; font-family: "DM Sans", sans-serif; color: var(--accent-text); font-size: 12px; }
-
-  /* 5. 1日の学習 */
-  .flow { display: grid; gap: 8px; }
-  .flow li { display: grid; grid-template-columns: 60px 1fr; gap: 14px; align-items: center; background: var(--off); border-radius: 14px; padding: 10px 14px 10px 10px; }
+  /* 04 ある日のレッスン */
+  .lesson-day .goal { text-align: center; background: var(--ink); color: #FFF; border-radius: 16px; padding: 16px 14px; }
+  .lesson-day .goal small { display: block; font-size: 12px; font-weight: 800; color: #FFB599; }
+  .lesson-day .goal b { display: block; font-size: 19px; font-weight: 900; line-height: 1.5; margin-top: 2px; }
+  .lesson-day .goal em { display: block; font-style: normal; font-family: "DM Sans", sans-serif; font-size: 15px; font-weight: 800; color: #FFB599; margin-top: 4px; }
+  .ls { display: grid; gap: 0; margin-top: 18px; position: relative; }
+  .ls::before { content: ""; position: absolute; left: 17px; top: 18px; bottom: 18px; width: 2px; background: var(--line); }
+  .ls > li { position: relative; display: grid; grid-template-columns: 36px 1fr; gap: 12px; padding: 10px 0; }
+  .ls .n { position: relative; z-index: 1; width: 36px; height: 36px; border-radius: 50%; background: #FFF; border: 2px solid var(--ink); display: grid; place-items: center; font-family: "DM Sans", sans-serif; font-weight: 800; font-size: 15px; }
+  .ls li.out .n { background: var(--accent); border-color: var(--accent); color: #FFF; }
+  .ls .body { background: #FFF; border-radius: 14px; box-shadow: var(--shadow); padding: 12px 14px; display: grid; grid-template-columns: 1fr 64px; gap: 10px; align-items: center; }
+  .ls h3 { font-size: 16px; font-weight: 900; line-height: 1.4; }
+  .ls p { font-size: 13.5px; font-weight: 700; color: var(--ink-2); line-height: 1.6; margin-top: 2px; }
+  .ls .en { display: block; margin-top: 4px; font-family: "DM Sans", sans-serif; font-weight: 800; font-size: 14.5px; color: var(--ink); background: var(--bg); border-radius: 8px; padding: 2px 8px; }
+  .ls .en s { color: var(--red); }
+  .ls .en ins { text-decoration: none; color: #1B7F4B; }
+  .ls .tool { display: inline-block; margin-top: 6px; font-size: 11.5px; font-weight: 800; color: var(--accent-text); background: var(--accent-soft); border-radius: 999px; padding: 0 8px; }
   .thumb { background: var(--ink); border-radius: 10px; padding: 2px; aspect-ratio: 3 / 4; overflow: hidden; }
   .thumb img, .thumb video { width: 100%; height: 100%; object-fit: cover; object-position: top; border-radius: 8px; }
   .thumb.wide img { object-position: 90% center; }
-  .flow .t { font-size: 12px; font-weight: 800; color: var(--accent-text); font-family: "DM Sans", sans-serif; }
-  .flow h3 { font-size: 16.5px; font-weight: 900; line-height: 1.4; }
-  .flow p { font-size: 13.5px; font-weight: 700; color: var(--ink-2); line-height: 1.6; }
-  .days { display: grid; gap: 10px; margin-top: 20px; }
-  .day { padding: 14px 16px; background: var(--bg); border-radius: 16px; }
-  .day .dh { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 4px; }
-  .day .dh b { font-size: 15.5px; font-weight: 900; }
-  .day .dh span { font-family: "DM Sans", sans-serif; font-size: 28px; font-weight: 800; color: var(--accent-text); line-height: 1.1; }
-  .day .dh span small { font-family: "Noto Sans JP", sans-serif; font-size: 13px; }
-  .day li { display: grid; grid-template-columns: 84px 1fr 38px; gap: 10px; align-items: center; padding: 3px 0; font-size: 13.5px; font-weight: 800; }
-  .day li i { display: block; height: 8px; border-radius: 4px; background: #FFF; position: relative; overflow: hidden; }
-  .day li i::after { content: ""; position: absolute; inset: 0 auto 0 0; width: var(--w); background: var(--accent); border-radius: 4px; }
-  .day.busy .dh span { color: var(--blue); }
-  .day.busy li i::after { background: var(--blue); }
-  .day li em { font-style: normal; text-align: right; }
+  .aha { margin-top: 16px; text-align: center; font-size: 15.5px; font-weight: 900; line-height: 1.7; }
+  .aha b { color: var(--accent-text); }
 
-  /* 6. LIVE */
-  .live { display: grid; gap: 14px; }
-  .live-main { padding: 18px 16px; }
-  .live-main .big { display: flex; align-items: baseline; gap: 6px; }
-  .live-main .big b { font-family: "DM Sans", sans-serif; font-size: 44px; font-weight: 800; color: var(--accent-text); line-height: 1; }
-  .live-main .big span { font-size: 16px; font-weight: 900; }
-  .live-main .sub { font-size: 13px; font-weight: 700; color: var(--ink-2); margin-top: 2px; }
-  .lessons { display: grid; gap: 6px; margin-top: 14px; }
-  .lesson { display: grid; grid-template-columns: 56px 1fr; gap: 10px; align-items: center; border-radius: 12px; padding: 9px 12px; background: var(--bg); }
-  .lesson.hot { background: var(--accent-soft); }
-  .lesson .when { text-align: center; font-weight: 900; color: #FFF; background: var(--ink); border-radius: 999px; font-size: 12px; padding: 1px 0; }
-  .lesson.hot .when { background: var(--accent); }
-  .lesson b { display: block; font-size: 14.5px; line-height: 1.45; }
-  .lesson span { display: block; color: var(--ink-2); font-size: 12.5px; font-weight: 700; line-height: 1.5; }
-  .live-badges { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
-  .live-badges li { font-size: 12.5px; font-weight: 800; border: 1.5px solid var(--line); border-radius: 999px; padding: 1px 10px; }
-  .live-pic { display: grid; grid-template-columns: 112px 1fr; gap: 14px; align-items: center; }
-  .live-pic .thumb { aspect-ratio: 780 / 1216; }
-  .live-pic p { font-size: 14px; font-weight: 700; line-height: 1.7; }
-  .live-pic p b { color: var(--accent-text); }
+  /* 05 学習環境（役割で分ける） */
+  .roles { display: grid; gap: 10px; }
+  .role { display: grid; grid-template-columns: 1fr 76px; gap: 12px; align-items: center; padding: 14px 14px 14px 16px; }
+  .role .lab { font-size: 11.5px; font-weight: 900; color: var(--accent-text); }
+  .role h3 { font-size: 17px; font-weight: 900; line-height: 1.4; }
+  .role .tags { display: flex; flex-wrap: wrap; gap: 4px; margin: 6px 0 4px; }
+  .role .tags li { font-size: 12px; font-weight: 800; background: var(--bg); border-radius: 999px; padding: 0 9px; line-height: 1.7; }
+  .role p { font-size: 13px; font-weight: 700; color: var(--ink-2); line-height: 1.6; }
+  .live-line { margin-top: 12px; background: #FFF; border-radius: 14px; box-shadow: var(--shadow); padding: 14px 16px; }
+  .live-line h3 { font-size: 15px; font-weight: 900; }
+  .live-line h3 b { color: var(--accent-text); }
+  .live-line ul { display: grid; gap: 2px; margin-top: 6px; }
+  .live-line li { display: flex; justify-content: space-between; gap: 10px; font-size: 13.5px; font-weight: 700; border-top: 1px dashed var(--line); padding: 4px 0; }
+  .live-line li:first-child { border-top: 0; }
+  .live-line li span { color: var(--ink-3); white-space: nowrap; }
 
-  /* 7. 学習環境 */
-  .env { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-  .env li { background: #FFF; border-radius: 14px; padding: 12px; box-shadow: var(--shadow); }
-  .env b { display: block; font-size: 14.5px; font-weight: 900; line-height: 1.4; }
-  .env span { display: block; font-size: 12px; font-weight: 700; color: var(--ink-3); line-height: 1.5; margin-top: 2px; }
+  /* 06 未来 */
+  .ba { display: grid; gap: 8px; }
+  .ba .b { border-radius: 16px; padding: 14px 16px; background: #FFF; box-shadow: var(--shadow); }
+  .ba .b small { font-family: "DM Sans", sans-serif; font-size: 11.5px; font-weight: 800; letter-spacing: .08em; color: var(--ink-3); }
+  .ba .b h3 { font-size: 17px; font-weight: 900; line-height: 1.45; }
+  .ba .b p { font-size: 13px; font-weight: 700; color: var(--ink-2); line-height: 1.6; margin-top: 2px; }
+  .ba .after { box-shadow: 0 0 0 2.5px var(--accent), var(--shadow); }
+  .ba .after small { color: var(--accent-text); }
+  .ba .arr { text-align: center; color: var(--accent); font-weight: 900; font-size: 18px; line-height: 1; }
+  .months3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-top: 18px; }
+  .months3 li { background: var(--bg); border-radius: 12px; padding: 10px 8px; text-align: center; }
+  .months3 li:last-child { background: var(--accent-soft); }
+  .months3 em { font-style: normal; display: block; font-size: 11.5px; font-weight: 900; color: var(--ink-3); }
+  .months3 b { display: block; font-size: 14px; font-weight: 900; line-height: 1.4; }
+  .months3 span { display: block; font-size: 11.5px; font-weight: 700; color: var(--ink-2); line-height: 1.5; margin-top: 2px; }
 
-  /* 8. Hina */
-  .teacher { padding: 20px 18px; }
-  .t-top { display: grid; grid-template-columns: 96px 1fr; gap: 16px; align-items: center; }
-  .t-top img { width: 96px; height: 96px; border-radius: 50%; object-fit: cover; border: 3px solid #FFF; box-shadow: var(--shadow); }
-  .t-top b { font-family: "DM Sans", sans-serif; font-size: 26px; line-height: 1.1; display: block; }
-  .t-top span { font-size: 13px; font-weight: 700; color: var(--ink-2); }
-  .creds { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 14px; }
-  .creds li { background: var(--bg); border-radius: 999px; padding: 2px 12px; font-size: 13px; font-weight: 800; }
-  .creds li.hot { background: var(--accent-soft); color: var(--accent-text); }
-  .message { margin-top: 14px; border-left: 4px solid var(--accent); padding: 2px 0 2px 14px; }
-  .message p { font-size: 14.5px; font-weight: 700; line-height: 1.85; }
-  .message p + p { margin-top: 8px; }
-  .message strong { color: var(--accent-text); }
-  .staff { margin-top: 14px; display: flex; align-items: center; gap: 10px; background: var(--bg); border-radius: 12px; padding: 10px 12px; font-size: 13.5px; font-weight: 700; line-height: 1.6; }
-  .staff img { width: 40px; height: 40px; flex-shrink: 0; }
+  /* 07 比較 */
+  .cmp { display: grid; gap: 8px; }
+  .cmp li { display: grid; grid-template-columns: 1fr; gap: 2px; background: #FFF; border-radius: 14px; box-shadow: var(--shadow); padding: 12px 14px; }
+  .cmp li b { font-size: 15.5px; font-weight: 900; }
+  .cmp li .p { font-size: 13px; font-weight: 700; line-height: 1.55; }
+  .cmp li .p::before { content: "◯ "; color: #1B7F4B; font-weight: 900; }
+  .cmp li .c { font-size: 13px; font-weight: 700; color: var(--ink-2); line-height: 1.55; }
+  .cmp li .c::before { content: "△ "; color: var(--ink-3); font-weight: 900; }
+  .cmp li.us { background: var(--ink); color: #FFF; box-shadow: 0 0 0 3px var(--accent); }
+  .cmp li.us .c { color: #C9D1E0; }
+  .cmp li.us .p::before { color: #7EE2A8; }
+  .cmp-msg { margin-top: 16px; text-align: center; font-size: 15.5px; font-weight: 900; line-height: 1.7; }
+  .cmp-msg b { color: var(--accent-text); }
 
-  /* 9. 価値・料金 */
-  .incs { display: grid; gap: 8px; }
-  .inc { padding: 14px 16px; }
-  .inc h3 { display: flex; align-items: center; gap: 8px; font-size: 16px; font-weight: 900; margin-bottom: 8px; }
-  .inc h3 i { font-style: normal; width: 26px; height: 26px; border-radius: 8px; background: var(--ink); color: #FFF; display: grid; place-items: center; font-family: "DM Sans", sans-serif; font-size: 13px; }
-  .inc ul { display: flex; flex-wrap: wrap; gap: 6px; }
-  .inc li { background: var(--bg); border-radius: 999px; padding: 2px 11px; font-size: 13px; font-weight: 800; line-height: 1.6; }
-  .all { margin: 14px 0 22px; text-align: center; font-size: 16px; font-weight: 900; }
+  /* 08 安心 */
+  .worry { display: grid; gap: 10px; }
+  .worry li { padding: 16px; display: grid; grid-template-columns: 1fr 70px; gap: 12px; align-items: center; }
+  .worry .who { font-size: 12px; font-weight: 900; color: var(--accent-text); }
+  .worry h3 { font-size: 16.5px; font-weight: 900; line-height: 1.45; }
+  .worry p { font-size: 13.5px; font-weight: 700; color: var(--ink-2); line-height: 1.65; margin-top: 2px; }
+
+  /* 09 価格 */
   .price-box { padding: 22px 18px; text-align: center; box-shadow: 0 0 0 3px var(--accent), var(--shadow); }
-  .price-box .tag { display: flex; justify-content: center; gap: 6px; flex-wrap: wrap; }
   .price-box .yen { display: flex; align-items: baseline; justify-content: center; gap: 4px; margin-top: 8px; }
   .price-box .yen b { font-family: "DM Sans", sans-serif; font-size: 48px; line-height: 1.1; }
   .price-box .yen span { font-weight: 900; font-size: 16px; }
   .price-box .tax { color: var(--ink-2); font-weight: 700; font-size: 13px; }
-  .checks { display: grid; gap: 2px; text-align: left; background: var(--bg); border-radius: 12px; padding: 10px 14px; margin: 14px 0 16px; }
+  .checks { display: grid; gap: 4px; text-align: left; background: var(--bg); border-radius: 12px; padding: 12px 14px; margin: 14px 0; }
+  .checks p { font-size: 12px; font-weight: 900; color: var(--ink-3); }
   .checks li { display: flex; gap: 8px; font-size: 14px; font-weight: 800; line-height: 1.6; }
+  .checks li small { display: block; font-size: 12px; color: var(--ink-3); font-weight: 700; }
   .checks li::before { content: ""; flex-shrink: 0; width: 16px; height: 16px; margin-top: 4px; border-radius: 50%; background: var(--accent) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpath d='M18 33 L28 43 L46 23' fill='none' stroke='%23fff' stroke-width='9' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/80% no-repeat; }
-  .invest { margin-top: 16px; font-size: 14.5px; font-weight: 800; line-height: 1.7; }
+  .plain { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px 12px; font-size: 12.5px; font-weight: 800; color: var(--ink-2); margin-bottom: 14px; }
+  .start { font-size: 14px; font-weight: 900; margin-bottom: 10px; }
+  .start b { color: var(--accent-text); }
+  .hina { display: grid; grid-template-columns: 72px 1fr; gap: 14px; align-items: start; margin-top: 14px; padding: 16px; }
+  .hina img { width: 72px; height: 72px; border-radius: 50%; object-fit: cover; }
+  .hina p { font-size: 14px; font-weight: 700; line-height: 1.8; }
+  .hina p strong { color: var(--accent-text); }
+  .hina .sig { margin-top: 6px; font-size: 12.5px; color: var(--ink-3); }
   .terms { display: grid; gap: 10px; margin-top: 12px; }
   .term { padding: 16px; }
-  .term h3 { font-size: 16px; font-weight: 900; margin-bottom: 8px; }
+  .term h3 { font-size: 15.5px; font-weight: 900; margin-bottom: 6px; }
   .term li { display: grid; grid-template-columns: 70px 1fr; gap: 10px; padding: 6px 0; border-top: 1px dashed var(--line); font-size: 13.5px; font-weight: 700; line-height: 1.6; }
   .term li:first-child { border-top: 0; }
   .term li .k { font-size: 12px; font-weight: 900; text-align: center; background: var(--bg); border-radius: 8px; padding: 1px 4px; height: fit-content; }
   .term li b { display: block; font-size: 14px; }
   .term .fine { margin-top: 6px; }
 
-  /* 10. FAQ */
+  /* 10 FAQ・最後 */
   .faq { display: grid; gap: 8px; }
   .faq details { background: #FFF; border-radius: 14px; box-shadow: var(--shadow); padding: 0 16px; }
   .faq summary { cursor: pointer; font-weight: 800; font-size: 15px; padding: 13px 28px 13px 0; list-style: none; position: relative; line-height: 1.55; }
@@ -281,16 +266,11 @@
   .faq summary::after { content: "+"; position: absolute; right: 0; top: 8px; color: var(--accent-text); font-size: 22px; font-weight: 800; }
   .faq details[open] summary::after { content: "−"; }
   .faq details p { font-size: 14.5px; padding-bottom: 14px; line-height: 1.75; }
-
-  /* 11. 最後 */
-  .final { text-align: center; }
-  .final h2 { font-size: 26px; font-weight: 900; line-height: 1.5; }
+  .final { text-align: center; margin-top: 36px; background: var(--ink); color: #FFF; border-radius: 20px; padding: 28px 18px; }
+  .final h2 { font-size: 22px; font-weight: 900; line-height: 1.55; }
   .final h2 .hl { color: #FFB599; }
-  .final .name { margin-top: 14px; font-size: 14px; font-weight: 800; color: #C9D1E0; }
-  .final .facts3 { display: grid; gap: 6px; margin: 14px auto 20px; max-width: 360px; text-align: left; }
-  .final .facts3 li { display: flex; gap: 10px; align-items: center; background: rgba(255,255,255,0.08); border-radius: 12px; padding: 8px 14px; font-weight: 800; font-size: 15px; }
-  .final .facts3 li::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--accent); flex-shrink: 0; }
-  .final .cta-note { color: #C9D1E0; }
+  .final .facts3 { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; margin: 14px 0 18px; }
+  .final .facts3 li { background: rgba(255,255,255,0.1); border-radius: 999px; padding: 2px 12px; font-weight: 800; font-size: 13px; }
   .final .deadline { color: #FFB599; }
 
   /* フッター */
@@ -306,13 +286,14 @@
   .sticky-cta p b { display: block; color: var(--ink); font-size: 14px; }
   .sticky-cta .btn { font-size: 15px; padding: 8px 20px; min-height: 46px; flex-shrink: 0; box-shadow: none; }
 
+
   /* ===== PC（900px以上） ===== */
   @media (min-width: 900px) {
     body { font-size: 16.5px; padding-bottom: 0; }
     .wrap { width: min(var(--wrap), 100% - 64px); }
-    section { padding: 80px 0; }
+    section { padding: 84px 0; }
     .sec-head { margin-bottom: 36px; }
-    .sec-head h2 { font-size: 34px; }
+    .sec-head h2 { font-size: 33px; }
     .sec-head .lead { font-size: 17px; }
     .part { font-size: 13px; }
     .top-bar .wrap { height: 60px; }
@@ -323,100 +304,81 @@
     .cta-note, .deadline { font-size: 14px; }
     .sticky-cta { display: none; }
     .fine { font-size: 13px; }
-    .pill { font-size: 13.5px; padding: 3px 14px; }
 
-    .hero { padding: 64px 0 76px; }
-    .hero .wrap { grid-template-columns: 1.2fr 0.8fr; align-items: center; gap: 40px; }
-    .hero .to { font-size: 15px; }
-    .hero h1 { font-size: 44px; }
-    .hero h1 small { font-size: 30px; }
+    .hero { padding: 72px 0 80px; }
+    .hero .wrap { grid-template-columns: 1.3fr 0.7fr; align-items: center; gap: 48px; }
+    .hero h1 { font-size: 40px; }
     .hero .sub { font-size: 18px; }
-    .hero .facts li { font-size: 15px; padding: 4px 16px; }
-    .hero .price b { font-size: 40px; }
-    .hero .cta { max-width: 440px; }
-    .hero .cta .btn.block { margin: 0; }
-    .hero .cta .cta-note, .hero .cta .deadline { text-align: left; }
-    .hero-phones { height: 420px; }
-    .hero-phones::before { width: 340px; height: 340px; margin-left: -170px; top: 30px; }
-    .hero-phones .p2 { width: 200px; border-radius: 34px; padding: 8px; }
-    .hero-phones .p2 img { border-radius: 26px; }
-    .hero-phones .p1 { width: 172px; transform: rotate(-7deg) translate(32px, 34px); }
-    .hero-phones .chibi { width: 110px; margin-right: -230px; }
+    .hero .course { font-size: 16px; }
+    .hero .go { max-width: 420px; font-size: 17px; }
+    .hero .mini-cta { text-align: left; max-width: 420px; }
+    .hero-pic .phone { width: 230px; border-radius: 34px; padding: 8px; }
+    .hero-pic .phone img { border-radius: 26px; }
+    .hero-pic .chibi { width: 130px; margin-left: -210px; }
 
-    .recap { grid-template-columns: repeat(3, 1fr); gap: 14px; }
-    .recap li { grid-template-columns: 1fr; justify-items: center; text-align: center; padding: 18px; }
-    .recap img { width: 90px; height: 82px; }
-    .recap b { font-size: 18px; }
-    .recap span { font-size: 15px; }
-    .to-next p { font-size: 20px; }
-    .to-next p + p { font-size: 16px; }
+    .narrow { max-width: 760px; margin: 0 auto; }
+    .vs .box { padding: 22px 18px; }
+    .vs b { font-size: 24px; }
+    .vs p { font-size: 15px; }
+    .diff { font-size: 28px; }
+    .types { grid-template-columns: 1fr 1fr; }
+    .types li { font-size: 15.5px; }
+    .not-waste { font-size: 17px; }
 
-    .steps { grid-template-columns: repeat(4, 1fr); gap: 22px; }
-    .step { grid-template-columns: 1fr; grid-template-rows: auto auto; padding: 18px; align-items: start; }
-    .step + .step { margin-top: 0; }
-    .step + .step::before { content: "→"; top: 50%; left: -18px; transform: translateY(-50%); }
-    .step .shot { grid-row: 1; grid-column: 1; width: 92px; margin-bottom: 8px; }
-    .step .txt { grid-row: 2; }
-    .step h3 { font-size: 19px; }
-    .step p { font-size: 14.5px; }
-    .loop { max-width: 640px; margin: 26px auto 0; padding: 16px 22px; }
-    .loop p { font-size: 18px; }
+    .cycle { grid-template-columns: repeat(5, 1fr); gap: 18px; padding: 0 0 46px; }
+    .cycle::after { left: 10%; right: 10%; top: auto; bottom: 8px; width: auto; height: 22px; border: 3px solid #FFB599; border-top: 0; border-radius: 0 0 18px 18px; }
+    .cycle .back { writing-mode: horizontal-tb; top: auto; bottom: 0; right: auto; left: 50%; transform: translateX(-50%); padding: 0 12px; font-size: 13px; }
+    .cstep { grid-template-columns: 1fr; justify-items: center; text-align: center; padding: 20px 14px; }
+    .cstep + .cstep { margin-top: 0; }
+    .cstep + .cstep::before { top: 50%; left: -16px; transform: translateY(-50%); border: 6px solid transparent; border-left: 8px solid #FFB599; }
+    .cstep .n { width: 52px; height: 52px; font-size: 20px; }
+    .cstep h3 { font-size: 18px; }
+    .cstep p { font-size: 14px; }
+    .key-msg { max-width: 720px; margin: 22px auto 0; }
+    .key-msg p { font-size: 20px; }
 
-    .months { grid-template-columns: repeat(3, 1fr); gap: 16px; }
-    .month { grid-template-columns: 1fr; padding: 22px; gap: 8px; }
-    .month .m { grid-row: auto; width: fit-content; padding: 4px 14px; font-size: 13px; }
-    .month .m b { display: inline; font-size: 18px; margin-right: 2px; }
-    .month h3 { font-size: 20px; }
-    .month li { font-size: 15px; }
-    .lvl-grid { grid-template-columns: 1fr 1fr; gap: 24px; padding: 0 22px 20px; }
-    .lvl-grid li { font-size: 15px; }
-    .goals { grid-template-columns: repeat(4, 1fr); gap: 14px; }
-    .goals li { font-size: 16px; padding: 18px; }
-    .goals-title { font-size: 21px; margin-top: 40px; }
+    .lesson-day { max-width: 820px; margin: 0 auto; }
+    .lesson-day .goal b { font-size: 24px; }
+    .ls .body { grid-template-columns: 1fr 96px; padding: 16px 20px; }
+    .ls h3 { font-size: 18px; }
+    .ls p { font-size: 15px; }
+    .aha { font-size: 19px; }
 
-    .daily { display: grid; grid-template-columns: 1.15fr 0.85fr; gap: 28px; align-items: start; }
-    .flow li { grid-template-columns: 72px 1fr; }
-    .flow h3 { font-size: 18px; }
-    .flow p { font-size: 15px; }
-    .days { margin-top: 0; }
-    .day { padding: 20px 22px; }
-    .day .dh b { font-size: 18px; }
-    .day .dh span { font-size: 36px; }
-    .day li { font-size: 15px; grid-template-columns: 100px 1fr 44px; }
+    .roles { grid-template-columns: 1fr 1fr; gap: 16px; }
+    .role { grid-template-columns: 1fr 96px; padding: 20px; }
+    .role h3 { font-size: 20px; }
+    .role p { font-size: 14.5px; }
+    .live-line { max-width: 640px; margin: 18px auto 0; }
 
-    .live { grid-template-columns: 1.2fr 0.8fr; gap: 20px; align-items: start; }
-    .live-main { padding: 26px; }
-    .live-main .big b { font-size: 56px; }
-    .lesson b { font-size: 17px; }
-    .lesson span { font-size: 14px; }
-    .live-pic { grid-template-columns: 1fr; }
-    .live-pic .thumb { width: 220px; margin: 0 auto; }
-    .live-pic p { font-size: 16px; }
+    .ba { grid-template-columns: 1fr auto 1fr; align-items: center; gap: 16px; }
+    .ba .b { padding: 22px; }
+    .ba .b h3 { font-size: 20px; }
+    .ba .arr { font-size: 26px; transform: rotate(-90deg); }
+    .months3 { gap: 14px; margin-top: 26px; }
+    .months3 li { padding: 18px 12px; }
+    .months3 b { font-size: 17px; }
+    .months3 span { font-size: 14px; }
 
-    .env { grid-template-columns: repeat(4, 1fr); gap: 14px; }
-    .env li { padding: 18px; }
-    .env b { font-size: 16.5px; }
-    .env span { font-size: 13.5px; }
+    .cmp { grid-template-columns: repeat(4, 1fr); gap: 14px; }
+    .cmp li { padding: 18px; align-content: start; gap: 6px; }
+    .cmp li b { font-size: 17px; }
+    .cmp li .p, .cmp li .c { font-size: 14px; }
+    .cmp-msg { font-size: 19px; }
 
-    .teacher { padding: 34px 40px; display: grid; grid-template-columns: 0.9fr 1.1fr; gap: 36px; align-items: start; }
-    .t-top { grid-template-columns: 130px 1fr; }
-    .t-top img { width: 130px; height: 130px; }
-    .t-top b { font-size: 34px; }
-    .creds li { font-size: 14.5px; }
-    .message { margin-top: 0; }
-    .message p { font-size: 16.5px; }
+    .worry { grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    .worry li { grid-template-columns: 1fr; padding: 22px; align-content: start; }
+    .worry li .thumb { width: 96px; grid-row: 1; }
+    .worry h3 { font-size: 18px; }
+    .worry p { font-size: 14.5px; }
 
-    .incs { grid-template-columns: repeat(4, 1fr); gap: 14px; }
-    .inc { padding: 20px; }
-    .inc h3 { font-size: 18px; }
-    .inc li { font-size: 14px; }
-    .all { font-size: 21px; margin: 22px 0 34px; }
     .pricing { display: grid; grid-template-columns: 1.05fr 0.95fr; gap: 20px; align-items: start; }
     .price-box { padding: 32px 30px; }
     .price-box .yen b { font-size: 72px; }
     .price-box .yen span { font-size: 22px; }
-    .price-box .tax { font-size: 15px; }
     .checks li { font-size: 15.5px; }
+    .hina { grid-template-columns: 96px 1fr; padding: 22px; }
+    .hina img { width: 96px; height: 96px; }
+    .hina p { font-size: 15.5px; }
     .terms { margin-top: 0; }
     .term { padding: 22px; }
     .term li { font-size: 14.5px; grid-template-columns: 84px 1fr; }
@@ -425,10 +387,9 @@
     .faq summary { font-size: 17px; padding: 16px 30px 16px 0; }
     .faq details { padding: 0 22px; }
     .faq details p { font-size: 16px; }
-
-    .final h2 { font-size: 40px; }
+    .final { max-width: 820px; margin: 48px auto 0; padding: 44px 32px; }
+    .final h2 { font-size: 32px; }
     .final .cta { max-width: 460px; margin: 0 auto; }
-    .final .facts3 li { font-size: 16px; }
     .site-foot { font-size: 14px; }
   }
   @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } .btn { transition: none; } }
@@ -448,282 +409,208 @@
 
 <main>
 
-  <!-- ===== PART 1：なぜこのコースなのか ===== -->
-
-  <!-- 1. ファーストビュー -->
+  <!-- 01 ファーストビュー：勉強会の続き -->
   <section class="hero">
     <div class="wrap">
       <div>
-        <p class="to">無料勉強会に参加してくれたあなたへ</p>
-        <h1><span class="ib">「知ってる英語」を、</span><br><span class="ib">「<span class="hl">パッと話せる英語</span>」に。</span><small>90日間。</small></h1>
-        <p class="sub"><span class="ib">毎日のアプリ学習で英語の土台を作り、</span><span class="ib">月12回以上のLIVE授業で実際に使う。</span><span class="ib">初心者のための3ヶ月突破コースです。</span></p>
-        <ul class="facts" aria-label="コースの概要">
-          <li class="hot">第1期生募集中</li><li>11/16（月）一斉スタート</li><li>3ヶ月間</li>
-        </ul>
-        <p class="price"><span>第1期生特別価格</span><b>110,000</b><small>円（税込）</small></p>
-        <div class="cta">
-          <a class="btn block" href="https://my.ohana-english.app/?view=join">第1期生に申し込む</a>
+        <p class="to">勉強会にご参加いただいた皆さんへ</p>
+        <h1><span class="ib">「知っている英語」を、</span><br><span class="ib">「<span class="hl">パッと話せる英語</span>」に</span><span class="ib">変える90日間。</span></h1>
+        <p class="sub"><span class="ib">何年も英語を勉強してきたのに、</span><span class="ib">いざ話そうとすると言葉が出てこない。</span><br><span class="ib">そこから抜け出すために、</span><span class="ib">本当に必要なトレーニングを。</span></p>
+        <p class="course"><span>第1期</span>ʻOhana English 3ヶ月突破コース</p>
+        <a class="go" href="#why">なぜこの学び方なのか、見てみる ↓</a>
+        <div class="mini-cta">
           <p class="deadline" data-deadline></p>
+          <p>もう決めている方は <a href="https://my.ohana-english.app/?view=join">こちらから申し込み</a></p>
         </div>
       </div>
-      <div class="hero-phones" aria-hidden="true">
-        <div class="phone p1"><img src="img/journal-crop.webp" width="780" height="1216" alt=""></div>
-        <div class="phone p2"><img src="img/home-crop.webp" width="780" height="1216" alt=""></div>
+      <div class="hero-pic" aria-hidden="true">
+        <div class="phone"><img src="img/journal-crop.webp" width="780" height="1216" alt=""></div>
         <img class="chibi" src="img/hina-phrases.webp" width="360" height="330" alt="">
       </div>
     </div>
   </section>
 
-  <!-- 2. 勉強会のふり返り -->
-  <section class="s-white" id="recap">
+  <!-- 02 原因：知っている ≠ 使える -->
+  <section class="s-white" id="why">
+    <div class="wrap narrow">
+      <div class="sec-head">
+        <span class="part">01 ─ WHY</span>
+        <h2><span class="ib">なぜ、勉強しているのに</span><span class="ib">英語が話せないの？</span></h2>
+      </div>
+      <div class="vs">
+        <div class="box know"><b>知っている</b><p>単語の意味がわかる。<br>文法問題が解ける。</p></div>
+        <span class="ne" aria-label="と">≠</span>
+        <div class="box use"><b>使える</b><p>自分で英文を作り、<br>会話で声に出せる。</p></div>
+      </div>
+      <p class="diff"><span class="ib">「知っている」と「話せる」は、</span><span class="ib em">別の力。</span></p>
+      <ul class="types">
+        <li><i>A</i><span>基礎があいまいなまま<small>文の作り方が、まだはっきりしない</small></span></li>
+        <li><i>B</i><span>知っているのに、使う練習が足りない<small>頭ではわかるのに、口から出てこない</small></span></li>
+      </ul>
+      <p class="not-waste"><span class="ib">今まで頑張ってきたことは、</span><span class="ib">無駄ではありません。</span><br><span class="ib">大事なのは、<b>その知識をどう使うか</b>です。</span></p>
+    </div>
+  </section>
+
+  <!-- 03 上達の仕組み（このLPの心臓） -->
+  <section class="s-navy" id="how">
     <div class="wrap">
       <div class="sec-head">
-        <h2><span class="ib">勉強会でお伝えした、</span><span class="ib">英語学習の<span class="em">3つのコツ</span>。</span></h2>
+        <span class="part">02 ─ HOW</span>
+        <h2><span class="ib">「知ってる」が「話せる」に</span><span class="ib">変わる5つのステップ</span></h2>
       </div>
-      <ul class="recap">
-        <li><img src="img/hina-words.webp" width="360" height="330" alt="" loading="lazy"><div><b><span class="n">①</span>繰り返して身につける</b><span>1回で完璧より、何度も触れて思い出す。</span></div></li>
-        <li><img src="img/hina-pronunciation.webp" width="400" height="330" alt="" loading="lazy"><div><b><span class="n">②</span>まねして使える英語に</b><span>聞いて、まねして、自分でも声に出す。</span></div></li>
-        <li><img src="img/hina-diary.webp" width="450" height="330" alt="" loading="lazy"><div><b><span class="n">③</span>やること・やらないを決める</b><span>必要な学習を絞って、毎日実践する。</span></div></li>
-      </ul>
-      <div class="to-next">
-        <p>大切なのは、<span class="ib">この3つを<span class="em">知って終わりにしないこと</span>。</span></p>
-        <p>ʻOhana Englishでは、<span class="ib">この3つを毎日の学習に組み込んでいます。</span></p>
-        <span class="arrow" aria-hidden="true"></span>
+      <ol class="cycle">
+        <li class="cstep"><span class="n">1</span><div><h3>必要な英語を知る</h3><p>会話に必要な単語・文法を学ぶ</p></div></li>
+        <li class="cstep out"><span class="n">2</span><div><h3>自分で英文を作る</h3><p>英文の組み立て・瞬間英作文</p></div></li>
+        <li class="cstep out"><span class="n">3</span><div><h3>声に出して身につける</h3><p>発音・モデリング</p></div></li>
+        <li class="cstep out"><span class="n">4</span><div><h3>実際に使ってみる</h3><p>英語日記・LIVEでの会話</p></div></li>
+        <li class="cstep"><span class="n">5</span><div><h3>振り返って繰り返す</h3><p>復習・添削</p></div></li>
+        <li class="back" aria-hidden="true">くり返す</li>
+      </ol>
+      <p class="legend"><span>インプット・復習</span><span class="o">アウトプット</span></p>
+      <div class="key-msg">
+        <p><span class="ib">インプットとアウトプットを</span><span class="ib"><b>切り離さない</b>。</span></p>
+        <small><span class="ib">このサイクルを毎週くり返して、</span><span class="ib">使える表現を増やしていきます。</span></small>
       </div>
     </div>
   </section>
 
-  <!-- 3. 学習設計（いちばん大事なセクション） -->
-  <section class="s-navy" id="design">
+  <!-- 04 ある日のレッスン例 -->
+  <section class="s-blue" id="lesson">
     <div class="wrap">
       <div class="sec-head">
-        <span class="part">WHY IT WORKS</span>
-        <h2><span class="ib">英語を「知っている」だけでは、</span><br><span class="ib">会話で使えるようにならない。</span></h2>
-        <p class="lead"><span class="ib">必要なのは、覚えた英語を何度も思い出し、</span><span class="ib">声に出して、実際に使う練習。</span></p>
+        <span class="part">03 ─ PRACTICE</span>
+        <h2><span class="ib">ʻOhana Englishでは、</span><span class="ib">実際に何をするの？</span></h2>
+        <p class="lead">過去形を学ぶ日の例</p>
       </div>
-      <ol class="steps">
-        <li class="step">
-          <div class="txt"><span class="no">STEP 1</span><h3>知る・理解する</h3>
-            <ul class="tags"><li>単語</li><li>中学文法</li><li>講義動画</li></ul>
-            <p>英語を使うための土台を作る。</p></div>
-          <div class="shot"><img src="img/words-tall.webp" width="720" height="1292" alt="単語カードの画面（見本）" loading="lazy"></div>
-        </li>
-        <li class="step key">
-          <div class="txt"><span class="no">STEP 2</span><h3>思い出して口に出す</h3>
-            <ul class="tags"><li>自動復習</li><li>瞬間英作文</li><li>モデリング</li></ul>
-            <p>知っている英語を、自分の口から出す。</p></div>
-          <div class="shot"><img src="img/mock-instant-top.webp" width="720" height="662" alt="瞬間英作文の画面（イメージ）" loading="lazy"></div>
-        </li>
-        <li class="step key">
-          <div class="txt"><span class="no">STEP 3</span><h3>自分の英語で使う</h3>
-            <ul class="tags"><li>英語日記</li><li>月12回以上のLIVE授業</li></ul>
-            <p>学んだことを、自分の言葉として使ってみる。</p></div>
-          <div class="shot"><img src="img/journal-still-top.webp" width="720" height="662" alt="英語日記を書く画面（見本）" loading="lazy"></div>
-        </li>
-        <li class="step">
-          <div class="txt"><span class="no">STEP 4</span><h3>振り返って、また使う</h3>
-            <ul class="tags"><li>AI添削</li><li>定期テスト</li><li>振り返り会</li></ul>
-            <p>直されたところを確認して、もう一度練習する。</p></div>
-          <div class="shot"><img src="img/journal-crop.webp" width="780" height="1216" alt="英語日記のAI添削の画面（見本）" loading="lazy"></div>
-        </li>
-      </ol>
-      <div class="loop">
-        <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M25 12a10 10 0 1 0 1 8" fill="none" stroke="#FFB599" stroke-width="3" stroke-linecap="round"/><path d="M26 5v7h-7" fill="none" stroke="#FFB599" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        <p><span class="ib">この流れを<b>3ヶ月間、くり返す</b>。</span><span class="ib">これがʻOhana Englishの学習設計です。</span></p>
+      <div class="lesson-day">
+        <div class="goal"><small>この日のゴール</small><b>「昨日、友達とカフェに行った」<br>を話せるようになるまで</b><em>I went to a cafe with my friend yesterday.</em></div>
+        <ol class="ls">
+          <li><span class="n">1</span><div class="body"><div><h3>文法を理解する</h3><p>過去のことは過去形。go の過去形は went。</p><span class="tool">講義動画</span></div><div class="thumb wide"><img src="img/lecture-sample.webp" width="1100" height="605" alt="講義動画の1場面" loading="lazy"></div></div></li>
+          <li class="out"><span class="n">2</span><div class="body"><div><h3>自分で英文を作る</h3><p>日本語を見て、パッと英語に。</p><span class="en">I went to a cafe with my friend.</span><span class="tool">瞬間英作文</span></div><div class="thumb"><img src="img/mock-instant-top.webp" width="720" height="662" alt="瞬間英作文の画面（イメージ）" loading="lazy"></div></div></li>
+          <li class="out"><span class="n">3</span><div class="body"><div><h3>お手本を聞いて声に出す</h3><p>音とリズムをまねして、録音して聞き比べ。</p><span class="tool">モデリング</span></div><div class="thumb"><img src="img/mock-record-big.webp" width="780" height="1040" alt="モデリングの画面（イメージ）" loading="lazy"></div></div></li>
+          <li class="out"><span class="n">4</span><div class="body"><div><h3>自分の経験に置きかえる</h3><p>昨日の自分のことを英語で書く。AIがすぐ直す。</p><span class="en"><s>I go</s> → <ins>I went</ins></span><span class="tool">英語日記・AI添削</span></div><div class="thumb"><video src="img/journal-top.mp4" poster="img/journal-still-top.webp" width="780" height="716" muted loop playsinline autoplay preload="none" aria-label="英語日記をAIが添削する動画（見本）"></video></div></div></li>
+          <li><span class="n">5</span><div class="body"><div><h3>使って、また復習する</h3><p>LIVEで話してみる。言えなかった表現は、復習でもう一度。</p><span class="tool">LIVE授業・自動の復習</span></div><div class="thumb"><img src="img/mock-zoom.webp" width="780" height="1216" alt="LIVE授業のイメージ画面" loading="lazy"></div></div></li>
+        </ol>
+        <p class="aha"><span class="ib">文法を教わって終わりじゃない。</span><br><span class="ib"><b>作る・声に出す・使う</b>まで、</span><span class="ib">毎回練習します。</span></p>
+        <p class="fine center" style="margin-top:6px">※画面は見本・イメージです。</p>
       </div>
     </div>
   </section>
 
-  <!-- 4. 3ヶ月の成長ロードマップ -->
-  <section class="s-blue" id="roadmap">
+  <!-- 05 その練習を支える学習環境（役割で分ける） -->
+  <section class="s-white" id="env">
     <div class="wrap">
       <div class="sec-head">
-        <span class="part">ROADMAP</span>
-        <h2><span class="ib">3ヶ月で、少しずつ</span><span class="ib">「<span class="em">話せる英語</span>」へ。</span></h2>
+        <span class="part">04 ─ TOOLS</span>
+        <h2><span class="ib">その練習を支える、</span><span class="ib">ʻOhanaの学習環境</span></h2>
       </div>
-      <ol class="months">
-        <li class="card month"><div class="m"><b>1</b>ヶ月目</div><h3>話すための土台を作る</h3>
-          <div><ul><li>基本の単語・文法</li><li>短い英文を作る練習</li><li>英語の音に慣れる</li></ul><p class="gram">文法 8単元</p></div></li>
-        <li class="card month"><div class="m"><b>2</b>ヶ月目</div><h3>「知っている」を「使える」に</h3>
-          <div><ul><li>自分のことを英語で表現する</li><li>モデリング・瞬間英作文</li><li>口から出す練習を増やす</li></ul><p class="gram">文法 6単元</p></div></li>
-        <li class="card month last"><div class="m"><b>3</b>ヶ月目</div><h3>会話のキャッチボールへ</h3>
-          <div><ul><li>簡単な質問に答える</li><li>自分からも質問する</li><li>英語を使う機会を増やす</li></ul><p class="gram">文法 4単元（全部で18単元）</p></div></li>
+      <div class="roles">
+        <div class="card role" style="background:var(--off)"><div><span class="lab">STEP 1・5</span><h3>知識を身につける</h3><ul class="tags"><li>レベル別の単語</li><li>文法18単元・講義動画53本</li><li>自動の復習</li></ul><p>文を作るための土台を、順番に。</p></div><div class="thumb"><img src="img/words-tall.webp" width="720" height="1292" alt="単語カードの画面（見本）" loading="lazy"></div></div>
+        <div class="card role" style="background:var(--off)"><div><span class="lab">STEP 2・4</span><h3>自分の英語を作る</h3><ul class="tags"><li>瞬間英作文</li><li>英語日記</li><li>AI添削</li></ul><p>覚えた知識を、言いたいことに使う。</p></div><div class="thumb"><img src="img/journal-crop.webp" width="780" height="1216" alt="英語日記のAI添削の画面（見本）" loading="lazy"></div></div>
+        <div class="card role" style="background:var(--off)"><div><span class="lab">STEP 3・4</span><h3>声に出して実践する</h3><ul class="tags"><li>モデリング</li><li>LIVE授業</li></ul><p>英語の音に慣れ、話す経験を重ねる。</p></div><div class="thumb"><img src="img/mock-record-big.webp" width="780" height="1040" alt="モデリングの画面（イメージ）" loading="lazy"></div></div>
+        <div class="card role" style="background:var(--off)"><div><span class="lab">毎日</span><h3>迷わず続ける</h3><ul class="tags"><li>毎日の学習メニュー</li><li>学習の記録・ランキング</li><li>仲間と学ぶ</li></ul><p>何をやるか迷わず、練習時間を作りやすく。</p></div><div class="thumb"><img src="img/home-crop.webp" width="780" height="1216" alt="今日のクエストの画面（見本）" loading="lazy"></div></div>
+      </div>
+      <div class="live-line">
+        <h3>LIVE授業 <b>月12回以上</b>（3ヶ月で36回以上）</h3>
+        <ul>
+          <li>日常英会話・瞬間英作文<span>週2回</span></li>
+          <li>文法強化・第1期生ホームルーム<span>週1回</span></li>
+          <li>質問会<span>月1回</span></li>
+          <li>目標設定・振り返り会<span>月1回</span></li>
+        </ul>
+        <p class="fine" style="margin-top:4px">Hinaが月2〜3回、ほかは英語講師が担当。録画あり・カメラオフOK。</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 06 未来のイメージ -->
+  <section class="s-blue" id="future">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="part">05 ─ FUTURE</span>
+        <h2><span class="ib">3ヶ月で、</span><span class="ib">どんな変化を目指すの？</span></h2>
+      </div>
+      <div class="ba">
+        <div class="b"><small>BEFORE</small><h3>言いたいことが英語にならない</h3><p>単語をつなげられない。会話になると黙ってしまう。</p></div>
+        <span class="arr" aria-hidden="true">▼</span>
+        <div class="b after"><small>目指す AFTER</small><h3>簡単な英文で自分のことを話せる</h3><p>短い文を作る。自分の経験を話す。質問を返す。</p></div>
+      </div>
+      <ol class="months3">
+        <li><em>1ヶ月目</em><b>土台を作る</b><span>短い英文を組み立てる</span></li>
+        <li><em>2ヶ月目</em><b>使う表現を増やす</b><span>経験・予定・気持ちを伝える</span></li>
+        <li><em>3ヶ月目</em><b>会話で練習する</b><span>質問・返答を実践する</span></li>
       </ol>
-      <details class="lvl">
-        <summary>レベル別の目標を見る（初級・中級）</summary>
-        <div class="lvl-grid">
-          <div><h4>初級</h4><ul><li><em>1ヶ月目</em>短い英語で伝える</li><li><em>2ヶ月目</em>パッと口から出す</li><li><em>3ヶ月目</em>会話を続ける</li></ul></div>
-          <div class="mid"><h4>中級</h4><ul><li><em>1ヶ月目</em>表現を広げる</li><li><em>2ヶ月目</em>会話への反応を速く</li><li><em>3ヶ月目</em>会話を深める</li></ul></div>
-        </div>
-      </details>
-      <h3 class="goals-title">3ヶ月後に目指す変化</h3>
-      <ul class="goals">
-        <li><b>01</b>思っていることを英語で伝える</li>
-        <li><b>02</b>趣味や仕事について話す</li>
-        <li><b>03</b>質問に答え、自分からも聞く</li>
-        <li><b>04</b>相手の英語が前より聞き取れる</li>
-      </ul>
       <p class="fine center" style="margin-top:10px">※目指す姿です。成長には個人差があります。</p>
     </div>
   </section>
 
-  <!-- ===== PART 2：実際に何をするのか ===== -->
-
-  <!-- 5. 1日の学習 -->
-  <section class="s-white" id="daily">
+  <!-- 07 比較 -->
+  <section class="s-white" id="compare">
     <div class="wrap">
       <div class="sec-head">
-        <span class="part">ONE DAY</span>
-        <h2><span class="ib">毎日何をすればいいか、</span><span class="ib">もう迷わない。</span></h2>
-        <p class="lead"><span class="ib">アプリを開けば、</span><span class="ib">その日の学習メニューがわかります。</span></p>
+        <span class="part">06 ─ COMPARE</span>
+        <h2><span class="ib">なぜ独学や英会話だけではなく、</span><span class="ib">ʻOhanaなの？</span></h2>
+        <p class="lead"><span class="ib">どの学び方にも、</span><span class="ib">向いている人がいます。</span></p>
       </div>
-      <div class="daily">
-        <ol class="flow">
-          <li><div class="thumb"><img src="img/mock-menu-top.webp" width="780" height="1054" alt="今日の学習メニューと単語の復習の画面（イメージ）" loading="lazy"></div><div><span class="t">1</span><h3>単語と復習</h3><p>忘れかけた単語が自動で出てくる。思い出すたびに定着。</p></div></li>
-          <li><div class="thumb wide"><img src="img/lecture-sample.webp" width="1100" height="605" alt="講義動画の1場面" loading="lazy"></div><div><span class="t">2</span><h3>文法・講義動画</h3><p>その週の文法を、Hinaの動画で理解する。</p></div></li>
-          <li><div class="thumb"><img src="img/mock-instant-top.webp" width="720" height="662" alt="瞬間英作文の画面（イメージ）" loading="lazy"></div><div><span class="t">3</span><h3>瞬間英作文</h3><p>日本語を見て、パッと英語で言う。</p></div></li>
-          <li><div class="thumb"><img src="img/mock-record-big.webp" width="780" height="1040" alt="モデリングの画面（イメージ）" loading="lazy"></div><div><span class="t">4</span><h3>モデリング</h3><p>お手本をまねて録音し、自分の声と聞き比べる。</p></div></li>
-          <li><div class="thumb"><video src="img/journal-top.mp4" poster="img/journal-still-top.webp" width="780" height="716" muted loop playsinline autoplay preload="none" aria-label="英語日記をAIが添削する動画（見本）"></video></div><div><span class="t">5</span><h3>英語日記</h3><p>自分のことを英語で書き、AIの添削で使える表現を増やす。</p></div></li>
-        </ol>
-        <div>
-          <div class="days">
-            <div class="day">
-              <div class="dh"><b>しっかり学ぶ日</b><span>60<small>分</small></span></div>
-              <ul>
-                <li>単語と復習<i style="--w:67%"></i><em>10分</em></li>
-                <li>文法と講義<i style="--w:100%"></i><em>15分</em></li>
-                <li>瞬間英作文<i style="--w:100%"></i><em>15分</em></li>
-                <li>モデリング<i style="--w:100%"></i><em>15分</em></li>
-                <li>英語日記<i style="--w:33%"></i><em>5分</em></li>
-              </ul>
-            </div>
-            <div class="day busy">
-              <div class="dh"><b>忙しい日</b><span>30<small>分</small></span></div>
-              <ul>
-                <li>単語と復習<i style="--w:33%"></i><em>5分</em></li>
-                <li>瞬間英作文<i style="--w:67%"></i><em>10分</em></li>
-                <li>モデリング<i style="--w:67%"></i><em>10分</em></li>
-                <li>英語日記<i style="--w:33%"></i><em>5分</em></li>
-              </ul>
-            </div>
-          </div>
-          <p class="fine" style="margin-top:8px">※学習の一例です。毎日同じ時間が必要という意味ではありません。メニューは目標と時間に合わせて変わります。画面は見本・イメージです。</p>
-        </div>
-      </div>
+      <ul class="cmp">
+        <li><b>独学</b><span class="p">自分のペースで、低コストに学べる</span><span class="c">学ぶ順番や復習を、自分で管理する</span></li>
+        <li><b>オンライン英会話</b><span class="p">人と会話する機会を作れる</span><span class="c">基礎が足りないと、話せないままになりやすい</span></li>
+        <li><b>個別コーチング</b><span class="p">一人ひとりに合わせた計画・管理</span><span class="c">一般に費用が高くなりやすい</span></li>
+        <li class="us"><b>ʻOhana English</b><span class="p">基礎から英文作り・声に出す練習までを、一つの流れで</span><span class="c">1対1の個別指導・個別管理はありません</span></li>
+      </ul>
+      <p class="cmp-msg"><span class="ib">一人で頑張るのが難しかった人が、</span><br><span class="ib"><b>話すための練習を順番に積み重ねられる</b></span><span class="ib">環境です。</span></p>
     </div>
   </section>
 
-  <!-- 6. LIVE授業 -->
-  <section class="s-blue" id="live">
+  <!-- 08 安心 -->
+  <section class="s-blue" id="safe">
     <div class="wrap">
       <div class="sec-head">
-        <span class="part">LIVE</span>
-        <h2><span class="ib">学んだ英語を、</span><span class="ib"><span class="em">実際に使う時間</span>も。</span></h2>
-        <p class="lead"><span class="ib">アプリで覚えた英語を、声に出して使う。</span><span class="ib">インプットだけで終わらせません。</span></p>
+        <span class="part">07 ─ FOR YOU</span>
+        <h2><span class="ib">「私でもついていけるかな？」</span><span class="ib">という方へ</span></h2>
       </div>
-      <div class="live">
-        <div class="card live-main">
-          <p class="big"><span>月</span><b>12</b><span>回以上のLIVE授業</span></p>
-          <p class="sub">3ヶ月で合計36回以上・Zoom</p>
-          <div class="lessons">
-            <div class="lesson hot"><span class="when">週2回</span><div><b>日常英会話・瞬間英作文</b><span>フレーズを教わって、実際に話す</span></div></div>
-            <div class="lesson hot"><span class="when">週1回</span><div><b>文法強化・第1期生ホームルーム</b><span>その週の文法を使ってみる</span></div></div>
-            <div class="lesson"><span class="when">月1回</span><div><b>質問会</b><span>わからないことを聞ける</span></div></div>
-            <div class="lesson"><span class="when">月1回</span><div><b>目標設定・振り返り会</b><span>1ヶ月をふり返り、次の目標を決める</span></div></div>
-          </div>
-          <ul class="live-badges"><li>録画あり</li><li>カメラオフOK</li><li>Hinaが月2〜3回担当</li></ul>
-        </div>
-        <div class="live-pic">
-          <div class="thumb"><img src="img/mock-zoom.webp" width="780" height="1216" alt="LIVE授業のイメージ画面" loading="lazy"></div>
-          <p><span class="ib">出られない日は、</span><span class="ib"><b>録画</b>であとから見られます。</span><span class="fine" style="display:block;margin-top:6px">※画面はイメージです。ほかの回は英語講師が担当します。</span></p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- 7. ひとりで終わらせない学習環境 -->
-  <section class="s-white" id="support">
-    <div class="wrap">
-      <div class="sec-head">
-        <h2><span class="ib">ひとりで頑張るだけの</span><span class="ib">90日間じゃない。</span></h2>
-        <p class="lead"><span class="ib">上達に必要な練習を、</span><span class="ib">続けやすくするしくみ。</span></p>
-      </div>
-      <ul class="env">
-        <li><b>自動の復習メニュー</b><span>忘れるころに出てくる</span></li>
-        <li><b>学習の記録・ランキング</b><span>勉強時間と続いた日数</span></li>
-        <li><b>定期テスト</b><span>月1回・合計3回</span></li>
-        <li><b>質問会・振り返り会</b><span>それぞれ月1回</span></li>
-        <li><b>朝活</b><span>月2〜3回程度（不定期）</span></li>
-        <li><b>Study Session</b><span>不定期</span></li>
-        <li><b>会員の掲示板</b><span>2026年11月中に提供開始予定</span></li>
-        <li><b>英語の録音</b><span>初日と最終日に録って、ふり返る</span></li>
+      <ul class="worry">
+        <li class="card"><div><span class="who">英語初心者の方へ</span><h3>基本の単語・文法から</h3><p>1ヶ月目は短い英文から。難しい英語を最初から使う必要はありません。</p></div><div class="thumb"><img src="img/words-tall.webp" width="720" height="1292" alt="単語カードの画面（見本）" loading="lazy"></div></li>
+        <li class="card"><div><span class="who">アプリが苦手な方へ</span><h3>開けば、今日やることが出る</h3><p>スマホのブラウザで開くだけ。始め方は、申し込み後にメールか公式LINEでご案内します。</p></div><div class="thumb"><img src="img/mock-menu-top.webp" width="780" height="1054" alt="今日の学習メニューの画面（イメージ）" loading="lazy"></div></li>
+        <li class="card"><div><span class="who">忙しい方へ</span><h3>忙しい日は30分の例</h3><p>単語と復習5分・瞬間英作文10分・モデリング10分・日記5分。LIVEは録画でも見られます。</p></div><div class="thumb"><img src="img/progress-crop.webp" width="720" height="1122" alt="学習記録の画面（見本）" loading="lazy"></div></li>
       </ul>
     </div>
   </section>
 
-  <!-- 8. Hina・講師紹介 -->
-  <section class="s-blue" id="teacher">
-    <div class="wrap">
-      <div class="sec-head">
-        <h2>一緒に、<span class="em">英語で突破</span>しよう。</h2>
-      </div>
-      <div class="card teacher">
-        <div>
-          <div class="t-top">
-            <img src="img/hina-photo.webp" width="400" height="400" alt="Hinaの写真" loading="lazy">
-            <div><b>Hina</b><span>梶崎 妃那・京都府出身</span></div>
-          </div>
-          <ul class="creds">
-            <li class="hot">TOEIC満点・英検1級</li>
-            <li class="hot">YouTube登録者 48万人</li>
-            <li>慶應義塾大学 経済学部</li>
-            <li>YouTubeで約3年、英語を発信</li>
-          </ul>
-        </div>
-        <div>
-          <div class="message">
-            <p>英語は、完璧じゃなくてもいい。<br>大切なのは、<strong>自分の言葉で伝えてみること。</strong></p>
-            <p>英語を知っている人を増やすだけでなく、話せる人を増やしたい。そのために、初心者が一歩ずつ進める3ヶ月を作りました。</p>
-          </div>
-          <div class="staff"><img src="teacher-native.svg" width="40" height="40" alt=""><span>LIVE授業は、Hina（月2〜3回）と英語講師が担当します。</span></div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ===== PART 3：参加するか決める ===== -->
-
-  <!-- 9. 含まれるもの・料金 -->
+  <!-- 09 価格と価値 -->
   <section class="s-white" id="price">
     <div class="wrap">
       <div class="sec-head">
-        <span class="part">WHAT'S INCLUDED</span>
-        <h2><span class="ib">この3ヶ月に、</span><span class="ib">必要な学びを<span class="em">全部</span>。</span></h2>
+        <span class="part">08 ─ PRICE</span>
+        <h2><span class="ib">ここまでの内容が、</span><span class="ib">3ヶ月で<span class="em">11万円</span>。</span></h2>
       </div>
-      <div class="incs">
-        <div class="card inc" style="background:var(--off)"><h3><i>1</i>アプリ学習</h3><ul><li>あなたに合わせた学習メニュー</li><li>レベル別の単語</li><li>自動の復習</li><li>モデリング</li><li>瞬間英作文</li><li>AI添削つき英語日記</li></ul></div>
-        <div class="card inc" style="background:var(--off)"><h3><i>2</i>文法・講義</h3><ul><li>中学文法 18単元</li><li>講義動画 合計53本</li><li>2027/2/15 23:59まで見られる</li></ul></div>
-        <div class="card inc" style="background:var(--off)"><h3><i>3</i>LIVE授業</h3><ul><li>月12回以上（3ヶ月で36回以上）</li><li>録画あり</li><li>質問会</li></ul></div>
-        <div class="card inc" style="background:var(--off)"><h3><i>4</i>振り返り・仲間</h3><ul><li>定期テスト 月1回</li><li>目標設定・振り返り会</li><li>学習の記録・ランキング</li><li>朝活・Study Session</li><li>会員の掲示板</li></ul></div>
-      </div>
-      <p class="all">これが全部、<span class="em">ひとつのコース</span>に。</p>
-
       <div class="pricing">
-        <div class="card price-box">
-          <div class="tag"><span class="pill navy">ʻOhana English 3ヶ月突破コース（第1期）</span></div>
-          <p class="yen"><b>110,000</b><span>円（税込）</span></p>
-          <p class="tax">第1期生特別価格・税抜 100,000円</p>
-          <ul class="checks">
-            <li>入会金・教材費なし</li>
-            <li>自動更新・自動課金なし</li>
-            <li>2026年11/16〜2027年2/15（92日間）</li>
-          </ul>
-          <div class="cta">
-            <a class="btn block" href="https://my.ohana-english.app/?view=join">第1期生に申し込む</a>
-            <p class="deadline" data-deadline></p>
-            <p class="cta-note">始め方は、申し込み後にメールか公式LINEでご案内します</p>
+        <div>
+          <div class="card price-box">
+            <span class="pill navy">ʻOhana English 3ヶ月突破コース｜第1期生</span>
+            <p class="yen"><b>110,000</b><span>円（税込）</span></p>
+            <p class="tax">第1期生特別価格・税抜100,000円・92日間</p>
+            <div class="checks">
+              <p>この3ヶ月で取り組めること</p>
+              <ul>
+                <li><span>基礎から学ぶ単語・文法<small>文法18単元・講義動画53本</small></span></li>
+                <li><span>瞬間英作文・英語日記・モデリング</span></li>
+                <li><span>LIVE授業 月12回以上<small>3ヶ月で36回以上・録画あり</small></span></li>
+                <li><span>復習・学習メニュー・定期テスト<small>定期テストは月1回（合計3回）</small></span></li>
+                <li><span>仲間と取り組める学習環境<small>朝活・Study Session・会員の掲示板（11月中に開始予定）</small></span></li>
+              </ul>
+            </div>
+            <p class="plain"><span>入会金・教材費なし</span><span>自動更新・自動課金なし</span></p>
+            <p class="start">第1期生 <b>11月16日（月）</b>一斉スタート</p>
+            <div class="cta">
+              <a class="btn block" href="https://my.ohana-english.app/?view=join">第1期生に申し込む</a>
+              <p class="deadline" data-deadline></p>
+            </div>
           </div>
-          <p class="invest"><span class="ib">アプリ・講義・LIVE・振り返りを、</span><span class="ib">3ヶ月間まるごと。</span><span class="ib">自分の英語を変えるための90日間です。</span></p>
+          <div class="card hina">
+            <img src="img/hina-photo.webp" width="400" height="400" alt="Hinaの写真" loading="lazy">
+            <div><p>英語を学んできたのに話せない人が、もう一度基礎から、<strong>自分の言葉で話せるようになる場所</strong>を作りたかった。</p><p class="sig">Hina（梶崎妃那）・TOEIC満点・英検1級</p></div>
+          </div>
         </div>
         <div class="terms">
           <div class="card term">
@@ -748,36 +635,26 @@
     </div>
   </section>
 
-  <!-- 10. FAQ -->
+  <!-- 10 FAQ → 申し込み -->
   <section class="s-blue" id="faq">
     <div class="wrap">
-      <div class="sec-head"><h2>まだ迷っている方へ。</h2></div>
+      <div class="sec-head"><span class="part">09 ─ FAQ</span><h2>最後に、よくある質問</h2></div>
       <div class="faq">
-        <details><summary>英語がほとんど話せなくても参加できますか？</summary><p>参加できます。初級から始められ、1ヶ月目は基本の単語・文法と短い英文から進めます。メニューは今のレベルに合わせて変わります。</p></details>
-        <details><summary>仕事でLIVE授業に出られない日はどうすればいいですか？</summary><p>録画があるので、あとから見られます。アプリ学習は、自分の空いた時間に進められます。</p></details>
-        <details><summary>毎日どれくらい勉強する必要がありますか？</summary><p>例として、忙しい日は30分、しっかり学ぶ日は60分です。毎日同じ時間が必要なわけではなく、目標と時間に合わせてメニューが変わります。</p></details>
-        <details><summary>具体的な目標がなくても大丈夫ですか？</summary><p>大丈夫です。月1回の「目標設定・振り返り会」で、1ヶ月をふり返りながら次の目標を決めていきます。</p></details>
-        <details><summary>パソコンがなくても参加できますか？</summary><p>はい。アプリもZoomも、スマホで使えます。</p></details>
-        <details><summary>講師から個別指導を受けられますか？</summary><p>このコースはみんなで学ぶグループ型で、講師による1対1の個別指導はありません。わからないことは、月1回の質問会で聞けます。</p></details>
-        <details><summary>支払い方法は何がありますか？</summary><p>クレジットカード（一括、またはカード会社の分割。日本のカードのみ、アメックスは分割できません）と銀行振込です。銀行振込は<a href="https://line.me/R/oaMessage/@039impnx/?%E9%8A%80%E8%A1%8C%E6%8C%AF%E8%BE%BC">公式LINEに「銀行振込」と送ってください</a>。</p></details>
-        <details><summary>途中で解約できますか？</summary><p>できます。書面を受け取った日を含めて8日以内は、クーリング・オフ（特定商取引法に基づく制度）ができます。11/15までの解約は、解約手数料0円で返金します。11/16以降は、対価（110,000円×経過日数÷92日）と通常損害（最大5,000円）を差し引いて返金します。くわしくは<a href="https://my.ohana-english.app/?view=gaiyou">概要書面</a>をご覧ください。</p></details>
+        <details><summary>本当に英語初心者でも参加できますか？</summary><p>参加できます。基本の単語・文法から学び、1ヶ月目は短い英文を作る練習から始めます。メニューは今のレベルに合わせて変わります。</p></details>
+        <details><summary>スマホやアプリの操作が苦手でも大丈夫ですか？</summary><p>スマホのブラウザで開いて使います（インストール不要）。開くと、その日やることが表示されます。始め方は、申し込み後にメールか公式LINEでご案内します。</p></details>
+        <details><summary>仕事が忙しくても続けられますか？</summary><p>忙しい日は30分、しっかり学ぶ日は60分が学習の例です。LIVE授業に出られない日は、録画であとから見られます。</p></details>
+        <details><summary>3ヶ月でどれくらい話せるようになりますか？</summary><p>今の英語力や学習時間によって個人差があります。短い英文を作る、自分のことを話す、日常的な質問に答えて聞き返す、を目標に練習します。</p></details>
+        <details><summary>以前コーチングを受けても話せませんでした。何が違いますか？</summary><p>ʻOhanaは個別管理の手厚さではなく、「知る → 作る → 声に出す → 使う → 振り返る」を毎週くり返す学習設計が特徴です。1対1の個別指導はなく、わからないことは月1回の質問会で聞けます。</p></details>
+        <details><summary>支払い方法は？</summary><p>クレジットカード（一括、またはカード会社の分割。日本のカードのみ、アメックスは分割できません）と銀行振込です。銀行振込は<a href="https://line.me/R/oaMessage/@039impnx/?%E9%8A%80%E8%A1%8C%E6%8C%AF%E8%BE%BC">公式LINEに「銀行振込」と送ってください</a>。</p></details>
+        <details><summary>途中で解約できますか？</summary><p>できます。書面を受け取った日を含めて8日以内は、クーリング・オフ（特定商取引法に基づく制度）ができます。11/15までの解約は解約手数料0円で返金します。11/16以降は、対価（110,000円×経過日数÷92日）と通常損害（最大5,000円）を差し引いて返金します。くわしくは<a href="https://my.ohana-english.app/?view=gaiyou">概要書面</a>をご覧ください。</p></details>
       </div>
-    </div>
-  </section>
-
-  <!-- 11. 最後のCTA -->
-  <section class="s-navy final">
-    <div class="wrap">
-      <h2><span class="ib">「えーっと…」を</span><span class="ib"><span class="hl">「言えた！」</span>に。</span><br><span class="ib">一緒に、90日間はじめよう。</span></h2>
-      <p class="name">ʻOhana English 3ヶ月突破コース 第1期生</p>
-      <ul class="facts3">
-        <li>11月16日（月）一斉スタート</li>
-        <li>110,000円（税込）</li>
-        <li>カード決済・銀行振込に対応</li>
-      </ul>
-      <div class="cta">
-        <a class="btn block" href="https://my.ohana-english.app/?view=join">第1期生に申し込む</a>
-        <p class="deadline" data-deadline></p>
+      <div class="final">
+        <h2><span class="ib">「えーっと…」を</span><span class="ib"><span class="hl">「言えた！」</span>に。</span><br><span class="ib">一緒に、90日間はじめよう。</span></h2>
+        <ul class="facts3"><li>11/16（月）一斉スタート</li><li>110,000円（税込）</li><li>カード・銀行振込</li></ul>
+        <div class="cta">
+          <a class="btn block" href="https://my.ohana-english.app/?view=join">第1期生に申し込む</a>
+          <p class="deadline" data-deadline></p>
+        </div>
       </div>
     </div>
   </section>
