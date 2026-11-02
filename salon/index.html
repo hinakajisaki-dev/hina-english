@@ -567,7 +567,7 @@
   .exi.or { background: var(--accent); color: #FFF; }
   .ext { margin-top: 8px; font-size: 14px; font-weight: 700; color: var(--ink-2); line-height: 1.75; }
   /* アプリ */
-  .shots-tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; background: var(--bg); border-radius: 999px; padding: 4px; margin: 14px auto 10px; max-width: 300px; }
+  .shots-tabs { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 4px; background: var(--bg); border-radius: 999px; padding: 4px; margin: 14px auto 10px; max-width: 340px; }
   .shots-tabs button { font: inherit; font-size: 13.5px; font-weight: 900; min-height: 38px; border: 0; border-radius: 999px; background: transparent; color: var(--ink-2); cursor: pointer; }
   .shots-tabs button[aria-selected="true"] { background: var(--accent); color: #FFF; }
   .shots { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; gap: 14px; padding: 4px 18% 14px; scrollbar-width: none; }
@@ -629,19 +629,12 @@
   .cap { width: 96px; height: auto; }
   @media (min-width: 900px) {
     .ex { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 18px; max-width: 980px; margin: 0 auto; }
-    .ex-app, .ex-live, .ex-grad { grid-column: 1 / -1; }
+    .ex > .exb { grid-column: 1 / -1; }
+    .ex .pair { max-width: 640px; margin-left: auto; margin-right: auto; }
     .exb { padding: 26px 28px; }
     .exh h3 { font-size: 22px; }
     .ext { font-size: 15.5px; }
-    .ex-app { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: auto auto 1fr; column-gap: 28px; }
-    .ex-app .exh { grid-column: 1; grid-row: 1; }
-    .ex-app .ext { grid-column: 1; grid-row: 2; }
-    .ex-app .ex3 { grid-column: 1; grid-row: 3; align-self: end; }
-    .ex-app .shots-tabs { display: none; }
-    .ex-app .shots { grid-column: 2; grid-row: 1 / 4; overflow: visible; padding: 0; justify-content: center; gap: 16px; }
-    .ex-app .shot { flex: 0 0 auto; }
-    .ex-app .shot .phone { width: 190px; }
-    .ex-app .shot:nth-child(2) { transform: translateY(24px); }
+    .ex-app { max-width: 620px; margin: 0 auto; width: 100%; }
     .ex3 b { font-size: 15px; }
     .ex3 span { font-size: 12.5px; }
     .ex-live { display: grid; grid-template-columns: 1fr 260px; grid-template-rows: auto 1fr auto auto; column-gap: 28px; }
@@ -682,6 +675,16 @@
     .ex-live .zoom { grid-column: 2; grid-row: 1 / 3; width: 100%; max-width: none; margin: 0; }
     .ex-live { grid-template-columns: 1fr 320px; }
   }
+  /* 11/2：アプリは3つのタブ、説明は真ん中 */
+  .ext.center { text-align: center; }
+  .exh.center-h { justify-content: center; }
+  .exh h3.one { font-size: 16.5px; white-space: nowrap; font-feature-settings: "palt"; }
+  .shot { flex-direction: column; align-items: center; gap: 8px; }
+  .shot-cap { font-size: 13.5px; font-weight: 800; color: var(--ink-2); text-align: center; line-height: 1.5; }
+  .shot-cap b { color: var(--accent-text); }
+  .shots-tabs button { font-size: 13px; }
+  @media (max-width: 340px) { .exh h3.one { font-size: 14.5px; } .exh.center-h .exi { width: 34px; height: 34px; } }
+  @media (min-width: 900px) { .exh h3.one { font-size: 22px; } .shot-cap { font-size: 15px; } }
 </style>
 </head>
 <body id="top">
@@ -808,18 +811,20 @@
       <div class="ex">
         <!-- Block 01 アプリ -->
         <div class="card exb ex-app">
-          <div class="exh"><span class="exi"><svg viewBox="0 0 24 24"><rect x="6" y="2.5" width="12" height="19" rx="2.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M10 18.5h4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span><h3><span class="ib">今日やることは、</span><span class="ib">アプリでわかる。</span></h3></div>
-          <p class="ext"><span class="ib">単語・文法・話す練習・復習まで。</span><span class="ib">自分のレベルや目標に合わせた</span><span class="ib">学習メニューで、迷わず取り組めます。</span></p>
+          <div class="exh center-h"><span class="exi"><svg viewBox="0 0 24 24"><rect x="6" y="2.5" width="12" height="19" rx="2.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M10 18.5h4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span><h3 class="one">今日やることは、アプリでわかる。</h3></div>
+          <p class="ext center"><span class="ib">単語・文法・話す練習・復習まで。</span><br><span class="ib">自分のレベルや目標に合わせた</span><span class="ib">学習メニューで、</span><span class="ib">迷わず取り組めます。</span></p>
           <div class="shots-tabs" role="tablist" aria-label="アプリの画面">
             <button type="button" role="tab" aria-selected="true" data-to="0">今日の学習</button>
-            <button type="button" role="tab" aria-selected="false" data-to="1">成長記録</button>
+            <button type="button" role="tab" aria-selected="false" data-to="1">自動復習</button>
+            <button type="button" role="tab" aria-selected="false" data-to="2">成長記録</button>
           </div>
           <div class="shots" tabindex="0" aria-label="アプリの画面（横にスワイプできます）">
-            <div class="shot"><div class="phone"><img src="img/home-crop.webp" width="780" height="1216" alt="今日の学習の画面（見本）" loading="lazy"></div></div>
-            <div class="shot"><div class="phone"><img src="img/progress-crop.webp" width="720" height="1122" alt="成長記録の画面（見本）" loading="lazy"></div></div>
+            <div class="shot"><p class="shot-cap">毎日迷わず、<b>やることがすでに決まっている</b></p><div class="phone"><img src="img/home-crop.webp" width="780" height="1216" alt="今日の学習の画面（見本）" loading="lazy"></div></div>
+            <div class="shot"><p class="shot-cap"><b>苦手なところを、徹底的に</b>くり返す</p><div class="phone"><img src="img/mock-menu-top.webp" width="780" height="1054" alt="きのうの単語の復習が出ている画面（見本）" loading="lazy"></div></div>
+            <div class="shot"><p class="shot-cap">毎日の<b>頑張りや成長を見える化</b></p><div class="phone"><img src="img/progress-crop.webp" width="720" height="1122" alt="成長記録の画面（見本）" loading="lazy"></div></div>
           </div>
           <ul class="ex3">
-            <li><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M4 7c4-2 8-2 12 1v18c-4-3-8-3-12-1zM28 7c-4-2-8-2-12 1v18c4-3 8-3 12-1z" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round"/></svg><b>今日の学習</b><span>開けば、やることがわかる</span></li>
+            <li><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M4 7c4-2 8-2 12 1v18c-4-3-8-3-12-1zM28 7c-4-2-8-2-12 1v18c4-3 8-3 12-1z" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round"/></svg><b>今日の学習</b><span>毎日やることが決まっている</span></li>
             <li><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M26 12a10 10 0 0 0-18-3M6 20a10 10 0 0 0 18 3" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/><path d="M8 3v6h6M24 29v-6h-6" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg><b>自動復習</b><span>苦手をもう一度</span></li>
             <li><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M7 26V18M13 26V13M19 26V16M25 26V7" stroke="currentColor" stroke-width="3.2" stroke-linecap="round"/></svg><b>成長記録</b><span>頑張りが見える</span></li>
           </ul>
@@ -827,8 +832,8 @@
 
         <!-- Block 02 LIVE -->
         <div class="exb ex-live">
-          <div class="exh"><span class="exi or"><svg viewBox="0 0 24 24"><rect x="2.5" y="6" width="13" height="12" rx="2.5" fill="currentColor"/><path d="M16.5 10.5l5-3v9l-5-3z" fill="currentColor"/></svg></span><h3><span class="ib">学んだ英語を、実際に話す。</span><br><span class="ib"><b>月12回以上</b>のLIVE授業。</span></h3></div>
-          <p class="ext"><span class="ib">覚えたフレーズを声に出したり、</span><span class="ib">文法を使ってみたり。</span><br><span class="ib">アプリで学んだ英語を、</span><span class="ib">実際に使う時間です。</span></p>
+          <div class="exh"><span class="exi or"><svg viewBox="0 0 24 24"><rect x="2.5" y="6" width="13" height="12" rx="2.5" fill="currentColor"/><path d="M16.5 10.5l5-3v9l-5-3z" fill="currentColor"/></svg></span><h3><span class="ib">学んだ英語を、実際に話す。</span><br><span class="ib"><b>月12回</b>のLIVE授業。</span></h3></div>
+          <p class="ext center"><span class="ib">覚えたフレーズを声に出したり、</span><span class="ib">文法を使ってみたり。</span><br><span class="ib">アプリで学んだ英語を、</span><span class="ib">実際に使う時間です。</span></p>
           <div class="zoom" aria-label="LIVE授業の様子：Hinaが今日のフレーズを教えている">
             <div class="z-top"><span class="z-live">● LIVE</span><span class="z-title">日常英会話LIVE</span></div>
             <div class="z-body">
@@ -847,12 +852,12 @@
             <div class="z-bar" aria-hidden="true"><i></i><i></i><i></i><i></i><i class="end"></i></div>
           </div>
           <ul class="live4">
-            <li><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M5 8h16a3 3 0 0 1 3 3v7a3 3 0 0 1-3 3h-8l-5 4v-4H5a3 3 0 0 1-3-3v-7a3 3 0 0 1 3-3z" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linejoin="round"/><path d="M26 12h1a3 3 0 0 1 3 3v6a3 3 0 0 1-3 3h-1v3l-4-3" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linejoin="round" stroke-linecap="round"/></svg><b>日常英会話・<br>瞬間英作文</b><span class="fq">週2回</span></li>
-            <li><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M4 7c4-2 8-2 12 1v18c-4-3-8-3-12-1zM28 7c-4-2-8-2-12 1v18c4-3 8-3 12-1z" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linejoin="round"/></svg><b>文法強化・<br>ホームルーム</b><span class="fq">週1回</span></li>
-            <li><svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="12" fill="none" stroke="currentColor" stroke-width="2.3"/><path d="M12.5 12.5a3.5 3.5 0 1 1 5 3.2c-1 .5-1.5 1.2-1.5 2.3v.5" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"/><circle cx="16" cy="22.5" r="1.5" fill="currentColor"/></svg><b>質問会</b><span class="fq">月1回</span></li>
-            <li><svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="15" cy="17" r="11" fill="none" stroke="currentColor" stroke-width="2.3"/><circle cx="15" cy="17" r="6" fill="none" stroke="currentColor" stroke-width="2.3"/><circle cx="15" cy="17" r="1.8" fill="currentColor"/><path d="M15 17L27 5M23 5h4v4" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"/></svg><b>目標設定・<br>振り返り会</b><span class="fq">月1回</span></li>
+            <li><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M5 8h16a3 3 0 0 1 3 3v7a3 3 0 0 1-3 3h-8l-5 4v-4H5a3 3 0 0 1-3-3v-7a3 3 0 0 1 3-3z" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linejoin="round"/><path d="M26 12h1a3 3 0 0 1 3 3v6a3 3 0 0 1-3 3h-1v3l-4-3" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linejoin="round" stroke-linecap="round"/></svg><b>日常英会話<br>瞬間英作文</b><span class="fq">週2回</span></li>
+            <li><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M4 7c4-2 8-2 12 1v18c-4-3-8-3-12-1zM28 7c-4-2-8-2-12 1v18c4-3 8-3 12-1z" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linejoin="round"/></svg><b>文法強化<br>ホームルーム</b><span class="fq">週1回</span></li>
+            <li><svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="12" fill="none" stroke="currentColor" stroke-width="2.3"/><path d="M12.5 12.5a3.5 3.5 0 1 1 5 3.2c-1 .5-1.5 1.2-1.5 2.3v.5" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"/><circle cx="16" cy="22.5" r="1.5" fill="currentColor"/></svg><b>質問会<br>壁打ち会</b><span class="fq">月1回</span></li>
+            <li><svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="15" cy="17" r="11" fill="none" stroke="currentColor" stroke-width="2.3"/><circle cx="15" cy="17" r="6" fill="none" stroke="currentColor" stroke-width="2.3"/><circle cx="15" cy="17" r="1.8" fill="currentColor"/><path d="M15 17L27 5M23 5h4v4" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"/></svg><b>目標設定<br>振り返り会</b><span class="fq">月1回</span></li>
           </ul>
-          <p class="live-note">4種類あわせて、月12回以上。Hinaが月2〜3回、ほかは英語講師が担当します。</p>
+          <p class="live-note">4種類あわせて、月12回。Hinaが月2〜3回、ほかは英語講師が担当します。</p>
         </div>
 
         <!-- Block 03 朝活・Study Session -->
@@ -868,23 +873,6 @@
               <b>Study Session</b><p>みんなでもくもく勉強会<br>25分集中＋5分休憩</p><span class="fq2">不定期開催</span>
             </div>
           </div>
-          <p class="fine" style="margin-top:8px">会員の掲示板も、2026年11月中に提供開始予定です。</p>
-        </div>
-
-        <!-- Block 04 成長を振り返る -->
-        <div class="card exb">
-          <div class="exh"><span class="exi"><svg viewBox="0 0 24 24"><rect x="8.5" y="2.5" width="7" height="12" rx="3.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span><h3><span class="ib">90日間の成長を、</span><span class="ib">目に見える形に。</span></h3></div>
-          <div class="grow">
-            <div class="waves" aria-hidden="true">
-              <div class="wv"><span class="tag">初日</span><span class="play">▶</span><i style="--h:30%"></i><i style="--h:50%"></i><i style="--h:35%"></i><i style="--h:60%"></i><i style="--h:40%"></i><i style="--h:30%"></i><i style="--h:55%"></i><i style="--h:35%"></i><i style="--h:45%"></i><i style="--h:30%"></i><i style="--h:40%"></i><i style="--h:25%"></i></div>
-              <div class="wv last"><span class="tag">最終日</span><span class="play">▶</span><i style="--h:45%"></i><i style="--h:75%"></i><i style="--h:60%"></i><i style="--h:90%"></i><i style="--h:70%"></i><i style="--h:85%"></i><i style="--h:65%"></i><i style="--h:95%"></i><i style="--h:70%"></i><i style="--h:80%"></i><i style="--h:60%"></i><i style="--h:75%"></i></div>
-            </div>
-            <ul class="checks2">
-              <li><b>最初と最後の英語を録音</b><span>初日と最終日に同じお題で。90日間の変化を聞き比べよう。</span></li>
-              <li><b>毎月の定期テスト</b><span>毎月、自分の理解度をチェック。</span></li>
-              <li><b>成長の見える化</b><span>勉強時間や継続日数を記録。</span></li>
-            </ul>
-          </div>
         </div>
 
         <!-- Block 05 卒業イベント -->
@@ -893,9 +881,9 @@
           <div class="grad-in">
             <div>
               <h3><span class="ib">90日間の最後には、</span><span class="ib"><span class="em">卒業イベント</span>も！</span></h3>
-              <p class="ext">3ヶ月頑張った自分を、仲間と一緒にお祝いしよう。</p>
+              <p class="ext"><span class="ib">3ヶ月頑張った自分を</span><br><span class="ib">仲間と一緒にお祝いしよう。</span></p>
               <p class="when"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M3 10h18M8 3v4M16 3v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>2027年2月頃 開催予定</p>
-              <p class="fine">日時・会場などの詳細は、決まり次第ご案内します。</p>
+              <p class="fine"><span class="ib">日時・会場などの詳細は</span><br><span class="ib">決まり次第ご案内します。</span></p>
             </div>
             <svg class="cap" viewBox="0 0 120 100" aria-hidden="true"><circle cx="60" cy="58" r="40" fill="#FFF"/><path d="M20 40l40-18 40 18-40 18z" fill="#17233B"/><path d="M38 49v14c0 6 10 11 22 11s22-5 22-11V49L60 58z" fill="#2A3A5C"/><path d="M96 42v20" stroke="#FFB25E" stroke-width="3" stroke-linecap="round"/><circle cx="96" cy="64" r="4" fill="#FFB25E"/><g transform="translate(14 64)"><circle r="7" fill="#FF8FA3"/><circle cx="10" cy="4" r="6" fill="#FFD27A"/><circle cx="3" cy="11" r="6" fill="#FFB5C2"/></g><rect x="74" y="74" width="30" height="20" rx="3" fill="#FFF7EC" stroke="#F45121" stroke-width="2"/><path d="M80 81h18M80 87h12" stroke="#F45121" stroke-width="2" stroke-linecap="round"/></svg>
           </div>
@@ -1118,7 +1106,7 @@
     var tabs = document.querySelectorAll(".shots-tabs button");
     function mark(i) { tabs.forEach(function (t, k) { t.setAttribute("aria-selected", k === i ? "true" : "false"); }); }
     tabs.forEach(function (t, i) { t.addEventListener("click", function () { box.scrollTo({ left: box.children[i].offsetLeft - box.offsetLeft - (box.clientWidth - box.children[i].clientWidth) / 2, behavior: "smooth" }); mark(i); }); });
-    box.addEventListener("scroll", function () { var i = Math.round(box.scrollLeft / (box.scrollWidth - box.clientWidth || 1)); mark(i); }, { passive: true });
+    box.addEventListener("scroll", function () { var best = 0, d = 1e9; [].forEach.call(box.children, function (c, k) { var x = Math.abs(c.offsetLeft - box.offsetLeft - box.scrollLeft - (box.clientWidth - c.clientWidth) / 2); if (x < d) { d = x; best = k; } }); mark(best); }, { passive: true });
   })();
 
   // 動画は画面に入ったときだけ再生する（通信量と電池のため）
