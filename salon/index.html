@@ -739,6 +739,10 @@
   /* 11/2：06 のカードを背景と分ける */
   #safe .worry li { background: var(--bg); box-shadow: none; border: 1.5px solid #D6E4F7; }
   #safe .worry li:nth-child(even) { background: #FFF4EC; border-color: #FBDCC8; }
+  .faq .ans { padding-bottom: 14px; }
+  .faq .ans p { font-size: 14.5px; line-height: 1.75; padding-bottom: 0; }
+  .faq .ans p + p { margin-top: 8px; }
+  @media (min-width: 900px) { .faq .ans p { font-size: 16px; } }
 </style>
 </head>
 <body id="top">
@@ -842,7 +846,7 @@
       <div class="lesson-day">
         <div class="goal"><small>この日のゴール</small><b>過去形をマスター</b></div>
         <ol class="ls">
-          <li><span class="n">1</span><div class="body"><div><h3>文法を理解する</h3><p>動画で、動詞の形の基本ルールを学ぶ。</p><span class="tool">講義動画</span></div><div class="thumb fit"><img src="img/lecture-list.webp" width="1179" height="1418" alt="アプリの講義動画の画面（見本）" loading="lazy"></div></div></li>
+          <li><span class="n">1</span><div class="body"><div><h3>文法を理解する</h3><p>動画で、動詞の形の基本ルールを学ぶ。</p><span class="tool">講義動画</span></div><div class="thumb wide"><img src="img/lecture-sample.webp" width="1100" height="605" alt="講義動画の1場面：LとRの発音のコツ" loading="lazy"></div></div></li>
           <li class="out"><span class="n">2</span><div class="body"><div><h3>英文を作ってみる</h3><p>日本語を見て、<br>自分で英語にする。<br>瞬発力を鍛えます。</p><span class="en">I went to a cafe with my friend.</span><span class="tool">瞬間英作文</span></div><div class="thumb fit"><img src="img/mock-instant-top.webp" width="720" height="662" alt="瞬間英作文の画面（見本）" loading="lazy"></div></div></li>
           <li class="out"><span class="n">3</span><div class="body"><div><h3>日記で使ってみる</h3><p>書いた英語を添削してもらう。</p><span class="en"><s>I go</s> → <ins>I went</ins></span><span class="tool">英語日記</span></div><div class="thumb fit"><video src="img/journal-top.mp4" poster="img/journal-still-top.webp" width="780" height="716" muted loop playsinline autoplay preload="none" aria-label="英語日記をAIが添削する動画（見本）"></video></div></div></li>
           <li class="out"><span class="n">4</span><div class="body"><div><h3>LIVEで話してみる</h3><p>学んだ表現を、<br>実際に声に出す。</p><span class="tool">LIVE授業 月12回</span></div><div class="mini-zoom" aria-label="Zoom のLIVE授業でHinaが話している様子"><span class="mz-live">● LIVE</span><img src="img/hina-live.webp" width="960" height="519" alt="" loading="lazy"><span class="mz-strip"><i style="--c:#F6A04D">ゆ</i><i style="--c:#3FB37F">K</i><i style="--c:#9B7BE0">ま</i></span><span class="mz-bar"><b></b><b></b><b class="end"></b></span></div></div></li>
@@ -1092,13 +1096,13 @@
     <div class="wrap">
       <div class="sec-head"><span class="part">09 ─ FAQ</span><h2>よくある質問</h2></div>
       <div class="faq">
-        <details open><summary>本当に英語初心者でも参加できますか？</summary><p>参加できます。基本の単語・文法から学び、1ヶ月目は短い英文を作る練習から始めます。メニューは今のレベルに合わせて変わります。</p></details>
-        <details><summary>スマホやアプリの操作が苦手でも大丈夫ですか？</summary><p>スマホのブラウザで開いて使います（インストール不要）。開くと、その日やることが表示されます。始め方は、申し込み後にメールか公式LINEでご案内します。</p></details>
-        <details><summary>仕事が忙しくても続けられますか？</summary><p>忙しい日は30分、しっかり学ぶ日は60分が学習の例です。毎日同じ時間が必要なわけではなく、自分の生活に合わせて取り組めます。</p></details>
-        <details><summary>英語を話せるようになった先の目標がまだなくても大丈夫ですか？</summary><p>もちろん参加できます。最初から大きな目標が決まっていなくても大丈夫です。まずは、自分のことを英語で話せるようになるところから、一緒に目指していきましょう。</p></details>
-        <details><summary>以前コーチングを受けても話せませんでした。何が違いますか？</summary><p>ʻOhana Englishは1対1の個別コーチングではなく、毎日の学習設計とアウトプット練習を組み合わせた、みんなで学ぶグループ型のコースです。「知る・作る・話す・復習する」を毎週くり返します。わからないことは、月1回の質問会で聞けます。</p></details>
-        <details><summary>支払い方法は何がありますか？</summary><p>クレジットカード（一括、またはカード会社の分割。日本のカードのみ、アメックスは分割できません）と銀行振込です。銀行振込は<a href="https://line.me/R/oaMessage/@039impnx/?%E9%8A%80%E8%A1%8C%E6%8C%AF%E8%BE%BC">公式LINEに「銀行振込」と送ってください</a>。</p></details>
-        <details><summary>途中で解約できますか？</summary><p>できます。書面を受け取った日を含めて8日以内は、クーリング・オフ（特定商取引法に基づく制度）ができます。11/15までの解約は解約手数料0円で返金します。11/16以降は、対価（110,000円×経過日数÷92日）と通常損害（最大5,000円）を差し引いて返金します。くわしくは<a href="https://my.ohana-english.app/?view=gaiyou">概要書面</a>をご覧ください。</p></details>
+        <details open><summary>英語がほとんどわからなくても参加できますか？</summary><div class="ans"><p>もちろんです！「be動詞って何だっけ？」という方も大丈夫。中学英語の基礎から学べるので、少しずつ取り組んでいきましょう！</p></div></details>
+        <details><summary>英語はある程度話せますが、中級者でも参加できますか？</summary><div class="ans"><p>もちろんです！最初にレベルチェックを行い、単語やおすすめの課題を調整します。知っている英語を使って、会話を広げる練習にも取り組めます。</p></div></details>
+        <details><summary>仕事が忙しくても続けられますか？</summary><div class="ans"><p>忙しい日は15〜30分の学習例も用意しています。毎日完璧にこなそうとせず、生活に合わせてできることから取り組んでいきましょう！</p></div></details>
+        <details><summary>以前コーチングを受けても話せませんでした。何が違いますか？</summary><div class="ans"><p>英語は、学んだことを繰り返し復習し、使う練習を続けることが大切です。</p><p>ʻOhana Englishでは、毎日の学習メニューに自動復習を組み込み、LIVE授業で実際に話す練習もできます。</p><p>1対1の個別指導はありませんが、その分費用を抑えながら、復習と実践を続けられる環境を整えています！</p></div></details>
+        <details><summary>講師に質問できる機会はありますか？</summary><div class="ans"><p>もちろんです！LIVE授業や質問会で、わからないことを質問できます。</p><p>1対1の個別コーチングではなく、仲間と一緒に学ぶグループ型のプログラムです。</p></div></details>
+        <details><summary>支払い方法は何がありますか？</summary><div class="ans"><p>クレジットカードと銀行振込に対応しています。</p><p>カード会社によっては分割払いも可能です。銀行振込をご希望の方は、<a href="https://line.me/R/oaMessage/@039impnx/?%E9%8A%80%E8%A1%8C%E6%8C%AF%E8%BE%BC">公式LINE</a>に「銀行振込希望です」とお送りください。</p></div></details>
+        <details><summary>途中で解約することはできますか？</summary><div class="ans"><p>はい、途中解約は可能です。</p><p>クーリング・オフや解約時期によって返金条件が異なります。詳しくは、お申し込み前に<a href="https://my.ohana-english.app/?view=gaiyou">概要書面</a>・受講契約書をご確認ください。</p></div></details>
       </div>
       <div class="final">
         <h2><span class="ib">「えーっと…」を</span><span class="ib"><span class="hl">「言えた！」</span>に。</span><br><span class="ib">一緒に、90日間はじめよう。</span></h2>
