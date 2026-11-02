@@ -3,7 +3,10 @@
 // their journals with the AI corrections.
 import { ApiError, api, diffHtml, esc, formatDateTime, icons, startOfJapanDay, toast, watchErrors } from "./common.js";
 import { UNITS } from "./grammar/lessons.js";
-import { bookWeeks, itemWeek, paceWeeks, setKey, vocabBooks, weekBook, weekWords, wordSets } from "./vocab/words.js";
+import {
+  TOEIC_PARTS, bookWeeks, isToeicWeek, itemWeek, listenSetKey, paceWeeks, setKey, toeicPart, toeicWeek, vocabBooks, weekBook, weekWords,
+  wordSets,
+} from "./vocab/words.js";
 import { USUAL_MONTHS, currentMonth, monthLabel, monthPhrases, pronMonths, studentMonths } from "./pron/phrases.js";
 import { CURRENT_WEEK, NOTES_FOR_STUDENTS } from "./course.js";
 import { MENUS } from "./menus.js";
@@ -22,9 +25,9 @@ const WEEKS = 24;
 const KINDS = {
   vocab: {
     tab: "単語",
-    columns: ["word", "meaning", "example"],
+    columns: ["word", "meaning", "example", "example_ja"],
     required: 2,
-    format: "単語 | 意味 | 例文（なくてもOK）",
+    format: "単語 | 意味 | 例文（なくてもOK） | 例文の日本語（なくてもOK）",
     example: "borrow | 借りる | Can I borrow your pen?\nslip one's mind | うっかり忘れる",
   },
   pron: {
@@ -558,7 +561,7 @@ function rowHtml(kind, item, progress) {
   let pill = "";
   let extra = "";
   if (kind === "vocab") {
-    main = d.word; sub = [d.meaning, d.example].filter(Boolean).join(" ・ ");
+    main = d.word; sub = [d.meaning, d.example, d.example_ja].filter(Boolean).join(" ・ ");
     if ((state.current.review || []).some((r) => r.key === `item/${item.id}`)) pill = `<span class="pill">復習カード</span>`;
   } else if (kind === "pron") {
     main = d.text; sub = d.tip;
@@ -611,12 +614,15 @@ function renderItems(panel, kind) {
     const options = Array.from({ length: WEEKS }, (_, i) => i + 1);
     if (count("other")) options.push("other");
     if (count("mine")) options.push("mine");
+    // TOEIC単語 (for a student with it on): Part 1〜3.
+    const toeic = TOEIC_PARTS.map((p) => toeicWeek(p.part)).filter((w) => state.current.toeic || count(w));
+    options.unshift(...toeic);
     weekPicker = `<label class="field"><span>Week をえらぶ</span>
-      <select id="week">${options.map((w) => `<option value="${w}" ${w === week ? "selected" : ""}>${w === "other" ? "そのほか（Week なし）" : w === "mine" ? "生徒が追加した単語" : `Week ${w}`}（${count(w)} 語）</option>`).join("")}</select>
+      <select id="week">${options.map((w) => `<option value="${w}" ${w === week ? "selected" : ""}>${vocabWeekName(state.current, w)}${w === "other" ? "（Week なし）" : ""}（${count(w)} 語）</option>`).join("")}</select>
     </label>`;
     list = list.filter((item) => weekOf(item) === week);
   }
-  const weekName = week === "other" ? "そのほか" : `Week ${week}`;
+  const weekName = vocabWeekName(state.current, week);
   // The words the student added themselves are only listed here (to fix or delete).
   const studentWords = week === "mine";
   // 言い換え問題 are listed by grammar, in the order each grammar was first added.
@@ -629,7 +635,7 @@ function renderItems(panel, kind) {
     });
   }
 
-  const bookId = kind === "vocab" && week !== "other" && !studentWords ? weekBook(week, state.current.vocabBooks) : null;
+  const bookId = kind === "vocab" && week !== "other" && !studentWords && !isToeicWeek(week) ? weekBook(week, state.current.vocabBooks) : null;
   const bookInfo = bookId && vocabBooks().find((b) => b.id === bookId);
   panel.innerHTML = `<div class="stack">
     ${kind === "grammar" ? lessonResultsHtml() : ""}
@@ -684,7 +690,8 @@ function renderItems(panel, kind) {
     const button = form.querySelector("button");
     busy(button, "追加中…");
     try {
-      const data = parsed.map((p) => (week && week !== "other" ? { ...p.data, week } : p.data));
+      const data = parsed.map((p) => (isToeicWeek(week) ? { ...p.data, toeic: toeicPart(week).part }
+        : week && week !== "other" ? { ...p.data, week } : p.data));
       await api(`/api/teacher/students/${student.id}/items`, {
         method: "POST",
         body: { kind, items: data },
@@ -723,7 +730,7 @@ function renderItems(panel, kind) {
 
   document.getElementById("week")?.addEventListener("change", (event) => {
     const value = event.target.value;
-    state.vocabWeek.week = value === "other" || value === "mine" ? value : Number(value);
+    state.vocabWeek.week = value === "other" || value === "mine" || isToeicWeek(value) ? value : Number(value);
     renderItems(panel, kind);
   });
 
@@ -838,20 +845,28 @@ function vocabBooksForm() {
 
 // Every set this student has (sets of ten, or days; their 単語帳 and own words), with its key.
 // With a pace of their own (vocab_pace), the weeks after its week are its pace weeks.
+// TOEIC単語's sets come twice: their test, then 例文の聞きとり.
 function vocabSetList(data) {
   const books = data.vocabBooks;
   const pace = data.vocabPace;
   let weeks = [...new Set([...bookWeeks(books), ...data.items.filter((i) => i.kind === "vocab").map(itemWeek)])];
   if (pace) weeks = [...weeks.filter((w) => typeof w !== "number" || w <= pace.week), ...paceWeeks(data.items, books, pace).map((p) => p.week)];
-  return weeks.flatMap((week) =>
-    wordSets(weekWords(week, data.items, books, pace), week, pace).map((set) => ({ week, ...set, key: setKey(week, set.number, books, pace) })),
-  );
+  return weeks.flatMap((week) => {
+    const sets = wordSets(weekWords(week, data.items, books, pace), week, pace);
+    const list = sets.map((set) => ({ week, ...set, key: setKey(week, set.number, books, pace) }));
+    if (isToeicWeek(week)) {
+      list.push(...sets.filter((set) => set.words.some((w) => w.examples.length))
+        .map((set) => ({ week, ...set, label: `${set.label}（例文の聞きとり）`, key: listenSetKey(week, set.number), listen: true })));
+    }
+    return list;
+  });
 }
 
 // "Week 2", "そのほか", "生徒が追加した単語", or a pace week's "Week 3 ①".
 function vocabWeekName(data, week) {
   if (week === "other") return "そのほか";
   if (week === "mine") return "生徒が追加した単語";
+  if (isToeicWeek(week)) return `TOEIC Part ${toeicPart(week).part}`;
   if (typeof week === "string") return paceWeeks(data.items, data.vocabBooks, data.vocabPace).find((p) => p.week === week)?.label || week;
   return `Week ${week}`;
 }
@@ -869,7 +884,8 @@ function vocabResultsHtml() {
       return `<li><div class="main">
         <div><b>${esc(vocabWeekName(state.current, set.week))} ・ ${esc(set.label)}</b></div>
         <div class="sub">${r
-          ? `ベスト ${r.best} / ${r.total}　前回 ${r.last} / ${r.total}　${r.times} 回　（${esc(formatDateTime(r.updated_at))}）`
+          ? set.listen ? `最後まで聞いた ${r.times} 回　（${esc(formatDateTime(r.updated_at))}）`
+            : `ベスト ${r.best} / ${r.total}　前回 ${r.last} / ${r.total}　${r.times} 回　（${esc(formatDateTime(r.updated_at))}）`
           : "まだやっていません"}</div>
       </div></li>`;
     }).join("")}</ul>
@@ -1031,6 +1047,8 @@ function renderSettings(panel) {
       <h3>生徒の画面に出すもの</h3>
       <p class="muted small">チェックを外したものは、この生徒のホームに出ません（ほかの生徒は変わりません）。生徒ごとのチャットからも変えられます。</p>
       <div class="menu-picks">${MENUS.map((m) => `<label><input type="checkbox" name="${esc(m.key)}" ${(state.current.hidden || []).includes(m.key) ? "" : "checked"}> ${esc(m.name)}</label>`).join("")}</div>
+      <p class="muted small">TOEIC の生徒だけ：</p>
+      <div class="menu-picks"><label><input type="checkbox" name="toeic" ${state.current.toeic ? "checked" : ""}> TOEIC単語（ホームのいちばん上）</label></div>
       <button class="btn" type="submit" style="align-self:flex-start">保存</button>
     </form>
     <form class="card stack" id="pron-months">
@@ -1091,8 +1109,10 @@ function renderSettings(panel) {
     const button = menuForm.querySelector("button");
     busy(button, "保存中…");
     const hidden = MENUS.map((m) => m.key).filter((key) => !menuForm.elements[key].checked);
+    const toeic = menuForm.elements.toeic.checked;
     try {
       await api(`/api/teacher/students/${student.id}/menus`, { method: "PUT", body: { hidden } });
+      if (toeic !== !!state.current.toeic) await api(`/api/teacher/students/${student.id}/toeic`, { method: "PUT", body: { on: toeic } });
       await renderStudent(student.id, "settings");
       toast("生徒の画面に出すものを保存しました");
     } catch (error) {

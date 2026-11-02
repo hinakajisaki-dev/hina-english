@@ -10,6 +10,7 @@
 // node scripts/teacher.mjs show なおみ
 // node scripts/teacher.mjs add なおみ vocab --week 2 words.txt     (単語 | 意味 | 例文)
 // node scripts/teacher.mjs add なおみ vocab --mine words.txt       (into the student's 自分の単語 / My vocabs)
+// node scripts/teacher.mjs add えいし vocab --toeic 1 words.txt    (TOEIC単語 Part 1〜3: 単語 | 意味 | 例文 | 例文の日本語)
 // node scripts/teacher.mjs add なおみ pron lines.txt               (読む文 | コツ)
 // node scripts/teacher.mjs add なおみ grammar lines.txt            (問題 | 答え | 選択肢 a / b | 解説)
 // node scripts/teacher.mjs add なおみ topic lines.txt              (テーマ)
@@ -33,6 +34,7 @@
 // node scripts/teacher.mjs phrase-books なおみ [--set talk1 | --default]   (フレーズ: own books instead of スモールトーク)
 // node scripts/teacher.mjs vocab-pace なおみ [--week 2 --days 4 --size 40 | --off]   (fewer words a week, across the 単語帳)
 // node scripts/teacher.mjs write-practice なおみ [--on | --off]   (★ on 復習 examples and 書く練習)
+// node scripts/teacher.mjs toeic えいし [--on | --off]             (TOEIC単語 at the top of the home screen)
 // node scripts/teacher.mjs stars なおみ                           (the ★ examples and their お題)
 // node scripts/teacher.mjs lesson-days なおみ [--add 2026-08-03,2026-08-16] [--remove 2026-08-03]   (the numbered lessons)
 //
@@ -65,7 +67,7 @@ const TOKEN = (process.env.HINA_TEACHER_TOKEN || "").trim();
 // What each kind of line holds; the first `required` columns must be filled
 // (the same as the teacher page).
 const KINDS = {
-  vocab: { name: "単語", columns: ["word", "meaning", "example"], required: 2 },
+  vocab: { name: "単語", columns: ["word", "meaning", "example", "example_ja"], required: 2 },
   pron: { name: "発音", columns: ["text", "tip"], required: 1 },
   grammar: { name: "文法", columns: ["question", "answer", "choices", "explanation"], required: 2 },
   topic: { name: "日記のテーマ", columns: ["prompt"], required: 1 },
@@ -288,7 +290,7 @@ const commands = {
   async show([name]) {
     const data = await studentData(await findStudent(name));
     console.log(`# ${data.student.name}さん`);
-    console.log(`\n## 生徒の画面に出すもの\n${menuLine(data.hidden)}`);
+    console.log(`\n## 生徒の画面に出すもの\n${menuLine(data.hidden)}${data.toeic ? "　○ TOEIC単語（いちばん上）" : ""}`);
     console.log(`\n## 発音課題の Month\n${pronLine(data.pronMonths)}`);
     console.log(`\n## 発音課題の完了\n${pronProgress(data.pronDone)}`);
     console.log(`\n## 単語帳\n${bookLine(data.vocabBooks)}`);
@@ -299,10 +301,11 @@ const commands = {
       const items = data.items.filter((i) => i.kind === kind);
       console.log(`\n## ${spec.name}（${items.length}）`);
       if (kind === "vocab") {
-        const weekOf = (i) => (i.data.mine ? "生徒が追加" : i.data.week || "そのほか");
+        const weekOf = (i) => (i.data.mine ? "生徒が追加" : i.data.toeic ? `TOEIC単語 Part ${i.data.toeic}` : i.data.week || "そのほか");
         const weeks = [...new Set(items.map(weekOf))];
         for (const week of weeks) {
-          console.log(week === "そのほか" ? "### そのほか（Week なし）" : week === "生徒が追加" ? "### 生徒が自分で追加した単語" : `### Week ${week}`);
+          console.log(week === "そのほか" ? "### そのほか（Week なし）" : week === "生徒が追加" ? "### 生徒が自分で追加した単語"
+            : typeof week === "string" ? `### ${week}` : `### Week ${week}`);
           for (const i of items.filter((i) => weekOf(i) === week)) console.log(`[${i.id}] ${itemLine(kind, i.data)}`);
         }
       } else {
@@ -323,15 +326,19 @@ const commands = {
     const bad = parsed.map((p, i) => (p.missing ? `${i + 1}行目：${lines[i]}` : null)).filter(Boolean);
     if (bad.length) stop(`足りない列がある行があります（${KINDS[kind].columns.slice(0, KINDS[kind].required).join("・")} は必須）\n${bad.join("\n")}`);
     let week = null;
-    // --mine puts the words in the student's own list (自分の単語), as if they had added them.
+    // --mine puts the words in the student's own list (自分の単語), as if they had added them,
+    // and --toeic 1〜3 in TOEIC単語's Part 1〜3.
     const mine = kind === "vocab" && options.mine === true;
-    if (kind === "vocab" && !mine) {
+    const toeic = kind === "vocab" && options.toeic !== undefined ? Number(options.toeic) : null;
+    if (toeic !== null && ![1, 2, 3].includes(toeic)) stop("TOEIC単語は --toeic 1、2、3 のどれかで Part を指定してください。");
+    if (kind === "vocab" && !mine && !toeic) {
       week = Number(options.week);
-      if (!Number.isInteger(week) || week < 1 || week > 24) stop("単語は --week 1〜24 で週を指定してください（生徒の「自分の単語」に入れるときは --mine）。");
+      if (!Number.isInteger(week) || week < 1 || week > 24) stop("単語は --week 1〜24 で週を指定してください（生徒の「自分の単語」は --mine、TOEIC単語は --toeic 1〜3）。");
     }
-    const items = parsed.map((p) => (week ? { ...p.data, week } : mine ? { ...p.data, mine } : p.data));
+    const items = parsed.map((p) => (week ? { ...p.data, week } : mine ? { ...p.data, mine } : toeic ? { ...p.data, toeic } : p.data));
     const { added } = await api(`/api/teacher/students/${student.id}/items`, { method: "POST", body: { kind, items } });
-    console.log(`${student.name}さんに${KINDS[kind].name}を ${added} こ追加しました${week ? `（Week ${week}）` : mine ? "（自分の単語）" : ""}。`);
+    console.log(`${student.name}さんに${KINDS[kind].name}を ${added} こ追加しました${week ? `（Week ${week}）` : mine ? "（自分の単語）" : toeic ? `（TOEIC単語 Part ${toeic}）` : ""}。`);
+    if (toeic && !(await studentData(student)).toeic) console.log(`※ ${student.name}さんの画面には、まだ TOEIC単語 が出ていません（toeic ${student.name} --on で出ます）。`);
   },
 
   async "edit-item"([name, id, line]) {
@@ -620,6 +627,16 @@ const commands = {
     }
     await api(`/api/teacher/students/${student.id}/write-practice`, { method: "PUT", body: { on: !!options.on } });
     console.log(`${student.name}さんの ★ と書く練習を${options.on ? "出しました（単語復習の例文に ☆、復習の画面に「書く練習」）" : "やめました（★ は残ります）"}。`);
+  },
+
+  async toeic([name], options) {
+    const student = await findStudent(name);
+    if (!options.on && !options.off) {
+      const { toeic } = await studentData(student);
+      return console.log(`${student.name}さんの TOEIC単語：${toeic ? "あり（ホームのいちばん上）" : "なし"}`);
+    }
+    await api(`/api/teacher/students/${student.id}/toeic`, { method: "PUT", body: { on: !!options.on } });
+    console.log(`${student.name}さんの TOEIC単語を${options.on ? "出しました（ホームのいちばん上。Part 1〜3）" : "しまいました（単語と結果は残ります）"}。`);
   },
 
   async stars([name]) {
