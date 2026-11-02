@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>ʻOhana English 3ヶ月突破コース（第1期）</title>
-<meta name="description" content="「知ってる英語」を「パッと話せる英語」に変える90日間。毎日のアプリ学習と月12回以上のLIVE授業で、インプットからアウトプットまでを一つの流れで練習する初心者向けの3ヶ月コース。2026年11/16一斉スタート。">
+<meta name="description" content="「知ってる英語」を「パッと話せる英語」に変える90日間。毎日のアプリ学習と月12回のLIVE授業で、インプットからアウトプットまでを一つの流れで練習する初心者向けの3ヶ月コース。2026年11/16一斉スタート。">
 <meta property="og:type" content="website">
 <meta property="og:title" content="ʻOhana English 3ヶ月突破コース（第1期）">
 <meta property="og:description" content="「知ってる英語」を「パッと話せる英語」に変える90日間。11/16一斉スタート。">
@@ -556,6 +556,137 @@
   .term .pay1 { font-size: 14px; font-weight: 800; line-height: 1.7; }
   @media (max-width: 340px) { .sched li { grid-template-columns: 1fr; gap: 0; } }
   @media (min-width: 900px) { details.term { padding: 0 22px; } details.term summary { font-size: 17px; } .sched li { font-size: 15px; } .sched li span { font-size: 14px; } }
+  /* ===== Section 04：90日間の学習体験 ===== */
+  .ex { display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px; }
+  .exb { min-width: 0; }
+  .exb { border-radius: 20px; padding: 18px 16px; }
+  .exh { display: flex; align-items: center; gap: 10px; }
+  .exh h3 { font-size: 18px; font-weight: 900; line-height: 1.45; }
+  .exi { flex-shrink: 0; width: 42px; height: 42px; border-radius: 50%; background: var(--accent-soft); color: var(--accent); display: grid; place-items: center; }
+  .exi svg { width: 22px; height: 22px; }
+  .exi.or { background: var(--accent); color: #FFF; }
+  .ext { margin-top: 8px; font-size: 14px; font-weight: 700; color: var(--ink-2); line-height: 1.75; }
+  /* アプリ */
+  .shots-tabs { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 4px; background: var(--bg); border-radius: 999px; padding: 4px; margin: 14px auto 10px; max-width: 340px; }
+  .shots-tabs button { font: inherit; font-size: 13.5px; font-weight: 900; min-height: 38px; border: 0; border-radius: 999px; background: transparent; color: var(--ink-2); cursor: pointer; }
+  .shots-tabs button[aria-selected="true"] { background: var(--accent); color: #FFF; }
+  .shots { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; gap: 14px; padding: 4px 18% 14px; scrollbar-width: none; }
+  .shots::-webkit-scrollbar { display: none; }
+  .shot { flex: 0 0 100%; scroll-snap-align: center; display: flex; justify-content: center; }
+  .shot .phone { width: 210px; border-radius: 30px; padding: 7px; }
+  .shot .phone img { border-radius: 24px; }
+  .shot .phone { aspect-ratio: 780 / 1216; overflow: hidden; }
+  .shot .phone img { height: 100%; object-fit: cover; object-position: top; }
+  .ex3 { display: grid; grid-template-columns: repeat(3, 1fr); background: var(--off); border-radius: 16px; padding: 10px 4px; margin-top: 6px; }
+  .ex3 li { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 2px; padding: 0 4px; }
+  .ex3 li + li { border-left: 1px solid var(--line); }
+  .ex3 svg { width: 24px; height: 24px; color: var(--accent); }
+  .ex3 b { font-size: 13.5px; font-weight: 900; }
+  .ex3 span { font-size: 11px; font-weight: 700; color: var(--ink-2); line-height: 1.4; }
+  /* LIVE */
+  .ex-live { background: var(--ink); color: #FFF; }
+  .ex-live .exh h3 b { color: #FFB599; }
+  .ex-live .ext { color: #C9D1E0; }
+  .live-vis { position: relative; margin: 14px auto 0; width: 230px; border-radius: 22px; padding: 6px; background: #0E1628; box-shadow: 0 0 0 2px rgba(255,181,153,0.5), 0 14px 30px rgba(0,0,0,0.35); }
+  .live-vis img { border-radius: 16px; width: 100%; }
+  .onair { position: absolute; top: -10px; left: 50%; transform: translateX(-50%); background: #E53935; color: #FFF; font-size: 12px; font-weight: 900; letter-spacing: .08em; border-radius: 999px; padding: 2px 12px; z-index: 1; }
+  .live4 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 16px; }
+  .live4 li { background: #FFF; color: var(--ink); border-radius: 14px; padding: 12px 8px; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 4px; }
+  .live4 svg { width: 30px; height: 30px; color: var(--accent); }
+  .live4 b { font-size: 13.5px; font-weight: 900; line-height: 1.4; }
+  .fq { display: inline-block; background: var(--accent); color: #FFF; font-size: 12px; font-weight: 900; border-radius: 999px; padding: 1px 12px; margin-top: 2px; }
+  .live-note { margin-top: 10px; font-size: 12px; font-weight: 700; color: #C9D1E0; text-align: center; line-height: 1.6; }
+  /* 朝活・Study Session */
+  .pair { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 12px; }
+  .mc { border-radius: 16px; padding: 10px 10px 12px; }
+  .mc.morning { background: #FFF4EA; }
+  .mc.study { background: #EDF4FF; }
+  .mc .ill { width: 100%; height: auto; display: block; margin-bottom: 8px; }
+  .mc b { display: block; font-size: 16px; font-weight: 900; }
+  .mc p { font-size: 12.5px; font-weight: 700; color: var(--ink-2); line-height: 1.55; margin-top: 2px; }
+  .fq2 { display: inline-block; margin-top: 6px; font-size: 11px; font-weight: 900; color: var(--accent-text); background: #FFF; border-radius: 999px; padding: 1px 8px; }
+  /* 成長 */
+  .grow { display: grid; gap: 12px; margin-top: 12px; }
+  .waves { display: grid; gap: 8px; background: var(--off); border-radius: 14px; padding: 12px; }
+  .wv { display: flex; align-items: center; gap: 4px; height: 30px; }
+  .wv .tag { width: 52px; flex-shrink: 0; text-align: center; font-size: 12px; font-weight: 900; color: var(--ink-2); background: #FFF; border-radius: 999px; padding: 1px 0; }
+  .wv.last .tag { color: var(--accent-text); background: var(--accent-soft); }
+  .wv .play { width: 22px; height: 22px; flex-shrink: 0; border-radius: 50%; background: var(--ink-3); color: #FFF; font-size: 9px; display: grid; place-items: center; margin-right: 4px; }
+  .wv.last .play { background: var(--accent); }
+  .wv i { flex: 1; height: var(--h); max-width: 8px; background: #B7C2D6; border-radius: 3px; }
+  .wv.last i { background: var(--accent); }
+  .checks2 { display: grid; gap: 8px; }
+  .checks2 li { position: relative; padding-left: 26px; }
+  .checks2 li::before { content: ""; position: absolute; left: 0; top: 3px; width: 18px; height: 18px; border-radius: 50%; background: var(--accent) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpath d='M18 33 L28 43 L46 23' fill='none' stroke='%23fff' stroke-width='9' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/80% no-repeat; }
+  .checks2 b { display: block; font-size: 14.5px; font-weight: 900; line-height: 1.5; }
+  .checks2 span { display: block; font-size: 12.5px; font-weight: 700; color: var(--ink-2); line-height: 1.6; }
+  /* 卒業イベント */
+  .ex-grad { position: relative; overflow: hidden; background: linear-gradient(135deg, #FFF1E4, #FFE3D6); }
+  .confetti { position: absolute; left: 0; top: 0; width: 100%; height: 56px; opacity: .9; }
+  .grad-in { position: relative; display: grid; grid-template-columns: 1fr 96px; gap: 8px; align-items: center; padding-top: 14px; }
+  .ex-grad h3 { font-size: 19px; font-weight: 900; line-height: 1.45; }
+  .ex-grad .when { display: flex; align-items: center; gap: 6px; margin-top: 10px; font-size: 15px; font-weight: 900; }
+  .ex-grad .when svg { width: 20px; height: 20px; color: var(--accent); }
+  .ex-grad .fine { margin-top: 2px; }
+  .cap { width: 96px; height: auto; }
+  @media (min-width: 900px) {
+    .ex { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 18px; max-width: 980px; margin: 0 auto; }
+    .ex > .exb { grid-column: 1 / -1; }
+    .ex .pair { max-width: 640px; margin-left: auto; margin-right: auto; }
+    .exb { padding: 26px 28px; }
+    .exh h3 { font-size: 22px; }
+    .ext { font-size: 15.5px; }
+    .ex-app { max-width: 620px; margin: 0 auto; width: 100%; }
+    .ex3 b { font-size: 15px; }
+    .ex3 span { font-size: 12.5px; }
+    .ex-live { display: grid; grid-template-columns: 1fr 260px; grid-template-rows: auto 1fr auto auto; column-gap: 28px; }
+    .ex-live .exh { grid-column: 1; grid-row: 1; }
+    .ex-live .ext { grid-column: 1; grid-row: 2; align-self: start; }
+    .ex-live .live-vis { grid-column: 2; grid-row: 1 / 3; width: 240px; margin: 10px 0 0; }
+    .ex-live .live4 { grid-row: 3; }
+    .ex-live .live-note { grid-row: 4; }
+    .ex-live .live4 { grid-column: 1 / -1; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+    .ex-live .live-note { grid-column: 1 / -1; }
+    .live4 b { font-size: 15px; }
+    .mc b { font-size: 18px; }
+    .mc p { font-size: 14px; }
+    .grad-in { grid-template-columns: 1fr 160px; max-width: 760px; margin: 0 auto; }
+    .cap { width: 160px; }
+    .ex-grad h3 { font-size: 22px; }
+  }
+  /* LIVEのZoom風の画面（Hinaは本物の講義動画の1場面、参加者は頭文字のアイコン） */
+  .zoom { margin: 16px auto 0; max-width: 300px; background: #0E1628; border-radius: 18px; padding: 8px; box-shadow: 0 0 0 2px rgba(255,181,153,0.45), 0 14px 30px rgba(0,0,0,0.35); }
+  .z-top { display: flex; align-items: center; justify-content: space-between; padding: 2px 4px 8px; }
+  .z-live { background: #E53935; color: #FFF; font-size: 11px; font-weight: 900; letter-spacing: .08em; border-radius: 999px; padding: 1px 10px; }
+  .z-title { font-size: 11px; font-weight: 800; color: #C9D1E0; }
+  .z-body { display: grid; grid-template-columns: 1fr 34%; gap: 6px; }
+  .z-main { position: relative; border-radius: 12px; overflow: hidden; box-shadow: 0 0 0 3px #3FB37F; aspect-ratio: 1 / 1; }
+  .z-main img { width: 100%; height: 100%; object-fit: cover; object-position: center top; display: block; }
+  .z-name { position: absolute; left: 6px; bottom: 6px; font-size: 9.5px !important; background: rgba(0,0,0,.6); color: #FFF; font-size: 10.5px; font-weight: 800; border-radius: 6px; padding: 1px 6px; }
+  .z-bubble { position: absolute; right: 6px; top: 6px; font-size: 10.5px !important; background: #FFF; color: var(--ink); font-family: "DM Sans", sans-serif; font-size: 12px; font-weight: 800; border-radius: 12px 12px 2px 12px; padding: 4px 9px; box-shadow: 0 4px 10px rgba(0,0,0,.2); }
+  .z-side { display: grid; grid-template-rows: repeat(4, 1fr); gap: 6px; }
+  .z-av { position: relative; display: grid; place-items: center; background: #1F2A44; border-radius: 10px; color: #FFF; font-weight: 900; font-size: 15px; }
+  .z-av::before { content: ""; position: absolute; width: 30px; height: 30px; border-radius: 50%; background: var(--c); left: 50%; top: 50%; transform: translate(-50%, -50%); }
+  .z-av { z-index: 0; } .z-av { isolation: isolate; }
+  .z-av::before { z-index: -1; }
+  .z-av i { position: absolute; left: -6px; top: -8px; font-style: normal; font-family: "DM Sans", sans-serif; font-size: 10px; font-weight: 800; background: var(--accent); color: #FFF; border-radius: 10px 10px 10px 2px; padding: 1px 6px; white-space: nowrap; transform: translateX(-60%); }
+  .z-bar { display: flex; justify-content: center; gap: 14px; padding: 8px 0 2px; }
+  .z-bar i { width: 18px; height: 18px; border-radius: 50%; background: #2C3A5A; }
+  .z-bar i.end { background: #E53935; width: 26px; border-radius: 9px; }
+  @media (min-width: 900px) {
+    .ex-live .zoom { grid-column: 2; grid-row: 1 / 3; width: 100%; max-width: none; margin: 0; }
+    .ex-live { grid-template-columns: 1fr 320px; }
+  }
+  /* 11/2：アプリは3つのタブ、説明は真ん中 */
+  .ext.center { text-align: center; }
+  .exh.center-h { justify-content: center; }
+  .exh h3.one { font-size: 16.5px; white-space: nowrap; font-feature-settings: "palt"; }
+  .shot { flex-direction: column; align-items: center; gap: 8px; }
+  .shot-cap { font-size: 13.5px; font-weight: 800; color: var(--ink-2); text-align: center; line-height: 1.5; }
+  .shot-cap b { color: var(--accent-text); }
+  .shots-tabs button { font-size: 13px; }
+  @media (max-width: 340px) { .exh h3.one { font-size: 14.5px; } .exh.center-h .exi { width: 34px; height: 34px; } }
+  @media (min-width: 900px) { .exh h3.one { font-size: 22px; } .shot-cap { font-size: 15px; } }
 </style>
 </head>
 <body id="top">
@@ -662,7 +793,7 @@
           <li><span class="n">1</span><div class="body"><div><h3>文法を理解する</h3><p>動画で、動詞の形の基本ルールを学ぶ。</p><span class="tool">講義動画</span></div><div class="thumb wide"><img src="img/lecture-sample.webp" width="1100" height="605" alt="講義動画の1場面" loading="lazy"></div></div></li>
           <li class="out"><span class="n">2</span><div class="body"><div><h3>英文を作ってみる</h3><p>日本語を見て、<br>自分で英語にする。<br>瞬発力を鍛えます。</p><span class="en">I went to a cafe with my friend.</span><span class="tool">瞬間英作文</span></div><div class="thumb"><img src="img/mock-instant-top.webp" width="720" height="662" alt="瞬間英作文の画面（イメージ）" loading="lazy"></div></div></li>
           <li class="out"><span class="n">3</span><div class="body"><div><h3>日記で使ってみる</h3><p>書いた英語を添削してもらう。</p><span class="en"><s>I go</s> → <ins>I went</ins></span><span class="tool">英語日記</span></div><div class="thumb"><video src="img/journal-top.mp4" poster="img/journal-still-top.webp" width="780" height="716" muted loop playsinline autoplay preload="none" aria-label="英語日記をAIが添削する動画（見本）"></video></div></div></li>
-          <li class="out"><span class="n">4</span><div class="body"><div><h3>LIVEで話してみる</h3><p>学んだ表現を、<br>実際に声に出す。</p><span class="tool">LIVE授業 月12回以上</span></div><div class="thumb"><img src="img/mock-zoom.webp" width="780" height="1216" alt="LIVE授業のイメージ画面" loading="lazy"></div></div></li>
+          <li class="out"><span class="n">4</span><div class="body"><div><h3>LIVEで話してみる</h3><p>学んだ表現を、<br>実際に声に出す。</p><span class="tool">LIVE授業 月12回</span></div><div class="thumb"><img src="img/hina-live.webp" width="510" height="490" alt="LIVE授業のHina" loading="lazy"></div></div></li>
           <li><span class="n">5</span><div class="body"><div><h3>復習して身につける</h3><p>苦手な表現を繰り返し練習する。</p><span class="tool">自動の復習</span></div><div class="thumb"><img src="img/mock-menu-top.webp" width="780" height="1054" alt="復習が出ている学習メニューの画面（イメージ）" loading="lazy"></div></div></li>
         </ol>
         <p class="aha"><span class="ib">あなたに必要な文法を、</span><span class="ib"><b>学んで、作って、使って、復習する</b>。</span><br><span class="ib">決して、知識だけで終わらせない。</span></p>
@@ -670,37 +801,95 @@
     </div>
   </section>
 
-  <!-- 5 毎日のアプリとLIVE授業 -->
-  <section class="s-white" id="env">
+  <!-- 5 Section 04：90日間の学習体験（11/2 ひなさんの指示書と参考デザイン） -->
+  <section class="s-blue" id="env">
     <div class="wrap">
       <div class="sec-head">
-        <span class="part">04 ─ EVERY DAY</span>
-        <h2><span class="ib">今日やらないと</span><span class="ib">いけないことは、</span><br><span class="ib">アプリが教えてくれる。</span></h2>
-        <p class="lead"><span class="ib">単語・文法・話す練習・復習まで。</span><br><span class="ib">毎日の学習メニューが決まっているから、</span><span class="ib">何を勉強するか迷いません。</span></p>
+        <span class="part">04 ─ YOUR LEARNING EXPERIENCE</span>
+        <h2><span class="ib">毎日の学習も、話す練習も。</span><br><span class="ib">ひとりじゃない<span class="em">90日間</span>。</span></h2>
+        <p class="lead"><span class="ib">アプリで学び、LIVEで実践。</span><br><span class="ib">仲間と一緒に、</span><span class="ib">英語を使う時間を増やそう。</span></p>
       </div>
-      <div class="app2">
-        <div>
-        <div class="phones2" aria-hidden="true">
-          <div class="phone"><img src="img/home-crop.webp" width="780" height="1216" alt="" loading="lazy"></div>
-          <div class="phone"><img src="img/progress-crop.webp" width="720" height="1122" alt="" loading="lazy"></div>
+
+      <div class="ex">
+        <!-- Block 01 アプリ -->
+        <div class="card exb ex-app">
+          <div class="exh center-h"><span class="exi"><svg viewBox="0 0 24 24"><rect x="6" y="2.5" width="12" height="19" rx="2.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M10 18.5h4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span><h3 class="one">今日やることは、アプリでわかる。</h3></div>
+          <p class="ext center"><span class="ib">単語・文法・話す練習・復習まで。</span><br><span class="ib">自分のレベルや目標に合わせた</span><span class="ib">学習メニューで、</span><span class="ib">迷わず取り組めます。</span></p>
+          <div class="shots-tabs" role="tablist" aria-label="アプリの画面">
+            <button type="button" role="tab" aria-selected="true" data-to="0">今日の学習</button>
+            <button type="button" role="tab" aria-selected="false" data-to="1">自動復習</button>
+            <button type="button" role="tab" aria-selected="false" data-to="2">成長記録</button>
+          </div>
+          <div class="shots" tabindex="0" aria-label="アプリの画面（横にスワイプできます）">
+            <div class="shot"><p class="shot-cap">毎日迷わず、<br><b>やることがすでに決まっている</b></p><div class="phone"><img src="img/home-crop.webp" width="780" height="1216" alt="今日の学習の画面（見本）" loading="lazy"></div></div>
+            <div class="shot"><p class="shot-cap"><b>苦手なところを分析して</b><br>徹底的にやる</p><div class="phone"><img src="img/mock-ai.webp" width="780" height="1350" alt="苦手分析の画面（見本）" loading="lazy"></div></div>
+            <div class="shot"><p class="shot-cap">毎日の<br><b>頑張りや成長を見える化</b></p><div class="phone"><img src="img/progress-crop.webp" width="720" height="1122" alt="成長記録の画面（見本）" loading="lazy"></div></div>
+          </div>
+          <ul class="ex3">
+            <li><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M4 7c4-2 8-2 12 1v18c-4-3-8-3-12-1zM28 7c-4-2-8-2-12 1v18c4-3 8-3 12-1z" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round"/></svg><b>今日の学習</b><span>毎日やることが決まっている</span></li>
+            <li><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M26 12a10 10 0 0 0-18-3M6 20a10 10 0 0 0 18 3" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/><path d="M8 3v6h6M24 29v-6h-6" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg><b>自動復習</b><span>苦手をもう一度</span></li>
+            <li><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M7 26V18M13 26V13M19 26V16M25 26V7" stroke="currentColor" stroke-width="3.2" stroke-linecap="round"/></svg><b>成長記録</b><span>頑張りが見える</span></li>
+          </ul>
         </div>
-          <p class="personal"><span class="ib">メニューは、あなたの</span><span class="ib"><b>目標・勉強時間・正答率</b>に</span><span class="ib">合わせて調整。</span><br><span class="ib">一人ひとりに合った</span><span class="ib">90日間に。</span></p>
+
+        <!-- Block 02 LIVE -->
+        <div class="exb ex-live">
+          <div class="exh"><span class="exi or"><svg viewBox="0 0 24 24"><rect x="2.5" y="6" width="13" height="12" rx="2.5" fill="currentColor"/><path d="M16.5 10.5l5-3v9l-5-3z" fill="currentColor"/></svg></span><h3><span class="ib">学んだ英語を、実際に話す。</span><br><span class="ib"><b>月12回</b>のLIVE授業。</span></h3></div>
+          <p class="ext center"><span class="ib">覚えたフレーズを声に出したり、</span><span class="ib">文法を使ってみたり。</span><br><span class="ib">アプリで学んだ英語を、</span><span class="ib">実際に使う時間です。</span></p>
+          <div class="zoom" aria-label="LIVE授業の様子：Hinaが今日のフレーズを教えている">
+            <div class="z-top"><span class="z-live">● LIVE</span><span class="z-title">日常英会話LIVE</span></div>
+            <div class="z-body">
+              <div class="z-main">
+                <img src="img/hina-live.webp" width="510" height="490" alt="" loading="lazy">
+                <span class="z-name">Hina（講師）</span>
+                <span class="z-bubble">How was your weekend?</span>
+              </div>
+              <div class="z-side">
+                <span class="z-av" style="--c:#F6A04D">ゆ<i>It was great!</i></span>
+                <span class="z-av" style="--c:#3FB37F">K</span>
+                <span class="z-av" style="--c:#9B7BE0">ま</span>
+                <span class="z-av" style="--c:#4A9BE0">さ</span>
+              </div>
+            </div>
+            <div class="z-bar" aria-hidden="true"><i></i><i></i><i></i><i></i><i class="end"></i></div>
+          </div>
+          <ul class="live4">
+            <li><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M5 8h16a3 3 0 0 1 3 3v7a3 3 0 0 1-3 3h-8l-5 4v-4H5a3 3 0 0 1-3-3v-7a3 3 0 0 1 3-3z" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linejoin="round"/><path d="M26 12h1a3 3 0 0 1 3 3v6a3 3 0 0 1-3 3h-1v3l-4-3" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linejoin="round" stroke-linecap="round"/></svg><b>日常英会話<br>瞬間英作文</b><span class="fq">週2回</span></li>
+            <li><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M4 7c4-2 8-2 12 1v18c-4-3-8-3-12-1zM28 7c-4-2-8-2-12 1v18c4-3 8-3 12-1z" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linejoin="round"/></svg><b>文法強化<br>ホームルーム</b><span class="fq">週1回</span></li>
+            <li><svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="12" fill="none" stroke="currentColor" stroke-width="2.3"/><path d="M12.5 12.5a3.5 3.5 0 1 1 5 3.2c-1 .5-1.5 1.2-1.5 2.3v.5" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"/><circle cx="16" cy="22.5" r="1.5" fill="currentColor"/></svg><b>質問会<br>壁打ち会</b><span class="fq">月1回</span></li>
+            <li><svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="15" cy="17" r="11" fill="none" stroke="currentColor" stroke-width="2.3"/><circle cx="15" cy="17" r="6" fill="none" stroke="currentColor" stroke-width="2.3"/><circle cx="15" cy="17" r="1.8" fill="currentColor"/><path d="M15 17L27 5M23 5h4v4" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"/></svg><b>目標設定<br>振り返り会</b><span class="fq">月1回</span></li>
+          </ul>
+          <p class="live-note">4種類あわせて、月12回。Hinaが月2〜3回、ほかは英語講師が担当します。</p>
         </div>
-        <ul class="feat3">
-          <li><b>今日の学習</b><span>開けば、やることが出る</span></li>
-          <li><b>自動復習</b><span>忘れるころに、もう一度</span></li>
-          <li><b>成長記録</b><span>勉強時間と続いた日数</span></li>
-        </ul>
-      </div>
-      <div class="live2">
-        <h3><span class="ib">学んだ英語を、実際に話す。</span><br><span class="ib"><b>月12回以上</b>のLIVE授業。</span></h3>
-        <ul>
-          <li>日常英会話・瞬間英作文<span>週2回</span></li>
-          <li>文法強化・第1期生ホームルーム<span>週1回</span></li>
-          <li>質問会<span>月1回</span></li>
-          <li>目標設定・振り返り会<span>月1回</span></li>
-        </ul>
-        <p class="fine">アプリで覚えた英語を、声に出して使う時間です。Hinaが月2〜3回、ほかは英語講師が担当します。</p>
+
+        <!-- Block 03 朝活・Study Session -->
+        <div class="card exb">
+          <div class="exh"><span class="exi"><svg viewBox="0 0 24 24"><circle cx="8" cy="8" r="3" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="16.5" cy="9" r="2.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M2.5 20c0-3.5 2.5-6 5.5-6s5.5 2.5 5.5 6M14 14.5c3 0 7 1.5 7 5.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span><h3>LIVE以外にも、仲間と学べる。</h3></div>
+          <div class="pair">
+            <div class="mc morning">
+              <svg class="ill" viewBox="0 0 120 70" aria-hidden="true"><defs><linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#BFE3FF"/><stop offset="1" stop-color="#FFE2C7"/></linearGradient></defs><rect width="120" height="70" rx="12" fill="url(#sky)"/><circle cx="60" cy="56" r="20" fill="#FFB25E"/><g stroke="#FF9A3C" stroke-width="3" stroke-linecap="round"><path d="M60 24v-8M38 34l-6-5M82 34l6-5M30 50h-8M90 50h8"/></g><rect y="56" width="120" height="14" fill="#8EC9F0" opacity=".7"/></svg>
+              <b>朝活</b><p>朝から、みんなで英語！</p><span class="fq2">月2〜3回程度・不定期</span>
+            </div>
+            <div class="mc study">
+              <svg class="ill" viewBox="0 0 120 70" aria-hidden="true"><rect width="120" height="70" rx="12" fill="#E3EEFF"/><rect x="22" y="22" width="44" height="34" rx="4" fill="#FFF" stroke="#17233B" stroke-width="2.5"/><path d="M30 32h28M30 40h28M30 48h18" stroke="#9AA6BA" stroke-width="2.5" stroke-linecap="round"/><circle cx="88" cy="38" r="15" fill="#FFF" stroke="#F45121" stroke-width="3"/><path d="M88 30v8l6 4" stroke="#F45121" stroke-width="3" stroke-linecap="round" fill="none"/><path d="M84 20h8" stroke="#F45121" stroke-width="3" stroke-linecap="round"/></svg>
+              <b>Study Session</b><p>みんなでもくもく勉強会<br>25分集中＋5分休憩</p><span class="fq2">不定期開催</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Block 05 卒業イベント -->
+        <div class="exb ex-grad">
+          <svg class="confetti" viewBox="0 0 300 80" preserveAspectRatio="none" aria-hidden="true"><g><rect x="20" y="10" width="8" height="4" rx="1" fill="#F45121" transform="rotate(25 24 12)"/><rect x="70" y="30" width="7" height="4" rx="1" fill="#2563B8" transform="rotate(-30 73 32)"/><circle cx="120" cy="14" r="3" fill="#FFB25E"/><rect x="170" y="22" width="8" height="4" rx="1" fill="#7EC8A0" transform="rotate(40 174 24)"/><circle cx="215" cy="40" r="3" fill="#F45121"/><rect x="250" y="12" width="7" height="4" rx="1" fill="#FFB25E" transform="rotate(-20 253 14)"/><circle cx="45" cy="50" r="2.5" fill="#7EC8A0"/><rect x="280" y="45" width="7" height="4" rx="1" fill="#2563B8" transform="rotate(30 283 47)"/></g></svg>
+          <div class="grad-in">
+            <div>
+              <h3><span class="ib">90日間の最後には、</span><span class="ib"><span class="em">卒業イベント</span>も！</span></h3>
+              <p class="ext"><span class="ib">3ヶ月頑張った自分を</span><br><span class="ib">仲間と一緒にお祝いしよう。</span></p>
+              <p class="when"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M3 10h18M8 3v4M16 3v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>2027年2月頃 開催予定</p>
+              <p class="fine"><span class="ib">日時・会場などの詳細は</span><br><span class="ib">決まり次第ご案内します。</span></p>
+            </div>
+            <svg class="cap" viewBox="0 0 120 100" aria-hidden="true"><circle cx="60" cy="58" r="40" fill="#FFF"/><path d="M20 40l40-18 40 18-40 18z" fill="#17233B"/><path d="M38 49v14c0 6 10 11 22 11s22-5 22-11V49L60 58z" fill="#2A3A5C"/><path d="M96 42v20" stroke="#FFB25E" stroke-width="3" stroke-linecap="round"/><circle cx="96" cy="64" r="4" fill="#FFB25E"/><g transform="translate(14 64)"><circle r="7" fill="#FF8FA3"/><circle cx="10" cy="4" r="6" fill="#FFD27A"/><circle cx="3" cy="11" r="6" fill="#FFB5C2"/></g><rect x="74" y="74" width="30" height="20" rx="3" fill="#FFF7EC" stroke="#F45121" stroke-width="2"/><path d="M80 81h18M80 87h12" stroke="#F45121" stroke-width="2" stroke-linecap="round"/></svg>
+          </div>
+        </div>
       </div>
     </div>
   </section>
@@ -719,28 +908,28 @@
 
       <div class="lv-panel" id="lv-beg" role="tabpanel" aria-labelledby="tab-beg">
         <div class="ba">
-          <div class="b"><small>BEFORE</small><h3>言いたいことが英語にならない</h3><p>単語をつなげられない。会話になると黙ってしまう。</p></div>
+          <div class="b"><small>BEFORE</small><h3>言いたいことが、パッと出てこない。</h3><p>何をどのように勉強すればいいかもわからない。</p></div>
           <span class="arr" aria-hidden="true">▼</span>
-          <div class="b after"><small>目指す AFTER</small><h3>簡単な英文で自分のことを話せる</h3><p>短い文を作り、自分の経験を話す。質問を返す。</p></div>
+          <div class="b after"><small>目指す AFTER</small><h3>自分のことを話せたり、簡単な会話をスムーズに</h3><p>好きなことや今日の出来事を伝え、「話せた！」を増やす。</p></div>
         </div>
         <ol class="tl">
-          <li><em>1ヶ月目</em><b>土台を作る</b><span>短い英文を組み立てる。</span></li>
-          <li><em>2ヶ月目</em><b>使う練習を増やす</b><span>瞬間英作文・モデリングで、知っている英語を口に出す。</span></li>
-          <li><em>3ヶ月目</em><b>会話で練習する</b><span>質問に答えたり、自分から質問したりする。</span></li>
+          <li><em>1ヶ月目</em><b>英語を話す土台を作る</b><span>基本の語順を学び、短い英文を作れるように。</span></li>
+          <li><em>2ヶ月目</em><b>作れる英文を、言える英文に</b><span>まねして、繰り返し声に出し、口から出る英語を増やす。</span></li>
+          <li><em>3ヶ月目</em><b>短い英語で、会話に挑戦</b><span>答える・質問する練習で、「英語が通じた！」を体験。</span></li>
         </ol>
       </div>
 
-      <!-- 中級の文言：2026-11-02 ひなさん確定 -->
+      <!-- 初級・中級の文言：2026-11-02 ひなさんの最新版 -->
       <div class="lv-panel" id="lv-mid" role="tabpanel" aria-labelledby="tab-mid" hidden>
         <div class="ba">
-          <div class="b"><small>BEFORE</small><h3>会話を広げようとすると、言葉が止まる</h3><p>簡単な英語は話せるけれど、その先が続かない。</p></div>
+          <div class="b"><small>BEFORE</small><h3>知っている英語が、パッと出てこない。</h3><p>会話で言葉が止まる。単語はわかるのに、聞き取れない。</p></div>
           <span class="arr" aria-hidden="true">▼</span>
-          <div class="b after"><small>目指す AFTER</small><h3>自分の経験や考えを、理由も添えて伝えられる</h3><p>相手に質問しながら、会話のやり取りを続けられる。</p></div>
+          <div class="b after"><small>目指す AFTER</small><h3>英語がパッと出てきて、会話のやり取りが続く。</h3><p>自分からも質問でき、自然な速さの英語も少しずつ聞き取れるように。</p></div>
         </div>
         <ol class="tl">
-          <li><em>1ヶ月目</em><b>表現を広げる</b><span>知っている英語を使って、理由や感想も伝える。</span></li>
-          <li><em>2ヶ月目</em><b>会話への反応を速く</b><span>質問を返したり、別の言葉に言い換えたりする。</span></li>
-          <li><em>3ヶ月目</em><b>会話を深める</b><span>自分の意見や経験を交えながら、会話を続ける。</span></li>
+          <li><em>1ヶ月目</em><b>知っている英語を、パッと口に</b><span>短い英文を繰り返し声に出し、すぐに答える力をつける。</span></li>
+          <li><em>2ヶ月目</em><b>聞いて、反応する力をつける</b><span>英語の音に慣れ、相づちや短い返事をスムーズに。</span></li>
+          <li><em>3ヶ月目</em><b>ひと言で終わらず、会話を続ける</b><span>感想をひと言添えたり、質問を返したりして、やり取りを増やす。</span></li>
         </ol>
       </div>
       <p class="fine center" style="margin-top:10px">※3ヶ月で目指す姿です。成長には個人差があります。</p>
@@ -774,7 +963,7 @@
   <section class="s-blue" id="hina">
     <div class="wrap">
       <div class="card hina2">
-        <img src="img/hina-photo.webp" width="400" height="400" alt="Hinaの写真" loading="lazy">
+        <img src="img/hina-photo.webp" width="480" height="480" alt="Hinaの写真" loading="lazy">
         <div>
           <span class="part" style="text-align:left">MESSAGE FROM HINA</span>
           <h2>「知ってる」を「話せる」に<span class="ib">変える場所を作りたかった。</span></h2>
@@ -805,7 +994,7 @@
           <div class="inc3">
             <div><h3><i>1</i>毎日の学習</h3><ul><li>個別のカリキュラム</li><li>単語学習</li><li>フレーズ学習</li><li>文法講座</li><li>毎日の勉強メニュー</li></ul></div>
             <div><h3><i>2</i>使える英語にする練習</h3><ul><li>瞬間英作文</li><li>モデリング</li><li>毎日の英語日記課題</li></ul></div>
-            <div><h3><i>3</i>実践と振り返り</h3><ul><li>月12回以上のLIVE授業</li><li>月1回の定期テスト</li><li>自動復習</li><li>仲間との学習環境</li></ul></div>
+            <div><h3><i>3</i>実践と振り返り</h3><ul><li>月12回のLIVE授業</li><li>月1回の定期テスト</li><li>自動復習</li><li>仲間との学習環境</li></ul></div>
           </div>
           <ul class="notes"><li>文法18単元・講義動画53本</li><li>定期テストは合計3回</li><li>仲間との学習環境：朝活・Study Session・会員の掲示板など</li></ul>
           <ul class="sched"><li><span>11月15日（日）19:00〜</span>キックオフ会</li><li class="key"><span>11月16日（月）</span>第1期生 一斉スタート</li><li><span>3ヶ月後</span>卒業イベントも開催します</li></ul>
@@ -911,6 +1100,15 @@
         pick(n); n.focus();
       });
     });
+  })();
+
+  // Section 04：アプリ画面の切り替え（タブ・横スワイプ）
+  (function () {
+    var box = document.querySelector(".shots"); if (!box) return;
+    var tabs = document.querySelectorAll(".shots-tabs button");
+    function mark(i) { tabs.forEach(function (t, k) { t.setAttribute("aria-selected", k === i ? "true" : "false"); }); }
+    tabs.forEach(function (t, i) { t.addEventListener("click", function () { box.scrollTo({ left: box.children[i].offsetLeft - box.offsetLeft - (box.clientWidth - box.children[i].clientWidth) / 2, behavior: "smooth" }); mark(i); }); });
+    box.addEventListener("scroll", function () { var best = 0, d = 1e9; [].forEach.call(box.children, function (c, k) { var x = Math.abs(c.offsetLeft - box.offsetLeft - box.scrollLeft - (box.clientWidth - c.clientWidth) / 2); if (x < d) { d = x; best = k; } }); mark(best); }, { passive: true });
   })();
 
   // 動画は画面に入ったときだけ再生する（通信量と電池のため）
