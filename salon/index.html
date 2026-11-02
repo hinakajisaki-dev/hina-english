@@ -423,8 +423,6 @@
   .lv-tabs button[aria-selected="true"] { background: var(--accent); color: #FFF; }
   .lv-panel { animation: lvfade .35s ease; }
   @keyframes lvfade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
-  .draft-note { display: none; text-align: center; font-size: 12px; font-weight: 900; color: var(--red); background: #FFF3F0; border: 1.5px dashed var(--red); border-radius: 10px; padding: 4px 8px; margin-bottom: 10px; }
-  .is-preview .draft-note { display: block; }
   .tl { position: relative; margin-top: 18px; padding-left: 22px; }
   .tl::before { content: ""; position: absolute; left: 6px; top: 8px; bottom: 8px; width: 3px; border-radius: 2px; background: linear-gradient(var(--line), var(--accent)); }
   .tl li { position: relative; background: #FFF; border-radius: 14px; box-shadow: var(--shadow); padding: 12px 14px; }
@@ -715,18 +713,17 @@
         </ol>
       </div>
 
-      <!-- 中級の文言は仮案（ひなさんの最終確認待ち・2026-11-02） -->
-      <div class="lv-panel" id="lv-mid" role="tabpanel" aria-labelledby="tab-mid" data-draft hidden>
-        <p class="draft-note">確認用ページだけに出る表示：中級の文言は確認待ちです</p>
+      <!-- 中級の文言：2026-11-02 ひなさん確定 -->
+      <div class="lv-panel" id="lv-mid" role="tabpanel" aria-labelledby="tab-mid" hidden>
         <div class="ba">
           <div class="b"><small>BEFORE</small><h3>会話を広げようとすると、言葉が止まる</h3><p>簡単な英語は話せるけれど、その先が続かない。</p></div>
           <span class="arr" aria-hidden="true">▼</span>
-          <div class="b after"><small>目指す AFTER</small><h3>理由や感想も添えて、考えを伝えられる</h3><p>相手に質問しながら、会話のやり取りを続ける。</p></div>
+          <div class="b after"><small>目指す AFTER</small><h3>自分の経験や考えを、理由も添えて伝えられる</h3><p>相手に質問しながら、会話のやり取りを続けられる。</p></div>
         </div>
         <ol class="tl">
-          <li><em>1ヶ月目</em><b>使える表現を増やす</b><span>知っている文法を整理し、別の言い方でも伝える。</span></li>
-          <li><em>2ヶ月目</em><b>話す内容を広げる</b><span>経験や意見を、理由や感想も添えて話す。</span></li>
-          <li><em>3ヶ月目</em><b>会話のキャッチボールを深める</b><span>相手の話に反応し、質問を返しながら続ける。</span></li>
+          <li><em>1ヶ月目</em><b>表現を広げる</b><span>知っている英語を使って、理由や感想も伝える。</span></li>
+          <li><em>2ヶ月目</em><b>会話への反応を速く</b><span>質問を返したり、別の言葉に言い換えたりする。</span></li>
+          <li><em>3ヶ月目</em><b>会話を深める</b><span>自分の意見や経験を交えながら、会話を続ける。</span></li>
         </ol>
       </div>
       <p class="fine center" style="margin-top:10px">※3ヶ月で目指す姿です。成長には個人差があります。</p>
@@ -881,9 +878,6 @@
     var sh = document.querySelector("[data-deadline-short]");
     if (sh) sh.textContent = "3ヶ月突破コース・11/16スタート";
   })();
-
-  // 確認用ページ（本番 ohana-english.app 以外）では、確認待ちの文言に印を出す
-  if (!/(^|\.)ohana-english\.app$/.test(location.hostname)) document.documentElement.classList.add("is-preview");
 
   // 初級・中級の切り替え（ページは移動しない）
   (function () {
