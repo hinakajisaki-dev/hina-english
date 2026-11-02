@@ -493,6 +493,41 @@
     .inc3 h3 { font-size: 16.5px; }
     .inc3 li { font-size: 14px; }
   }
+
+  /* ===== ファーストビュー（11/2：スマホ画面を大きく） ===== */
+  .hero2 { padding: 24px 0 32px; }
+  .hero2 .wrap { display: grid; gap: 0; grid-template-areas: "head" "pic" "body"; }
+  .hero2 .h-head { grid-area: head; }
+  .hero2 h1 { margin-bottom: 0; }
+  .hero2 .h-pic { grid-area: pic; position: relative; display: flex; flex-direction: column; align-items: flex-end; padding: 14px 8% 0 0; }
+  .hero2 .h-pic::before { content: ""; position: absolute; width: 230px; height: 230px; border-radius: 50%; background: #FFF; right: 2%; top: 40px; }
+  .hero2 .h-pic .phone { width: 200px; transform: rotate(3deg); border-radius: 30px; padding: 7px; }
+  .hero2 .h-pic .phone img { border-radius: 24px; }
+  .hero2 .h-pic .chibi { position: absolute; left: 2%; bottom: 34px; width: 96px; margin: 0; }
+  .hero2 .h-pic .cap { position: relative; align-self: center; margin-top: 14px; font-size: 12px; font-weight: 800; color: var(--ink-2); }
+  .hero2 .h-body { grid-area: body; margin-top: 18px; }
+  .hero2 .voices { display: grid; gap: 4px; }
+  .hero2 .voices li { font-size: 14px; font-weight: 700; color: var(--ink-2); line-height: 1.6; }
+  .hero2 .sub2 { margin-top: 10px; font-size: 16.5px; font-weight: 900; line-height: 1.65; }
+  .hero2 .go { margin-top: 18px; }
+  .hero2 .deadline { margin-top: 10px; text-align: center; }
+  .hero2 .quiet { margin-top: 2px; text-align: center; font-size: 12.5px; font-weight: 700; }
+  .hero2 .quiet a { color: var(--ink-3); }
+  @media (max-width: 340px) { .sticky-cta p { font-size: 10.5px; white-space: nowrap; } .hero2 .h-pic .phone { width: 176px; } .hero2 .h-pic .chibi { width: 80px; } }
+  @media (min-width: 900px) {
+    .hero2 { padding: 64px 0 72px; }
+    .hero2 .wrap { grid-template-columns: 1.25fr 0.75fr; grid-template-areas: "head pic" "body pic"; column-gap: 48px; align-items: start; }
+    .hero2 .h-pic { padding: 0; align-items: center; align-self: center; }
+    .hero2 .h-pic::before { width: 360px; height: 360px; right: 50%; margin-right: -180px; top: 30px; }
+    .hero2 .h-pic .phone { width: 270px; border-radius: 38px; padding: 9px; }
+    .hero2 .h-pic .phone img { border-radius: 30px; }
+    .hero2 .h-pic .chibi { width: 130px; left: -20px; bottom: 40px; }
+    .hero2 .h-pic .cap { font-size: 14px; }
+    .hero2 .voices li { font-size: 16.5px; }
+    .hero2 .sub2 { font-size: 21px; }
+    .hero2 .go, .hero2 .deadline, .hero2 .quiet { max-width: 420px; }
+    .hero2 .deadline, .hero2 .quiet { text-align: left; }
+  }
 </style>
 </head>
 <body id="top">
@@ -509,24 +544,27 @@
 
 <main>
 
-  <!-- 1 ファーストビュー -->
-  <section class="hero">
+  <!-- 1 ファーストビュー：見出し → スマホ画面 → 短い説明 → CTA -->
+  <section class="hero hero2">
     <div class="wrap">
-      <div>
+      <div class="h-head">
         <p class="to">勉強会にご参加いただいた皆さんへ</p>
         <h1><span class="ib">「知っている英語」を、</span><br><span class="ib">「<span class="hl">パッと話せる英語</span>」に</span><span class="ib">変える90日間。</span></h1>
-        <p class="sub"><span class="ib">単語は知っているのに、</span><span class="ib">言いたい文が作れない。</span><br><span class="ib">勉強しても、会話になると</span><span class="ib">英語が出てこない。</span><br>そんなあなたへ。</p>
-        <p class="sub2"><span class="ib">「覚える」と「使う」を繰り返す、</span><span class="ib">90日間の英語トレーニング。</span></p>
-        <p class="what"><span class="ib">毎日の学習アプリ</span> × <span class="ib">月12回以上のLIVE授業</span></p>
-        <a class="go" href="#why">なぜこの学び方なのか、見てみる ↓</a>
-        <div class="mini-cta">
-          <p class="deadline on" data-deadline><span class="ib">お申し込み期限：</span><span class="ib">11月3日（火・祝）22:00</span></p>
-          <p>もう決めている方は <a href="https://my.ohana-english.app/?view=join">こちらから申し込み</a></p>
-        </div>
       </div>
-      <div class="hero-pic" aria-hidden="true">
+      <div class="h-pic" aria-hidden="true">
         <div class="phone"><img src="img/journal-crop.webp" width="780" height="1216" alt=""></div>
         <img class="chibi" src="img/hina-phrases.webp" width="360" height="330" alt="">
+        <p class="cap">毎日の学習アプリ × 月12回以上のLIVE授業</p>
+      </div>
+      <div class="h-body">
+        <ul class="voices">
+          <li><span class="ib">「単語は知っているのに、</span><span class="ib">言いたい文が作れない。。」</span></li>
+          <li><span class="ib">「勉強しても、会話になると</span><span class="ib">英語が出てこない。。」</span></li>
+        </ul>
+        <p class="sub2"><span class="ib">「覚える」と「使う」を繰り返す、</span><br><span class="ib">90日間の英語トレーニング。</span></p>
+        <a class="go" href="#why">なぜこの学び方なのか、見てみる ↓</a>
+        <p class="deadline on" data-deadline><span class="ib">お申し込み期限：</span><span class="ib">11月3日（火・祝）22:00</span></p>
+        <p class="quiet"><a href="https://my.ohana-english.app/?view=join">申し込みページへ</a></p>
       </div>
     </div>
   </section>
