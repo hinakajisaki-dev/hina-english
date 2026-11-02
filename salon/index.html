@@ -494,39 +494,47 @@
     .inc3 li { font-size: 14px; }
   }
 
-  /* ===== ファーストビュー（11/2：スマホ画面を大きく） ===== */
-  .hero2 { padding: 24px 0 32px; }
-  .hero2 .wrap { display: grid; gap: 0; grid-template-areas: "head" "pic" "body"; }
-  .hero2 .h-head { grid-area: head; }
-  .hero2 h1 { margin-bottom: 0; }
-  .hero2 .h-pic { grid-area: pic; position: relative; display: flex; flex-direction: column; align-items: flex-end; padding: 14px 8% 0 0; }
-  .hero2 .h-pic::before { content: ""; position: absolute; width: 230px; height: 230px; border-radius: 50%; background: #FFF; right: 2%; top: 40px; }
-  .hero2 .h-pic .phone { width: 200px; transform: rotate(3deg); border-radius: 30px; padding: 7px; }
-  .hero2 .h-pic .phone img { border-radius: 24px; }
-  .hero2 .h-pic .chibi { position: absolute; left: 2%; bottom: 34px; width: 96px; margin: 0; }
-  .hero2 .h-pic .cap { position: relative; align-self: center; margin-top: 14px; font-size: 12px; font-weight: 800; color: var(--ink-2); }
-  .hero2 .h-body { grid-area: body; margin-top: 18px; }
-  .hero2 .voices { display: grid; gap: 4px; }
-  .hero2 .voices li { font-size: 14px; font-weight: 700; color: var(--ink-2); line-height: 1.6; }
-  .hero2 .sub2 { margin-top: 10px; font-size: 16.5px; font-weight: 900; line-height: 1.65; }
-  .hero2 .go { margin-top: 18px; }
-  .hero2 .deadline { margin-top: 10px; text-align: center; }
-  .hero2 .quiet { margin-top: 2px; text-align: center; font-size: 12.5px; font-weight: 700; }
-  .hero2 .quiet a { color: var(--ink-3); }
-  @media (max-width: 340px) { .sticky-cta p { font-size: 10.5px; white-space: nowrap; } .hero2 .h-pic .phone { width: 176px; } .hero2 .h-pic .chibi { width: 80px; } }
+  /* ===== ファーストビュー（11/2 ひなさんの見本） ===== */
+  .hero3 { padding: 22px 0 28px; }
+  .hero3 .wrap { display: grid; grid-template-areas: "top" "mid" "low"; }
+  .hero3 .h-top { grid-area: top; }
+  .hero3 h1 { font-size: 25px; margin-bottom: 0; }
+  .hero3 .h-mid { grid-area: mid; display: grid; grid-template-columns: 1fr 46%; align-items: start; gap: 6px; margin-top: -56px; }
+  .hero3 .sub2 { margin-top: 72px; font-size: 15px; font-weight: 900; line-height: 1.7; }
+  .hero3 .h-pic { position: relative; }
+  .hero3 .h-pic::before { content: ""; position: absolute; width: 190px; height: 190px; border-radius: 50%; background: #FFF4EC; right: -40px; top: 50px; }
+  .hero3 .h-pic .phone { width: 100%; max-width: 190px; margin-left: auto; transform: rotate(5deg); border-radius: 26px; padding: 6px; }
+  .hero3 .h-pic .phone img { border-radius: 20px; }
+  .hero3 .spark { position: absolute; right: -6px; top: -14px; width: 34px; height: 34px; z-index: 1; }
+  .hero3 .h-low { grid-area: low; margin-top: 18px; }
+  .hero3 .pts { display: grid; grid-template-columns: repeat(3, 1fr); background: #FFF; border-radius: 18px; box-shadow: var(--shadow); padding: 10px 4px; }
+  .hero3 .pts li { display: flex; flex-direction: column; align-items: center; gap: 4px; text-align: center; font-size: 12.5px; font-weight: 900; line-height: 1.35; padding: 0 4px; }
+  .hero3 .pts li + li { border-left: 1px solid var(--line); }
+  .hero3 .pts svg { width: 28px; height: 28px; color: var(--accent); }
+  .hero3 .go { margin-top: 16px; }
+  .hero3 .apply { display: grid; grid-template-columns: 84px 1fr; gap: 8px; align-items: end; margin-top: 14px; }
+  .hero3 .apply .chibi { width: 84px; position: static; margin: 0; }
+  .hero3 .apply .deadline { text-align: center; margin-bottom: 6px; font-size: 13px; }
+  .hero3 .apply .btn { display: flex; width: 100%; min-height: 50px; font-size: 17px; }
+  @media (max-width: 340px) { .sticky-cta p { font-size: 10.5px; white-space: nowrap; } .hero3 h1 { font-size: 22px; } .hero3 .sub2 { font-size: 13.5px; margin-top: 62px; } .hero3 .pts li { font-size: 11px; } .hero3 .apply { grid-template-columns: 64px 1fr; } .hero3 .apply .chibi { width: 64px; } .hero3 .apply .deadline { font-size: 12px; } }
   @media (min-width: 900px) {
-    .hero2 { padding: 64px 0 72px; }
-    .hero2 .wrap { grid-template-columns: 1.25fr 0.75fr; grid-template-areas: "head pic" "body pic"; column-gap: 48px; align-items: start; }
-    .hero2 .h-pic { padding: 0; align-items: center; align-self: center; }
-    .hero2 .h-pic::before { width: 360px; height: 360px; right: 50%; margin-right: -180px; top: 30px; }
-    .hero2 .h-pic .phone { width: 270px; border-radius: 38px; padding: 9px; }
-    .hero2 .h-pic .phone img { border-radius: 30px; }
-    .hero2 .h-pic .chibi { width: 130px; left: -20px; bottom: 40px; }
-    .hero2 .h-pic .cap { font-size: 14px; }
-    .hero2 .voices li { font-size: 16.5px; }
-    .hero2 .sub2 { font-size: 21px; }
-    .hero2 .go, .hero2 .deadline, .hero2 .quiet { max-width: 420px; }
-    .hero2 .deadline, .hero2 .quiet { text-align: left; }
+    .hero3 { padding: 60px 0 68px; }
+    .hero3 .wrap { position: relative; grid-template-columns: 1fr; padding-right: 42%; row-gap: 0; }
+    .hero3 .pts li { white-space: nowrap; }
+    .hero3 .h-mid { display: block; margin-top: 0; }
+    .hero3 .sub2 { margin-top: 18px; font-size: 20px; }
+    .hero3 .sub2 br { display: none; }
+    .hero3 h1 { font-size: 40px; }
+    .hero3 .h-pic { position: absolute; right: 0; top: 50%; transform: translateY(-50%); width: 36%; }
+    .hero3 .h-pic::before { width: 340px; height: 340px; right: -30px; top: 60px; }
+    .hero3 .h-pic .phone { max-width: 280px; margin: 0 auto; border-radius: 38px; padding: 9px; }
+    .hero3 .h-pic .phone img { border-radius: 30px; }
+    .hero3 .spark { width: 48px; height: 48px; right: 10px; }
+    .hero3 .pts { max-width: 560px; padding: 14px 6px; }
+    .hero3 .pts li { flex-direction: row; justify-content: center; font-size: 15px; }
+    .hero3 .go, .hero3 .apply { max-width: 560px; }
+    .hero3 .apply { grid-template-columns: 110px 1fr; }
+    .hero3 .apply .chibi { width: 110px; }
   }
 </style>
 </head>
@@ -544,27 +552,34 @@
 
 <main>
 
-  <!-- 1 ファーストビュー：見出し → スマホ画面 → 短い説明 → CTA -->
-  <section class="hero hero2">
+  <!-- 1 ファーストビュー（11/2 ひなさんの見本どおり） -->
+  <section class="hero hero3">
     <div class="wrap">
-      <div class="h-head">
+      <div class="h-top">
         <p class="to">勉強会にご参加いただいた皆さんへ</p>
-        <h1><span class="ib">「知っている英語」を、</span><br><span class="ib">「<span class="hl">パッと話せる英語</span>」に</span><span class="ib">変える90日間。</span></h1>
+        <h1><span class="ib">「知っている英語」を、</span><br><span class="ib">「<span class="hl">パッと話せる英語</span>」に</span><br><span class="ib">変える90日間。</span></h1>
       </div>
-      <div class="h-pic" aria-hidden="true">
-        <div class="phone"><img src="img/journal-crop.webp" width="780" height="1216" alt=""></div>
-        <img class="chibi" src="img/hina-phrases.webp" width="360" height="330" alt="">
-        <p class="cap">毎日の学習アプリ × 月12回以上のLIVE授業</p>
+      <div class="h-mid">
+        <p class="sub2">「覚える」と「使う」を<br>繰り返す、<br>90日間の<br>英語トレーニング。</p>
+        <div class="h-pic" aria-hidden="true">
+          <svg class="spark" viewBox="0 0 40 40" aria-hidden="true"><path d="M8 4 L12 14 M22 2 L20 13 M34 10 L26 17" stroke="#F45121" stroke-width="4" stroke-linecap="round"/></svg>
+          <div class="phone"><img src="img/journal-crop.webp" width="780" height="1216" alt=""></div>
+        </div>
       </div>
-      <div class="h-body">
-        <ul class="voices">
-          <li><span class="ib">「単語は知っているのに、</span><span class="ib">言いたい文が作れない。。」</span></li>
-          <li><span class="ib">「勉強しても、会話になると</span><span class="ib">英語が出てこない。。」</span></li>
+      <div class="h-low">
+        <ul class="pts">
+          <li><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M4 7c4-2 8-2 12 1v18c-4-3-8-3-12-1zM28 7c-4-2-8-2-12 1v18c4-3 8-3 12-1z" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round"/></svg><span>目標に合わせて学ぶ。</span></li>
+          <li><svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="10" r="4.5" fill="none" stroke="currentColor" stroke-width="2.4"/><circle cx="7" cy="13" r="3.2" fill="none" stroke="currentColor" stroke-width="2.2"/><circle cx="25" cy="13" r="3.2" fill="none" stroke="currentColor" stroke-width="2.2"/><path d="M8 27c0-5 3.5-8 8-8s8 3 8 8M2 25c0-3 2-5 5-5M30 25c0-3-2-5-5-5" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg><span>LIVEで話す。</span></li>
+          <li><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M26 12a10 10 0 0 0-18-3M6 20a10 10 0 0 0 18 3" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/><path d="M8 3v6h6M24 29v-6h-6" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg><span>自動で復習。</span></li>
         </ul>
-        <p class="sub2"><span class="ib">「覚える」と「使う」を繰り返す、</span><br><span class="ib">90日間の英語トレーニング。</span></p>
-        <a class="go" href="#why">なぜこの学び方なのか、見てみる ↓</a>
-        <p class="deadline on" data-deadline><span class="ib">お申し込み期限：</span><span class="ib">11月3日（火・祝）22:00</span></p>
-        <p class="quiet"><a href="https://my.ohana-english.app/?view=join">申し込みページへ</a></p>
+        <a class="go" href="#why">なぜここで伸びるのか見る ↓</a>
+        <div class="apply">
+          <img class="chibi" src="img/hina-phrases.webp" width="360" height="330" alt="">
+          <div>
+            <p class="deadline on" data-deadline><span class="ib">お申し込み期限：</span><span class="ib">11月3日（火・祝）22:00</span></p>
+            <a class="btn" href="https://my.ohana-english.app/?view=join">お申し込みする →</a>
+          </div>
+        </div>
       </div>
     </div>
   </section>
