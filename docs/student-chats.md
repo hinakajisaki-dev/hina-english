@@ -72,6 +72,7 @@ node scripts/teacher.mjs publish なおみ 5
 | `pron-months 名前 --default` | はじめの状態にもどす（Month 1・2 を、もとの名前で出す. Month 3 は出さない） |
 | `vocab-books 名前` | その生徒の Week ごとの単語帳と、アプリにある単語帳（左の名前：`w1`、`ielts1` …）を見る |
 | `vocab-books 名前 --set "1=ielts1"` | Week 1 の単語帳を `ielts1`（IELTS 語彙 Week 1）にする. その生徒には全員共通の Week 1 は出ない. いくつかあるときは `,` で区切る（例：`"2=w2,3=w3,4=w4,5=w5,6=w6"` で単語帳 Week 2〜6 を出す）. `--set` は前の設定を全部入れかえるので、出したい Week を全部書く. テストの結果と復習カードは単語帳ごとに残る |
+| `phrase-books 名前 --set talk1` | フレーズを、スモールトークの代わりにその本にする（`phrase-books 名前` で見る、`--default` でスモールトークにもどす）. 新しい本は、アプリのチャットで作ってもらう |
 | `vocab-pace 名前 --week 2 --days 4 --size 40` | 単語を1週間 40 語にする（Week 2 は Day 4 までそのまま、残りを7日に。Week 3 からは単語帳をまたいで 40 語ずつ）. `vocab-pace 名前` で見る、`--off` でもとにもどす. Week 3 からの単語帳は `vocab-books` で出す |
 | `write-practice 名前 --on` / `--off` | 単語復習の例文の ☆（★）と「書く練習」を、その生徒に出す / やめる |
 | `stars 名前` | その生徒の ★ の例文と、AI が作ったお題（○ × は前回の結果） |

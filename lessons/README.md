@@ -173,6 +173,7 @@ Week ごとに、全員共通の単語帳のかわりに、別の単語帳を出
 - いまある別の単語帳：
   - `ielts1`「IELTS 語彙 Week 1」（`public/vocab/ielts1.js`。先生の PDF「IELTS 語彙 100」から。10 のテーマ × 10 語、例文は 1 語に 1 つ）
   - `ielts2`「IELTS 語彙 Week 2」（`public/vocab/ielts2.js`。はるきさんのチャットで先生が OK した 100 語。10 のテーマ × 10 語、例文は 1 語に 1 つ）
+  - `ielts3`「IELTS 語彙 Week 3」（`public/vocab/ielts3.js`。はるきさんのチャットで先生が OK した 100 語。10 のテーマ × 10 語、例文は 1 語に 1 つ。ielts1・2 と同じ単語はない）
   - `linkup1`「LinkUp 英単語 Week 1」（`public/vocab/linkup1.js`。先生の PDF「LinkUp英単語」の最初の 10 ページから。動詞 30・名詞 20・形容詞 20・副詞 10・前置詞 20 の 100 語、例文は 1 語に 1 つ（日本語訳つき）。PDF の発音記号は入れていない）
   - `linkup2`「LinkUp 英単語 Week 2」（`public/vocab/linkup2.js`。同じ PDF の 11〜20 ページから、なおみさんのチャットで先生が OK した 100 語。形は linkup1 と同じ。Week 2 なので Day 1〜7 に分かれる）
   - `w2`〜`w6`「単語帳 Week 2〜6」（`public/vocab/week2.js`〜`week6.js`。先生のスライド「単語帳 week 2〜6」から。100 語・例文 200 ずつ）。Week 1 のつづきですが、いまは全員共通ではなく、出した生徒だけに出ます（`everyone: false`。全員に出すときは、その行を消す）
@@ -203,7 +204,15 @@ Week ごとに、全員共通の単語帳のかわりに、別の単語帳を出
 
 ## フレーズとフレーズ復習
 
-フレーズは、単語帳と同じく生徒全員に共通です。中身はスモールトークのコースで、`public/phrases/` に週ごとのファイル（`week1.js` …）で入っています。
+### 生徒ごとのフレーズ
+
+生徒ごとのチャットの `phrase-books 名前 --set talk1` で、その生徒にはスモールトークの代わりに、その本のフレーズが出ます（`--default` でスモールトークにもどる）。
+
+- いまある本：`talk1`「英語の会話でそのまま使うフレーズ」（`public/phrases/talk1.js`。はるきさんのチャットで先生が OK した 35 こ。Week 1、Day 1〜7 で1日5こ。塊・解説・例文・瞬間英作文つき）
+- カード・瞬間英作文・テスト・フレーズ復習は、スモールトークと同じです。テストの結果は本ごとに残ります（`talk1/s1` …）
+- 本を変えても、フレーズ復習に入っているフレーズはそのまま残ります
+
+フレーズは、ふだんは生徒全員に共通です。中身はスモールトークのコースで、`public/phrases/` に週ごとのファイル（`week1.js` …）で入っています。単語帳と同じように、生徒ごとにスモールトークの代わりの本を出すこともできます（下の「生徒ごとのフレーズ」）。
 
 - いま入っているのは 2 週分。もとはこのリポジトリの `smalltalk/week1.md`・`week2.md`（書き方のルールは `smalltalk/README.md`）
   - Week 1「はじめて会った人と話す」：#1〜49 の 49 フレーズ、1 日 7 フレーズ × Day 1〜7、瞬間英作文 92 問
@@ -394,8 +403,8 @@ API キーを入れると、そのあとに送られた日記から、AI が 1 �
 | `src/worker.js` | サーバー（ログイン、教材、日記、言い換え問題、授業メモ、発音の録音、勉強時間） |
 | `public/grammar/lessons.js` | 文法の単元とレッスン（説明と問題） |
 | `public/mistakes.js` | 入力した答えのまちがい探し（スペルミス・文法・語順など。サーバーも同じものを使う） |
-| `public/vocab/week1.js`〜`week6.js`、`ielts1.js`、`ielts2.js`、`linkup1.js`、`linkup2.js`、`words.js` | 単語帳 Week 1（全員共通）、Week 2〜6 と IELTS 語彙 Week 1・2、LinkUp 英単語 Week 1・2（出した生徒だけ）と、週・セット・復習・生徒ごとの単語帳の決まり |
-| `public/phrases/book.js`、`week1.js`、`week2.js` | フレーズ（週・Day・テストの決まりと、スモールトーク Week 1・2 の中身） |
+| `public/vocab/week1.js`〜`week6.js`、`ielts1.js`〜`ielts3.js`、`linkup1.js`、`linkup2.js`、`words.js` | 単語帳 Week 1（全員共通）、Week 2〜6 と IELTS 語彙 Week 1〜3、LinkUp 英単語 Week 1・2（出した生徒だけ）と、週・セット・復習・生徒ごとの単語帳の決まり |
+| `public/phrases/book.js`、`week1.js`、`week2.js`、`talk1.js` | フレーズ（週・Day・テスト・生徒ごとの本の決まりと、スモールトーク Week 1・2、英語の会話でそのまま使うフレーズの中身） |
 | `../smalltalk/` | スモールトークのフレーズ教材（md）と、書き方のルール |
 | `scripts/smalltalk-to-js.mjs`、`smalltalk-overrides.json` | md を `public/phrases/weekN.js` に変換する（md にない先生の変更も入れる） |
 | `public/pron/month1.js`、`month2.js`、`month3.js`、`phrases.js`、`audio/` | 発音 Month 1（先生のシート「8月_発音課題」から 30 文）、Month 2（「7月_発音課題」から 30 文）、Month 3（「10月_発音課題」から 30 文）と先生の録音 |
