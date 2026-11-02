@@ -543,6 +543,19 @@
   .personal { margin-top: 26px; text-align: center; font-size: 14px; font-weight: 800; line-height: 1.75; background: var(--accent-soft); border-radius: 14px; padding: 10px 12px; }
   .personal b { color: var(--accent-text); }
   @media (min-width: 900px) { .personal { font-size: 16px; } }
+  .sched { display: grid; gap: 4px; text-align: left; background: var(--bg); border-radius: 12px; padding: 10px 14px; margin: 4px 0 14px; }
+  .sched li { display: grid; grid-template-columns: 9.5em 1fr; gap: 8px; font-size: 13.5px; font-weight: 800; line-height: 1.6; }
+  .sched li span { color: var(--ink-3); font-size: 12.5px; }
+  .sched li.key, .sched li.key span { color: var(--accent-text); }
+  details.term { padding: 0 16px; }
+  details.term summary { cursor: pointer; list-style: none; position: relative; padding: 14px 28px 14px 0; font-size: 15.5px; font-weight: 900; }
+  details.term summary::-webkit-details-marker { display: none; }
+  details.term summary::after { content: "+"; position: absolute; right: 0; top: 9px; color: var(--accent-text); font-size: 22px; font-weight: 800; }
+  details.term[open] summary::after { content: "−"; }
+  details.term[open] { padding-bottom: 14px; }
+  .term .pay1 { font-size: 14px; font-weight: 800; line-height: 1.7; }
+  @media (max-width: 340px) { .sched li { grid-template-columns: 1fr; gap: 0; } }
+  @media (min-width: 900px) { details.term { padding: 0 22px; } details.term summary { font-size: 17px; } .sched li { font-size: 15px; } .sched li span { font-size: 14px; } }
 </style>
 </head>
 <body id="top">
@@ -790,35 +803,31 @@
           <p class="yen"><b>110,000</b><span>円（税込）</span></p>
           <p class="tax">税抜100,000円・92日間（11/16〜2/15）</p>
           <div class="inc3">
-            <div><h3><i>1</i>毎日の学習</h3><ul><li>学習アプリ</li><li>単語・文法講義</li><li>今日の学習メニュー</li></ul></div>
-            <div><h3><i>2</i>使える英語にする練習</h3><ul><li>瞬間英作文</li><li>モデリング</li><li>AI添削付き英語日記</li></ul></div>
-            <div><h3><i>3</i>実践と振り返り</h3><ul><li>月12回以上のLIVE授業</li><li>自動復習</li><li>定期テスト</li><li>仲間との学習環境</li></ul></div>
+            <div><h3><i>1</i>毎日の学習</h3><ul><li>個別のカリキュラム</li><li>単語学習</li><li>フレーズ学習</li><li>文法講座</li><li>毎日の勉強メニュー</li></ul></div>
+            <div><h3><i>2</i>使える英語にする練習</h3><ul><li>瞬間英作文</li><li>モデリング</li><li>毎日の英語日記課題</li></ul></div>
+            <div><h3><i>3</i>実践と振り返り</h3><ul><li>月12回以上のLIVE授業</li><li>月1回の定期テスト</li><li>自動復習</li><li>仲間との学習環境</li></ul></div>
           </div>
-          <ul class="notes"><li>文法18単元・講義動画53本</li><li>定期テストは月1回（合計3回）</li><li>仲間との学習環境：朝活・Study Session・会員の掲示板（2026年11月中に提供開始予定）など</li></ul>
-          <p class="plain"><span>入会金・教材費なし</span><span>自動更新・自動課金なし</span></p>
-          <p class="start">第1期生 <b>11月16日（月）</b>一斉スタート</p>
+          <ul class="notes"><li>文法18単元・講義動画53本</li><li>定期テストは合計3回</li><li>仲間との学習環境：朝活・Study Session・会員の掲示板など</li></ul>
+          <ul class="sched"><li><span>11月15日（日）19:00〜</span>キックオフ会</li><li class="key"><span>11月16日（月）</span>第1期生 一斉スタート</li><li><span>3ヶ月後</span>卒業イベントも開催します</li></ul>
           <div class="cta">
             <a class="btn block" href="https://my.ohana-english.app/?view=join">第1期生に申し込む</a>
             <p class="deadline on" data-deadline><span class="ib">お申し込み期限：</span><span class="ib">11月3日（火・祝）22:00</span></p>
           </div>
         </div>
         <div class="terms">
-          <div class="card term">
-            <h3>お支払い</h3>
-            <ul>
-              <li><span class="k">カード</span><span><b>一括・カード会社の分割</b>日本のカードのみ。アメックスは分割できません</span></li>
-              <li><span class="k">振込</span><span><b>銀行振込</b><a href="https://line.me/R/oaMessage/@039impnx/?%E9%8A%80%E8%A1%8C%E6%8C%AF%E8%BE%BC">公式LINEに「銀行振込」と送ってください</a></span></li>
-            </ul>
-          </div>
-          <div class="card term">
-            <h3>解約について</h3>
+          <details class="card term">
+            <summary>お支払い</summary>
+            <p class="pay1">クレジットカード（分割も可能です）、銀行振込</p>
+          </details>
+          <details class="card term">
+            <summary>解約について</summary>
             <ul>
               <li><span class="k">8日以内</span><span><b>クーリング・オフ</b>特定商取引法に基づく制度。書面を受け取った日を含めて8日以内</span></li>
               <li><span class="k">11/15まで</span><span><b>解約手数料0円で返金</b></span></li>
               <li><span class="k">11/16以降</span><span><b>差し引いて返金</b>対価（110,000円×経過日数÷92日）と通常損害（最大5,000円）</span></li>
             </ul>
             <p class="fine">くわしくは<a href="https://my.ohana-english.app/?view=gaiyou">概要書面</a>をご覧ください。</p>
-          </div>
+          </details>
           <p class="fine">※卒業イベント（2027年2月頃・日にちと会場は決まりしだいお知らせ）は参加費1人3,000円（別途）。交通費・宿泊費は参加者負担です。</p>
         </div>
       </div>
