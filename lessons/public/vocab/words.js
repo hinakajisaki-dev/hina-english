@@ -65,20 +65,33 @@ export function bookWord(key) {
 // Where a word added for one student (kind "vocab") is listed: its week (1–24),
 // "mine" (自分の単語: the student added it themselves) or "other" (the teacher's,
 // with no week: そのほか).
-export const itemWeek = (item) => (item.data.mine ? "mine" : item.data.week || "other");
+export const itemWeek = (item) => (item.data.mine ? "mine" : item.data.toeic ? toeicWeek(item.data.toeic) : item.data.week || "other");
+
+// ---------- TOEIC単語 ----------
+// For a student studying for TOEIC (student_settings toeic): the teacher's words
+// for Part 1〜3 of the listening (kind "vocab" with toeic: 1〜3). Each part is a
+// list of its own, "toeic1" … (like a week), in sets of ten.
+export const TOEIC_PARTS = [
+  { part: 1, title: "Part 1 リスニング", sub: "写真描写" },
+  { part: 2, title: "Part 2 リスニング", sub: "応答問題" },
+  { part: 3, title: "Part 3 リスニング", sub: "会話問題" },
+];
+export const toeicWeek = (part) => `toeic${part}`;
+export const isToeicWeek = (week) => /^toeic[1-3]$/.test(String(week));
+export const toeicPart = (week) => TOEIC_PARTS.find((p) => toeicWeek(p.part) === String(week)) || null;
 
 // A word added for one student, by the teacher or by the student (mine, with its
-// id so the student can change it): one example at most.
+// id so the student can change it): one example at most (with its Japanese, example_ja).
 export function itemWord(item) {
-  const { word, meaning, example, mine } = item.data;
+  const { word, meaning, example, example_ja: ja, mine, toeic } = item.data;
   const form = example ? findForm(example, word) : null;
   return {
     key: `item/${item.id}`,
     word,
     meaning,
     pos: "",
-    group: mine ? "自分で追加した単語" : "先生が追加した単語",
-    examples: example ? [{ en: example, ja: "", note: "", form }] : [],
+    group: mine ? "自分で追加した単語" : toeic ? `TOEIC Part ${toeic}` : "先生が追加した単語",
+    examples: example ? [{ en: example, ja: ja || "", note: "", form }] : [],
     ...(mine ? { mine: true, id: item.id } : {}),
   };
 }
@@ -89,7 +102,7 @@ export function itemWord(item) {
 export function weekWords(week, items = [], books = null, pace = null) {
   if (isPaceWeek(week)) return paceWeeks(items, books, pace).find((p) => p.week === week)?.words || [];
   const own = items.filter((item) => item.kind === "vocab" && itemWeek(item) === week).map(itemWord);
-  const book = week === "other" || week === "mine" ? null : weekBook(week, books);
+  const book = week === "other" || week === "mine" || isToeicWeek(week) ? null : weekBook(week, books);
   return [...(book ? bookWords(book) : []), ...own];
 }
 
@@ -170,7 +183,7 @@ export function wordSets(words, week, pace = null) {
   const mine = (i) => (sets.length > 1 ? `My vocabs ${i + 1}` : "My vocabs");
   return sets.map((chunk, i) => {
     const title = setTitle([...new Set(chunk.map((w) => w.group))]);
-    const label = days ? `Day ${i + 1}` : week === "mine" ? mine(i) : `${i + 1}. ${title}`;
+    const label = days ? `Day ${i + 1}` : week === "mine" ? mine(i) : isToeicWeek(week) ? `セット ${i + 1}` : `${i + 1}. ${title}`;
     return { number: i + 1, words: chunk, title, label, day: days };
   });
 }
@@ -188,9 +201,10 @@ function setTitle(groups) {
 }
 
 // A set's test results are kept under its book ("w1/s3", "ielts1/s3"; a day
-// is "w2/d3"); a week with only the teacher's words uses "w{week}".
+// is "w2/d3"); a week with only the teacher's words uses "w{week}", and TOEIC単語 "toeic1/s2".
 export function setKey(week, number, books = null, pace = null) {
   if (isPaceWeek(week)) return `pace/${week}/d${number}`;
+  if (isToeicWeek(week)) return `${week}/s${number}`;
   const book = week !== "other" && weekBook(week, books);
   // The days after the kept ones in a pace's week are new days ("w2/p5").
   if (pace && book && Number(week) === pace.week && number > pace.days) return `${book}/p${number}`;
@@ -218,13 +232,33 @@ export const speakable = (word) => word
   .trim();
 
 // The word as it appears in a sentence (made for make), or null when it can't be found.
+// A phrase is found word by word ("lean against" → "leaning against", "be stacked" → "are stacked").
 export function findForm(sentence, word) {
   const base = speakable(word).toLowerCase();
+  if (/\s/.test(base)) return findPhraseForm(sentence, base.match(/[a-z'’-]+/g) || []);
   const tokens = sentence.match(/[A-Za-z'’-]+/g) || [];
   const exact = tokens.find((t) => t.toLowerCase() === base);
   if (exact) return exact;
-  const stem = base.replace(/e$/, "");
-  return tokens.find((t) => t.toLowerCase().startsWith(stem) && t.length <= base.length + 4) || null;
+  return tokens.find((t) => sameStem(t, base)) || null;
+}
+
+const sameStem = (token, base) => {
+  const t = token.toLowerCase();
+  return t === base || (t.startsWith(base.replace(/e$/, "")) && t.length <= base.length + 4);
+};
+const BE = ["be", "is", "are", "am", "was", "were", "been", "being"];
+
+function findPhraseForm(sentence, words) {
+  if (!words.length) return null;
+  const tokens = [...sentence.matchAll(/[A-Za-z'’-]+/g)];
+  const fits = (token, word) => (word === "be" ? BE.includes(token.toLowerCase()) : sameStem(token, word));
+  for (let i = 0; i + words.length <= tokens.length; i++) {
+    if (words.every((word, j) => fits(tokens[i + j][0], word))) {
+      const last = tokens[i + words.length - 1];
+      return sentence.slice(tokens[i].index, last.index + last[0].length);
+    }
+  }
+  return null;
 }
 
 // Splits a sentence around every whole-word use of `form`, for highlighting or

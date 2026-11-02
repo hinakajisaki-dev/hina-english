@@ -10,7 +10,9 @@ import {
 } from "./errors.js";
 import { findLesson, lessonExampleSentences, plain, questionCount } from "../public/grammar/lessons.js";
 import { findMistakes, normalizeWords } from "../public/mistakes.js";
-import { bookSentences, bookWord, isPaceWeek, itemWord, setKey, vocabBooks, weekWords, wordSets } from "../public/vocab/words.js";
+import {
+  bookSentences, bookWord, isPaceWeek, isToeicWeek, itemWord, setKey, speakable, vocabBooks, weekWords, wordSets,
+} from "../public/vocab/words.js";
 import { findPhrase, pronMonths } from "../public/pron/phrases.js";
 import { phraseBooks, phraseByKey, phraseSentences, phraseSetKey, phraseSets, testSize } from "../public/phrases/book.js";
 import { noteProblems, noteSentences } from "../public/notes/format.js";
@@ -27,7 +29,8 @@ const DB_BUSY_MESSAGE = "ただいまサーバーが混み合っています。�
 
 // Fields each kind of item keeps; the first `required` of them must be filled.
 const KINDS = {
-  vocab: { fields: ["word", "meaning", "example"], required: 2 },
+  // example_ja: the Japanese of the example (optional).
+  vocab: { fields: ["word", "meaning", "example", "example_ja"], required: 2 },
   pron: { fields: ["text", "tip"], required: 1 },
   grammar: { fields: ["question", "answer", "choices", "explanation"], required: 2 },
   topic: { fields: ["prompt"], required: 1 },
@@ -250,6 +253,13 @@ async function route(request, env, url, who, ctx) {
     await saveSetting(db, student, "write_practice", on === true ? true : null);
     return json({ on: on === true });
   }
+  // TOEIC単語 on the student's home screen (for a student studying for TOEIC).
+  if (parts[1] === "students" && parts[3] === "toeic" && parts.length === 4 && method === "PUT") {
+    const student = await findStudent(db, id(2));
+    const { on } = await readJson(request);
+    await saveSetting(db, student, "toeic", on === true ? true : null);
+    return json({ on: on === true });
+  }
   if (parts[1] === "students" && parts[3] === "stars" && parts.length === 4 && method === "PUT") {
     return editStar(request, db, await findStudent(db, id(2)));
   }
@@ -436,7 +446,8 @@ async function speech(env, student, text) {
     allowed = rows.some((row) => {
       const data = JSON.parse(row.data);
       if (row.kind === "rephrase") return rephraseAnswers(data.en).includes(text);
-      return SPOKEN_FIELDS[row.kind].some((field) => data[field] === text);
+      // (A word is voiced without its 〜: "〜 is lined up" is "is lined up".)
+      return SPOKEN_FIELDS[row.kind].some((field) => data[field] === text) || (row.kind === "vocab" && speakable(data.word || "") === text);
     });
   }
   // The English of the student's published 授業メモ: its 復習問題, the answers of its 英作文
@@ -639,7 +650,7 @@ async function saveOwnWord(request, env, student, row) {
 
 // The score of a set's test (ten words, or a day's). The total is the set's size, worked out here.
 async function saveVocabTest(request, env, student, weekParam, number) {
-  const week = weekParam === "other" || weekParam === "mine" || isPaceWeek(weekParam) ? weekParam : Number(weekParam);
+  const week = weekParam === "other" || weekParam === "mine" || isPaceWeek(weekParam) || isToeicWeek(weekParam) ? weekParam : Number(weekParam);
   const items = (await all(env.DB, `SELECT * FROM items WHERE student_id = ? AND kind = 'vocab'`, student.id)).map(itemRow);
   const books = await studentSetting(env.DB, student, "vocab_books");
   const pace = await studentSetting(env.DB, student, "vocab_pace");
@@ -1217,10 +1228,12 @@ function cleanItem(kind, data) {
   }
   // Words are grouped into Week 1–24; words without a week show as そのほか, and
   // the words a student added themselves (mine) as 自分の単語.
+  // TOEIC単語 are in Part 1〜3 (toeic) instead of a week.
   if (kind === "vocab") {
     const week = Number(data.week);
     clean.week = Number.isInteger(week) && week >= 1 && week <= WEEKS ? week : null;
     if (data.mine === true) Object.assign(clean, { mine: true, week: null });
+    else if ([1, 2, 3].includes(Number(data.toeic))) Object.assign(clean, { toeic: Number(data.toeic), week: null });
   }
   return clean;
 }

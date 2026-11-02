@@ -433,6 +433,7 @@ export async function studentBundle(db, studentId) {
     vocabPace: setting("vocab_pace"),
     phraseBooks: setting("phrase_books"),
     writePractice: !!setting("write_practice"),
+    toeic: !!setting("toeic"),
     stars: starRows.map(starRow),
   };
 }

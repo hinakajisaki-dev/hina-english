@@ -5,7 +5,10 @@ import {
   SPEEDS, getSpeed, setSpeed, speak, startOfJapanDay, stopSpeaking, toast, watchErrors,
 } from "./common.js";
 import { UNITS, findLesson, plain, questionCount } from "./grammar/lessons.js";
-import { bookWeeks, isPaceWeek, itemWeek, paceWeeks, setKey, speakable, splitOnForm, weekWords, wordSets } from "./vocab/words.js";
+import {
+  TOEIC_PARTS, bookWeeks, isPaceWeek, isToeicWeek, itemWeek, paceWeeks, setKey, speakable, splitOnForm, toeicPart, toeicWeek,
+  weekWords, wordSets,
+} from "./vocab/words.js";
 import { MONTHS, currentMonth, monthLabel, monthPhrases, studentMonths } from "./pron/phrases.js";
 import { CURRENT_WEEK, NOTES_FOR_STUDENTS } from "./course.js";
 import { MENUS } from "./menus.js";
@@ -69,6 +72,7 @@ function render() {
     vocab: renderVocab, review: renderReview, phrases: renderPhrases, "phrase-review": renderPhraseReview, pron: renderPron,
     grammar: renderGrammar, rephrase: renderRephrase, journal: renderJournal, study: renderStudy,
     ...(NOTES_FOR_STUDENTS ? { notes: renderNotes } : {}),
+    ...(state.me.toeic ? { toeic: renderToeic } : {}),
   };
   (screens[screen] || renderHome)(...rest.map(decodeURIComponent));
 }
@@ -347,6 +351,7 @@ function renderHome() {
         <h2>こんにちは、${esc(state.me.student.name)}さん</h2>
       </div>
       ${installCard()}
+      ${state.me.toeic ? toeicTile() : ""}
       ${shows("plan") ? `<section class="card plan" aria-label="今週の勉強範囲">
         <p class="label">今週の勉強範囲</p>
         ${plan ? `<div class="note-body plan-body">${memoHtml(plan.body)}</div>` : `<p class="muted small">先生が、今週の勉強範囲をここに書きます。</p>`}
@@ -797,9 +802,14 @@ const myPace = () => state.me.vocabPace || null;
 const myPaceWeeks = () => paceWeeks(state.me.items, state.me.vocabBooks, myPace());
 const paceWeek = (week) => myPaceWeeks().find((p) => p.week === week);
 const weekLabel = (week) => (week === "other" ? "そのほか" : week === "mine" ? "自分の単語"
-  : isPaceWeek(week) ? paceWeek(week)?.label || "" : `Week ${week}`);
-// "Week 1 ・ 1. 動詞 ①・②", or just "My vocabs" for 自分の単語.
-const setName = (week, set) => (week === "mine" ? set.label : `${weekLabel(week)} ・ ${set.label}`);
+  : isPaceWeek(week) ? paceWeek(week)?.label || "" : isToeicWeek(week) ? toeicPart(week).title : `Week ${week}`);
+// "Week 1 ・ 1. 動詞 ①・②", "Part 1 ・ セット 2" (TOEIC単語), or just "My vocabs" for 自分の単語.
+const setName = (week, set) => (week === "mine" ? set.label
+  : isToeicWeek(week) ? `Part ${toeicPart(week).part} ・ ${set.label}` : `${weekLabel(week)} ・ ${set.label}`);
+// Where a week's sets are: TOEIC単語 has its own screen (#/toeic/1 is Part 1),
+// and its sets remember つづきから apart from 単語カード.
+const weekHref = (week) => (isToeicWeek(week) ? `#/toeic/${toeicPart(week).part}` : `#/vocab/${week}`);
+const resumeKind = (week) => (isToeicWeek(week) ? "toeic" : "vocab");
 const studentWeekWords = (week) => weekWords(week, state.me.items, state.me.vocabBooks, myPace());
 const studentSets = (week) => wordSets(studentWeekWords(week), week, myPace());
 const studentSetKey = (week, number) => setKey(week, number, state.me.vocabBooks, myPace());
@@ -817,7 +827,7 @@ const testResult = (week, number) => state.me.vocabTests[studentSetKey(week, num
 
 // Every word this student has, by key, so the 復習 list can find its words.
 function wordsByKey() {
-  const weeks = new Set([...studyWeeks(), "mine"]);
+  const weeks = new Set([...studyWeeks(), "mine", ...(state.me.toeic ? TOEIC_PARTS.map((p) => toeicWeek(p.part)) : [])]);
   const map = new Map();
   for (const week of weeks) for (const w of studentWeekWords(week)) map.set(w.key, { ...w, week });
   return map;
@@ -861,7 +871,7 @@ const wordExamplesHtml = (word, { stars = false } = {}) => (word.examples.length
 // #/vocab/2/1 is Day 1's words, #/vocab/2/1/card/3 its third card,
 // #/vocab/2/1/test its テスト tab and #/vocab/2/1/test/start the test itself.
 function renderVocab(week, setNumber, mode, arg) {
-  const w = week === "other" || week === "mine" || isPaceWeek(week) ? week : Number(week);
+  const w = week === "other" || week === "mine" || isPaceWeek(week) || isToeicWeek(week) ? week : Number(week);
   if (week && setNumber && mode === "test") return arg === "start" ? renderVocabTest(w, Number(setNumber)) : renderVocabDay(w, Number(setNumber), "test");
   if (week && setNumber && mode === "card") return renderVocabSet(w, Number(setNumber), Number(arg) - 1);
   if (week && setNumber) return renderVocabDay(w, Number(setNumber), "words");
@@ -939,7 +949,8 @@ function renderWeek(week) {
   state.vocabTest = null;
   const sets = studentSets(week);
   const mine = week === "mine";
-  app.innerHTML = `${topbar(`単語カード ・ ${weekLabel(week)}`, "#/vocab")}
+  const toeic = isToeicWeek(week);
+  app.innerHTML = `${topbar(toeic ? weekLabel(week) : `単語カード ・ ${weekLabel(week)}`, toeic ? "#/toeic" : "#/vocab")}
     <main class="wrap stack">
       ${mine ? `<section class="card stack">
         <h3>単語を追加</h3>
@@ -947,11 +958,12 @@ function renderWeek(week) {
       </section>` : ""}
       ${isPaceWeek(week) ? `<p class="pace-range">${esc(paceWeek(week)?.range || "")}</p>` : ""}
       ${sets.length ? `<p class="muted">${sets[0].day ? "Day" : "セット"}をえらぶと、単語の一覧が出ます。<br>テストは「テスト」タブから、いつでもできます。</p>` : ""}
-      ${sets.length ? "" : mine ? `<p class="muted small" style="text-align:center">追加した単語は、10 語ずつのセットになって、カードとテストで練習できます。</p>` : emptyState("この週の単語は、まだありません。")}
+      ${sets.length ? "" : mine ? `<p class="muted small" style="text-align:center">追加した単語は、10 語ずつのセットになって、カードとテストで練習できます。</p>`
+        : emptyState(toeic ? "この Part の単語は、先生が用意します。" : "この週の単語は、まだありません。")}
       ${sets.map((set) => {
         const result = testResult(week, set.number);
-        const place = resumeAt("vocab", studentSetKey(week, set.number));
-        return `<a class="lesson-card" href="#/vocab/${week}/${set.number}">
+        const place = resumeAt(resumeKind(week), studentSetKey(week, set.number));
+        return `<a class="lesson-card" href="${weekHref(week)}/${set.number}">
           <div><b>${esc(set.label)}</b>${set.day ? `<span class="muted small">${esc(set.title)} ・ ${set.words.length}語</span>` : ""}<span class="muted small" lang="en">${set.words.map((w) => esc(w.word)).join(" ・ ")}</span></div>
           ${place ? `<span class="badge start">つづきから ${esc(place.of)}</span>`
             : result ? `<span class="badge">✓ ${result.best} / ${result.total}</span>` : `<span class="badge start">はじめる</span>`}
@@ -990,11 +1002,11 @@ function renderVocabDay(week, number, tab) {
   const set = findSet(week, number);
   if (!set) return renderWeek(week);
   state.vocabTest = null;
-  const base = `#/vocab/${week}/${number}`;
+  const base = `${weekHref(week)}/${number}`;
   const result = testResult(week, number);
-  const place = resumeAt("vocab", studentSetKey(week, number));
+  const place = resumeAt(resumeKind(week), studentSetKey(week, number));
 
-  app.innerHTML = `${topbar(setName(week, set), `#/vocab/${week}`)}
+  app.innerHTML = `${topbar(setName(week, set), weekHref(week))}
     <main class="wrap stack">
       ${tabsHtml("単語とテスト", [
         { href: base, label: `単語 <small>${set.words.length}</small>`, on: tab !== "test" },
@@ -1023,12 +1035,12 @@ function renderVocabDay(week, number, tab) {
 function renderVocabSet(week, number, at) {
   const set = findSet(week, number);
   if (!set) return renderWeek(week);
-  const base = `#/vocab/${week}/${number}`;
+  const base = `${weekHref(week)}/${number}`;
   const index = at >= 0 && at < set.words.length ? at : 0;
   const id = studentSetKey(week, number);
   if (state.vocab?.id !== id) state.vocab = { id, turned: new Set() };
   const V = state.vocab;
-  saveResume("vocab", id, index ? { week, number, index, of: `${index + 1} / ${set.words.length}` } : null);
+  saveResume(resumeKind(week), id, index ? { week, number, index, of: `${index + 1} / ${set.words.length}` } : null);
   const word = set.words[index];
   const last = index === set.words.length - 1;
   const go = (i) => location.replace(`${base}/card/${i + 1}`);
@@ -1125,10 +1137,57 @@ function renderVocabSet(week, number, at) {
   document.getElementById("prev")?.addEventListener("click", () => go(index - 1));
   document.getElementById("next").addEventListener("click", () => {
     if (!last) return go(index + 1);
-    saveResume("vocab", id, null);
+    saveResume(resumeKind(week), id, null);
     state.vocab = null;
     location.hash = base;
   });
+}
+
+// ---------- TOEIC単語 ----------
+// For a student studying for TOEIC (state.me.toeic): Part 1〜3 of the listening,
+// each the teacher's words in sets of ten, with the same cards, test and 復習 as
+// 単語カード (#/toeic/1 is Part 1, #/toeic/1/2/card/3 its second set's third card).
+
+function toeicSets() {
+  return TOEIC_PARTS.flatMap((p) => studentSets(toeicWeek(p.part)).map((set) => ({ week: toeicWeek(p.part), ...set })));
+}
+
+// At the top of the home screen.
+function toeicTile() {
+  const sets = toeicSets();
+  const tested = sets.filter((s) => testResult(s.week, s.number)).length;
+  return `<nav class="tiles" aria-label="TOEIC単語"><a class="tile wide toeic-tile" href="#/toeic">
+    <span class="emoji" aria-hidden="true">🎧</span>
+    <div><b>TOEIC単語</b>
+      <p class="muted">Part 1〜3 リスニング${sets.length ? ` ・ テスト ${tested} / ${sets.length}` : ""}</p>
+      ${sets.length ? `<div class="bar"><i style="width:${Math.round((tested / sets.length) * 100)}%"></i></div>` : ""}</div>
+  </a></nav>`;
+}
+
+function renderToeic(part, ...rest) {
+  if (part && toeicPart(toeicWeek(part))) return renderVocab(toeicWeek(part), ...rest);
+  state.vocabTest = null;
+  const last = lastResume("toeic");
+  const lastSet = last && studentSetKey(last.week, last.number) === last.key && findSet(last.week, last.number);
+  app.innerHTML = `${topbar("TOEIC単語")}
+    <main class="wrap stack">
+      ${lastSet ? resumeCard(`${weekHref(last.week)}/${last.number}/card/${last.index + 1}`, esc(setName(last.week, lastSet)), last.of) : ""}
+      ${TOEIC_PARTS.map((p) => {
+        const week = toeicWeek(p.part);
+        const words = studentWeekWords(week);
+        const sets = studentSets(week);
+        const tested = sets.filter((s) => testResult(week, s.number)).length;
+        const title = `<b>Part ${p.part} <small>リスニング</small></b>`;
+        if (!words.length) {
+          return `<div class="lesson-card toeic-part empty-part"><div>${title}<span class="muted small">${esc(p.sub)} ・ 準備中</span></div></div>`;
+        }
+        return `<a class="lesson-card toeic-part ${tested === sets.length ? "done" : ""}" href="${weekHref(week)}">
+          <div>${title}<span class="muted small">${esc(p.sub)} ・ ${words.length} 語 ・ テスト ${tested} / ${sets.length}</span>
+            <div class="bar"><i style="width:${Math.round((tested / sets.length) * 100)}%"></i></div></div>
+          <span class="chev" aria-hidden="true">›</span>
+        </a>`;
+      }).join("")}
+    </main>`;
 }
 
 // ---------- set test ----------
@@ -1166,7 +1225,7 @@ function renderVocabTest(week, number) {
     renderVocabTest(week, number);
     window.scrollTo(0, 0);
   };
-  const back = `#/vocab/${week}/${number}/test`;
+  const back = `${weekHref(week)}/${number}/test`;
 
   if (T.index >= T.questions.length) return renderVocabTestResult(week, set, rerender);
 
@@ -1233,7 +1292,7 @@ function renderVocabTestResult(week, set, rerender) {
   const next = findSet(week, set.number + 1);
   const perfect = score === T.questions.length;
 
-  app.innerHTML = `${topbar(`テスト ・ ${set.label}`, `#/vocab/${week}/${set.number}/test`)}
+  app.innerHTML = `${topbar(`テスト ・ ${set.label}`, `${weekHref(week)}/${set.number}/test`)}
     <main class="wrap stack">
       <section class="card stack" style="text-align:center">
         <p style="font-size:40px">${perfect ? "🎉" : "👏"}</p>
@@ -1244,9 +1303,9 @@ function renderVocabTestResult(week, set, rerender) {
         <h3>復習カードに入れた単語</h3>
         <ul class="plain-list">${missed.map((w) => `<li><b lang="en">${esc(w.word)}</b>　${esc(w.meaning)}</li>`).join("")}</ul>
       </section>` : ""}
-      ${next ? `<a class="btn block" href="#/vocab/${week}/${next.number}">${next.day ? "次の日へ" : "次の10語へ"}（${esc(next.label)}）</a>` : ""}
+      ${next ? `<a class="btn block" href="${weekHref(week)}/${next.number}">${next.day ? "次の日へ" : "次の10語へ"}（${esc(next.label)}）</a>` : ""}
       <button type="button" class="btn secondary block" id="again">もう一度テスト</button>
-      <a class="btn ghost block" href="#/vocab/${week}">${weekLabel(week)} にもどる</a>
+      <a class="btn ghost block" href="${weekHref(week)}">${weekLabel(week)} にもどる</a>
     </main>`;
   document.getElementById("again").addEventListener("click", () => {
     state.vocabTest = null;
