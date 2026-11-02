@@ -656,10 +656,10 @@ async function saveVocabTest(request, env, student, weekParam, number) {
   const pace = await studentSetting(env.DB, student, "vocab_pace");
   const set = wordSets(weekWords(week, items, books, pace), week, pace).find((s) => s.number === number);
   if (!set) throw new HttpError(404, "見つかりません。");
-  const total = set.words.length;
-  // listen: TOEIC単語's 音だけ聞いてえらぶ, kept apart from the set's test.
+  // listen: TOEIC単語's 例文の聞きとり heard to the end (its examples), kept apart from the set's test.
   const { score, listen } = await readJson(request);
   if (listen && !isToeicWeek(week)) throw new HttpError(404, "見つかりません。");
+  const total = listen ? set.words.filter((w) => w.examples.length).length : set.words.length;
   const clean = Math.max(0, Math.min(total, Math.round(Number(score)) || 0));
   await run(
     env.DB,

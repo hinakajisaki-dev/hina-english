@@ -845,7 +845,7 @@ function vocabBooksForm() {
 
 // Every set this student has (sets of ten, or days; their 単語帳 and own words), with its key.
 // With a pace of their own (vocab_pace), the weeks after its week are its pace weeks.
-// TOEIC単語's sets come twice: their test, then 音だけ聞いてえらぶ.
+// TOEIC単語's sets come twice: their test, then 例文の聞きとり.
 function vocabSetList(data) {
   const books = data.vocabBooks;
   const pace = data.vocabPace;
@@ -854,7 +854,10 @@ function vocabSetList(data) {
   return weeks.flatMap((week) => {
     const sets = wordSets(weekWords(week, data.items, books, pace), week, pace);
     const list = sets.map((set) => ({ week, ...set, key: setKey(week, set.number, books, pace) }));
-    if (isToeicWeek(week)) list.push(...sets.map((set) => ({ week, ...set, label: `${set.label}（聞いてえらぶ）`, key: listenSetKey(week, set.number) })));
+    if (isToeicWeek(week)) {
+      list.push(...sets.filter((set) => set.words.some((w) => w.examples.length))
+        .map((set) => ({ week, ...set, label: `${set.label}（例文の聞きとり）`, key: listenSetKey(week, set.number), listen: true })));
+    }
     return list;
   });
 }
@@ -881,7 +884,8 @@ function vocabResultsHtml() {
       return `<li><div class="main">
         <div><b>${esc(vocabWeekName(state.current, set.week))} ・ ${esc(set.label)}</b></div>
         <div class="sub">${r
-          ? `ベスト ${r.best} / ${r.total}　前回 ${r.last} / ${r.total}　${r.times} 回　（${esc(formatDateTime(r.updated_at))}）`
+          ? set.listen ? `最後まで聞いた ${r.times} 回　（${esc(formatDateTime(r.updated_at))}）`
+            : `ベスト ${r.best} / ${r.total}　前回 ${r.last} / ${r.total}　${r.times} 回　（${esc(formatDateTime(r.updated_at))}）`
           : "まだやっていません"}</div>
       </div></li>`;
     }).join("")}</ul>
