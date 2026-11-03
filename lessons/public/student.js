@@ -3912,7 +3912,9 @@ function renderJournal(id) {
 
   app.innerHTML = `${topbar(journalName())}
     <main class="wrap stack">
-      <p class="notice">📝 ここに書いた日記がたまっていくと、それをもとに苦手なところを分析していきます。<b>辞書や翻訳で調べずに</b>、できるだけ長く、がんばって書いてみてください。</p>
+      ${ielts()
+        ? `<p class="notice">📝 <b>IELTS Speaking Part 1 の練習</b><br>試験官と4〜5分。身近な話題を2〜3つ、3〜4問ずつ聞かれます。</p>`
+        : `<p class="notice">📝 ここに書いた日記がたまっていくと、それをもとに苦手なところを分析していきます。<b>辞書や翻訳で調べずに</b>、できるだけ長く、がんばって書いてみてください。</p>`}
       <form id="journal" class="card stack">
         ${topic.free
           ? `<div class="topic-box">
@@ -3933,7 +3935,7 @@ function renderJournal(id) {
             </div>`}
         ${ielts() && !topic.free ? `<div class="ielts-guide">
           <p class="label">答え方</p>
-          <ul><li>1問に <b>2〜3文</b>で答える（30〜50語くらい）</li><li>「答え ＋ <b>理由か例</b>」。1文で終わらない</li></ul>
+          <ul><li>1問に <b>2〜3文</b>で答える（30〜50語・話して20〜30秒）</li><li>6.5 のコツ：答え ＋ <b>理由か例</b>。because・although なども使ってみる</li></ul>
         </div>` : ""}
         <label class="field"><span>${ielts() && !topic.free ? "英語で答えよう" : "英語で書いてみよう"}</span>
           <textarea name="body" lang="en" rows="9" spellcheck="false" placeholder="${esc(!topic.free && current.start ? current.start : "Today I ...")}">${esc(draft.body || "")}</textarea>
