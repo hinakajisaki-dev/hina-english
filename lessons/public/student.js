@@ -21,7 +21,7 @@ import {
 import { findMistakes, normalizeWords } from "./mistakes.js";
 import { lessonDayLabel, lessonList, noteDayLabel, noteHtml as memoHtml, notePages, noteProblems } from "./notes/format.js";
 import {
-  appMinutes, bindPanels, formatMinutes, monthPanel, monthStart, startStudyClock, studySplit, summary, timeHtml,
+  allTime, appMinutes, bindPanels, formatMinutes, monthPanel, monthStart, startStudyClock, studySplit, summary, timeHtml,
   today, totalMinutes, totalPanel, weekDays, weekPanel, weekStart,
 } from "./study.js";
 
@@ -400,9 +400,10 @@ function renderHome() {
             <span class="emoji" aria-hidden="true">${done ? "✅" : "✍️"}</span><b>日記${ielts() ? "<small>（IELTS問題練習）</small>" : ""}</b>
             <span class="muted">${diary.month}月 ${diary.written} / ${diary.of} 日</span>
             ${barHtml(diary.written, diary.of)}` },
-          { key: "study", html: `
-            <span class="emoji" aria-hidden="true">⏱️</span><b>勉強時間</b>
-            <span class="muted">今日 ${formatMinutes(totalMinutes(todayRow))}<br>今週 ${formatMinutes(week.total)}</span>` },
+          { key: "pron", html: `
+            <span class="emoji" aria-hidden="true">🎤</span><b>発音課題</b>
+            <span class="muted">${shared.length ? `${esc(monthLabel(myMonths(), pronMonth))} ・ 完了 ${pronFinished} / ${shared.length}` : "まだありません"}</span>
+            ${shared.length ? `<div class="bar"><i style="width:${Math.round((pronFinished / shared.length) * 100)}%"></i></div>` : ""}` },
           { key: "vocab", html: `
             <span class="emoji" aria-hidden="true">🃏</span><b>単語カード</b>
             <span class="muted">${sets.length ? `Week ${CURRENT_WEEK} ・ テスト ${tested} / ${sets.length}` : "まだありません"}</span>
@@ -424,10 +425,9 @@ function renderHome() {
           { key: "grammar-review", html: `
             <span class="emoji" aria-hidden="true">🔂</span><b>文法復習</b>
             <span class="muted">${grammarReviewCount ? `${grammarReviewCount} こ` : "まだありません"}</span>` },
-          { key: "pron", html: `
-            <span class="emoji" aria-hidden="true">🎤</span><b>発音課題</b>
-            <span class="muted">${shared.length ? `${esc(monthLabel(myMonths(), pronMonth))} ・ 完了 ${pronFinished} / ${shared.length}` : "まだありません"}</span>
-            ${shared.length ? `<div class="bar"><i style="width:${Math.round((pronFinished / shared.length) * 100)}%"></i></div>` : ""}` },
+          { key: "study", wide: true, html: `
+            <span class="emoji" aria-hidden="true">⏱️</span>
+            <div><b>勉強時間</b><p class="muted">今日 ${formatMinutes(totalMinutes(todayRow))} ・ 今週 ${formatMinutes(week.total)} ・ これまで ${formatMinutes(allTime(state.me.study).total)}</p></div>` },
           groups.length && { key: "rephrase", wide: true, cls: rephraseDone ? "done" : "", html: `
             <span class="emoji" aria-hidden="true">${rephraseDone ? "✅" : "⚡"}</span>
             <div><b>${rephraseTitle}</b>
