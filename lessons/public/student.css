@@ -556,3 +556,18 @@ body.quiz-open .wrap { padding-bottom: 62vh; }
 .listen-answer { display: grid; gap: 8px; padding: 14px; border-radius: 14px; background: var(--sky-soft); }
 .listen-ja { font-size: 19px; font-weight: 800; line-height: 1.6; }
 .listen-answer .en { font-family: var(--en); font-size: 16px; line-height: 1.6; }
+
+/* 単語復習: 外す on each word's row. */
+.word-item-row { display: flex; align-items: center; padding-right: 10px; }
+.word-item-row .word-item-head { flex: 1; min-width: 0; }
+.word-item-row .small-btn { flex: none; }
+/* 文法: all the lessons done, at the top. */
+.grammar-total { gap: 6px; }
+.grammar-total b { font-size: 22px; }
+.unit-card .bar { margin-top: 6px; }
+/* 日記（IELTS問題練習）: how to answer, the tip, and the 6.5 answer. */
+.ielts-guide { padding: 12px 14px; border-radius: 14px; background: var(--sky-soft); }
+.ielts-guide ul { margin: 4px 0 0; padding-left: 1.2em; line-height: 1.7; }
+.band-tip p:last-child { font-weight: 800; line-height: 1.6; }
+.sample-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.sample-text { font-family: var(--en); font-size: 17px; line-height: 1.7; }

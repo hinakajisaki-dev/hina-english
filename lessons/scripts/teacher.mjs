@@ -13,7 +13,10 @@
 // node scripts/teacher.mjs add えいし vocab --toeic 1 words.txt    (TOEIC単語 Part 1〜3: 単語 | 意味 | 例文 | 例文の日本語)
 // node scripts/teacher.mjs add なおみ pron lines.txt               (読む文 | コツ)
 // node scripts/teacher.mjs add なおみ grammar lines.txt            (問題 | 答え | 選択肢 a / b | 解説)
-// node scripts/teacher.mjs add なおみ topic lines.txt              (テーマ)
+// node scripts/teacher.mjs add なおみ topic lines.txt              (テーマ | 答えの例: the example is shown after the correction)
+// node scripts/teacher.mjs topic-samples はるき samples.txt        (答えの例 for topics already in: テーマ | 答えの例)
+// node scripts/teacher.mjs journal-ielts はるき [--on | --off]     (日記（IELTS問題練習）: Part 1 practice, 6.5 tip and answer)
+// node scripts/teacher.mjs ai-note はるき [note.txt | --clear]     (the AI's note about the student: see, set or clear)
 // node scripts/teacher.mjs add なおみ rephrase lines.txt           (言い換え問題: 文法 | 日本語 | 英語 a / b | ヒント)
 // node scripts/teacher.mjs edit-item なおみ 12 "borrow | 借りる | Can I borrow your pen?"
 // node scripts/teacher.mjs delete-item なおみ 12
@@ -70,7 +73,7 @@ const KINDS = {
   vocab: { name: "単語", columns: ["word", "meaning", "example", "example_ja"], required: 2 },
   pron: { name: "発音", columns: ["text", "tip"], required: 1 },
   grammar: { name: "文法", columns: ["question", "answer", "choices", "explanation"], required: 2 },
-  topic: { name: "日記のテーマ", columns: ["prompt"], required: 1 },
+  topic: { name: "日記のテーマ", columns: ["prompt", "sample"], required: 1 },
   rephrase: { name: "言い換え問題", columns: ["group", "ja", "en", "hint"], required: 3 },
 };
 
@@ -127,7 +130,7 @@ const readText = (file) => (file === "-" ? readFileSync(0, "utf8") : readFileSyn
 
 function parseLine(kind, line) {
   const spec = KINDS[kind];
-  const fields = kind === "topic" ? [line.trim()] : line.split(/\t|\||｜/).map((f) => f.trim());
+  const fields = line.split(/\t|\||｜/).map((f) => f.trim());
   const data = {};
   spec.columns.forEach((column, i) => {
     if (column === "choices") data.choices = (fields[i] || "").split(/\/|／/).map((c) => c.trim()).filter(Boolean);
@@ -290,7 +293,7 @@ const commands = {
   async show([name]) {
     const data = await studentData(await findStudent(name));
     console.log(`# ${data.student.name}さん`);
-    console.log(`\n## 生徒の画面に出すもの\n${menuLine(data.hidden)}${data.toeic ? "　○ TOEIC単語（いちばん上）" : ""}`);
+    console.log(`\n## 生徒の画面に出すもの\n${menuLine(data.hidden)}${data.toeic ? "　○ TOEIC単語（いちばん上）" : ""}${data.journalIelts ? "　○ 日記（IELTS問題練習）" : ""}`);
     console.log(`\n## 発音課題の Month\n${pronLine(data.pronMonths)}`);
     console.log(`\n## 発音課題の完了\n${pronProgress(data.pronDone)}`);
     console.log(`\n## 単語帳\n${bookLine(data.vocabBooks)}`);
@@ -627,6 +630,48 @@ const commands = {
     }
     await api(`/api/teacher/students/${student.id}/write-practice`, { method: "PUT", body: { on: !!options.on } });
     console.log(`${student.name}さんの ★ と書く練習を${options.on ? "出しました（単語復習の例文に ☆、復習の画面に「書く練習」）" : "やめました（★ は残ります）"}。`);
+  },
+
+  // 答えの例 for the topics a student already has, matched by the topic's text.
+  async "topic-samples"([name, file], options) {
+    if (!file) stop("1行に「テーマ | 答えの例」を書いたファイルを指定してください（- で標準入力）。");
+    const student = await findStudent(name);
+    const lines = readText(file).split("\n").map((l) => l.trim()).filter(Boolean);
+    const { items } = await studentData(student);
+    const topics = items.filter((i) => i.kind === "topic");
+    const same = (a, b) => a.trim().replace(/\s+/g, " ").toLowerCase() === b.trim().replace(/\s+/g, " ").toLowerCase();
+    const plan = lines.map((line) => {
+      const [prompt, sample] = line.split(/\t|\||｜/).map((f) => f.trim());
+      return { line, prompt, sample, item: prompt && sample ? topics.find((t) => same(t.data.prompt, prompt)) : null };
+    });
+    const missing = plan.filter((p) => !p.item);
+    if (missing.length) stop(`このテーマが見つからないか、答えの例がありません（add ${student.name} topic で先に入れてください）：\n${missing.map((p) => p.line).join("\n")}`);
+    if (options.dry) return console.log(`${student.name}さんのテーマ ${plan.length} こに答えの例を入れます（まだ入れていません）：\n${plan.map((p) => `[${p.item.id}] ${p.item.data.prompt}`).join("\n")}`);
+    for (const p of plan) await api(`/api/teacher/items/${p.item.id}`, { method: "PUT", body: { data: { prompt: p.item.data.prompt, sample: p.sample } } });
+    console.log(`${student.name}さんのテーマ ${plan.length} こに、答えの例を入れました。`);
+  },
+
+  async "journal-ielts"([name], options) {
+    const student = await findStudent(name);
+    if (!options.on && !options.off) {
+      const { journalIelts } = await studentData(student);
+      return console.log(`${student.name}さんの日記：${journalIelts ? "日記（IELTS問題練習）" : "ふつうの日記"}`);
+    }
+    await api(`/api/teacher/students/${student.id}/journal-ielts`, { method: "PUT", body: { on: !!options.on } });
+    console.log(`${student.name}さんの日記を${options.on ? "「日記（IELTS問題練習）」にしました（Part 1 の答え方・6.5 にするためのひとこと・答えの例）" : "ふつうの日記にもどしました"}。`);
+  },
+
+  // The teacher's note about the student that the AI reads (先生ページの「AI へのメモ」).
+  async "ai-note"([name, file], options) {
+    const student = await findStudent(name);
+    if (!file && !options.clear) {
+      const { student: s } = await studentData(student);
+      return console.log(s.note ? `${student.name}さんの AI へのメモ：\n${s.note}` : `${student.name}さんの AI へのメモ：（なし）`);
+    }
+    const note = options.clear ? "" : readText(file).trim();
+    if (note.length > 1000) stop("1000文字までにしてください。");
+    await api(`/api/teacher/students/${student.id}`, { method: "PATCH", body: { note } });
+    console.log(note ? `${student.name}さんの AI へのメモを入れかえました：\n${note}` : `${student.name}さんの AI へのメモを消しました。`);
   },
 
   async toeic([name], options) {
