@@ -21,7 +21,7 @@ import {
 import { findMistakes, normalizeWords } from "./mistakes.js";
 import { lessonDayLabel, lessonList, noteDayLabel, noteHtml as memoHtml, notePages, noteProblems } from "./notes/format.js";
 import {
-  allTime, appMinutes, bindPanels, formatMinutes, monthPanel, monthStart, startStudyClock, studySplit, summary, timeHtml,
+  appMinutes, bindPanels, formatMinutes, monthPanel, monthStart, startStudyClock, studySplit, summary, timeHtml,
   today, totalMinutes, totalPanel, weekDays, weekPanel, weekStart,
 } from "./study.js";
 
@@ -70,7 +70,7 @@ function render() {
   if (screen === "pron") state.pron = { which: null, index: 0 };
   const screens = {
     vocab: renderVocab, review: renderReview, phrases: renderPhrases, "phrase-review": renderPhraseReview, pron: renderPron,
-    grammar: renderGrammar, rephrase: renderRephrase, journal: renderJournal, study: renderStudy,
+    grammar: renderGrammar, "grammar-review": renderGrammarReview, rephrase: renderRephrase, journal: renderJournal, study: renderStudy,
     ...(NOTES_FOR_STUDENTS ? { notes: renderNotes } : {}),
     ...(state.me.toeic ? { toeic: renderToeic } : {}),
   };
@@ -186,6 +186,24 @@ function wroteToday() {
   const start = startOfJapanDay();
   return state.me.journals.some((j) => new Date(j.created_at) >= start);
 }
+
+// This month's diary (Japan time): the days with a diary, out of the month's days (a full month fills the bar).
+function diaryMonth() {
+  const now = today();
+  const month = now.slice(0, 7);
+  const japanDay = (iso) => new Date(new Date(iso).getTime() + 9 * 3600e3).toISOString().slice(0, 10);
+  const days = new Set(state.me.journals.map((j) => japanDay(j.created_at)).filter((d) => d.startsWith(month)));
+  const [y, m] = month.split("-").map(Number);
+  return { month: m, written: days.size, of: new Date(Date.UTC(y, m, 0)).getUTCDate() };
+}
+
+// The grammar lessons done (a lesson counts once its questions are answered to the end).
+function grammarDone() {
+  const ready = UNITS.flatMap((u) => u.lessons.filter((l) => l.steps));
+  return { done: ready.filter((l) => state.me.lessons?.[l.id]).length, of: ready.length };
+}
+
+const barHtml = (done, of) => `<div class="bar"><i style="width:${of ? Math.round((done / of) * 100) : 0}%"></i></div>`;
 
 // ---------- login ----------
 
@@ -328,6 +346,9 @@ function renderHome() {
   const shared = monthPhrases(pronMonth);
   const pronFinished = shared.filter((p) => pronDone(p.key)).length;
   const grammar = items("grammar");
+  const grammarProgress = grammarDone();
+  const grammarReviewCount = grammarReviewSteps().length;
+  const diary = diaryMonth();
   const done = wroteToday();
   const tasks = todaysTasks();
   const left = tasks.filter((t) => !t.done).length;
@@ -366,9 +387,13 @@ function renderHome() {
       </section>` : ""}
       <nav class="tiles" aria-label="メニュー">
         ${homeTiles([
-          { key: "journal", wide: true, cls: done ? "done" : "", html: `
-            <span class="emoji" aria-hidden="true">${done ? "✅" : "✍️"}</span>
-            <div><b>日記を書く</b><p class="muted">${done ? "今日の日記は書けました！" : "今日のお題で、英語の日記を書こう"}</p></div>` },
+          { key: "journal", cls: done ? "done" : "", html: `
+            <span class="emoji" aria-hidden="true">${done ? "✅" : "✍️"}</span><b>日記</b>
+            <span class="muted">${diary.month}月 ${diary.written} / ${diary.of} 日</span>
+            ${barHtml(diary.written, diary.of)}` },
+          { key: "study", html: `
+            <span class="emoji" aria-hidden="true">⏱️</span><b>勉強時間</b>
+            <span class="muted">今日 ${formatMinutes(totalMinutes(todayRow))}<br>今週 ${formatMinutes(week.total)}</span>` },
           { key: "vocab", html: `
             <span class="emoji" aria-hidden="true">🃏</span><b>単語カード</b>
             <span class="muted">${sets.length ? `Week ${CURRENT_WEEK} ・ テスト ${tested} / ${sets.length}` : "まだありません"}</span>
@@ -385,7 +410,11 @@ function renderHome() {
             <span class="muted">${phraseReviewCount ? `${phraseReviewCount} フレーズ` : "まだありません"}</span>` },
           { key: "grammar", html: `
             <span class="emoji" aria-hidden="true">✏️</span><b>文法</b>
-            <span class="muted">全 ${UNITS.reduce((n, u) => n + u.lessons.length, 0)} レッスン${grammar.length ? `<br>＋ 先生からの問題` : ""}</span>` },
+            <span class="muted">完了 ${grammarProgress.done} / ${grammarProgress.of} レッスン${grammar.length ? `<br>＋ 先生からの問題` : ""}</span>
+            ${barHtml(grammarProgress.done, grammarProgress.of)}` },
+          { key: "grammar-review", html: `
+            <span class="emoji" aria-hidden="true">🔂</span><b>文法復習</b>
+            <span class="muted">${grammarReviewCount ? `${grammarReviewCount} こ` : "まだありません"}</span>` },
           { key: "pron", html: `
             <span class="emoji" aria-hidden="true">🎤</span><b>発音課題</b>
             <span class="muted">${shared.length ? `${esc(monthLabel(myMonths(), pronMonth))} ・ 完了 ${pronFinished} / ${shared.length}` : "まだありません"}</span>
@@ -401,9 +430,6 @@ function renderHome() {
               lessonCount ? `これまでの授業 ${lessonCount} 回` : "",
               latestNote ? `${esc(noteDayLabel(latestNote.day))}${latestNote.title ? ` ・ ${esc(latestNote.title)}` : ""}` : "",
             ].filter(Boolean).join(" ・ ") || "授業のあとに、先生のメモがとどきます"}</p></div>` },
-          { key: "study", wide: true, html: `
-            <span class="emoji" aria-hidden="true">⏱️</span>
-            <div><b>勉強時間</b><p class="muted">今日 ${formatMinutes(totalMinutes(todayRow))} ・ 今週 ${formatMinutes(week.total)} ・ これまで ${formatMinutes(allTime(state.me.study).total)}</p></div>` },
         ])}
       </nav>
       <p class="footer-links">
@@ -1468,22 +1494,22 @@ function renderReview(level) {
             <p class="muted small">単語をタップすると、意味と例文が出ます。</p>
           </div>
           <ul class="word-list">${words.map((w) => `<li class="word-item">
-            <button type="button" class="word-item-head" data-open aria-expanded="false">
-              <span class="word-main">
-                <b lang="en">${esc(w.word)}</b>
-                <span class="word-open"><span class="when-closed">例文を見る ▾</span><span class="when-open">とじる ▴</span></span>
-              </span>
-              <span class="word-tag ${w.source === "test" ? "test" : ""}">${w.source === "test" ? "テスト" : "チェック"}</span>
-            </button>
+            <div class="word-item-row">
+              <button type="button" class="word-item-head" data-open aria-expanded="false">
+                <span class="word-main">
+                  <b lang="en">${esc(w.word)}</b>
+                  <span class="word-open"><span class="when-closed">例文を見る ▾</span><span class="when-open">とじる ▴</span></span>
+                </span>
+                <span class="word-tag ${w.source === "test" ? "test" : ""}">${w.source === "test" ? "テスト" : "チェック"}</span>
+              </button>
+              <button type="button" class="btn ghost small-btn" data-remove="${esc(w.key)}" aria-label="${esc(w.word)} を外す">外す</button>
+            </div>
             <div class="word-item-body" hidden>
               <div class="detail-head">
                 <div>${w.pos ? `<span class="pill">${esc(w.pos)}</span>` : ""}<p class="meaning">${noteHtml(w.meaning)}</p></div>
                 ${sayIcon(speakable(w.word))}
               </div>
               ${wordExamplesHtml(w, { stars: state.me.writePractice })}
-              <div class="word-item-foot">
-                <button type="button" class="btn ghost small-btn" data-remove="${esc(w.key)}">この単語を復習から外す</button>
-              </div>
             </div>
           </li>`).join("")}</ul>
         </section>`
@@ -2776,8 +2802,14 @@ function renderGrammar(unitId, lessonId, mode) {
   if (unit) return renderUnit(unit);
 
   const own = items("grammar").length;
+  const all = grammarDone();
   app.innerHTML = `${topbar("文法")}
     <main class="wrap stack">
+      <section class="card stack grammar-total">
+        <p class="label">ぜんぶで</p>
+        <p><b>${all.done} / ${all.of}</b> <span class="muted small">レッスン完了</span></p>
+        ${barHtml(all.done, all.of)}
+      </section>
       ${UNITS.map((u, i) => {
         const ready = u.lessons.filter((l) => l.steps);
         const done = ready.filter((l) => state.me.lessons?.[l.id]).length;
@@ -2785,7 +2817,8 @@ function renderGrammar(unitId, lessonId, mode) {
           <span class="label">Unit ${i + 1}</span>
           <b>${esc(u.title)}</b>
           <span class="muted">${esc(u.subtitle)}</span>
-          <span class="muted small">${done} / ${u.lessons.length} レッスン完了</span>
+          <span class="muted small">${done} / ${ready.length} レッスン完了</span>
+          ${barHtml(done, ready.length)}
         </a>`;
       }).join("")}
       ${own ? `<a class="unit-card teacher-unit" href="#/grammar/teacher">
@@ -2866,6 +2899,7 @@ function renderLesson(unit, lessonId, testOnly = false) {
   if (step.type === "explain") body = explainHtml(step);
   else body = questionStepHtml(step, answer);
 
+  const reviewKey = grammarKey(lesson.id, L.index);
   app.innerHTML = `${topbar(lesson.title, back)}
     <main class="wrap stack">
       <div class="lesson-progress" role="progressbar" aria-valuemin="0" aria-valuemax="${shown.length}" aria-valuenow="${at + 1}">
@@ -2874,6 +2908,7 @@ function renderLesson(unit, lessonId, testOnly = false) {
         <span class="counter">${at + 1} / ${shown.length}</span>
       </div>
       ${body}
+      ${grammarCheckHtml(reviewKey)}
       <div class="lesson-nav">
         ${at > 0 ? `<button type="button" class="btn ghost" id="prev">← もどる</button>` : "<span></span>"}
         ${step.type === "explain" || (answer && !answer.judging) ? `<button type="button" class="btn" id="next">${at === shown.length - 1 ? "おわり" : "次へ"}</button>` : ""}
@@ -2888,15 +2923,32 @@ function renderLesson(unit, lessonId, testOnly = false) {
     L.index = shown[at + 1] ?? steps.length;
     rerender();
   });
+  bindGrammarCheck(reviewKey);
   if (answer) {
     document.getElementById("next")?.focus();
     return;
   }
+  bindQuestion(step, L, L.index, {
+    source: { lesson: lessonId, step: L.index },
+    store: (a) => { L.answers[L.index] = a; },
+    redraw: () => renderLesson(unit, lessonId, testOnly),
+    settled: (a) => { if (!a.right) setGrammarReview(reviewKey, true, "wrong"); },
+  });
+}
 
-  const record = (given, right) => {
-    L.answers[L.index] = { given, right };
-    renderLesson(unit, lessonId, testOnly);
+// Wires the answer of a lesson question (choice, order or write) on the screen:
+// store keeps it, redraw shows it, and settled runs once it is final (a typed
+// answer may wait for the AI). S keeps the 並べかえ chips, for the question at.
+function bindQuestion(step, S, at, { source, store, redraw, settled = () => {} }) {
+  const shown = () => {
+    redraw();
     document.getElementById("verdict")?.scrollIntoView({ block: "nearest" });
+  };
+  const record = (given, right) => {
+    const answer = { given, right };
+    store(answer);
+    settled(answer);
+    shown();
   };
 
   if (step.type === "choice") {
@@ -2906,8 +2958,8 @@ function renderLesson(unit, lessonId, testOnly = false) {
   }
 
   if (step.type === "order") {
-    if (L.order?.index !== L.index) L.order = { index: L.index, pool: shuffleUnlike(step.words), picked: [] };
-    const O = L.order;
+    if (S.order?.index !== at) S.order = { index: at, pool: shuffleUnlike(step.words), picked: [] };
+    const O = S.order;
     const draw = () => {
       app.querySelector("#line").innerHTML = O.picked.length
         ? O.picked.map((i) => `<button type="button" class="chip" data-unpick="${i}" lang="en">${esc(O.pool[i])}</button>`).join("")
@@ -2933,14 +2985,183 @@ function renderLesson(unit, lessonId, testOnly = false) {
 
   if (step.type === "write") {
     bindWriteForm((given) => {
-      const source = { lesson: lessonId, step: L.index };
-      const redraw = () => renderLesson(unit, lessonId, testOnly);
       if (!given) return record("", false);
-      L.answers[L.index] = checkTyped(given, step.answers, source, { redraw });
-      redraw();
-      document.getElementById("verdict")?.scrollIntoView({ block: "nearest" });
+      store(checkTyped(given, step.answers, source, { redraw, settled }));
+      shown();
     });
   }
+}
+
+// ---------- 文法復習 ----------
+// Lesson screens to go over again ("be-present/3"): every question answered
+// wrong goes in by itself, and the student can put in any screen (explanations
+// too) with 文法復習に入れる. A round takes up to ten, in no order; the ones
+// answered right are ticked to take out at the end. Any can be taken out (外す).
+
+const GRAMMAR_REVIEW_SESSION = 10;
+const grammarKey = (lessonId, index) => `${lessonId}/${index}`;
+const inGrammarReview = (key) => (state.me.grammarReview || []).some((r) => r.key === key);
+
+// The lesson screens in the list (a lesson changed since may have lost one).
+function grammarReviewSteps() {
+  return (state.me.grammarReview || []).map((r) => {
+    const [lessonId, index] = r.key.split("/");
+    const found = findLesson(lessonId);
+    const step = found?.lesson.steps?.[Number(index)];
+    return step && { ...r, step, index: Number(index), lesson: found.lesson, unit: found.unit };
+  }).filter(Boolean);
+}
+
+async function setGrammarReview(key, on, source = "check") {
+  const list = state.me.grammarReview || (state.me.grammarReview = []);
+  if (on && !inGrammarReview(key)) list.push({ key, source, added_at: new Date().toISOString() });
+  if (!on) state.me.grammarReview = list.filter((r) => r.key !== key);
+  const box = document.querySelector(`[data-grammar-check="${CSS.escape(key)}"] input`);
+  if (box) box.checked = on;
+  try {
+    await api("/api/grammar/review", { method: "POST", body: { key, on, source } });
+  } catch (error) {
+    toast(error.message);
+  }
+}
+
+// Under every lesson screen: put it in 文法復習 (checked by itself when answered wrong).
+const grammarCheckHtml = (key) => `<label class="review-check" data-grammar-check="${esc(key)}">
+    <input type="checkbox" ${inGrammarReview(key) ? "checked" : ""}>
+    <span>わからない → 文法復習に入れる</span>
+  </label>`;
+
+function bindGrammarCheck(key) {
+  app.querySelector(`[data-grammar-check="${CSS.escape(key)}"] input`)?.addEventListener("change", (event) => {
+    setGrammarReview(key, event.target.checked);
+    toast(event.target.checked ? "文法復習に入れました" : "文法復習から外しました");
+  });
+}
+
+// A screen in a list: the question (or the explanation's title) and its lesson.
+function grammarStepLine(entry, tag = "div") {
+  const { step } = entry;
+  const main = step.type === "explain" ? `📖 ${plain(step.title)}` : step.type === "choice" ? step.q : plain(step.ja || "");
+  const sub = step.type === "choice" && step.ja ? `${step.ja} ・ ` : "";
+  return `<${tag}><b ${step.type === "choice" ? 'lang="en"' : ""}>${esc(main)}</b><span class="muted small">${esc(sub)}${esc(entry.lesson.title)}</span></${tag}>`;
+}
+
+function renderGrammarReview(mode) {
+  if (mode === "go") return renderGrammarReviewRound();
+  state.grammarRound = null;
+  const list = grammarReviewSteps();
+  app.innerHTML = `${topbar("文法復習")}
+    <main class="wrap stack">
+      ${list.length ? `
+        <p class="muted">復習する問題：<b>${list.length} こ</b>（1回 ${GRAMMAR_REVIEW_SESSION} こまで、順番はばらばらに出ます）</p>
+        <a class="unit-card" href="#/grammar-review/go">
+          <b>復習をはじめる</b>
+          <span class="muted small">まちがえた問題と、わからなかった説明をもう一度</span>
+        </a>
+        <section class="card stack">
+          <h3>文法復習に入っている問題</h3>
+          <ul class="review-list">${list.map((entry) => `<li>
+            ${grammarStepLine(entry)}
+            <span class="badge ${entry.source === "wrong" ? "teacher" : ""}">${entry.source === "wrong" ? "まちがえた" : "自分で"}</span>
+            <button type="button" class="btn ghost small-btn" data-remove="${esc(entry.key)}">外す</button>
+          </li>`).join("")}</ul>
+        </section>`
+      : emptyState("まだ文法復習がありません。<br>文法のレッスンでまちがえた問題と、<br>「文法復習に入れる」にチェックした画面がここに入ります。")}
+    </main>`;
+  app.querySelectorAll("[data-remove]").forEach((button) =>
+    button.addEventListener("click", async () => {
+      await setGrammarReview(button.dataset.remove, false);
+      renderGrammarReview();
+    }),
+  );
+}
+
+function renderGrammarReviewRound() {
+  if (!state.grammarRound) {
+    const entries = shuffle(grammarReviewSteps()).slice(0, GRAMMAR_REVIEW_SESSION);
+    if (!entries.length) {
+      location.hash = "#/grammar-review";
+      return;
+    }
+    state.grammarRound = { entries, index: 0, answers: {}, done: false };
+  }
+  const G = state.grammarRound;
+  const rerender = () => {
+    renderGrammarReviewRound();
+    window.scrollTo(0, 0);
+  };
+  if (G.done) return renderGrammarReviewResult(G);
+  const entry = G.entries[G.index];
+  const { step } = entry;
+  const answer = G.answers[G.index];
+  const last = G.index === G.entries.length - 1;
+  app.innerHTML = `${topbar("文法復習", "#/grammar-review")}
+    <main class="wrap stack">
+      <div class="lesson-progress" role="progressbar" aria-valuemin="1" aria-valuemax="${G.entries.length}" aria-valuenow="${G.index + 1}">
+        <div class="bar"><i style="width:${Math.round((G.index / G.entries.length) * 100)}%"></i></div>
+        <span class="counter">${G.index + 1} / ${G.entries.length}</span>
+      </div>
+      <p class="muted small">${esc(entry.unit.title)} ・ ${esc(entry.lesson.title)}</p>
+      ${step.type === "explain" ? explainHtml(step) : questionStepHtml(step, answer)}
+      <div class="lesson-nav">
+        <span></span>
+        ${step.type === "explain" || (answer && !answer.judging) ? `<button type="button" class="btn" id="next">${last ? "結果を見る" : "次へ"}</button>` : ""}
+      </div>
+    </main>`;
+  document.getElementById("next")?.addEventListener("click", () => {
+    if (last) G.done = true;
+    else G.index += 1;
+    rerender();
+  });
+  if (answer || step.type === "explain") {
+    document.getElementById("next")?.focus();
+    return;
+  }
+  const at = G.index;
+  bindQuestion(step, G, at, {
+    source: { lesson: entry.lesson.id, step: entry.index },
+    store: (a) => { G.answers[at] = a; },
+    redraw: () => { if (state.grammarRound === G && G.index === at) renderGrammarReviewRound(); },
+  });
+}
+
+// How the round went, and which screens to take out: the questions answered
+// right are ticked to begin with (explanations are left for the student to tick).
+function renderGrammarReviewResult(G) {
+  const questions = G.entries.map((e, i) => ({ e, answer: G.answers[i] })).filter(({ e }) => e.step.type !== "explain");
+  const right = questions.filter(({ answer }) => answer?.right).length;
+  app.innerHTML = `${topbar("文法復習", "#/grammar-review")}
+    <main class="wrap stack">
+      <section class="card stack" style="text-align:center">
+        <p style="font-size:40px">${right === questions.length ? "🎉" : "👏"}</p>
+        ${questions.length ? `<p class="score">${right} / ${questions.length}<small> 問正解</small></p>` : ""}
+        <p>${G.entries.length} こを復習しました。</p>
+      </section>
+      <section class="card stack" id="known-box">
+        <h3>文法復習から外す</h3>
+        <p class="muted small">もう大丈夫なものにチェックを入れてください（正解した問題には、はじめからチェックが入っています）。チェックしないものは、文法復習に残ります。</p>
+        <ul class="pick-list">${G.entries.map((e, i) => `<li><label>
+          <input type="checkbox" data-key="${esc(e.key)}" ${G.answers[i]?.right ? "checked" : ""}>
+          ${grammarStepLine(e, "span")}
+        </label></li>`).join("")}</ul>
+        <button type="button" class="btn secondary block" id="remove-known">チェックしたものを外す</button>
+      </section>
+      <button type="button" class="btn block" id="again">もう一度</button>
+      <a class="btn ghost block" href="#/grammar-review">文法復習にもどる</a>
+    </main>`;
+  document.getElementById("remove-known").addEventListener("click", async (event) => {
+    event.target.disabled = true;
+    const box = document.getElementById("known-box");
+    const picked = [...box.querySelectorAll("input[data-key]:checked")].map((input) => input.dataset.key);
+    for (const key of picked) await setGrammarReview(key, false);
+    const kept = G.entries.length - picked.length;
+    box.innerHTML = `<p>${picked.length ? `${picked.length} こを文法復習から外しました。` : "外したものはありません。"}${kept ? `${kept} こは文法復習に残しました。` : ""}</p>`;
+  });
+  document.getElementById("again").addEventListener("click", () => {
+    state.grammarRound = null;
+    renderGrammarReviewRound();
+    window.scrollTo(0, 0);
+  });
 }
 
 // Words listed in a step's `highlight` (like am / is / are) are shown in red.

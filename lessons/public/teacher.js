@@ -810,7 +810,22 @@ function rephraseResultsHtml() {
 function lessonResultsHtml() {
   const results = state.current.lessons || {};
   const lessons = UNITS.flatMap((unit) => unit.lessons.filter((l) => l.steps).map((l) => ({ unit, lesson: l })));
+  // 文法復習: the lesson screens the student answered wrong or put in themselves.
+  const review = (state.current.grammarReview || []).map((r) => {
+    const [lessonId, index] = r.key.split("/");
+    const found = lessons.find(({ lesson }) => lesson.id === lessonId);
+    const step = found?.lesson.steps[Number(index)];
+    return step && { ...r, step, lesson: found.lesson };
+  }).filter(Boolean);
+  const stepText = (step) => (step.type === "explain" ? `説明：${step.title}` : step.type === "choice" ? `${step.q}（${step.ja || ""}）` : step.ja || "");
   return `<section class="card stack">
+    <h3>文法復習（${review.length}）</h3>
+    ${review.length ? `<ul class="rows">${review.map((r) => `<li><div class="main">
+        <div><b>${esc(stepText(r.step).replace(/\[\[|\]\]|\{\{|\}\}|\*\*/g, ""))}</b></div>
+        <div class="sub">${esc(r.lesson.title)} ・ ${r.source === "wrong" ? "まちがえた" : "生徒が自分で入れた"}　（${esc(formatDateTime(r.added_at))}）</div>
+      </div></li>`).join("")}</ul>` : `<p class="muted small">まだありません。レッスンでまちがえた問題と、生徒が「文法復習に入れる」にチェックした画面が入ります。</p>`}
+  </section>
+  <section class="card stack">
     <h3>文法レッスンの結果</h3>
     <ul class="rows">${lessons.map(({ unit, lesson }) => {
       const r = results[lesson.id];

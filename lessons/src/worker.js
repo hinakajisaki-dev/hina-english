@@ -104,6 +104,7 @@ async function route(request, env, url, who, ctx) {
       return saveLessonResult(request, env, student, parts[1]);
     }
     if (path === "/api/vocab/review" && method === "POST") return saveReview(request, env, student);
+    if (path === "/api/grammar/review" && method === "POST") return saveGrammarReview(request, env, student);
     if (path === "/api/vocab/words" && method === "POST") return saveOwnWord(request, env, student, null);
     if (parts[0] === "vocab" && parts[1] === "words" && parts.length === 3 && (method === "PUT" || method === "DELETE")) {
       const row = await first(env.DB, `SELECT * FROM items WHERE id = ? AND student_id = ? AND kind = 'vocab'`, id(2), student.id);
@@ -614,6 +615,24 @@ async function saveStudyDay(request, env, student, day) {
 }
 
 // A word key must be a 単語帳 word ("w1/go", "ielts1/increase") or one of this student's own words ("item/12").
+// 文法復習: a lesson screen ("be-present/3": the lesson and its step) the student
+// answered wrong (source "wrong") or put in themselves ("check"); off takes it out.
+async function saveGrammarReview(request, env, student) {
+  const { key, on, source } = await readJson(request);
+  const [, lessonId, step] = String(key || "").match(/^([a-z0-9-]+)\/(\d+)$/) || [];
+  if (on && !findLesson(lessonId)?.lesson.steps?.[Number(step)]) throw new HttpError(404, "見つかりません。");
+  if (on) {
+    await run(
+      env.DB,
+      `INSERT OR IGNORE INTO grammar_review (student_id, step_key, source, added_at) VALUES (?, ?, ?, ?)`,
+      student.id, key, source === "wrong" ? "wrong" : "check", now(),
+    );
+  } else {
+    await run(env.DB, `DELETE FROM grammar_review WHERE student_id = ? AND step_key = ?`, student.id, String(key || ""));
+  }
+  return json({ ok: true });
+}
+
 async function requireWordKey(db, student, key) {
   if (!key.startsWith("item/") && bookWord(key)) return;
   const item = key.match(/^item\/(\d+)$/);

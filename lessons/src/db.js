@@ -62,6 +62,15 @@ const SCHEMA = [
     added_at TEXT NOT NULL,
     PRIMARY KEY (student_id, word_key)
   )`,
+  // The student's 文法復習: lesson screens to go over again. step_key is "be-present/3"
+  // (the lesson and its step); source is "wrong" (answered wrong) or "check" (put in by the student).
+  `CREATE TABLE IF NOT EXISTS grammar_review (
+    student_id INTEGER NOT NULL REFERENCES students(id) ON DELETE CASCADE,
+    step_key TEXT NOT NULL,
+    source TEXT NOT NULL,
+    added_at TEXT NOT NULL,
+    PRIMARY KEY (student_id, step_key)
+  )`,
   // Best and latest score of each ten-word set test; set_key is "w1/s3".
   `CREATE TABLE IF NOT EXISTS vocab_tests (
     student_id INTEGER NOT NULL REFERENCES students(id) ON DELETE CASCADE,
@@ -355,7 +364,7 @@ export function noteRow(row) {
 export async function studentBundle(db, studentId) {
   const [
     items, progress, lessonRows, reviewRows, testRows, phraseReviewRows, phraseTestRows, pronRows, studyRows, journals, plan,
-    menus, settings, lessonDays, rephraseRows, starRows,
+    menus, settings, lessonDays, rephraseRows, starRows, grammarReviewRows,
   ] = await Promise.all([
     all(db, `SELECT * FROM items WHERE student_id = ? ORDER BY id`, studentId),
     all(db, `SELECT * FROM progress WHERE student_id = ?`, studentId),
@@ -384,6 +393,7 @@ export async function studentBundle(db, studentId) {
       studentId,
     ),
     all(db, `SELECT * FROM example_stars WHERE student_id = ? ORDER BY created_at`, studentId),
+    all(db, `SELECT * FROM grammar_review WHERE student_id = ? ORDER BY added_at`, studentId),
   ]);
   const setting = (name) => {
     const row = settings.find((r) => r.name === name);
@@ -404,6 +414,7 @@ export async function studentBundle(db, studentId) {
   }
   const review = reviewRows.map((r) => ({ key: r.word_key, source: r.source, added_at: r.added_at }));
   const phraseReview = phraseReviewRows.map((r) => ({ key: r.phrase_key, source: r.source, added_at: r.added_at }));
+  const grammarReview = grammarReviewRows.map((r) => ({ key: r.step_key, source: r.source, added_at: r.added_at }));
   const scores = (rows) => {
     const bySet = {};
     for (const r of rows) {
@@ -434,6 +445,7 @@ export async function studentBundle(db, studentId) {
     phraseBooks: setting("phrase_books"),
     writePractice: !!setting("write_practice"),
     toeic: !!setting("toeic"),
+    grammarReview,
     stars: starRows.map(starRow),
   };
 }
