@@ -445,6 +445,7 @@ export async function studentBundle(db, studentId) {
     phraseBooks: setting("phrase_books"),
     writePractice: !!setting("write_practice"),
     toeic: !!setting("toeic"),
+    journalIelts: !!setting("journal_ielts"),
     grammarReview,
     stars: starRows.map(starRow),
   };

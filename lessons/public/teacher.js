@@ -53,9 +53,9 @@ const KINDS = {
   },
   topic: {
     tab: "日記のテーマ",
-    columns: ["prompt"],
+    columns: ["prompt", "sample"],
     required: 1,
-    format: "テーマ（1行に1つ）",
+    format: "テーマ | 答えの例（なくてもOK。添削のあとに生徒に見せる）",
     example: "週末にしたこと\n最近うれしかったこと",
   },
 };
@@ -325,6 +325,7 @@ function renderJournals(panel) {
               <p class="change" lang="en"><del>${esc(fix.before)}</del><span class="arrow">→</span><ins>${esc(fix.after)}</ins></p>
               <p>${esc(fix.why)}</p>
             </div>`).join("")}</div>` : ""}
+          ${c.band_tip ? `<p><b>6.5 にするためのひとこと：</b>${esc(c.band_tip)}</p>` : ""}
         ` : ""}
         <form class="comment stack">
           <label class="field"><span>先生からのコメント（生徒に表示されます）</span>
@@ -533,7 +534,7 @@ function renderNotes(panel) {
 
 function parseLine(kind, line) {
   const spec = KINDS[kind];
-  const fields = kind === "topic" ? [line.trim()] : line.split(/\t|\||｜/).map((f) => f.trim());
+  const fields = line.split(/\t|\||｜/).map((f) => f.trim());
   const data = {};
   spec.columns.forEach((column, i) => {
     if (column === "choices") {
@@ -578,7 +579,7 @@ function rowHtml(kind, item, progress) {
     sub = [`答え：${d.answer}`, d.choices?.length ? `選択肢：${d.choices.join(" / ")}` : "", d.explanation].filter(Boolean).join(" ・ ");
     if (p.right || p.wrong) pill = `<span class="pill">⭕${p.right || 0} ❌${p.wrong || 0}</span>`;
   } else {
-    sub = "";
+    sub = d.sample ? `答えの例：${d.sample}` : "";
     main = d.prompt;
   }
   const japanese = kind === "topic" || kind === "rephrase";
@@ -1062,8 +1063,9 @@ function renderSettings(panel) {
       <h3>生徒の画面に出すもの</h3>
       <p class="muted small">チェックを外したものは、この生徒のホームに出ません（ほかの生徒は変わりません）。生徒ごとのチャットからも変えられます。</p>
       <div class="menu-picks">${MENUS.map((m) => `<label><input type="checkbox" name="${esc(m.key)}" ${(state.current.hidden || []).includes(m.key) ? "" : "checked"}> ${esc(m.name)}</label>`).join("")}</div>
-      <p class="muted small">TOEIC の生徒だけ：</p>
-      <div class="menu-picks"><label><input type="checkbox" name="toeic" ${state.current.toeic ? "checked" : ""}> TOEIC単語（ホームのいちばん上）</label></div>
+      <p class="muted small">この生徒だけ：</p>
+      <div class="menu-picks"><label><input type="checkbox" name="toeic" ${state.current.toeic ? "checked" : ""}> TOEIC単語（ホームのいちばん上）</label>
+        <label><input type="checkbox" name="journal-ielts" ${state.current.journalIelts ? "checked" : ""}> 日記を「日記（IELTS問題練習）」にする</label></div>
       <button class="btn" type="submit" style="align-self:flex-start">保存</button>
     </form>
     <form class="card stack" id="pron-months">
@@ -1128,6 +1130,10 @@ function renderSettings(panel) {
     try {
       await api(`/api/teacher/students/${student.id}/menus`, { method: "PUT", body: { hidden } });
       if (toeic !== !!state.current.toeic) await api(`/api/teacher/students/${student.id}/toeic`, { method: "PUT", body: { on: toeic } });
+      const journalIelts = menuForm.elements["journal-ielts"].checked;
+      if (journalIelts !== !!state.current.journalIelts) {
+        await api(`/api/teacher/students/${student.id}/journal-ielts`, { method: "PUT", body: { on: journalIelts } });
+      }
       await renderStudent(student.id, "settings");
       toast("生徒の画面に出すものを保存しました");
     } catch (error) {

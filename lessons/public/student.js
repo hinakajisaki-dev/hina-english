@@ -182,6 +182,12 @@ function shuffle(list) {
   return copy;
 }
 
+// 日記（IELTS問題練習）: one student's journal as IELTS Speaking Part 1 practice
+// (journal_ielts): the お題 are Part 1 questions, the page shows how to answer,
+// and after the correction comes a tip and the teacher's 6.5 answer for the question.
+const ielts = () => !!state.me?.journalIelts;
+const journalName = () => (ielts() ? "日記（IELTS問題練習）" : "日記");
+
 function wroteToday() {
   const start = startOfJapanDay();
   return state.me.journals.some((j) => new Date(j.created_at) >= start);
@@ -324,7 +330,10 @@ function todaysTasks() {
   const next = nextPhrase();
   const pron = pronDoneToday() || !next;
   return [
-    { key: "journal", done: journal, href: "#/journal", title: "日記を書く", sub: journal ? "今日の日記は書けました" : "今日のお題で、英語の日記を1つ" },
+    {
+      key: "journal", done: journal, href: "#/journal", title: ielts() ? "日記（IELTS問題練習）" : "日記を書く",
+      sub: journal ? "今日の日記は書けました" : ielts() ? "Part 1 の問題に、英語で答える" : "今日のお題で、英語の日記を1つ",
+    },
     {
       key: "pron",
       done: pron,
@@ -388,7 +397,7 @@ function renderHome() {
       <nav class="tiles" aria-label="メニュー">
         ${homeTiles([
           { key: "journal", cls: done ? "done" : "", html: `
-            <span class="emoji" aria-hidden="true">${done ? "✅" : "✍️"}</span><b>日記</b>
+            <span class="emoji" aria-hidden="true">${done ? "✅" : "✍️"}</span><b>日記${ielts() ? "<small>（IELTS問題練習）</small>" : ""}</b>
             <span class="muted">${diary.month}月 ${diary.written} / ${diary.of} 日</span>
             ${barHtml(diary.written, diary.of)}` },
           { key: "study", html: `
@@ -3860,7 +3869,7 @@ const TOPIC_KEY = "hina-lessons-topic";
 
 function topicPool() {
   const own = items("topic");
-  return own.length ? own.map((t) => ({ ja: t.data.prompt, start: "" })) : TOPICS;
+  return own.length ? own.map((t) => ({ ja: t.data.prompt, start: "", sample: t.data.sample || "" })) : TOPICS;
 }
 
 // The day's order of the topics: a shuffle that is the same all day.
@@ -3901,7 +3910,7 @@ function renderJournal(id) {
   const current = pool[order[step]];
   const draft = readDraft();
 
-  app.innerHTML = `${topbar("日記")}
+  app.innerHTML = `${topbar(journalName())}
     <main class="wrap stack">
       <p class="notice">📝 ここに書いた日記がたまっていくと、それをもとに苦手なところを分析していきます。<b>辞書や翻訳で調べずに</b>、できるだけ長く、がんばって書いてみてください。</p>
       <form id="journal" class="card stack">
@@ -3912,8 +3921,8 @@ function renderJournal(id) {
               <button type="button" class="btn ghost small-btn" id="topic-back">お題にもどる</button>
             </div>`
           : `<div class="topic-box">
-              <p class="label">今日のお題</p>
-              <p class="topic-ja">${esc(current.ja)}</p>
+              <p class="label">${ielts() ? "Part 1 の問題" : "今日のお題"}</p>
+              <p class="topic-ja" ${ielts() ? 'lang="en"' : ""}>${esc(current.ja)}</p>
               ${current.start ? `<p class="muted small">書き出しの例：<span lang="en">${esc(current.start)}</span></p>` : ""}
               <div class="topic-actions">
                 ${pool.length > 1 ? `
@@ -3922,10 +3931,14 @@ function renderJournal(id) {
                 <button type="button" class="btn ghost small-btn" id="topic-free">お題なしで書く</button>
               </div>
             </div>`}
-        <label class="field"><span>英語で書いてみよう</span>
+        ${ielts() && !topic.free ? `<div class="ielts-guide">
+          <p class="label">答え方</p>
+          <ul><li>1問に <b>2〜3文</b>で答える（30〜50語くらい）</li><li>「答え ＋ <b>理由か例</b>」。1文で終わらない</li></ul>
+        </div>` : ""}
+        <label class="field"><span>${ielts() && !topic.free ? "英語で答えよう" : "英語で書いてみよう"}</span>
           <textarea name="body" lang="en" rows="9" spellcheck="false" placeholder="${esc(!topic.free && current.start ? current.start : "Today I ...")}">${esc(draft.body || "")}</textarea>
         </label>
-        <p class="wordcount" id="wordcount" aria-live="polite">${countWords(draft.body || "")} words</p>
+        <p class="wordcount" id="wordcount" aria-live="polite">${countWords(draft.body || "")} words${ielts() ? "（目安 30〜50）" : ""}</p>
         <p class="notice bad" id="journal-error" role="alert" hidden></p>
         <button class="btn block" type="submit">日記を送る</button>
       </form>
@@ -3935,7 +3948,7 @@ function renderJournal(id) {
   const form = document.getElementById("journal");
   const save = () => writeDraft({ body: form.body.value });
   form.body.addEventListener("input", () => {
-    document.getElementById("wordcount").textContent = `${countWords(form.body.value)} words`;
+    document.getElementById("wordcount").textContent = `${countWords(form.body.value)} words${ielts() ? "（目安 30〜50）" : ""}`;
     save();
   });
   for (const [id, move] of [["topic-prev", -1], ["topic-next", 1]]) {
@@ -4004,7 +4017,7 @@ function historyHtml() {
 function renderJournalEntry(id) {
   const j = state.me.journals.find((entry) => entry.id === id);
   if (!j) {
-    app.innerHTML = `${topbar("日記")}<main class="wrap stack">${emptyState("日記が見つかりません。")}</main>`;
+    app.innerHTML = `${topbar(journalName())}<main class="wrap stack">${emptyState("日記が見つかりません。")}</main>`;
     return;
   }
   const c = j.correction;
@@ -4012,6 +4025,8 @@ function renderJournalEntry(id) {
   // Spelling fixes only show as the right word in the diary, in blue.
   const spelling = c && spellingMap(c);
   const points = c ? shownPoints(c) : [];
+  // The teacher's answer example for this お題 (a topic with a sample), after the correction.
+  const sample = c && j.topic ? items("topic").find((t) => t.data.prompt === j.topic && t.data.sample)?.data.sample : "";
 
   app.innerHTML = `${topbar(formatDate(j.created_at))}
     <main class="wrap stack">
@@ -4032,6 +4047,12 @@ function renderJournalEntry(id) {
                 <p>${esc(fix.why)}</p>
               </div>`).join("")}
           </section>` : spelling.size ? "" : `<p class="notice good">まちがいはありませんでした！すばらしい！</p>`}
+        ${c.band_tip ? `<section class="card band-tip"><p class="label">6.5 にするためのひとこと</p><p>💡 ${esc(c.band_tip)}</p></section>` : ""}
+        ${sample ? `<section class="card stack sample-answer">
+          <div class="sample-head"><p class="label">${ielts() ? "6.5 の答えの例" : "答えの例"}</p>${sayIcon(sample)}</div>
+          <p class="muted small" lang="en">Q. ${esc(j.topic)}</p>
+          <p class="sample-text" lang="en">${esc(sample)}</p>
+        </section>` : ""}
         <details class="card"><summary>はじめに書いた文を見る</summary><p class="journal-text" lang="en" style="margin-top:10px">${esc(j.body)}</p></details>
       ` : `
         ${state.me.ai && !j.imported ? `<p class="notice ${aiError ? "bad" : ""}">${esc(aiError || "この日記は、まだ添削がありません。")}</p>` : ""}
@@ -4043,7 +4064,7 @@ function renderJournalEntry(id) {
           ? `<button class="btn block" id="retry">${aiError ? "もう一度ためす" : "添削してもらう"}</button>`
           : j.teacher_comment ? "" : `<p class="muted" style="text-align:center">先生が読んで、コメントをくれます。</p>`}
       `}
-      <a class="btn secondary block" href="#/journal">日記のページにもどる</a>
+      <a class="btn secondary block" href="#/journal">${journalName()}にもどる</a>
     </main>`;
 
   const retry = document.getElementById("retry");

@@ -70,16 +70,30 @@ const SCHEMA = {
   additionalProperties: false,
 };
 
+// For a student practising IELTS Speaking Part 1 in the journal (student_settings
+// journal_ielts): the topic is the examiner's question, and the correction also
+// gives band_tip, one line on what would take the answer to band 6.5.
+const IELTS_NOTE = `<ielts_part1>
+This student is practising IELTS Speaking Part 1 in writing: the <topic> is the examiner's question and the journal is the student's answer (a good Part 1 answer is two or three sentences, about 30 to 50 words: the answer plus a reason or an example, not a single sentence).
+Also fill "band_tip": one short line in Japanese (about 40 characters at most) with the one thing that would most help this answer reach band 6.5, such as adding a sentence with a reason or an example, or joining ideas with because / although. Don't repeat a correction.
+</ielts_part1>`;
+const IELTS_SCHEMA = {
+  ...SCHEMA,
+  properties: { ...SCHEMA.properties, band_tip: { type: "string" } },
+  required: [...SCHEMA.required, "band_tip"],
+};
+
 // A change that only moves commas, periods, hyphens and the like (the teacher
 // asked for punctuation to be left alone).
 const words = (text) => String(text).toLowerCase().replace(/[^a-z0-9'’]+/g, " ").trim();
 const punctuationOnly = (fix) => words(fix.before) === words(fix.after);
 
-export async function correctJournal(env, { body, topic, note }) {
+export async function correctJournal(env, { body, topic, note, ielts = false }) {
   if (!env.ANTHROPIC_API_KEY) throw new AiError("添削の設定がまだです。先生に知らせてください。", "ANTHROPIC_API_KEY がない");
 
   const parts = [];
   if (note) parts.push(`<teacher_note>\n${note}\n</teacher_note>`);
+  if (ielts) parts.push(IELTS_NOTE);
   if (topic) parts.push(`<topic>\n${topic}\n</topic>`);
   parts.push(`<journal>\n${body}\n</journal>`);
 
@@ -93,7 +107,7 @@ export async function correctJournal(env, { body, topic, note }) {
       fallbacks: "default",
       output_config: {
         effort: "medium",
-        format: { type: "json_schema", schema: SCHEMA },
+        format: { type: "json_schema", schema: ielts ? IELTS_SCHEMA : SCHEMA },
       },
       system: SYSTEM,
       messages: [{ role: "user", content: parts.join("\n\n") }],
@@ -134,6 +148,7 @@ export async function correctJournal(env, { body, topic, note }) {
       corrections: (Array.isArray(result.corrections) ? result.corrections : [])
         .filter((fix) => !punctuationOnly(fix) && !onlySpelling(fix, map)),
       spelling,
+      ...(ielts && String(result.band_tip ?? "").trim() ? { band_tip: String(result.band_tip).trim().slice(0, 200) } : {}),
       model: response.model,
     };
   } catch {
