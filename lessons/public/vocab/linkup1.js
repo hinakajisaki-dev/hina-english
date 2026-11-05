@@ -1,4 +1,4 @@
-// 単語帳 LinkUp 英単語 Week 1, from the teacher's PDF「LinkUp英単語」(the first 10 pages,
+// 単語帳 英単語 Week 1 (LinkUp), from the teacher's PDF「LinkUp英単語」(the first 10 pages,
 // 100 words: 動詞 30・名詞 20・形容詞 20・副詞 10・前置詞 20), one example each.
 // Only for the students the teacher gives it to (vocab_books, see words.js); it
 // takes the place of the shared Week 1 for them.
@@ -9,7 +9,7 @@
 export const LINKUP1 = {
   id: "linkup1",
   week: 1,
-  title: "LinkUp 英単語 Week 1",
+  title: "英単語 Week 1",
   groups: [
     {
       title: "動詞 ①",
