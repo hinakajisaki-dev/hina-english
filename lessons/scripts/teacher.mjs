@@ -38,6 +38,9 @@
 // node scripts/teacher.mjs vocab-pace なおみ [--week 2 --days 4 --size 40 | --off]   (fewer words a week, across the 単語帳)
 // node scripts/teacher.mjs write-practice なおみ [--on | --off]   (★ on 復習 examples and 書く練習)
 // node scripts/teacher.mjs toeic えいし [--on | --off]             (TOEIC単語 at the top of the home screen)
+// node scripts/teacher.mjs debate なおみ [--on | --off]            (話す・ディベート練習 on the home screen)
+// node scripts/teacher.mjs debate-note なおみ [note.txt | --clear] (what kind of topics the AI makes for the student)
+// node scripts/teacher.mjs debates なおみ [--days 7]               (what the student said in 話す・ディベート練習 (transcript), with corrections)
 // node scripts/teacher.mjs stars なおみ                           (the ★ examples and their お題)
 // node scripts/teacher.mjs lesson-days なおみ [--add 2026-08-03,2026-08-16] [--remove 2026-08-03]   (the numbered lessons)
 //
@@ -264,7 +267,7 @@ function japanTime(iso) {
   return `${d.getUTCMonth() + 1}/${d.getUTCDate()} ${two(d.getUTCHours())}:${two(d.getUTCMinutes())}`;
 }
 
-const ERROR_KINDS = { journal: "日記の添削", judge: "AI の判定", rephrase: "言い換え問題の添削", speech: "音声", server: "サーバー", browser: "画面" };
+const ERROR_KINDS = { journal: "日記の添削", judge: "AI の判定", rephrase: "言い換え問題の添削", debate: "話す・ディベート練習", speech: "音声", server: "サーバー", browser: "画面" };
 
 function errorLines(e) {
   const when = e.count > 1 ? `${japanTime(e.first_at)} 〜 ${japanTime(e.last_at)}（${e.count} 回）` : japanTime(e.last_at);
@@ -293,7 +296,7 @@ const commands = {
   async show([name]) {
     const data = await studentData(await findStudent(name));
     console.log(`# ${data.student.name}さん`);
-    console.log(`\n## 生徒の画面に出すもの\n${menuLine(data.hidden)}${data.toeic ? "　○ TOEIC単語（いちばん上）" : ""}${data.journalIelts ? "　○ 日記（IELTS問題練習）" : ""}`);
+    console.log(`\n## 生徒の画面に出すもの\n${menuLine(data.hidden)}${data.toeic ? "　○ TOEIC単語（いちばん上）" : ""}${data.journalIelts ? "　○ 日記（IELTS問題練習）" : ""}${data.debate ? "　○ 話す・ディベート練習" : ""}`);
     console.log(`\n## 発音課題の Month\n${pronLine(data.pronMonths)}`);
     console.log(`\n## 発音課題の完了\n${pronProgress(data.pronDone)}`);
     console.log(`\n## 単語帳\n${bookLine(data.vocabBooks)}`);
@@ -672,6 +675,48 @@ const commands = {
     if (note.length > 1000) stop("1000文字までにしてください。");
     await api(`/api/teacher/students/${student.id}`, { method: "PATCH", body: { note } });
     console.log(note ? `${student.name}さんの AI へのメモを入れかえました：\n${note}` : `${student.name}さんの AI へのメモを消しました。`);
+  },
+
+  async debate([name], options) {
+    const student = await findStudent(name);
+    if (!options.on && !options.off) {
+      const { debate, debateNote } = await studentData(student);
+      return console.log(`${student.name}さんの話す・ディベート練習：${debate ? "あり" : "なし"}（トピックの好み：${debateNote || "なし（ふつうのトピック）"}）`);
+    }
+    await api(`/api/teacher/students/${student.id}/debate`, { method: "PUT", body: { on: !!options.on } });
+    console.log(`${student.name}さんの話す・ディベート練習を${options.on ? "出しました（ホーム。トピックは AI がレベルごとに作る）" : "しまいました（書いたものは残ります）"}。`);
+  },
+
+  // What kind of topics the AI makes for this student (empty: everyday conversation and simple debates).
+  async "debate-note"([name, file], options) {
+    const student = await findStudent(name);
+    if (!file && !options.clear) {
+      const { debateNote } = await studentData(student);
+      return console.log(`${student.name}さんのトピックの好み：${debateNote || "なし（日常英会話の質問・ふつうの会話・かんたんなディベート）"}`);
+    }
+    const note = options.clear ? "" : readText(file).trim();
+    if (note.length > 1000) stop("1000文字までにしてください。");
+    const result = await api(`/api/teacher/students/${student.id}/debate-note`, { method: "PUT", body: { note } });
+    console.log(result.note ? `${student.name}さんのトピックの好みを入れかえました：\n${result.note}` : `${student.name}さんのトピックの好みを消しました（ふつうのトピックになります）。`);
+  },
+
+  async debates([name], options) {
+    const data = await studentData(await findStudent(name));
+    const days = Number(options.days) || 7;
+    const since = japanDay(-(days - 1));
+    const list = (data.debateAnswers || []).filter((a) => japanDate(a.created_at) >= since).reverse();
+    console.log(`# ${data.student.name}さんの話す・ディベート練習（${since} から ${list.length} こ）`);
+    const levels = { 1: "やさしい", 2: "ふつう", 3: "むずかしい" };
+    for (const a of list) {
+      const c = a.correction;
+      console.log(`\n[${japanTime(a.created_at)}] ${a.topic}（${levels[a.level] || "レベルなし"}）${a.extra ? "（＋30秒）" : ""}`);
+      if (a.memo) console.log(`メモ：${a.memo.replace(/\n/g, " / ")}`);
+      console.log(`話したこと（文字起こし）：${a.body || "（なし）"}${a.audio ? "" : "（録音は消えました）"}`);
+      if (!c) { console.log("添削なし"); continue; }
+      console.log(`直した文：${c.corrected}`);
+      for (const fix of c.corrections || []) console.log(`- ${fix.before} → ${fix.after}：${fix.why}`);
+      if (c.tip) console.log(`もっと伝わるひとこと：${c.tip}`);
+    }
   },
 
   async toeic([name], options) {

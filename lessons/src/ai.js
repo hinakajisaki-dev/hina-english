@@ -77,10 +77,23 @@ const IELTS_NOTE = `<ielts_part1>
 This student is practising IELTS Speaking Part 1 in writing: the <topic> is the examiner's question and the journal is the student's answer (a good Part 1 answer is two or three sentences, about 30 to 50 words: the answer plus a reason or an example, not a single sentence).
 Also fill "band_tip": one short line in Japanese (about 40 characters at most) with the one thing that would most help this answer reach band 6.5, such as adding a sentence with a reason or an example, or joining ideas with because / although. Don't repeat a correction.
 </ielts_part1>`;
+// 話す・ディベート練習: the topic is a conversation question or a debate statement, and
+// the entry is a transcript of what the student said in a minute and a half; "tip" is
+// one line on making it clearer.
+const DEBATE_NOTE = `<debate>
+This is a timed speaking exercise: the <topic> is a conversation question or a debate statement, and the journal is a speech-to-text transcript of the student's spoken answer (about a minute and a half, so it may be short or unfinished; don't correct it for being short).
+It was spoken, not written: never correct punctuation, capital letters, filler words (um, uh, like) or repeated words. The speech-to-text may have misheard a word: when a word only looks wrong because it was probably misheard, leave it.
+Also fill "tip": one short line in Japanese (about 40 characters at most) with the one thing that would most make this answer clearer or more convincing when spoken, such as giving the answer or opinion first, adding a reason or an example, or joining ideas with because / so / but. Don't repeat a correction.
+</debate>`;
 const IELTS_SCHEMA = {
   ...SCHEMA,
   properties: { ...SCHEMA.properties, band_tip: { type: "string" } },
   required: [...SCHEMA.required, "band_tip"],
+};
+const DEBATE_SCHEMA = {
+  ...SCHEMA,
+  properties: { ...SCHEMA.properties, tip: { type: "string" } },
+  required: [...SCHEMA.required, "tip"],
 };
 
 // A change that only moves commas, periods, hyphens and the like (the teacher
@@ -88,12 +101,13 @@ const IELTS_SCHEMA = {
 const words = (text) => String(text).toLowerCase().replace(/[^a-z0-9'’]+/g, " ").trim();
 const punctuationOnly = (fix) => words(fix.before) === words(fix.after);
 
-export async function correctJournal(env, { body, topic, note, ielts = false }) {
+export async function correctJournal(env, { body, topic, note, ielts = false, debate = false }) {
   if (!env.ANTHROPIC_API_KEY) throw new AiError("添削の設定がまだです。先生に知らせてください。", "ANTHROPIC_API_KEY がない");
 
   const parts = [];
   if (note) parts.push(`<teacher_note>\n${note}\n</teacher_note>`);
   if (ielts) parts.push(IELTS_NOTE);
+  if (debate) parts.push(DEBATE_NOTE);
   if (topic) parts.push(`<topic>\n${topic}\n</topic>`);
   parts.push(`<journal>\n${body}\n</journal>`);
 
@@ -107,7 +121,7 @@ export async function correctJournal(env, { body, topic, note, ielts = false }) 
       fallbacks: "default",
       output_config: {
         effort: "medium",
-        format: { type: "json_schema", schema: ielts ? IELTS_SCHEMA : SCHEMA },
+        format: { type: "json_schema", schema: ielts ? IELTS_SCHEMA : debate ? DEBATE_SCHEMA : SCHEMA },
       },
       system: SYSTEM,
       messages: [{ role: "user", content: parts.join("\n\n") }],
@@ -149,6 +163,7 @@ export async function correctJournal(env, { body, topic, note, ielts = false }) 
         .filter((fix) => !punctuationOnly(fix) && !onlySpelling(fix, map)),
       spelling,
       ...(ielts && String(result.band_tip ?? "").trim() ? { band_tip: String(result.band_tip).trim().slice(0, 200) } : {}),
+      ...(debate && String(result.tip ?? "").trim() ? { tip: String(result.tip).trim().slice(0, 200) } : {}),
       model: response.model,
     };
   } catch {
@@ -450,6 +465,59 @@ export async function makeRephraseProblems(env, { grammar, count, note, existing
   }
 }
 
+// ---------- 話す・ディベート練習: a topic made by the AI ----------
+
+const DEBATE_TOPIC_SYSTEM = `You help an English teacher in Japan whose private students are Japanese adults learning English. In 話す・ディベート練習 the student gets a topic, thinks for a minute and a half (making notes in Japanese), then writes their answer in English for a minute and a half.
+Make one topic at the <level> asked:
+- level 1 (やさしい): an everyday conversation question about the student's own life, like one a friend would ask ("What do you usually do on weekends?").
+- level 2 (ふつう): a question asking the student's opinion or preference on everyday life, to answer with a reason ("Which do you prefer, cooking at home or eating out? Why?").
+- level 3 (むずかしい): a short debate statement to agree or disagree with ("Working from home is better than working in an office.").
+"topic" is the English, in plain words the student can read at once; "ja" is the same in natural Japanese.
+Unless the <topic_note> says otherwise, keep to everyday English conversation: daily life, work, study, family, food, travel, hobbies, money, technology and simple debates about them. No politics, religion or other sensitive subjects.
+Make it different from every topic in <recent>.
+There may be a <teacher_note> about the student (their level, interests) and a <topic_note> from the teacher about what kind of topics this student should get: follow them.`;
+
+const DEBATE_TOPIC_SCHEMA = {
+  type: "object",
+  properties: { topic: { type: "string" }, ja: { type: "string" } },
+  required: ["topic", "ja"],
+  additionalProperties: false,
+};
+
+export async function makeDebateTopic(env, { level, note, topicNote, recent }) {
+  if (!env.ANTHROPIC_API_KEY) throw new AiError("AI の設定がまだです。", "ANTHROPIC_API_KEY がない");
+  const parts = [];
+  if (note) parts.push(`<teacher_note>\n${note}\n</teacher_note>`);
+  if (topicNote) parts.push(`<topic_note>\n${topicNote}\n</topic_note>`);
+  parts.push(`<level>${level}</level>`);
+  parts.push(`<recent>\n${recent.join("\n") || "(none)"}\n</recent>`);
+  let response;
+  try {
+    response = await client(env).beta.messages.create({
+      model: model(env),
+      max_tokens: 2000,
+      betas: ["server-side-fallback-2026-07-01"],
+      fallbacks: "default",
+      output_config: { effort: "low", format: { type: "json_schema", schema: DEBATE_TOPIC_SCHEMA } },
+      system: DEBATE_TOPIC_SYSTEM,
+      messages: [{ role: "user", content: parts.join("\n\n") }],
+    });
+  } catch (error) {
+    console.error("anthropic error", error?.status, error?.message);
+    throw new AiError("トピックを作れませんでした。少し待ってから、もう一度ためしてください。", apiDetail(error));
+  }
+  const text = response.content.find((block) => block.type === "text")?.text;
+  try {
+    const result = JSON.parse(text);
+    const clean = (value, n) => String(value ?? "").replace(/\s+/g, " ").trim().slice(0, n);
+    const topic = { topic: clean(result.topic, 200), ja: clean(result.ja, 200) };
+    if (!topic.topic) throw new Error("empty");
+    return topic;
+  } catch {
+    throw new AiError("トピックを作れませんでした。もう一度ためしてください。", `could not parse the topic: ${text?.slice(0, 200)}`);
+  }
+}
+
 // ---------- 書く練習 ----------
 
 const STAR_SYSTEM = `You help an English teacher in Japan whose private students are Japanese adults learning beginner English.
@@ -525,4 +593,28 @@ export async function makeStarPrompts(env, { word, meaning, example, ja, note })
     console.error("could not parse star prompts", text?.slice(0, 200));
     throw new AiError("お題を作れませんでした。", `could not parse the prompts (stop_reason ${response.stop_reason}): ${text?.slice(0, 200)}`);
   }
+}
+
+// ---------- speech to text (話す・ディベート練習) ----------
+// What the student said, from their recording, with Workers AI's Whisper. Returns
+// the text, or throws an AiError (the student's recording is kept either way).
+
+function toBase64(bytes) {
+  let binary = "";
+  for (let i = 0; i < bytes.length; i += 0x8000) binary += String.fromCharCode(...bytes.subarray(i, i + 0x8000));
+  return btoa(binary);
+}
+
+export async function transcribe(env, audio) {
+  if (!env.AI) throw new AiError("文字起こしの設定がまだです。先生に知らせてください。", "AI binding がない");
+  const bytes = new Uint8Array(audio);
+  let result;
+  try {
+    result = await env.AI.run("@cf/openai/whisper-large-v3-turbo", { audio: toBase64(bytes), language: "en" });
+  } catch (error) {
+    throw new AiError("文字起こしができませんでした。少し待ってから、もう一度ためしてください。", `Workers AI whisper: ${error?.message ?? error}`);
+  }
+  const text = String(result?.text ?? "").replace(/\s+/g, " ").trim();
+  if (!text) throw new AiError("声が聞きとれませんでした。もう少し大きな声で、もう一度録音してみてください。", "whisper: empty text");
+  return text;
 }

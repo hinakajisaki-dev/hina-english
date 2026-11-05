@@ -259,6 +259,8 @@ async function renderStudent(id, tab) {
       [kind, `${spec.tab} ${byKind(kind).length}`],
       ...(kind === "vocab" ? [["phrases", "フレーズ"]] : []),
     ]),
+    // 話す・ディベート only for a student with it on (or who has done it).
+    ...(data.debate || data.debateAnswers?.length ? [["debate", "話す・ディベート"]] : []),
     ["settings", "設定・コード"],
   ];
 
@@ -294,6 +296,7 @@ async function renderStudent(id, tab) {
   else if (tab === "settings") renderSettings(panel);
   else if (tab === "notes") renderNotes(panel);
   else if (tab === "phrases") panel.innerHTML = phraseResultsHtml();
+  else if (tab === "debate") renderDebateTab(panel, student);
   else if (KINDS[tab]) renderItems(panel, tab);
   else renderJournals(panel);
 }
@@ -824,6 +827,57 @@ function renderItems(panel, kind) {
 
 // The student's latest 言い換え問題 answers, with the AI's corrections (shown on
 // the 言い換え問題 tab).
+// 話す・ディベート練習: what kind of topics the AI makes for this student (empty:
+// everyday conversation and simple debates), and what the student wrote.
+const DEBATE_LEVEL_NAMES = { 1: "やさしい", 2: "ふつう", 3: "むずかしい" };
+
+function renderDebateTab(panel, student) {
+  const answers = state.current.debateAnswers || [];
+  panel.innerHTML = `<div class="stack">
+    ${state.current.debate ? "" : `<p class="notice">この生徒の画面には、いま出ていません（「設定・コード」の「話す・ディベート練習」）。</p>`}
+    <form class="card stack" id="debate-note">
+      <h3>トピックの好み（AI へのメモ）</h3>
+      <p class="muted small">空のときは、日常英会話の質問・ふつうの会話・かんたんなディベートの話から作ります。生徒はレベル（やさしい・ふつう・むずかしい）をえらべます。</p>
+      <textarea name="note" rows="3" maxlength="1000" placeholder="例：仕事（中古車の輸出）とマレーシアの生活の話を多めに。むずかしいレベルは IELTS Part 3 のような質問で。">${esc(state.current.debateNote || "")}</textarea>
+      <button class="btn" type="submit" style="align-self:flex-start">保存</button>
+    </form>
+    ${debateResultsHtml(answers)}
+  </div>`;
+  const form = document.getElementById("debate-note");
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const button = form.querySelector("button");
+    busy(button, "保存中…");
+    try {
+      const { note } = await api(`/api/teacher/students/${student.id}/debate-note`, { method: "PUT", body: { note: form.note.value } });
+      state.current.debateNote = note;
+      toast(note ? "トピックの好みを保存しました" : "トピックの好みを消しました（ふつうのトピックになります）");
+    } catch (error) {
+      toast(error.message);
+    }
+    done(button);
+  });
+}
+
+function debateResultsHtml(answers) {
+  return `<section class="card stack">
+    <h3>生徒が話したもの（${answers.length}）</h3>
+    <p class="muted small">録音は30日で消えます。下の英語は、AI が聞きとった文の添削です。</p>
+    ${answers.length ? `<ul class="rows">${answers.map((a) => {
+      const c = a.correction;
+      return `<li><div class="main stack">
+        <div><b lang="en">${esc(a.topic)}</b> ${a.level ? `<span class="pill">${DEBATE_LEVEL_NAMES[a.level] || ""}</span>` : ""}${a.extra ? ` <span class="pill">＋30秒</span>` : ""}</div>
+        <div class="sub">${esc(formatDateTime(a.created_at))}</div>
+        ${a.memo ? `<p class="muted small">メモ：${esc(a.memo)}</p>` : ""}
+        ${a.audio ? `<audio controls preload="none" src="/api/teacher/debate/${a.id}/audio" style="width:100%"></audio>` : `<p class="muted small">録音なし（30日たって消えました）</p>`}
+        <p class="journal-text${c ? " diff" : ""}" lang="en">${c ? diffHtml(a.body, c.corrected, spellingMap(c)) : esc(a.body || "（文字起こしなし）")}</p>
+        ${c ? shownPoints(c).map((fix) => `<div class="fix"><p class="change" lang="en"><del>${esc(fix.before)}</del><span class="arrow">→</span><ins>${esc(fix.after)}</ins></p><p>${esc(fix.why)}</p></div>`).join("") : `<p class="muted small">添削なし</p>`}
+        ${c?.tip ? `<p><b>もっと伝わるひとこと：</b>${esc(c.tip)}</p>` : ""}
+      </div></li>`;
+    }).join("")}</ul>` : `<p class="muted small">まだありません。</p>`}
+  </section>`;
+}
+
 function rephraseResultsHtml() {
   const answers = state.current.rephraseAnswers || [];
   const all = state.current.rephrase || [];
@@ -1113,7 +1167,8 @@ function renderSettings(panel) {
       <div class="menu-picks">${MENUS.map((m) => `<label><input type="checkbox" name="${esc(m.key)}" ${(state.current.hidden || []).includes(m.key) ? "" : "checked"}> ${esc(m.name)}</label>`).join("")}</div>
       <p class="muted small">この生徒だけ：</p>
       <div class="menu-picks"><label><input type="checkbox" name="toeic" ${state.current.toeic ? "checked" : ""}> TOEIC単語（ホームのいちばん上）</label>
-        <label><input type="checkbox" name="journal-ielts" ${state.current.journalIelts ? "checked" : ""}> 日記を「日記（IELTS問題練習）」にする</label></div>
+        <label><input type="checkbox" name="journal-ielts" ${state.current.journalIelts ? "checked" : ""}> 日記を「日記（IELTS問題練習）」にする</label>
+        <label><input type="checkbox" name="debate" ${state.current.debate ? "checked" : ""}> 話す・ディベート練習</label></div>
       <button class="btn" type="submit" style="align-self:flex-start">保存</button>
     </form>
     <form class="card stack" id="pron-months">
@@ -1171,6 +1226,8 @@ function renderSettings(panel) {
     try {
       await api(`/api/teacher/students/${student.id}/menus`, { method: "PUT", body: { hidden } });
       if (toeic !== !!state.current.toeic) await api(`/api/teacher/students/${student.id}/toeic`, { method: "PUT", body: { on: toeic } });
+      const debate = menuForm.elements.debate.checked;
+      if (debate !== !!state.current.debate) await api(`/api/teacher/students/${student.id}/debate`, { method: "PUT", body: { on: debate } });
       const journalIelts = menuForm.elements["journal-ielts"].checked;
       if (journalIelts !== !!state.current.journalIelts) {
         await api(`/api/teacher/students/${student.id}/journal-ielts`, { method: "PUT", body: { on: journalIelts } });
