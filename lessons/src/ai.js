@@ -77,11 +77,11 @@ const IELTS_NOTE = `<ielts_part1>
 This student is practising IELTS Speaking Part 1 in writing: the <topic> is the examiner's question and the journal is the student's answer (a good Part 1 answer is two or three sentences, about 30 to 50 words: the answer plus a reason or an example, not a single sentence).
 Also fill "band_tip": one short line in Japanese (about 40 characters at most) with the one thing that would most help this answer reach band 6.5, such as adding a sentence with a reason or an example, or joining ideas with because / although. Don't repeat a correction.
 </ielts_part1>`;
-// ディベート練習: the topic is a debate statement and the entry is the student's
-// opinion, written in a minute and a half; "tip" is one line on making the argument clearer.
+// 話す・ディベート練習: the topic is a conversation question or a debate statement, and
+// the entry is the student's answer, written in a minute and a half; "tip" is one line on making it clearer.
 const DEBATE_NOTE = `<debate>
-This is a timed debate exercise: the <topic> is a debate statement, and the journal is the student's opinion on it, written in about a minute and a half (so it may be short or unfinished; don't correct it for being short).
-Also fill "tip": one short line in Japanese (about 40 characters at most) with the one thing that would most make this opinion clearer or more convincing, such as stating agree or disagree first, adding a reason or an example, or ending with the opinion again. Don't repeat a correction.
+This is a timed speaking and debate exercise: the <topic> is a conversation question or a debate statement, and the journal is the student's answer, written in about a minute and a half (so it may be short or unfinished; don't correct it for being short).
+Also fill "tip": one short line in Japanese (about 40 characters at most) with the one thing that would most make this answer clearer or more convincing, such as giving the answer or opinion first, adding a reason or an example, or ending with the opinion again. Don't repeat a correction.
 </debate>`;
 const IELTS_SCHEMA = {
   ...SCHEMA,
@@ -463,14 +463,17 @@ export async function makeRephraseProblems(env, { grammar, count, note, existing
   }
 }
 
-// ---------- ディベート練習: a topic made by the AI ----------
+// ---------- 話す・ディベート練習: a topic made by the AI ----------
 
-const DEBATE_TOPIC_SYSTEM = `You help an English teacher in Japan whose private students are Japanese adults learning English. In ディベート練習 the student gets a debate topic, thinks for a minute and a half, then writes their opinion for a minute and a half.
-Make one debate topic for this student:
-- "topic": one short English statement people can agree or disagree with (for example "Working from home is better than working in an office."), about everyday life, work, study, travel, technology, food, money or society. Plain words the student can read at once; no politics, religion or other sensitive subjects.
-- "ja": the same statement in natural Japanese.
-- Something different from every topic in <recent>.
-There may be a <teacher_note> about the student: follow what it says about their level and interests.`;
+const DEBATE_TOPIC_SYSTEM = `You help an English teacher in Japan whose private students are Japanese adults learning English. In 話す・ディベート練習 the student gets a topic, thinks for a minute and a half (making notes in Japanese), then writes their answer in English for a minute and a half.
+Make one topic at the <level> asked:
+- level 1 (やさしい): an everyday conversation question about the student's own life, like one a friend would ask ("What do you usually do on weekends?").
+- level 2 (ふつう): a question asking the student's opinion or preference on everyday life, to answer with a reason ("Which do you prefer, cooking at home or eating out? Why?").
+- level 3 (むずかしい): a short debate statement to agree or disagree with ("Working from home is better than working in an office.").
+"topic" is the English, in plain words the student can read at once; "ja" is the same in natural Japanese.
+Unless the <topic_note> says otherwise, keep to everyday English conversation: daily life, work, study, family, food, travel, hobbies, money, technology and simple debates about them. No politics, religion or other sensitive subjects.
+Make it different from every topic in <recent>.
+There may be a <teacher_note> about the student (their level, interests) and a <topic_note> from the teacher about what kind of topics this student should get: follow them.`;
 
 const DEBATE_TOPIC_SCHEMA = {
   type: "object",
@@ -479,10 +482,12 @@ const DEBATE_TOPIC_SCHEMA = {
   additionalProperties: false,
 };
 
-export async function makeDebateTopic(env, { note, recent }) {
+export async function makeDebateTopic(env, { level, note, topicNote, recent }) {
   if (!env.ANTHROPIC_API_KEY) throw new AiError("AI の設定がまだです。", "ANTHROPIC_API_KEY がない");
   const parts = [];
   if (note) parts.push(`<teacher_note>\n${note}\n</teacher_note>`);
+  if (topicNote) parts.push(`<topic_note>\n${topicNote}\n</topic_note>`);
+  parts.push(`<level>${level}</level>`);
   parts.push(`<recent>\n${recent.join("\n") || "(none)"}\n</recent>`);
   let response;
   try {
@@ -497,7 +502,7 @@ export async function makeDebateTopic(env, { note, recent }) {
     });
   } catch (error) {
     console.error("anthropic error", error?.status, error?.message);
-    throw new AiError("AI でトピックを作れませんでした。少し待ってから、もう一度ためしてください。", apiDetail(error));
+    throw new AiError("トピックを作れませんでした。少し待ってから、もう一度ためしてください。", apiDetail(error));
   }
   const text = response.content.find((block) => block.type === "text")?.text;
   try {
@@ -507,7 +512,7 @@ export async function makeDebateTopic(env, { note, recent }) {
     if (!topic.topic) throw new Error("empty");
     return topic;
   } catch {
-    throw new AiError("AI でトピックを作れませんでした。もう一度ためしてください。", `could not parse the topic: ${text?.slice(0, 200)}`);
+    throw new AiError("トピックを作れませんでした。もう一度ためしてください。", `could not parse the topic: ${text?.slice(0, 200)}`);
   }
 }
 

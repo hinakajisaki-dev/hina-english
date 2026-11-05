@@ -71,13 +71,26 @@ const SCHEMA = [
     added_at TEXT NOT NULL,
     PRIMARY KEY (student_id, step_key)
   )`,
-  // ディベート練習: what the student wrote on a debate topic (source "teacher": one of
-  // the teacher's topics, or "ai": one the AI made) and its correction (like a journal's, with a tip).
+  // 話す・ディベート練習: the topics the AI made for a student (level 1 やさしい・
+  // 2 ふつう・3 むずかしい; ten a day), and what the student wrote on one: the
+  // memo in Japanese from the thinking time, the English and its correction
+  // (like a journal's, with a tip).
+  `CREATE TABLE IF NOT EXISTS debate_topics (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    student_id INTEGER NOT NULL REFERENCES students(id) ON DELETE CASCADE,
+    level INTEGER NOT NULL,
+    topic TEXT NOT NULL,
+    topic_ja TEXT NOT NULL DEFAULT '',
+    created_at TEXT NOT NULL
+  )`,
+  `CREATE INDEX IF NOT EXISTS debate_topics_student ON debate_topics(student_id, created_at)`,
   `CREATE TABLE IF NOT EXISTS debate_answers (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     student_id INTEGER NOT NULL REFERENCES students(id) ON DELETE CASCADE,
     topic TEXT NOT NULL,
     topic_ja TEXT NOT NULL DEFAULT '',
+    level INTEGER NOT NULL DEFAULT 0,
+    memo TEXT NOT NULL DEFAULT '',
     source TEXT NOT NULL,
     body TEXT NOT NULL,
     extra INTEGER NOT NULL DEFAULT 0,
@@ -86,15 +99,6 @@ const SCHEMA = [
     corrected_at TEXT
   )`,
   `CREATE INDEX IF NOT EXISTS debate_answers_student ON debate_answers(student_id, created_at)`,
-  // How many times a student used an AI feature in a day (Japan time), for limits
-  // on the ones nothing else counts (kind "debate-topic": ディベート練習の AI のトピック).
-  `CREATE TABLE IF NOT EXISTS ai_usage (
-    student_id INTEGER NOT NULL REFERENCES students(id) ON DELETE CASCADE,
-    day TEXT NOT NULL,
-    kind TEXT NOT NULL,
-    n INTEGER NOT NULL,
-    PRIMARY KEY (student_id, day, kind)
-  )`,
   // Best and latest score of each ten-word set test; set_key is "w1/s3".
   `CREATE TABLE IF NOT EXISTS vocab_tests (
     student_id INTEGER NOT NULL REFERENCES students(id) ON DELETE CASCADE,
@@ -362,6 +366,8 @@ export function debateRow(row) {
     id: row.id,
     topic: row.topic,
     topic_ja: row.topic_ja,
+    level: row.level,
+    memo: row.memo,
     source: row.source,
     body: row.body,
     extra: !!row.extra,
@@ -485,6 +491,7 @@ export async function studentBundle(db, studentId) {
     toeic: !!setting("toeic"),
     journalIelts: !!setting("journal_ielts"),
     debate: !!setting("debate"),
+    debateNote: setting("debate_note"),
     debateAnswers: debateRows.map(debateRow),
     grammarReview,
     stars: starRows.map(starRow),

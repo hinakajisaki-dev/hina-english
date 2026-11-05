@@ -579,7 +579,7 @@ body.quiz-open .wrap { padding-bottom: 62vh; }
 }
 .preview-bar span { opacity: .8; }
 
-/* ディベート練習 */
+/* 話す・ディベート練習 */
 .debate-steps { display: flex; gap: 8px; margin: 0; padding: 0; list-style: none; counter-reset: step; }
 .debate-steps li { flex: 1; padding: 8px 6px; border-radius: 12px; background: var(--sky-soft); text-align: center; font-size: 13px; font-weight: 700; line-height: 1.4; }
 .debate-steps li small { display: block; font-size: 11px; color: var(--muted); }
@@ -591,3 +591,12 @@ body.quiz-open .wrap { padding-bottom: 62vh; }
 .debate-timer.over { border-color: var(--bad); }
 .debate-timer.over b { font-size: 24px; color: var(--bad); }
 .debate-hint { text-align: center; line-height: 1.7; }
+.level-picks { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.level-pick { display: grid; gap: 2px; padding: 10px 4px; border: 2px solid var(--line); border-radius: 12px; background: var(--card); font: inherit; color: var(--ink); cursor: pointer; }
+.level-pick b { font-size: 15px; }
+.level-pick small { font-size: 11px; color: var(--muted); }
+.level-pick[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); }
+.debate-topic-box { display: grid; gap: 4px; padding-top: 6px; border-top: 1px dashed var(--line); }
+.debate-memo textarea { width: 100%; }
+.debate-memo-view { background: var(--sky-soft); border-color: transparent; }
+.debate-memo-view p:last-child { line-height: 1.7; }

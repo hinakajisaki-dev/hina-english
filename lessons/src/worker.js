@@ -40,13 +40,11 @@ const KINDS = {
   // 言い換え問題 (瞬間英作文): the grammar it practises, the Japanese, the English
   // (two or more right answers split by /) and a hint.
   rephrase: { fields: ["group", "ja", "en", "hint"], required: 3 },
-  // ディベート練習 (for students with debate on): a debate statement and its Japanese.
-  debate: { fields: ["topic", "ja"], required: 1 },
 };
 const WEEKS = 24;
 const FIELD_NAMES = {
   word: "単語", meaning: "意味", text: "文", question: "問題", answer: "答え", prompt: "テーマ",
-  group: "文法", ja: "日本語", en: "英語", topic: "トピック",
+  group: "文法", ja: "日本語", en: "英語",
 };
 
 class HttpError extends Error {
@@ -156,7 +154,7 @@ async function route(request, env, url, who, ctx) {
     if (parts[0] === "rephrase" && parts[2] === "correct" && parts.length === 3 && method === "POST") {
       return retryRephrase(env, student, id(1));
     }
-    if (path === "/api/debate/topic" && method === "POST") return newDebateTopic(env, student);
+    if (path === "/api/debate/topic" && method === "POST") return newDebateTopic(request, env, student);
     if (path === "/api/debate" && method === "POST") return answerDebate(request, env, student);
     if (parts[0] === "debate" && parts[2] === "correct" && parts.length === 3 && method === "POST") {
       return retryDebate(env, student, id(1));
@@ -274,12 +272,19 @@ async function route(request, env, url, who, ctx) {
     await saveSetting(db, student, "write_practice", on === true ? true : null);
     return json({ on: on === true });
   }
-  // ディベート練習 on the student's home screen (for one student).
+  // 話す・ディベート練習 on the student's home screen (for one student).
   if (parts[1] === "students" && parts[3] === "debate" && parts.length === 4 && method === "PUT") {
     const student = await findStudent(db, id(2));
     const { on } = await readJson(request);
     await saveSetting(db, student, "debate", on === true ? true : null);
     return json({ on: on === true });
+  }
+  // What kind of topics the AI makes for this student (話す・ディベート練習); empty is the usual.
+  if (parts[1] === "students" && parts[3] === "debate-note" && parts.length === 4 && method === "PUT") {
+    const student = await findStudent(db, id(2));
+    const note = String((await readJson(request)).note ?? "").trim().slice(0, 1000);
+    await saveSetting(db, student, "debate_note", note || null);
+    return json({ note: note || null });
   }
   // 日記（IELTS問題練習）: the journal as IELTS Speaking Part 1 practice (for one student).
   if (parts[1] === "students" && parts[3] === "journal-ielts" && parts.length === 4 && method === "PUT") {
@@ -465,7 +470,7 @@ async function newJournal(request, env, student) {
 // sentences and 授業メモ), the 単語帳, the フレーズ or the grammar lessons'
 // examples, so the endpoint can't be used to voice anything else.
 // (The pronunciation months play the teacher's own recordings instead.)
-const SPOKEN_FIELDS = { vocab: ["word", "example"], pron: ["text"], rephrase: ["en"], topic: ["sample"], debate: ["topic"] };
+const SPOKEN_FIELDS = { vocab: ["word", "example"], pron: ["text"], rephrase: ["en"], topic: ["sample"] };
 const LESSON_SENTENCES = lessonExampleSentences();
 const BOOK_SENTENCES = bookSentences();
 const PHRASE_SENTENCES = phraseSentences();
@@ -475,7 +480,7 @@ async function speech(env, student, text) {
   if (!allowed) {
     const rows = await all(
       env.DB,
-      `SELECT kind, data FROM items WHERE student_id = ? AND kind IN ('vocab', 'pron', 'rephrase', 'topic', 'debate')`,
+      `SELECT kind, data FROM items WHERE student_id = ? AND kind IN ('vocab', 'pron', 'rephrase', 'topic')`,
       student.id,
     );
     allowed = rows.some((row) => {
@@ -484,6 +489,10 @@ async function speech(env, student, text) {
       // (A word is voiced without its 〜: "〜 is lined up" is "is lined up".)
       return SPOKEN_FIELDS[row.kind].some((field) => data[field] === text) || (row.kind === "vocab" && speakable(data.word || "") === text);
     });
+  }
+  // A topic the AI made for this student (話す・ディベート練習).
+  if (!allowed && text) {
+    allowed = !!(await first(env.DB, `SELECT 1 FROM debate_topics WHERE student_id = ? AND topic = ? LIMIT 1`, student.id, text));
   }
   // The English of the student's published 授業メモ: its 復習問題, the answers of its 英作文
   // and its sentences to read (**英語**).
@@ -804,13 +813,15 @@ async function correctOnce(env, student, journalId) {
   return json({ journal: journalRow(row), ai_error: aiError });
 }
 
-// ---------- ディベート練習 ----------
-// For a student with debate on: a debate topic (the teacher's, or one the AI
-// makes), a minute and a half to think, a minute and a half (+30 seconds) to
-// write the opinion, then the AI corrects it like a journal, with one tip.
+// ---------- 話す・ディベート練習 ----------
+// For a student with debate on: the AI makes a topic at the level the student
+// picks (debate_topics; the teacher can steer it for one student with debate_note),
+// 1:30 to think (with a memo in Japanese), 1:30 (+30 seconds) to write; then the
+// AI corrects it like a journal, with one tip. Ten topics and ten corrections a day.
 
-const DEBATE_TOPICS_PER_DAY = 20;
-const DEBATE_CORRECTED_PER_DAY = 20;
+const DEBATE_TOPICS_PER_DAY = 10;
+const DEBATE_CORRECTED_PER_DAY = 10;
+const DEBATE_LEVELS = [1, 2, 3];
 const debateErrorKey = (answerId) => `debate|${answerId}`;
 const japanDayStart = () => new Date(Date.parse(`${japanDay()}T00:00:00+09:00`)).toISOString();
 
@@ -818,42 +829,49 @@ async function requireDebate(env, student) {
   if (!(await studentSetting(env.DB, student, "debate"))) throw new HttpError(404, "見つかりません。");
 }
 
-// A topic made by the AI, different from the student's latest ones.
-async function newDebateTopic(env, student) {
+const topicsToday = async (env, student) => (await first(
+  env.DB, `SELECT COUNT(*) AS n FROM debate_topics WHERE student_id = ? AND created_at >= ?`, student.id, japanDayStart(),
+)).n;
+
+// A topic made by the AI at the level asked, different from the student's latest ones.
+async function newDebateTopic(request, env, student) {
   await requireDebate(env, student);
-  if (!aiEnabled(env)) throw new HttpError(400, "AI がいまは使えません。先生のトピックをえらんでください。");
-  const day = japanDay();
-  const used = await first(env.DB, `SELECT n FROM ai_usage WHERE student_id = ? AND day = ? AND kind = 'debate-topic'`, student.id, day);
-  if ((used?.n ?? 0) >= DEBATE_TOPICS_PER_DAY) throw new HttpError(429, "今日の AI のトピックは、ここまでです。先生のトピックをえらんでください。");
-  await run(
-    env.DB,
-    `INSERT INTO ai_usage (student_id, day, kind, n) VALUES (?, ?, 'debate-topic', 1)
-     ON CONFLICT (student_id, day, kind) DO UPDATE SET n = n + 1`,
-    student.id, day,
-  );
-  const recent = (await all(env.DB, `SELECT topic FROM debate_answers WHERE student_id = ? ORDER BY id DESC LIMIT 15`, student.id)).map((r) => r.topic);
+  if (!aiEnabled(env)) throw new HttpError(400, "AI がいまは使えません。");
+  const { level } = await readJson(request);
+  if (!DEBATE_LEVELS.includes(Number(level))) throw new HttpError(400, "レベルをえらんでください。");
+  const used = await topicsToday(env, student);
+  if (used >= DEBATE_TOPICS_PER_DAY) throw new HttpError(429, "今日のトピックは、ここまでです。また明日ためしてください。");
+  const recent = (await all(env.DB, `SELECT topic FROM debate_topics WHERE student_id = ? ORDER BY id DESC LIMIT 20`, student.id)).map((r) => r.topic);
+  let made;
   try {
-    return json({ topic: await makeDebateTopic(env, { note: student.note, recent }) });
+    made = await makeDebateTopic(env, {
+      level: Number(level), note: student.note, topicNote: await studentSetting(env.DB, student, "debate_note"), recent,
+    });
   } catch (error) {
     if (!(error instanceof AiError)) throw error;
-    await recordError(env.DB, { kind: "debate", message: `ディベート練習の AI のトピックが作れなかった（生徒の画面：${error.message}）`, detail: error.detail, studentId: student.id });
+    await recordError(env.DB, { kind: "debate", message: `話す・ディベート練習のトピックが作れなかった（生徒の画面：${error.message}）`, detail: error.detail, studentId: student.id });
     throw new HttpError(502, error.message);
   }
+  const { meta } = await run(
+    env.DB, `INSERT INTO debate_topics (student_id, level, topic, topic_ja, created_at) VALUES (?, ?, ?, ?, ?)`,
+    student.id, Number(level), made.topic, made.ja, now(),
+  );
+  return json({ topic: { id: meta.last_row_id, level: Number(level), topic: made.topic, ja: made.ja }, left: DEBATE_TOPICS_PER_DAY - used - 1 });
 }
 
 async function answerDebate(request, env, student) {
   await requireDebate(env, student);
   const input = await readJson(request);
-  const text = (value, n) => String(value ?? "").trim().slice(0, n);
-  const topic = text(input.topic, 300).replace(/\s+/g, " ");
+  const topic = await first(env.DB, `SELECT * FROM debate_topics WHERE id = ? AND student_id = ?`, Number(input.topic), student.id);
+  if (!topic) throw new HttpError(404, "そのトピックは見つかりません。");
   const body = String(input.body ?? "").replace(/\r\n?/g, "\n").trim();
-  if (!topic) throw new HttpError(400, "トピックがありません。");
   if (!body) throw new HttpError(400, "英語で書いてから送ってください。");
   if (body.length > 3000) throw new HttpError(400, "長すぎます。3000文字以内にしてください。");
+  const memo = String(input.memo ?? "").replace(/\r\n?/g, "\n").trim().slice(0, 1000);
   const { meta } = await run(
     env.DB,
-    `INSERT INTO debate_answers (student_id, topic, topic_ja, source, body, extra, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)`,
-    student.id, topic, text(input.ja, 300), input.source === "ai" ? "ai" : "teacher", body, input.extra ? 1 : 0, now(),
+    `INSERT INTO debate_answers (student_id, topic, topic_ja, level, memo, source, body, extra, created_at) VALUES (?, ?, ?, ?, ?, 'ai', ?, ?, ?)`,
+    student.id, topic.topic, topic.topic_ja, topic.level, memo, body, input.extra ? 1 : 0, now(),
   );
   if (!aiEnabled(env)) return json({ answer: debateRow(await first(env.DB, `SELECT * FROM debate_answers WHERE id = ?`, meta.last_row_id)) });
   return correctDebate(env, student, meta.last_row_id);
@@ -891,7 +909,7 @@ async function correctDebate(env, student, answerId) {
     aiError = error.message;
     await recordError(env.DB, {
       kind: "debate",
-      message: `ディベート練習 ${answerId} の添削ができなかった（生徒の画面：${error.message}）`,
+      message: `話す・ディベート練習 ${answerId} の添削ができなかった（生徒の画面：${error.message}）`,
       detail: error.detail,
       studentId: student.id,
       ref: String(answerId),
