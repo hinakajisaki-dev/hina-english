@@ -176,6 +176,7 @@ Week ごとに、全員共通の単語帳のかわりに、別の単語帳を出
   - `ielts3`「IELTS 語彙 Week 3」（`public/vocab/ielts3.js`。はるきさんのチャットで先生が OK した 100 語。10 のテーマ × 10 語、例文は 1 語に 1 つ。ielts1・2 と同じ単語はない）
   - `linkup1`「LinkUp 英単語 Week 1」（`public/vocab/linkup1.js`。先生の PDF「LinkUp英単語」の最初の 10 ページから。動詞 30・名詞 20・形容詞 20・副詞 10・前置詞 20 の 100 語、例文は 1 語に 1 つ（日本語訳つき）。PDF の発音記号は入れていない）
   - `linkup2`「LinkUp 英単語 Week 2」（`public/vocab/linkup2.js`。同じ PDF の 11〜20 ページから、なおみさんのチャットで先生が OK した 100 語。形は linkup1 と同じ。Week 2 なので Day 1〜7 に分かれる）
+  - `linkup3`「LinkUp 英単語 Week 3」（`public/vocab/linkup3.js`。同じ PDF の 21〜30 ページの 100 語：動詞 30・名詞 20・形容詞 20・副詞 10・イディオム 20。Day 1〜7）
   - `w2`〜`w6`「単語帳 Week 2〜6」（`public/vocab/week2.js`〜`week6.js`。先生のスライド「単語帳 week 2〜6」から。100 語・例文 200 ずつ）。Week 1 のつづきですが、いまは全員共通ではなく、出した生徒だけに出ます（`everyone: false`。全員に出すときは、その行を消す）
 - 単語帳がない Week（たとえば Week 2 で、その生徒に `w2` を出していない）は、生徒の画面で「まだありません」
 - 別の単語帳にした生徒には、その Week の全員共通の単語帳は出ません。ほかの生徒は変わりません
@@ -441,7 +442,7 @@ API キーを入れると、そのあとに送られた日記から、AI が 1 �
 | `src/worker.js` | サーバー（ログイン、教材、日記、言い換え問題、授業メモ、発音の録音、勉強時間） |
 | `public/grammar/lessons.js` | 文法の単元とレッスン（説明と問題） |
 | `public/mistakes.js` | 入力した答えのまちがい探し（スペルミス・文法・語順など。サーバーも同じものを使う） |
-| `public/vocab/week1.js`〜`week6.js`、`ielts1.js`〜`ielts3.js`、`linkup1.js`、`linkup2.js`、`words.js` | 単語帳 Week 1（全員共通）、Week 2〜6 と IELTS 語彙 Week 1〜3、LinkUp 英単語 Week 1・2（出した生徒だけ）と、週・セット・復習・生徒ごとの単語帳の決まり |
+| `public/vocab/week1.js`〜`week6.js`、`ielts1.js`〜`ielts3.js`、`linkup1.js`〜`linkup3.js`、`words.js` | 単語帳 Week 1（全員共通）、Week 2〜6 と IELTS 語彙 Week 1〜3、LinkUp 英単語 Week 1〜3（出した生徒だけ）と、週・セット・復習・生徒ごとの単語帳の決まり |
 | `public/phrases/book.js`、`week1.js`、`week2.js`、`talk1.js` | フレーズ（週・Day・テスト・生徒ごとの本の決まりと、スモールトーク Week 1・2、英語の会話でそのまま使うフレーズの中身） |
 | `../smalltalk/` | スモールトークのフレーズ教材（md）と、書き方のルール |
 | `scripts/smalltalk-to-js.mjs`、`smalltalk-overrides.json` | md を `public/phrases/weekN.js` に変換する（md にない先生の変更も入れる） |
