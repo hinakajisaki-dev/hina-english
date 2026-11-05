@@ -2,7 +2,7 @@
 // today's phrase, pronunciation, grammar and the journal with its correction.
 import {
   ApiError, api, diffHtml, esc, formatDate, icons, japanDayNumber,
-  SPEEDS, getSpeed, setSpeed, speak, startOfJapanDay, stopSpeaking, toast, watchErrors,
+  SPEEDS, getSpeed, setApiParams, setSpeed, speak, startOfJapanDay, stopSpeaking, toast, watchErrors,
 } from "./common.js";
 import { UNITS, findLesson, plain, questionCount } from "./grammar/lessons.js";
 import {
@@ -27,6 +27,13 @@ import {
 
 watchErrors("/api/errors");
 
+// The teacher's preview of a student (先生ページの「生徒の画面」: /?preview=5): the
+// student's screens with the teacher signed in. Nothing is saved (the server
+// refuses), study time isn't counted, and a bar at the top says so.
+const PREVIEW = /^\d+$/.test(new URLSearchParams(location.search).get("preview") || "")
+  ? new URLSearchParams(location.search).get("preview") : null;
+if (PREVIEW) setApiParams({ preview: PREVIEW });
+
 const app = document.getElementById("app");
 const state = {
   me: null, vocab: null, vocabTest: null, listen: null, review: null, pron: { which: null, index: 0 }, grammar: null, lesson: null, aiError: {},
@@ -48,7 +55,13 @@ const asterisk = `<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="t
 async function load() {
   try {
     state.me = await api("/api/me");
+    if (PREVIEW) showPreviewBar();
   } catch (error) {
+    if (PREVIEW) {
+      const message = error.status === 401 ? "先生ページにログインしてから、もう一度開いてください。" : error.message;
+      app.innerHTML = `<main class="wrap"><div class="card empty stack" style="margin-top:40px"><p>${esc(message)}</p><a class="btn" href="/teacher">先生ページへ</a></div></main>`;
+      return false;
+    }
     if (error instanceof ApiError && error.status === 401) {
       state.me = null;
     } else {
@@ -106,8 +119,17 @@ document.addEventListener("click", (event) => {
 
 // Time in the app counts as study time once signed in (see study.js).
 let clockStarted = false;
+function showPreviewBar() {
+  const bar = document.createElement("div");
+  bar.className = "preview-bar";
+  bar.setAttribute("role", "status");
+  bar.innerHTML = `👀 <b>${esc(state.me.student.name)}さんの画面（プレビュー）</b><span>ここでしたことは記録されません</span>`;
+  document.body.prepend(bar);
+  document.title = `${state.me.student.name}さんの画面（プレビュー）`;
+}
+
 function startClock() {
-  if (clockStarted) return;
+  if (clockStarted || PREVIEW) return;
   clockStarted = true;
   startStudyClock(() => !!state.me, (seconds) => {
     if (!state.me) return;
@@ -443,12 +465,12 @@ function renderHome() {
       </nav>
       <p class="footer-links">
         ${canInstall() && installHidden() ? `<button type="button" class="btn ghost small-btn" id="install-show">ホーム画面に追加する方法</button>` : ""}
-        <button type="button" class="btn ghost small-btn" id="logout">ログアウト</button>
+        ${PREVIEW ? "" : `<button type="button" class="btn ghost small-btn" id="logout">ログアウト</button>`}
       </p>
     </main>`;
 
   bindInstall();
-  document.getElementById("logout").addEventListener("click", async () => {
+  document.getElementById("logout")?.addEventListener("click", async () => {
     if (!confirm("ログアウトしますか？ もう一度入るときは、レッスンコードが必要です。")) return;
     await api("/api/logout", { method: "POST" }).catch(() => {});
     state.me = null;

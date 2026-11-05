@@ -95,3 +95,9 @@ textarea.bulk { font-family: var(--en); min-height: 140px; }
 .more-answers > .stack { margin-top: 10px; }
 .ai-make { background: var(--sky-soft); border-radius: 14px; padding: 12px 14px; }
 .ai-make select { flex: none; width: auto; }
+
+/* 今週の勉強範囲 at the top of a student's page. */
+.plan-quick { border: 2px solid var(--accent); }
+.plan-head, .plan-foot { display: flex; align-items: baseline; justify-content: space-between; gap: 6px 12px; flex-wrap: wrap; }
+.plan-foot { align-items: center; justify-content: flex-start; }
+.plan-quick textarea { width: 100%; resize: vertical; }
