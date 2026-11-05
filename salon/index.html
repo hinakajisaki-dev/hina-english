@@ -1195,5 +1195,18 @@
     vids.forEach(function (v) { io.observe(v); });
   })();
 </script>
+<script>
+  // LINE のボタンから ?lf=<友だちID> で開いた人：申し込みページへのリンクに lf を付ける（申し込み・決済が LINE とつながる）。LP を開いたことをアプリに知らせる（LINE にタグ「LPを開いた」）。lf が無い人には何もしない（11/5 ひなさん）
+  (function () {
+    var m = /[?&]lf=([0-9a-f-]{36})(?:&|$)/i.exec(location.search);
+    var lf = m ? m[1].toLowerCase() : null;
+    try { if (lf) sessionStorage.setItem("ohana_lf", lf); else lf = sessionStorage.getItem("ohana_lf"); } catch (e) {}
+    if (!lf) return;
+    if (m) { try { navigator.sendBeacon("https://my.ohana-english.app/api/line-lp", new Blob([JSON.stringify({ lf: lf })], { type: "text/plain" })); } catch (e) {} }
+    document.querySelectorAll('a[href*="my.ohana-english.app"]').forEach(function (a) {
+      try { var u = new URL(a.href); if (!u.searchParams.get("lf")) { u.searchParams.set("lf", lf); a.href = u.toString(); } } catch (e) {}
+    });
+  })();
+</script>
 </body>
 </html>
