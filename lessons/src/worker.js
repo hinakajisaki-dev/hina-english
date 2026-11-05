@@ -95,7 +95,17 @@ async function route(request, env, url, who, ctx) {
     return json({ ok: true }, 200, { "Set-Cookie": cookie(STUDENT_COOKIE, "", 0, url) });
   }
   if (parts[0] !== "teacher") {
-    const student = await requireStudent(request, env);
+    // The teacher's preview of a student's screen (?preview=5, with the teacher
+    // signed in): that student's pages, but nothing is saved.
+    const preview = url.searchParams.get("preview");
+    let student;
+    if (preview) {
+      await requireTeacher(request, env);
+      student = await findStudent(env.DB, Number(preview));
+      if (method !== "GET") throw new HttpError(403, "プレビュー中なので、保存しません（生徒の記録には入りません）。");
+    } else {
+      student = await requireStudent(request, env);
+    }
     who.studentId = student.id;
     if (path === "/api/me" && method === "GET") return studentHome(env, student);
     if (path === "/api/errors" && method === "POST") return saveBrowserError(request, env, student.id);

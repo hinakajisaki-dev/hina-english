@@ -8,10 +8,17 @@ export class ApiError extends Error {
   }
 }
 
+// Added to every API address of this page (the teacher's preview of a student: { preview: 5 }).
+let apiParams = "";
+export function setApiParams(params) {
+  apiParams = new URLSearchParams(params).toString();
+}
+const withParams = (path) => (apiParams ? `${path}${path.includes("?") ? "&" : "?"}${apiParams}` : path);
+
 export async function api(path, { method = "GET", body } = {}) {
   let response;
   try {
-    response = await fetch(path, {
+    response = await fetch(withParams(path), {
       method,
       headers: body === undefined ? {} : { "Content-Type": "application/json" },
       body: body === undefined ? undefined : JSON.stringify(body),
@@ -153,7 +160,7 @@ export function speak(text, { device = false, src = null } = {}) {
     speakWithDevice(text, speed);
     return Promise.resolve();
   }
-  player.src = src || `/api/speech?text=${encodeURIComponent(text)}`;
+  player.src = src || withParams(`/api/speech?text=${encodeURIComponent(text)}`);
   player.defaultPlaybackRate = player.playbackRate = speed;
   return player.play().catch((error) => {
     // AbortError means another button was tapped before this one started.

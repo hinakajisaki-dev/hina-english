@@ -266,9 +266,11 @@ async function renderStudent(id, tab) {
     <header class="topbar"><div class="topbar-in">
       <a class="icon-btn" href="#/" aria-label="生徒の一覧にもどる">${icons.back}</a>
       <h1>${esc(student.name)}さん</h1>
+      <a class="btn small-btn" href="/?preview=${student.id}" target="_blank" rel="noopener" title="${esc(student.name)}さんのアプリの画面を、別のタブで開きます（記録には入りません）">👀 生徒の画面</a>
       <button class="btn secondary small-btn" id="copy-invite">招待をコピー</button>
     </div></header>
     <main class="wrap stack">
+      ${planFormHtml()}
       <div class="stats">
         <div class="stat"><b>${journals.length}</b><span>日記（この7日で ${thisWeek}）</span></div>
         <div class="stat"><b>${vocabTested} / ${vocabSets.length}</b><span>単語テスト Week ${CURRENT_WEEK}（復習カード ${(data.review || []).length} 語）</span></div>
@@ -285,6 +287,7 @@ async function renderStudent(id, tab) {
     </main>`;
 
   document.getElementById("copy-invite").addEventListener("click", () => copy(inviteText(student)));
+  bindPlanForm(student);
   const panel = document.getElementById("tab");
   if (tab === "journals") renderJournals(panel);
   else if (tab === "study") renderStudyTab(panel);
@@ -293,6 +296,51 @@ async function renderStudent(id, tab) {
   else if (tab === "phrases") panel.innerHTML = phraseResultsHtml();
   else if (KINDS[tab]) renderItems(panel, tab);
   else renderJournals(panel);
+}
+
+// 今週の勉強範囲, at the top of the student's page: write and 保存 (or ⌘/Ctrl + Enter).
+// It shows at the top of the student's home at once; saved empty, it goes away.
+function planFormHtml() {
+  const plan = state.current.plan;
+  const lines = (plan?.body || "").split("\n").length;
+  return `<form class="card stack plan-quick" id="plan">
+    <div class="plan-head">
+      <h3>今週の勉強範囲</h3>
+      <span class="muted small" id="plan-when">${plan ? `${esc(formatDateTime(plan.updated_at))} に更新` : "まだありません"}</span>
+    </div>
+    <textarea name="body" rows="${Math.min(10, Math.max(3, lines + 1))}" maxlength="5000" placeholder="- フレーズ Week 1 の Day 1〜3&#10;- 単語 Week 1 のセット 1〜5&#10;- 発音 Month 1 を毎日1文">${esc(plan?.body || "")}</textarea>
+    <div class="plan-foot">
+      <button class="btn" type="submit">保存</button>
+      <span class="muted small">生徒のホームのいちばん上に、すぐ出ます（⌘ / Ctrl ＋ Enter でも保存）</span>
+    </div>
+  </form>`;
+}
+
+function bindPlanForm(student) {
+  const form = document.getElementById("plan");
+  const save = async () => {
+    const button = form.querySelector("button");
+    busy(button, "保存中…");
+    try {
+      const { plan } = await api(`/api/teacher/students/${student.id}/plan`, { method: "PUT", body: { body: form.body.value } });
+      state.current.plan = plan;
+      document.getElementById("plan-when").textContent = plan ? `${formatDateTime(plan.updated_at)} に更新` : "まだありません";
+      toast(plan ? "今週の勉強範囲を保存しました" : "今週の勉強範囲を消しました");
+    } catch (error) {
+      toast(error.message);
+    }
+    done(button);
+  };
+  form.addEventListener("submit", (event) => {
+    event.preventDefault();
+    save();
+  });
+  form.body.addEventListener("keydown", (event) => {
+    if (event.key === "Enter" && (event.metaKey || event.ctrlKey)) {
+      event.preventDefault();
+      save();
+    }
+  });
 }
 
 // ---------- journals ----------
@@ -1083,13 +1131,6 @@ function renderSettings(panel) {
       <button class="btn" type="submit" style="align-self:flex-start">保存</button>
     </form>
     ${vocabBooksForm()}
-    <form class="card stack" id="plan">
-      <h3>今週の勉強範囲</h3>
-      <p class="muted small">生徒のホームのいちばん上に出ます。空にして保存すると消えます。生徒ごとのチャットからも変えられます。</p>
-      <textarea name="body" rows="5" maxlength="5000" placeholder="- フレーズ Week 1 の Day 1〜3&#10;- 単語 Week 1 のセット 1〜5&#10;- 発音 Month 1 を毎日1文">${esc(state.current.plan?.body || "")}</textarea>
-      ${state.current.plan ? `<p class="muted small">${esc(formatDateTime(state.current.plan.updated_at))} に更新</p>` : ""}
-      <button class="btn" type="submit" style="align-self:flex-start">保存</button>
-    </form>
     <form class="card stack" id="profile">
       <h3>生徒の情報</h3>
       <label class="field"><span>名前（アプリで「〇〇さん」と表示）</span>
@@ -1176,20 +1217,6 @@ function renderSettings(panel) {
       await api(`/api/teacher/students/${student.id}/vocab-books`, { method: "PUT", body: { books } });
       await renderStudent(student.id, "settings");
       toast("単語帳を保存しました");
-    } catch (error) {
-      toast(error.message);
-      done(button);
-    }
-  });
-  const planForm = document.getElementById("plan");
-  planForm.addEventListener("submit", async (event) => {
-    event.preventDefault();
-    const button = planForm.querySelector("button");
-    busy(button, "保存中…");
-    try {
-      const { plan } = await api(`/api/teacher/students/${student.id}/plan`, { method: "PUT", body: { body: planForm.body.value } });
-      await renderStudent(student.id, "settings");
-      toast(plan ? "今週の勉強範囲を保存しました" : "今週の勉強範囲を消しました");
     } catch (error) {
       toast(error.message);
       done(button);
