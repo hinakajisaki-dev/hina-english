@@ -77,10 +77,21 @@ const IELTS_NOTE = `<ielts_part1>
 This student is practising IELTS Speaking Part 1 in writing: the <topic> is the examiner's question and the journal is the student's answer (a good Part 1 answer is two or three sentences, about 30 to 50 words: the answer plus a reason or an example, not a single sentence).
 Also fill "band_tip": one short line in Japanese (about 40 characters at most) with the one thing that would most help this answer reach band 6.5, such as adding a sentence with a reason or an example, or joining ideas with because / although. Don't repeat a correction.
 </ielts_part1>`;
+// ディベート練習: the topic is a debate statement and the entry is the student's
+// opinion, written in a minute and a half; "tip" is one line on making the argument clearer.
+const DEBATE_NOTE = `<debate>
+This is a timed debate exercise: the <topic> is a debate statement, and the journal is the student's opinion on it, written in about a minute and a half (so it may be short or unfinished; don't correct it for being short).
+Also fill "tip": one short line in Japanese (about 40 characters at most) with the one thing that would most make this opinion clearer or more convincing, such as stating agree or disagree first, adding a reason or an example, or ending with the opinion again. Don't repeat a correction.
+</debate>`;
 const IELTS_SCHEMA = {
   ...SCHEMA,
   properties: { ...SCHEMA.properties, band_tip: { type: "string" } },
   required: [...SCHEMA.required, "band_tip"],
+};
+const DEBATE_SCHEMA = {
+  ...SCHEMA,
+  properties: { ...SCHEMA.properties, tip: { type: "string" } },
+  required: [...SCHEMA.required, "tip"],
 };
 
 // A change that only moves commas, periods, hyphens and the like (the teacher
@@ -88,12 +99,13 @@ const IELTS_SCHEMA = {
 const words = (text) => String(text).toLowerCase().replace(/[^a-z0-9'’]+/g, " ").trim();
 const punctuationOnly = (fix) => words(fix.before) === words(fix.after);
 
-export async function correctJournal(env, { body, topic, note, ielts = false }) {
+export async function correctJournal(env, { body, topic, note, ielts = false, debate = false }) {
   if (!env.ANTHROPIC_API_KEY) throw new AiError("添削の設定がまだです。先生に知らせてください。", "ANTHROPIC_API_KEY がない");
 
   const parts = [];
   if (note) parts.push(`<teacher_note>\n${note}\n</teacher_note>`);
   if (ielts) parts.push(IELTS_NOTE);
+  if (debate) parts.push(DEBATE_NOTE);
   if (topic) parts.push(`<topic>\n${topic}\n</topic>`);
   parts.push(`<journal>\n${body}\n</journal>`);
 
@@ -107,7 +119,7 @@ export async function correctJournal(env, { body, topic, note, ielts = false }) 
       fallbacks: "default",
       output_config: {
         effort: "medium",
-        format: { type: "json_schema", schema: ielts ? IELTS_SCHEMA : SCHEMA },
+        format: { type: "json_schema", schema: ielts ? IELTS_SCHEMA : debate ? DEBATE_SCHEMA : SCHEMA },
       },
       system: SYSTEM,
       messages: [{ role: "user", content: parts.join("\n\n") }],
@@ -149,6 +161,7 @@ export async function correctJournal(env, { body, topic, note, ielts = false }) 
         .filter((fix) => !punctuationOnly(fix) && !onlySpelling(fix, map)),
       spelling,
       ...(ielts && String(result.band_tip ?? "").trim() ? { band_tip: String(result.band_tip).trim().slice(0, 200) } : {}),
+      ...(debate && String(result.tip ?? "").trim() ? { tip: String(result.tip).trim().slice(0, 200) } : {}),
       model: response.model,
     };
   } catch {
@@ -447,6 +460,54 @@ export async function makeRephraseProblems(env, { grammar, count, note, existing
   } catch {
     console.error("could not parse problems", text?.slice(0, 200));
     throw new AiError("AI で問題を作れませんでした。もう一度ためしてください。", `could not parse the problems (stop_reason ${response.stop_reason}): ${text?.slice(0, 200)}`);
+  }
+}
+
+// ---------- ディベート練習: a topic made by the AI ----------
+
+const DEBATE_TOPIC_SYSTEM = `You help an English teacher in Japan whose private students are Japanese adults learning English. In ディベート練習 the student gets a debate topic, thinks for a minute and a half, then writes their opinion for a minute and a half.
+Make one debate topic for this student:
+- "topic": one short English statement people can agree or disagree with (for example "Working from home is better than working in an office."), about everyday life, work, study, travel, technology, food, money or society. Plain words the student can read at once; no politics, religion or other sensitive subjects.
+- "ja": the same statement in natural Japanese.
+- Something different from every topic in <recent>.
+There may be a <teacher_note> about the student: follow what it says about their level and interests.`;
+
+const DEBATE_TOPIC_SCHEMA = {
+  type: "object",
+  properties: { topic: { type: "string" }, ja: { type: "string" } },
+  required: ["topic", "ja"],
+  additionalProperties: false,
+};
+
+export async function makeDebateTopic(env, { note, recent }) {
+  if (!env.ANTHROPIC_API_KEY) throw new AiError("AI の設定がまだです。", "ANTHROPIC_API_KEY がない");
+  const parts = [];
+  if (note) parts.push(`<teacher_note>\n${note}\n</teacher_note>`);
+  parts.push(`<recent>\n${recent.join("\n") || "(none)"}\n</recent>`);
+  let response;
+  try {
+    response = await client(env).beta.messages.create({
+      model: model(env),
+      max_tokens: 2000,
+      betas: ["server-side-fallback-2026-07-01"],
+      fallbacks: "default",
+      output_config: { effort: "low", format: { type: "json_schema", schema: DEBATE_TOPIC_SCHEMA } },
+      system: DEBATE_TOPIC_SYSTEM,
+      messages: [{ role: "user", content: parts.join("\n\n") }],
+    });
+  } catch (error) {
+    console.error("anthropic error", error?.status, error?.message);
+    throw new AiError("AI でトピックを作れませんでした。少し待ってから、もう一度ためしてください。", apiDetail(error));
+  }
+  const text = response.content.find((block) => block.type === "text")?.text;
+  try {
+    const result = JSON.parse(text);
+    const clean = (value, n) => String(value ?? "").replace(/\s+/g, " ").trim().slice(0, n);
+    const topic = { topic: clean(result.topic, 200), ja: clean(result.ja, 200) };
+    if (!topic.topic) throw new Error("empty");
+    return topic;
+  } catch {
+    throw new AiError("AI でトピックを作れませんでした。もう一度ためしてください。", `could not parse the topic: ${text?.slice(0, 200)}`);
   }
 }
 

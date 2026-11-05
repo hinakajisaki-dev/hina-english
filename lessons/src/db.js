@@ -71,6 +71,30 @@ const SCHEMA = [
     added_at TEXT NOT NULL,
     PRIMARY KEY (student_id, step_key)
   )`,
+  // ディベート練習: what the student wrote on a debate topic (source "teacher": one of
+  // the teacher's topics, or "ai": one the AI made) and its correction (like a journal's, with a tip).
+  `CREATE TABLE IF NOT EXISTS debate_answers (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    student_id INTEGER NOT NULL REFERENCES students(id) ON DELETE CASCADE,
+    topic TEXT NOT NULL,
+    topic_ja TEXT NOT NULL DEFAULT '',
+    source TEXT NOT NULL,
+    body TEXT NOT NULL,
+    extra INTEGER NOT NULL DEFAULT 0,
+    correction TEXT,
+    created_at TEXT NOT NULL,
+    corrected_at TEXT
+  )`,
+  `CREATE INDEX IF NOT EXISTS debate_answers_student ON debate_answers(student_id, created_at)`,
+  // How many times a student used an AI feature in a day (Japan time), for limits
+  // on the ones nothing else counts (kind "debate-topic": ディベート練習の AI のトピック).
+  `CREATE TABLE IF NOT EXISTS ai_usage (
+    student_id INTEGER NOT NULL REFERENCES students(id) ON DELETE CASCADE,
+    day TEXT NOT NULL,
+    kind TEXT NOT NULL,
+    n INTEGER NOT NULL,
+    PRIMARY KEY (student_id, day, kind)
+  )`,
   // Best and latest score of each ten-word set test; set_key is "w1/s3".
   `CREATE TABLE IF NOT EXISTS vocab_tests (
     student_id INTEGER NOT NULL REFERENCES students(id) ON DELETE CASCADE,
@@ -333,6 +357,19 @@ export function rephraseRow(row) {
   };
 }
 
+export function debateRow(row) {
+  return {
+    id: row.id,
+    topic: row.topic,
+    topic_ja: row.topic_ja,
+    source: row.source,
+    body: row.body,
+    extra: !!row.extra,
+    correction: row.correction ? JSON.parse(row.correction) : null,
+    created_at: row.created_at,
+  };
+}
+
 export function starRow(row) {
   return {
     key: row.word_key,
@@ -364,7 +401,7 @@ export function noteRow(row) {
 export async function studentBundle(db, studentId) {
   const [
     items, progress, lessonRows, reviewRows, testRows, phraseReviewRows, phraseTestRows, pronRows, studyRows, journals, plan,
-    menus, settings, lessonDays, rephraseRows, starRows, grammarReviewRows,
+    menus, settings, lessonDays, rephraseRows, starRows, grammarReviewRows, debateRows,
   ] = await Promise.all([
     all(db, `SELECT * FROM items WHERE student_id = ? ORDER BY id`, studentId),
     all(db, `SELECT * FROM progress WHERE student_id = ?`, studentId),
@@ -394,6 +431,7 @@ export async function studentBundle(db, studentId) {
     ),
     all(db, `SELECT * FROM example_stars WHERE student_id = ? ORDER BY created_at`, studentId),
     all(db, `SELECT * FROM grammar_review WHERE student_id = ? ORDER BY added_at`, studentId),
+    all(db, `SELECT * FROM debate_answers WHERE student_id = ? ORDER BY id DESC LIMIT 30`, studentId),
   ]);
   const setting = (name) => {
     const row = settings.find((r) => r.name === name);
@@ -446,6 +484,8 @@ export async function studentBundle(db, studentId) {
     writePractice: !!setting("write_practice"),
     toeic: !!setting("toeic"),
     journalIelts: !!setting("journal_ielts"),
+    debate: !!setting("debate"),
+    debateAnswers: debateRows.map(debateRow),
     grammarReview,
     stars: starRows.map(starRow),
   };

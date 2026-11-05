@@ -578,3 +578,16 @@ body.quiz-open .wrap { padding-bottom: 62vh; }
   padding: 8px 16px; background: var(--ink); color: #fff; font-size: 13px; text-align: center;
 }
 .preview-bar span { opacity: .8; }
+
+/* ディベート練習 */
+.debate-steps { display: flex; gap: 8px; margin: 0; padding: 0; list-style: none; counter-reset: step; }
+.debate-steps li { flex: 1; padding: 8px 6px; border-radius: 12px; background: var(--sky-soft); text-align: center; font-size: 13px; font-weight: 700; line-height: 1.4; }
+.debate-steps li small { display: block; font-size: 11px; color: var(--muted); }
+.debate-topic-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+.debate-topic { font-family: var(--en); font-size: 19px; font-weight: 800; line-height: 1.5; }
+.debate-timer { display: grid; justify-items: center; gap: 4px; padding: 14px; border-radius: var(--radius); background: var(--card); border: 2px solid var(--accent); }
+.debate-timer b { font-family: var(--en); font-size: 44px; font-weight: 800; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.debate-timer .bar { width: 100%; }
+.debate-timer.over { border-color: var(--bad); }
+.debate-timer.over b { font-size: 24px; color: var(--bad); }
+.debate-hint { text-align: center; line-height: 1.7; }

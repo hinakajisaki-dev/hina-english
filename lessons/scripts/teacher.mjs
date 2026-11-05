@@ -38,6 +38,9 @@
 // node scripts/teacher.mjs vocab-pace なおみ [--week 2 --days 4 --size 40 | --off]   (fewer words a week, across the 単語帳)
 // node scripts/teacher.mjs write-practice なおみ [--on | --off]   (★ on 復習 examples and 書く練習)
 // node scripts/teacher.mjs toeic えいし [--on | --off]             (TOEIC単語 at the top of the home screen)
+// node scripts/teacher.mjs add なおみ debate topics.txt             (ディベートのトピック: トピック | 日本語)
+// node scripts/teacher.mjs debate なおみ [--on | --off]            (ディベート練習 on the home screen)
+// node scripts/teacher.mjs debates なおみ [--days 7]               (what the student wrote in ディベート練習, with corrections)
 // node scripts/teacher.mjs stars なおみ                           (the ★ examples and their お題)
 // node scripts/teacher.mjs lesson-days なおみ [--add 2026-08-03,2026-08-16] [--remove 2026-08-03]   (the numbered lessons)
 //
@@ -75,6 +78,7 @@ const KINDS = {
   grammar: { name: "文法", columns: ["question", "answer", "choices", "explanation"], required: 2 },
   topic: { name: "日記のテーマ", columns: ["prompt", "sample"], required: 1 },
   rephrase: { name: "言い換え問題", columns: ["group", "ja", "en", "hint"], required: 3 },
+  debate: { name: "ディベートのトピック", columns: ["topic", "ja"], required: 1 },
 };
 
 class Stop extends Error {}
@@ -264,7 +268,7 @@ function japanTime(iso) {
   return `${d.getUTCMonth() + 1}/${d.getUTCDate()} ${two(d.getUTCHours())}:${two(d.getUTCMinutes())}`;
 }
 
-const ERROR_KINDS = { journal: "日記の添削", judge: "AI の判定", rephrase: "言い換え問題の添削", speech: "音声", server: "サーバー", browser: "画面" };
+const ERROR_KINDS = { journal: "日記の添削", judge: "AI の判定", rephrase: "言い換え問題の添削", debate: "ディベート練習の添削", speech: "音声", server: "サーバー", browser: "画面" };
 
 function errorLines(e) {
   const when = e.count > 1 ? `${japanTime(e.first_at)} 〜 ${japanTime(e.last_at)}（${e.count} 回）` : japanTime(e.last_at);
@@ -293,7 +297,7 @@ const commands = {
   async show([name]) {
     const data = await studentData(await findStudent(name));
     console.log(`# ${data.student.name}さん`);
-    console.log(`\n## 生徒の画面に出すもの\n${menuLine(data.hidden)}${data.toeic ? "　○ TOEIC単語（いちばん上）" : ""}${data.journalIelts ? "　○ 日記（IELTS問題練習）" : ""}`);
+    console.log(`\n## 生徒の画面に出すもの\n${menuLine(data.hidden)}${data.toeic ? "　○ TOEIC単語（いちばん上）" : ""}${data.journalIelts ? "　○ 日記（IELTS問題練習）" : ""}${data.debate ? "　○ ディベート練習" : ""}`);
     console.log(`\n## 発音課題の Month\n${pronLine(data.pronMonths)}`);
     console.log(`\n## 発音課題の完了\n${pronProgress(data.pronDone)}`);
     console.log(`\n## 単語帳\n${bookLine(data.vocabBooks)}`);
@@ -672,6 +676,33 @@ const commands = {
     if (note.length > 1000) stop("1000文字までにしてください。");
     await api(`/api/teacher/students/${student.id}`, { method: "PATCH", body: { note } });
     console.log(note ? `${student.name}さんの AI へのメモを入れかえました：\n${note}` : `${student.name}さんの AI へのメモを消しました。`);
+  },
+
+  async debate([name], options) {
+    const student = await findStudent(name);
+    if (!options.on && !options.off) {
+      const { debate, items } = await studentData(student);
+      return console.log(`${student.name}さんのディベート練習：${debate ? "あり" : "なし"}（先生のトピック ${items.filter((i) => i.kind === "debate").length} こ）`);
+    }
+    await api(`/api/teacher/students/${student.id}/debate`, { method: "PUT", body: { on: !!options.on } });
+    console.log(`${student.name}さんのディベート練習を${options.on ? "出しました（ホーム。先生のトピックと AI のトピック）" : "しまいました（書いたものは残ります）"}。`);
+  },
+
+  async debates([name], options) {
+    const data = await studentData(await findStudent(name));
+    const days = Number(options.days) || 7;
+    const since = japanDay(-(days - 1));
+    const list = (data.debateAnswers || []).filter((a) => japanDate(a.created_at) >= since).reverse();
+    console.log(`# ${data.student.name}さんのディベート練習（${since} から ${list.length} こ）`);
+    for (const a of list) {
+      const c = a.correction;
+      console.log(`\n[${japanTime(a.created_at)}] ${a.topic}${a.source === "ai" ? "（AI のトピック）" : ""}${a.extra ? "（＋30秒）" : ""}`);
+      console.log(`書いた文：${a.body}`);
+      if (!c) { console.log("添削なし"); continue; }
+      console.log(`直した文：${c.corrected}`);
+      for (const fix of c.corrections || []) console.log(`- ${fix.before} → ${fix.after}：${fix.why}`);
+      if (c.tip) console.log(`もっと伝わるひとこと：${c.tip}`);
+    }
   },
 
   async toeic([name], options) {

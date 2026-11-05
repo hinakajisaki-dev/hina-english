@@ -3,7 +3,9 @@
 //
 // Students sign in with a personal code (kept in an HttpOnly cookie).
 // The teacher signs in with TEACHER_PASSWORD; the cookie holds an HMAC of it.
-import { AiError, correctJournal, correctSentence, judgeAnswer, makeRephraseProblems, makeStarPrompts } from "./ai.js";
+import {
+  AiError, correctJournal, correctSentence, judgeAnswer, makeDebateTopic, makeRephraseProblems, makeStarPrompts,
+} from "./ai.js";
 import { SpeechError, speechFor } from "./speech.js";
 import {
   closeErrors, journalErrorKey, listErrors, markErrorDone, markErrorsSeen, noteStuckJournals, recordError,
@@ -19,7 +21,7 @@ import { noteProblems, noteSentences } from "../public/notes/format.js";
 import { NOTES_FOR_STUDENTS } from "../public/course.js";
 import { MENUS } from "../public/menus.js";
 import {
-  all, ensureSchema, first, isDbBusy, itemRow, japanDay, journalRow, noteRow, now, rephraseRow, run, starRow, studentBundle,
+  all, debateRow, ensureSchema, first, isDbBusy, itemRow, japanDay, journalRow, noteRow, now, rephraseRow, run, starRow, studentBundle,
 } from "./db.js";
 
 const STUDENT_COOKIE = "hl_student";
@@ -38,11 +40,13 @@ const KINDS = {
   // 言い換え問題 (瞬間英作文): the grammar it practises, the Japanese, the English
   // (two or more right answers split by /) and a hint.
   rephrase: { fields: ["group", "ja", "en", "hint"], required: 3 },
+  // ディベート練習 (for students with debate on): a debate statement and its Japanese.
+  debate: { fields: ["topic", "ja"], required: 1 },
 };
 const WEEKS = 24;
 const FIELD_NAMES = {
   word: "単語", meaning: "意味", text: "文", question: "問題", answer: "答え", prompt: "テーマ",
-  group: "文法", ja: "日本語", en: "英語",
+  group: "文法", ja: "日本語", en: "英語", topic: "トピック",
 };
 
 class HttpError extends Error {
@@ -151,6 +155,11 @@ async function route(request, env, url, who, ctx) {
     if (path === "/api/stars/result" && method === "POST") return saveStarResult(request, env, student);
     if (parts[0] === "rephrase" && parts[2] === "correct" && parts.length === 3 && method === "POST") {
       return retryRephrase(env, student, id(1));
+    }
+    if (path === "/api/debate/topic" && method === "POST") return newDebateTopic(env, student);
+    if (path === "/api/debate" && method === "POST") return answerDebate(request, env, student);
+    if (parts[0] === "debate" && parts[2] === "correct" && parts.length === 3 && method === "POST") {
+      return retryDebate(env, student, id(1));
     }
     if (path === "/api/journals" && method === "POST") return newJournal(request, env, student);
     if (parts[0] === "journals" && parts[2] === "correct" && parts.length === 3 && method === "POST") {
@@ -263,6 +272,13 @@ async function route(request, env, url, who, ctx) {
     const student = await findStudent(db, id(2));
     const { on } = await readJson(request);
     await saveSetting(db, student, "write_practice", on === true ? true : null);
+    return json({ on: on === true });
+  }
+  // ディベート練習 on the student's home screen (for one student).
+  if (parts[1] === "students" && parts[3] === "debate" && parts.length === 4 && method === "PUT") {
+    const student = await findStudent(db, id(2));
+    const { on } = await readJson(request);
+    await saveSetting(db, student, "debate", on === true ? true : null);
     return json({ on: on === true });
   }
   // 日記（IELTS問題練習）: the journal as IELTS Speaking Part 1 practice (for one student).
@@ -449,7 +465,7 @@ async function newJournal(request, env, student) {
 // sentences and 授業メモ), the 単語帳, the フレーズ or the grammar lessons'
 // examples, so the endpoint can't be used to voice anything else.
 // (The pronunciation months play the teacher's own recordings instead.)
-const SPOKEN_FIELDS = { vocab: ["word", "example"], pron: ["text"], rephrase: ["en"], topic: ["sample"] };
+const SPOKEN_FIELDS = { vocab: ["word", "example"], pron: ["text"], rephrase: ["en"], topic: ["sample"], debate: ["topic"] };
 const LESSON_SENTENCES = lessonExampleSentences();
 const BOOK_SENTENCES = bookSentences();
 const PHRASE_SENTENCES = phraseSentences();
@@ -459,7 +475,7 @@ async function speech(env, student, text) {
   if (!allowed) {
     const rows = await all(
       env.DB,
-      `SELECT kind, data FROM items WHERE student_id = ? AND kind IN ('vocab', 'pron', 'rephrase', 'topic')`,
+      `SELECT kind, data FROM items WHERE student_id = ? AND kind IN ('vocab', 'pron', 'rephrase', 'topic', 'debate')`,
       student.id,
     );
     allowed = rows.some((row) => {
@@ -786,6 +802,103 @@ async function correctOnce(env, student, journalId) {
   }
   const row = await first(env.DB, `SELECT * FROM journals WHERE id = ?`, journalId);
   return json({ journal: journalRow(row), ai_error: aiError });
+}
+
+// ---------- ディベート練習 ----------
+// For a student with debate on: a debate topic (the teacher's, or one the AI
+// makes), a minute and a half to think, a minute and a half (+30 seconds) to
+// write the opinion, then the AI corrects it like a journal, with one tip.
+
+const DEBATE_TOPICS_PER_DAY = 20;
+const DEBATE_CORRECTED_PER_DAY = 20;
+const debateErrorKey = (answerId) => `debate|${answerId}`;
+const japanDayStart = () => new Date(Date.parse(`${japanDay()}T00:00:00+09:00`)).toISOString();
+
+async function requireDebate(env, student) {
+  if (!(await studentSetting(env.DB, student, "debate"))) throw new HttpError(404, "見つかりません。");
+}
+
+// A topic made by the AI, different from the student's latest ones.
+async function newDebateTopic(env, student) {
+  await requireDebate(env, student);
+  if (!aiEnabled(env)) throw new HttpError(400, "AI がいまは使えません。先生のトピックをえらんでください。");
+  const day = japanDay();
+  const used = await first(env.DB, `SELECT n FROM ai_usage WHERE student_id = ? AND day = ? AND kind = 'debate-topic'`, student.id, day);
+  if ((used?.n ?? 0) >= DEBATE_TOPICS_PER_DAY) throw new HttpError(429, "今日の AI のトピックは、ここまでです。先生のトピックをえらんでください。");
+  await run(
+    env.DB,
+    `INSERT INTO ai_usage (student_id, day, kind, n) VALUES (?, ?, 'debate-topic', 1)
+     ON CONFLICT (student_id, day, kind) DO UPDATE SET n = n + 1`,
+    student.id, day,
+  );
+  const recent = (await all(env.DB, `SELECT topic FROM debate_answers WHERE student_id = ? ORDER BY id DESC LIMIT 15`, student.id)).map((r) => r.topic);
+  try {
+    return json({ topic: await makeDebateTopic(env, { note: student.note, recent }) });
+  } catch (error) {
+    if (!(error instanceof AiError)) throw error;
+    await recordError(env.DB, { kind: "debate", message: `ディベート練習の AI のトピックが作れなかった（生徒の画面：${error.message}）`, detail: error.detail, studentId: student.id });
+    throw new HttpError(502, error.message);
+  }
+}
+
+async function answerDebate(request, env, student) {
+  await requireDebate(env, student);
+  const input = await readJson(request);
+  const text = (value, n) => String(value ?? "").trim().slice(0, n);
+  const topic = text(input.topic, 300).replace(/\s+/g, " ");
+  const body = String(input.body ?? "").replace(/\r\n?/g, "\n").trim();
+  if (!topic) throw new HttpError(400, "トピックがありません。");
+  if (!body) throw new HttpError(400, "英語で書いてから送ってください。");
+  if (body.length > 3000) throw new HttpError(400, "長すぎます。3000文字以内にしてください。");
+  const { meta } = await run(
+    env.DB,
+    `INSERT INTO debate_answers (student_id, topic, topic_ja, source, body, extra, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)`,
+    student.id, topic, text(input.ja, 300), input.source === "ai" ? "ai" : "teacher", body, input.extra ? 1 : 0, now(),
+  );
+  if (!aiEnabled(env)) return json({ answer: debateRow(await first(env.DB, `SELECT * FROM debate_answers WHERE id = ?`, meta.last_row_id)) });
+  return correctDebate(env, student, meta.last_row_id);
+}
+
+// Only an answer with no correction yet (the AI failed) can be sent again.
+async function retryDebate(env, student, answerId) {
+  const row = await first(env.DB, `SELECT * FROM debate_answers WHERE id = ? AND student_id = ?`, answerId, student.id);
+  if (!row) throw new HttpError(404, "見つかりません。");
+  if (row.correction || !aiEnabled(env)) return json({ answer: debateRow(row) });
+  return correctDebate(env, student, answerId);
+}
+
+// Like a journal: the answer is saved before the AI runs, so when the AI fails
+// the student keeps what they wrote and the message comes back as ai_error.
+async function correctDebate(env, student, answerId) {
+  const row = await first(env.DB, `SELECT * FROM debate_answers WHERE id = ?`, answerId);
+  const today = await first(
+    env.DB, `SELECT COUNT(*) AS n FROM debate_answers WHERE student_id = ? AND created_at >= ? AND correction IS NOT NULL`,
+    student.id, japanDayStart(),
+  );
+  if (today.n >= DEBATE_CORRECTED_PER_DAY) {
+    return json({ answer: debateRow(row), ai_error: "今日の添削は、ここまでです。また明日ためしてください。" });
+  }
+  let aiError = null;
+  try {
+    const correction = await correctJournal(env, { body: row.body, topic: row.topic, note: student.note, debate: true });
+    await run(
+      env.DB, `UPDATE debate_answers SET correction = ?, corrected_at = ? WHERE id = ? AND correction IS NULL`,
+      JSON.stringify(correction), now(), answerId,
+    );
+    await closeErrors(env.DB, debateErrorKey(answerId), "もう一度ためして、添削できた");
+  } catch (error) {
+    if (!(error instanceof AiError)) throw error;
+    aiError = error.message;
+    await recordError(env.DB, {
+      kind: "debate",
+      message: `ディベート練習 ${answerId} の添削ができなかった（生徒の画面：${error.message}）`,
+      detail: error.detail,
+      studentId: student.id,
+      ref: String(answerId),
+      key: debateErrorKey(answerId),
+    });
+  }
+  return json({ answer: debateRow(await first(env.DB, `SELECT * FROM debate_answers WHERE id = ?`, answerId)), ai_error: aiError });
 }
 
 // ---------- 言い換え問題 ----------

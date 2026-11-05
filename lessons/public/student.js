@@ -37,7 +37,7 @@ if (PREVIEW) setApiParams({ preview: PREVIEW });
 const app = document.getElementById("app");
 const state = {
   me: null, vocab: null, vocabTest: null, listen: null, review: null, pron: { which: null, index: 0 }, grammar: null, lesson: null, aiError: {},
-  study: null, notes: {}, quiz: null, rephrase: null, rephraseGroup: null, write: null,
+  study: null, notes: {}, quiz: null, rephrase: null, rephraseGroup: null, write: null, debate: null, debatePick: null,
 };
 
 // フレーズ of this student's own books (phrase_books), or スモールトーク.
@@ -79,6 +79,7 @@ function render() {
   if (MENUS.some((m) => m.key === screen) && !shows(screen)) [screen, rest] = ["", []];
   shownAnswer = null;
   closeQuiz();
+  clearInterval(debateClock);
   // Opening a pronunciation month goes to the first phrase that isn't 完了 yet.
   if (screen === "pron") state.pron = { which: null, index: 0 };
   const screens = {
@@ -86,6 +87,7 @@ function render() {
     grammar: renderGrammar, "grammar-review": renderGrammarReview, rephrase: renderRephrase, journal: renderJournal, study: renderStudy,
     ...(NOTES_FOR_STUDENTS ? { notes: renderNotes } : {}),
     ...(state.me.toeic ? { toeic: renderToeic } : {}),
+    ...(state.me.debate ? { debate: renderDebate } : {}),
   };
   (screens[screen] || renderHome)(...rest.map(decodeURIComponent));
 }
@@ -455,6 +457,9 @@ function renderHome() {
             <div><b>${rephraseTitle}</b>
               <p class="muted">${rephraseDone ? `今日はクリア！（${rephrased} 問）おかわりもできます` : `今日 ${rephrased} / ${REPHRASE_GOAL}`}</p>
               ${rephraseDone ? "" : `<div class="bar"><i style="width:${Math.round((rephrased / REPHRASE_GOAL) * 100)}%"></i></div>`}</div>` },
+          state.me.debate && { key: "debate", wide: true, html: `
+            <span class="emoji" aria-hidden="true">🗣️</span>
+            <div><b>ディベート練習</b><p class="muted">1:30 考えて、1:30 で書く${debateToday() ? ` ・ 今日 ${debateToday()} 回` : ""}</p></div>` },
           NOTES_FOR_STUDENTS && { key: "notes", wide: true, html: `
             <span class="emoji" aria-hidden="true">📝</span>
             <div><b>授業メモ</b><p class="muted">${[
@@ -3606,6 +3611,253 @@ function renderTeacherProblems() {
     g.queue.shift();
     g.answer = null;
     renderTeacherProblems();
+  });
+}
+
+// ---------- ディベート練習 ----------
+// For a student with debate on (the teacher's switch): a debate topic, the
+// teacher's (items of kind debate, in a shuffled order of the day; 別のトピック
+// goes to the next) or one the AI makes. 1:30 to think (it goes on to writing by
+// itself, or スキップ), then 1:30 to write; at the end the text stops, and ＋30秒
+// gives half a minute more, once. 送る has the AI correct it like a journal,
+// with one tip (もっと伝わるひとこと).
+
+const DEBATE_SECONDS = 90;
+const DEBATE_EXTRA = 30;
+let debateClock = null;
+const debateTopics = () => items("debate").map((t) => ({ topic: t.data.topic, ja: t.data.ja || "", source: "teacher" }));
+const debateToday = () => {
+  const start = startOfJapanDay();
+  return (state.me.debateAnswers || []).filter((a) => new Date(a.created_at) >= start).length;
+};
+const clockText = (ms) => {
+  const s = Math.max(0, Math.ceil(ms / 1000));
+  return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
+};
+
+// The topic on the start screen: the AI's, or the teacher's of the day's order.
+function debatePick() {
+  const pool = debateTopics();
+  const day = japanDayNumber();
+  if (state.debatePick?.day !== day) state.debatePick = { day, step: 0, ai: null };
+  const P = state.debatePick;
+  if (P.ai || !pool.length) return { P, pool, topic: P.ai };
+  const order = topicOrder(day, pool.length);
+  return { P, pool, topic: pool[order[((P.step % pool.length) + pool.length) % pool.length]] };
+}
+
+function renderDebate(id) {
+  if (id) return renderDebateAnswer(Number(id));
+  const D = state.debate;
+  if (D?.phase === "think") return renderDebateThink();
+  if (D?.phase === "write" || D?.phase === "sending") return renderDebateWrite();
+  const { P, pool, topic } = debatePick();
+  const past = state.me.debateAnswers || [];
+  app.innerHTML = `${topbar("ディベート練習")}
+    <main class="wrap stack">
+      <ol class="debate-steps"><li><b>1:30</b> 考える</li><li><b>1:30</b> 書く<small>（＋30秒）</small></li><li>AI が添削</li></ol>
+      <section class="card stack debate-pick">
+        <p class="label">トピック${topic?.source === "ai" ? "（AI）" : ""}</p>
+        ${topic ? `<div class="debate-topic-row"><p class="debate-topic" lang="en">${esc(topic.topic)}</p>${topic.source === "teacher" ? sayIcon(topic.topic) : ""}</div>
+          ${topic.ja ? `<p class="muted small">${esc(topic.ja)}</p>` : ""}`
+          : `<p class="muted">「AI のトピック」で、トピックを作ります。</p>`}
+        <div class="topic-actions">
+          ${pool.length > 1 && !P.ai ? `<button type="button" class="btn secondary small-btn" id="debate-next">別のトピック →</button>` : ""}
+          ${P.ai && pool.length ? `<button type="button" class="btn secondary small-btn" id="debate-teacher">先生のトピックにもどる</button>` : ""}
+          ${state.me.ai ? `<button type="button" class="btn secondary small-btn" id="debate-ai">🤖 AI のトピック</button>` : ""}
+        </div>
+      </section>
+      ${topic ? `<button type="button" class="btn block" id="debate-start">スタート（1:30 考える）</button>` : ""}
+      ${past.length ? `<section class="card">
+        <h3>これまでのディベート</h3>
+        <ul class="history">${past.map((a) => `<li><a href="#/debate/${a.id}">
+          <div class="badges"><span class="muted small">${esc(formatDate(a.created_at))}</span>${a.correction ? `<span class="badge">添削ずみ</span>` : ""}</div>
+          <p class="first-line" lang="en">${esc(a.topic)}</p>
+        </a></li>`).join("")}</ul>
+      </section>` : ""}
+    </main>`;
+
+  document.getElementById("debate-next")?.addEventListener("click", () => {
+    P.step += 1;
+    renderDebate();
+  });
+  document.getElementById("debate-teacher")?.addEventListener("click", () => {
+    P.ai = null;
+    renderDebate();
+  });
+  const ai = document.getElementById("debate-ai");
+  ai?.addEventListener("click", async () => {
+    ai.disabled = true;
+    ai.innerHTML = `<span class="spinner" aria-hidden="true"></span>作っています…`;
+    try {
+      const { topic: made } = await api("/api/debate/topic", { method: "POST", body: {} });
+      P.ai = { ...made, source: "ai" };
+      renderDebate();
+    } catch (error) {
+      toast(error.message);
+      ai.disabled = false;
+      ai.textContent = "🤖 AI のトピック";
+    }
+  });
+  document.getElementById("debate-start")?.addEventListener("click", () => {
+    state.debate = { phase: "think", topic, endsAt: Date.now() + DEBATE_SECONDS * 1000, body: "", extra: false };
+    renderDebate();
+  });
+}
+
+// The topic again at the top of the timed screens.
+const debateTopicHtml = (topic) => `<section class="card debate-pick">
+    <p class="debate-topic" lang="en">${esc(topic.topic)}</p>
+    ${topic.ja ? `<p class="muted small">${esc(topic.ja)}</p>` : ""}
+  </section>`;
+
+const timerHtml = (label, D, total) => `<div class="debate-timer" role="timer">
+    <span class="label">${label}</span>
+    <b id="clock">${clockText(D.endsAt - Date.now())}</b>
+    <div class="bar"><i id="clock-bar" style="width:${Math.max(0, Math.min(100, ((D.endsAt - Date.now()) / (total * 1000)) * 100))}%"></i></div>
+  </div>`;
+
+// Counts down on the screen; done() runs once when the time is up.
+function runClock(D, total, done) {
+  clearInterval(debateClock);
+  const tick = () => {
+    const left = D.endsAt - Date.now();
+    const clock = document.getElementById("clock");
+    if (clock) clock.textContent = clockText(left);
+    const bar = document.getElementById("clock-bar");
+    if (bar) bar.style.width = `${Math.max(0, Math.min(100, (left / (total * 1000)) * 100))}%`;
+    if (left <= 0) {
+      clearInterval(debateClock);
+      done();
+    }
+  };
+  debateClock = setInterval(tick, 250);
+  tick();
+}
+
+function renderDebateThink() {
+  const D = state.debate;
+  const toWrite = () => {
+    Object.assign(D, { phase: "write", endsAt: Date.now() + DEBATE_SECONDS * 1000 });
+    renderDebate();
+  };
+  if (Date.now() >= D.endsAt) return toWrite();
+  app.innerHTML = `${topbar("ディベート練習", "#/debate")}
+    <main class="wrap stack">
+      ${timerHtml("① 考える", D, DEBATE_SECONDS)}
+      ${debateTopicHtml(D.topic)}
+      <p class="muted debate-hint">賛成か反対かを決めて、理由を2つ考えよう。<br>時間になると、書く画面に進みます。</p>
+      <button type="button" class="btn secondary block" id="debate-skip">スキップして書く →</button>
+      <button type="button" class="btn ghost block" id="debate-quit">やめる</button>
+    </main>`;
+  document.getElementById("debate-skip").addEventListener("click", toWrite);
+  document.getElementById("debate-quit").addEventListener("click", () => {
+    state.debate = null;
+    renderDebate();
+  });
+  runClock(D, DEBATE_SECONDS, toWrite);
+}
+
+function renderDebateWrite() {
+  const D = state.debate;
+  const total = D.extra ? DEBATE_EXTRA : DEBATE_SECONDS;
+  const over = Date.now() >= D.endsAt;
+  const sending = D.phase === "sending";
+  app.innerHTML = `${topbar("ディベート練習", "#/debate")}
+    <main class="wrap stack">
+      ${over ? `<div class="debate-timer over" role="status"><span class="label">② 書く</span><b>⏰ 時間です</b></div>` : timerHtml(`② 書く${D.extra ? "（＋30秒）" : ""}`, D, total)}
+      ${debateTopicHtml(D.topic)}
+      <form id="debate-form" class="card stack">
+        <textarea name="body" lang="en" rows="8" spellcheck="false" placeholder="I agree / I disagree, because ..." ${over || sending ? "readonly" : ""}>${esc(D.body)}</textarea>
+        <p class="wordcount" id="wordcount">${countWords(D.body)} words</p>
+        ${over && !D.extra && !sending ? `<button type="button" class="btn secondary block" id="debate-more">＋30秒 書く</button>` : ""}
+        <button class="btn block" type="submit" ${sending ? "disabled" : ""}>${sending ? `<span class="spinner" aria-hidden="true"></span>添削中…（30秒〜1分ほど）` : over ? "送る" : "できたら送る"}</button>
+      </form>
+    </main>`;
+  const form = document.getElementById("debate-form");
+  form.body.addEventListener("input", () => {
+    D.body = form.body.value;
+    document.getElementById("wordcount").textContent = `${countWords(D.body)} words`;
+  });
+  if (!over && !sending) form.body.focus();
+  document.getElementById("debate-more")?.addEventListener("click", () => {
+    Object.assign(D, { extra: true, endsAt: Date.now() + DEBATE_EXTRA * 1000 });
+    renderDebate();
+  });
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    if (sending) return;
+    D.body = form.body.value;
+    if (!D.body.trim()) return toast("英語で書いてから送ってください。");
+    clearInterval(debateClock);
+    D.phase = "sending";
+    renderDebateWrite();
+    try {
+      const result = await api("/api/debate", {
+        method: "POST",
+        body: { topic: D.topic.topic, ja: D.topic.ja, source: D.topic.source, body: D.body, extra: D.extra },
+      });
+      (state.me.debateAnswers ||= []).unshift(result.answer);
+      if (result.ai_error) state.aiError[`debate${result.answer.id}`] = result.ai_error;
+      state.debate = null;
+      if (state.debatePick) state.debatePick.ai = null;
+      location.hash = `#/debate/${result.answer.id}`;
+    } catch (error) {
+      toast(error.message);
+      D.phase = "write";
+      renderDebateWrite();
+    }
+  });
+  if (!over && !sending) runClock(D, total, () => renderDebateWrite());
+}
+
+function renderDebateAnswer(id) {
+  const a = (state.me.debateAnswers || []).find((x) => x.id === id);
+  if (!a) {
+    app.innerHTML = `${topbar("ディベート練習", "#/debate")}<main class="wrap stack">${emptyState("見つかりません。")}</main>`;
+    return;
+  }
+  const c = a.correction;
+  const aiError = state.aiError[`debate${a.id}`];
+  const spelling = c && spellingMap(c);
+  const points = c ? shownPoints(c) : [];
+  app.innerHTML = `${topbar(formatDate(a.created_at), "#/debate")}
+    <main class="wrap stack">
+      ${debateTopicHtml({ topic: a.topic, ja: a.topic_ja })}
+      ${c ? `
+        <section class="card stack">
+          <h3>添削した文</h3>
+          <p class="journal-text diff" lang="en">${diffHtml(a.body, c.corrected, spelling)}</p>
+          ${spelling.size ? `<p class="muted small"><ins class="spell">青い字</ins>は、つづりを直したところです。</p>` : ""}
+        </section>
+        ${points.length ? `<section class="card stack">
+          <h3>直したところ</h3>
+          ${points.map((fix) => `<div class="fix">
+            <p class="change" lang="en"><del>${esc(fix.before)}</del><span class="arrow" aria-label="を">→</span><ins>${esc(fix.after)}</ins></p>
+            <p>${esc(fix.why)}</p>
+          </div>`).join("")}
+        </section>` : spelling.size ? "" : `<p class="notice good">まちがいはありませんでした！すばらしい！</p>`}
+        ${c.tip ? `<section class="card band-tip"><p class="label">もっと伝わるひとこと</p><p>💡 ${esc(c.tip)}</p></section>` : ""}
+        <details class="card"><summary>はじめに書いた文を見る</summary><p class="journal-text" lang="en" style="margin-top:10px">${esc(a.body)}</p></details>
+      ` : `
+        ${state.me.ai ? `<p class="notice ${aiError ? "bad" : ""}">${esc(aiError || "まだ添削がありません。")}</p>` : ""}
+        <section class="card"><p class="journal-text" lang="en">${esc(a.body)}</p></section>
+        ${state.me.ai ? `<button class="btn block" id="retry">${aiError ? "もう一度ためす" : "添削してもらう"}</button>` : ""}
+      `}
+      <a class="btn block" href="#/debate">つぎのトピックへ</a>
+    </main>`;
+  const retry = document.getElementById("retry");
+  retry?.addEventListener("click", async () => {
+    retry.disabled = true;
+    retry.innerHTML = `<span class="spinner" aria-hidden="true"></span>添削中…（30秒〜1分ほど）`;
+    try {
+      const result = await api(`/api/debate/${a.id}/correct`, { method: "POST", body: {} });
+      Object.assign(a, result.answer);
+      state.aiError[`debate${a.id}`] = result.ai_error;
+    } catch (error) {
+      state.aiError[`debate${a.id}`] = error.message;
+    }
+    renderDebateAnswer(id);
   });
 }
 

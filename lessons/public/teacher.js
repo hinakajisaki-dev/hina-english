@@ -51,6 +51,13 @@ const KINDS = {
     format: "文法 | 日本語 | 英語（正解が2つ以上は / で区切る） | ヒント（なくてもOK）",
     example: "今日のこと（過去形） | 仕事のあと、スーパーに行きました。 | I went to the supermarket after work.\n自分のこと（現在形） | 姉は毎朝コーヒーを飲みます。 | My sister drinks coffee every morning. | 姉＝my sister",
   },
+  debate: {
+    tab: "ディベート",
+    columns: ["topic", "ja"],
+    required: 1,
+    format: "トピック（英語） | 日本語（なくてもOK）",
+    example: "Working from home is better than working in an office. | 在宅勤務は、オフィスで働くよりいい。\nEveryone should learn to cook. | だれでも料理を覚えるべきだ。",
+  },
   topic: {
     tab: "日記のテーマ",
     columns: ["prompt", "sample"],
@@ -61,7 +68,7 @@ const KINDS = {
 };
 const COLUMN_NAMES = {
   word: "単語", meaning: "意味", text: "文", question: "問題", answer: "答え", prompt: "テーマ",
-  group: "文法", ja: "日本語", en: "英語",
+  group: "文法", ja: "日本語", en: "英語", topic: "トピック",
 };
 
 // ---------- boot and routing ----------
@@ -255,7 +262,8 @@ async function renderStudent(id, tab) {
     ["journals", `日記${unread ? `（未読 ${unread}）` : ""}`],
     ["notes", `授業メモ ${data.notes.length}`],
     ["study", "勉強時間"],
-    ...Object.entries(KINDS).flatMap(([kind, spec]) => [
+    // ディベート only for a student with it on (or with topics already).
+    ...Object.entries(KINDS).filter(([kind]) => kind !== "debate" || data.debate || byKind("debate").length).flatMap(([kind, spec]) => [
       [kind, `${spec.tab} ${byKind(kind).length}`],
       ...(kind === "vocab" ? [["phrases", "フレーズ"]] : []),
     ]),
@@ -626,6 +634,10 @@ function rowHtml(kind, item, progress) {
     main = d.question;
     sub = [`答え：${d.answer}`, d.choices?.length ? `選択肢：${d.choices.join(" / ")}` : "", d.explanation].filter(Boolean).join(" ・ ");
     if (p.right || p.wrong) pill = `<span class="pill">⭕${p.right || 0} ❌${p.wrong || 0}</span>`;
+  } else if (kind === "debate") {
+    main = d.topic; sub = d.ja || "";
+    const n = (state.current.debateAnswers || []).filter((a) => a.topic === d.topic).length;
+    if (n) pill = `<span class="pill">${n}回</span>`;
   } else {
     sub = d.sample ? `答えの例：${d.sample}` : "";
     main = d.prompt;
@@ -692,6 +704,7 @@ function renderItems(panel, kind) {
     ${kind === "vocab" ? vocabResultsHtml() : ""}
     ${kind === "pron" ? pronRecordingsHtml() : ""}
     ${kind === "rephrase" ? rephraseResultsHtml() : ""}
+    ${kind === "debate" ? debateResultsHtml() : ""}
     <section class="card stack">
       ${weekPicker}
       ${bookInfo ? `<p class="notice">${weekName} には、${bookInfo.shared ? "全員共通の単語帳" : `この生徒の単語帳「${esc(bookInfo.title)}」`}（${bookInfo.count} 語）が入っています。ここで足した単語は、この生徒の ${weekName} の最後に加わります。</p>` : ""}
@@ -824,6 +837,25 @@ function renderItems(panel, kind) {
 
 // The student's latest 言い換え問題 answers, with the AI's corrections (shown on
 // the 言い換え問題 tab).
+// ディベート練習: what the student wrote (on the teacher's topics or the AI's) and the corrections.
+function debateResultsHtml() {
+  const answers = state.current.debateAnswers || [];
+  return `<section class="card stack">
+    <h3>生徒が書いたもの（${answers.length}）</h3>
+    ${state.current.debate ? "" : `<p class="notice">この生徒の画面には、まだ出ていません（「設定・コード」の「ディベート練習」）。</p>`}
+    ${answers.length ? `<ul class="rows">${answers.map((a) => {
+      const c = a.correction;
+      return `<li><div class="main stack">
+        <div><b lang="en">${esc(a.topic)}</b> ${a.source === "ai" ? `<span class="pill">AI のトピック</span>` : ""}${a.extra ? ` <span class="pill">＋30秒</span>` : ""}</div>
+        <div class="sub">${esc(formatDateTime(a.created_at))}</div>
+        <p class="journal-text${c ? " diff" : ""}" lang="en">${c ? diffHtml(a.body, c.corrected, spellingMap(c)) : esc(a.body)}</p>
+        ${c ? shownPoints(c).map((fix) => `<div class="fix"><p class="change" lang="en"><del>${esc(fix.before)}</del><span class="arrow">→</span><ins>${esc(fix.after)}</ins></p><p>${esc(fix.why)}</p></div>`).join("") : `<p class="muted small">添削なし</p>`}
+        ${c?.tip ? `<p><b>もっと伝わるひとこと：</b>${esc(c.tip)}</p>` : ""}
+      </div></li>`;
+    }).join("")}</ul>` : `<p class="muted small">まだありません。</p>`}
+  </section>`;
+}
+
 function rephraseResultsHtml() {
   const answers = state.current.rephraseAnswers || [];
   const all = state.current.rephrase || [];
@@ -1113,7 +1145,8 @@ function renderSettings(panel) {
       <div class="menu-picks">${MENUS.map((m) => `<label><input type="checkbox" name="${esc(m.key)}" ${(state.current.hidden || []).includes(m.key) ? "" : "checked"}> ${esc(m.name)}</label>`).join("")}</div>
       <p class="muted small">この生徒だけ：</p>
       <div class="menu-picks"><label><input type="checkbox" name="toeic" ${state.current.toeic ? "checked" : ""}> TOEIC単語（ホームのいちばん上）</label>
-        <label><input type="checkbox" name="journal-ielts" ${state.current.journalIelts ? "checked" : ""}> 日記を「日記（IELTS問題練習）」にする</label></div>
+        <label><input type="checkbox" name="journal-ielts" ${state.current.journalIelts ? "checked" : ""}> 日記を「日記（IELTS問題練習）」にする</label>
+        <label><input type="checkbox" name="debate" ${state.current.debate ? "checked" : ""}> ディベート練習</label></div>
       <button class="btn" type="submit" style="align-self:flex-start">保存</button>
     </form>
     <form class="card stack" id="pron-months">
@@ -1171,6 +1204,8 @@ function renderSettings(panel) {
     try {
       await api(`/api/teacher/students/${student.id}/menus`, { method: "PUT", body: { hidden } });
       if (toeic !== !!state.current.toeic) await api(`/api/teacher/students/${student.id}/toeic`, { method: "PUT", body: { on: toeic } });
+      const debate = menuForm.elements.debate.checked;
+      if (debate !== !!state.current.debate) await api(`/api/teacher/students/${student.id}/debate`, { method: "PUT", body: { on: debate } });
       const journalIelts = menuForm.elements["journal-ielts"].checked;
       if (journalIelts !== !!state.current.journalIelts) {
         await api(`/api/teacher/students/${student.id}/journal-ielts`, { method: "PUT", body: { on: journalIelts } });
