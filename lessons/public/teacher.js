@@ -861,14 +861,16 @@ function renderDebateTab(panel, student) {
 
 function debateResultsHtml(answers) {
   return `<section class="card stack">
-    <h3>生徒が書いたもの（${answers.length}）</h3>
+    <h3>生徒が話したもの（${answers.length}）</h3>
+    <p class="muted small">録音は30日で消えます。下の英語は、AI が聞きとった文の添削です。</p>
     ${answers.length ? `<ul class="rows">${answers.map((a) => {
       const c = a.correction;
       return `<li><div class="main stack">
         <div><b lang="en">${esc(a.topic)}</b> ${a.level ? `<span class="pill">${DEBATE_LEVEL_NAMES[a.level] || ""}</span>` : ""}${a.extra ? ` <span class="pill">＋30秒</span>` : ""}</div>
         <div class="sub">${esc(formatDateTime(a.created_at))}</div>
         ${a.memo ? `<p class="muted small">メモ：${esc(a.memo)}</p>` : ""}
-        <p class="journal-text${c ? " diff" : ""}" lang="en">${c ? diffHtml(a.body, c.corrected, spellingMap(c)) : esc(a.body)}</p>
+        ${a.audio ? `<audio controls preload="none" src="/api/teacher/debate/${a.id}/audio" style="width:100%"></audio>` : `<p class="muted small">録音なし（30日たって消えました）</p>`}
+        <p class="journal-text${c ? " diff" : ""}" lang="en">${c ? diffHtml(a.body, c.corrected, spellingMap(c)) : esc(a.body || "（文字起こしなし）")}</p>
         ${c ? shownPoints(c).map((fix) => `<div class="fix"><p class="change" lang="en"><del>${esc(fix.before)}</del><span class="arrow">→</span><ins>${esc(fix.after)}</ins></p><p>${esc(fix.why)}</p></div>`).join("") : `<p class="muted small">添削なし</p>`}
         ${c?.tip ? `<p><b>もっと伝わるひとこと：</b>${esc(c.tip)}</p>` : ""}
       </div></li>`;

@@ -4,7 +4,7 @@
 // Students sign in with a personal code (kept in an HttpOnly cookie).
 // The teacher signs in with TEACHER_PASSWORD; the cookie holds an HMAC of it.
 import {
-  AiError, correctJournal, correctSentence, judgeAnswer, makeDebateTopic, makeRephraseProblems, makeStarPrompts,
+  AiError, correctJournal, correctSentence, judgeAnswer, makeDebateTopic, makeRephraseProblems, makeStarPrompts, transcribe,
 } from "./ai.js";
 import { SpeechError, speechFor } from "./speech.js";
 import {
@@ -155,7 +155,10 @@ async function route(request, env, url, who, ctx) {
       return retryRephrase(env, student, id(1));
     }
     if (path === "/api/debate/topic" && method === "POST") return newDebateTopic(request, env, student);
-    if (path === "/api/debate" && method === "POST") return answerDebate(request, env, student);
+    if (path === "/api/debate" && method === "POST") return answerDebate(request, env, student, ctx);
+    if (parts[0] === "debate" && parts[2] === "audio" && parts.length === 3 && method === "GET") {
+      return debateAudio(env, await first(env.DB, `SELECT * FROM debate_answers WHERE id = ? AND student_id = ?`, id(1), student.id));
+    }
     if (parts[0] === "debate" && parts[2] === "correct" && parts.length === 3 && method === "POST") {
       return retryDebate(env, student, id(1));
     }
@@ -219,6 +222,7 @@ async function route(request, env, url, who, ctx) {
     if (method === "DELETE") {
       await run(db, `DELETE FROM students WHERE id = ?`, student.id);
       await deleteRecordings(env, `rec/${student.id}/`);
+      await deleteFiles(env, `debate/${student.id}/`);
       return json({ ok: true });
     }
   }
@@ -278,6 +282,10 @@ async function route(request, env, url, who, ctx) {
     const { on } = await readJson(request);
     await saveSetting(db, student, "debate", on === true ? true : null);
     return json({ on: on === true });
+  }
+  // The recording of a 話す・ディベート練習 answer.
+  if (parts[1] === "debate" && parts[3] === "audio" && parts.length === 4 && method === "GET") {
+    return debateAudio(env, await first(db, `SELECT * FROM debate_answers WHERE id = ?`, id(2)));
   }
   // What kind of topics the AI makes for this student (話す・ディベート練習); empty is the usual.
   if (parts[1] === "students" && parts[3] === "debate-note" && parts.length === 4 && method === "PUT") {
@@ -816,13 +824,19 @@ async function correctOnce(env, student, journalId) {
 // ---------- 話す・ディベート練習 ----------
 // For a student with debate on: the AI makes a topic at the level the student
 // picks (debate_topics; the teacher can steer it for one student with debate_note),
-// 1:30 to think (with a memo in Japanese), 1:30 (+30 seconds) to write; then the
-// AI corrects it like a journal, with one tip. Ten topics and ten corrections a day.
+// 1:30 to think (with a memo in Japanese), then 1:30 (+30 seconds) to speak. The
+// recording goes to R2 (FILES, "debate/<student>/<answer>"; D1 keeps only where it
+// is), Whisper writes down what was said, and the AI corrects that like a journal,
+// with one tip. One a day is the goal, three at most; ten topics a day.
+// Recordings are kept 30 days.
 
 const DEBATE_TOPICS_PER_DAY = 10;
-const DEBATE_CORRECTED_PER_DAY = 10;
+const DEBATE_ANSWERS_PER_DAY = 3;
 const DEBATE_LEVELS = [1, 2, 3];
+const DEBATE_KEEP_DAYS = 30;
+const MAX_DEBATE_AUDIO = 6 * 1024 * 1024;
 const debateErrorKey = (answerId) => `debate|${answerId}`;
+const debateAudioKey = (studentId, answerId) => `debate/${studentId}/${answerId}`;
 const japanDayStart = () => new Date(Date.parse(`${japanDay()}T00:00:00+09:00`)).toISOString();
 
 async function requireDebate(env, student) {
@@ -859,57 +873,78 @@ async function newDebateTopic(request, env, student) {
   return json({ topic: { id: meta.last_row_id, level: Number(level), topic: made.topic, ja: made.ja }, left: DEBATE_TOPICS_PER_DAY - used - 1 });
 }
 
-async function answerDebate(request, env, student) {
+// The student's answer: a form with the topic, the memo, extra (＋30秒 used),
+// seconds and the recording (audio). Kept first, then written down and corrected.
+async function answerDebate(request, env, student, ctx) {
   await requireDebate(env, student);
-  const input = await readJson(request);
-  const topic = await first(env.DB, `SELECT * FROM debate_topics WHERE id = ? AND student_id = ?`, Number(input.topic), student.id);
+  if (!env.FILES) throw new HttpError(500, "録音の置き場所の設定がまだです。先生に知らせてください。");
+  const { n } = await first(env.DB, `SELECT COUNT(*) AS n FROM debate_answers WHERE student_id = ? AND created_at >= ?`, student.id, japanDayStart());
+  if (n >= DEBATE_ANSWERS_PER_DAY) throw new HttpError(429, `今日はここまで（${DEBATE_ANSWERS_PER_DAY}回）です。また明日ためしてください。`);
+  if (Number(request.headers.get("Content-Length")) > MAX_DEBATE_AUDIO + 64 * 1024) throw new HttpError(413, "録音が長すぎます。");
+  let form;
+  try {
+    form = await request.formData();
+  } catch {
+    throw new HttpError(400, "録音を送れませんでした。もう一度ためしてください。");
+  }
+  const topic = await first(env.DB, `SELECT * FROM debate_topics WHERE id = ? AND student_id = ?`, Number(form.get("topic")), student.id);
   if (!topic) throw new HttpError(404, "そのトピックは見つかりません。");
-  const body = String(input.body ?? "").replace(/\r\n?/g, "\n").trim();
-  if (!body) throw new HttpError(400, "英語で書いてから送ってください。");
-  if (body.length > 3000) throw new HttpError(400, "長すぎます。3000文字以内にしてください。");
-  const memo = String(input.memo ?? "").replace(/\r\n?/g, "\n").trim().slice(0, 1000);
+  const audio = form.get("audio");
+  if (!audio || typeof audio === "string" || !audio.size) throw new HttpError(400, "録音がありません。");
+  const type = String(audio.type || "").split(";")[0].trim().replace(/^video\//, "audio/");
+  if (!RECORDING_TYPES.includes(type)) throw new HttpError(415, "この録音の形式は送れません。");
+  if (audio.size > MAX_DEBATE_AUDIO) throw new HttpError(413, "録音が長すぎます。");
+  const memo = String(form.get("memo") ?? "").replace(/\r\n?/g, "\n").trim().slice(0, 1000);
+  const seconds = Math.max(0, Math.min(150, Number(form.get("seconds")) || 0));
   const { meta } = await run(
     env.DB,
-    `INSERT INTO debate_answers (student_id, topic, topic_ja, level, memo, source, body, extra, created_at) VALUES (?, ?, ?, ?, ?, 'ai', ?, ?, ?)`,
-    student.id, topic.topic, topic.topic_ja, topic.level, memo, body, input.extra ? 1 : 0, now(),
+    `INSERT INTO debate_answers (student_id, topic, topic_ja, level, memo, source, body, extra, audio_type, audio_bytes, seconds, created_at)
+     VALUES (?, ?, ?, ?, ?, 'ai', '', ?, ?, ?, ?, ?)`,
+    student.id, topic.topic, topic.topic_ja, topic.level, memo, form.get("extra") === "1" ? 1 : 0, type, audio.size, seconds, now(),
   );
-  if (!aiEnabled(env)) return json({ answer: debateRow(await first(env.DB, `SELECT * FROM debate_answers WHERE id = ?`, meta.last_row_id)) });
-  return correctDebate(env, student, meta.last_row_id);
+  const answerId = meta.last_row_id;
+  const key = debateAudioKey(student.id, answerId);
+  await env.FILES.put(key, await audio.arrayBuffer(), { httpMetadata: { contentType: type } });
+  await run(env.DB, `UPDATE debate_answers SET audio_key = ? WHERE id = ?`, key, answerId);
+  if (ctx?.waitUntil) ctx.waitUntil(dropOldDebateAudio(env));
+  return transcribeAndCorrect(env, student, answerId);
 }
 
-// Only an answer with no correction yet (the AI failed) can be sent again.
+// Only an answer with no correction yet (writing it down or the AI failed) can be sent again.
 async function retryDebate(env, student, answerId) {
   const row = await first(env.DB, `SELECT * FROM debate_answers WHERE id = ? AND student_id = ?`, answerId, student.id);
   if (!row) throw new HttpError(404, "見つかりません。");
-  if (row.correction || !aiEnabled(env)) return json({ answer: debateRow(row) });
-  return correctDebate(env, student, answerId);
+  if (row.correction) return json({ answer: debateRow(row) });
+  return transcribeAndCorrect(env, student, answerId);
 }
 
-// Like a journal: the answer is saved before the AI runs, so when the AI fails
-// the student keeps what they wrote and the message comes back as ai_error.
-async function correctDebate(env, student, answerId) {
-  const row = await first(env.DB, `SELECT * FROM debate_answers WHERE id = ?`, answerId);
-  const today = await first(
-    env.DB, `SELECT COUNT(*) AS n FROM debate_answers WHERE student_id = ? AND created_at >= ? AND correction IS NOT NULL`,
-    student.id, japanDayStart(),
-  );
-  if (today.n >= DEBATE_CORRECTED_PER_DAY) {
-    return json({ answer: debateRow(row), ai_error: "今日の添削は、ここまでです。また明日ためしてください。" });
-  }
+// Writes down what the student said (if not yet), then corrects it like a journal.
+// A failure goes in the error log, and the student keeps the recording.
+async function transcribeAndCorrect(env, student, answerId) {
+  let row = await first(env.DB, `SELECT * FROM debate_answers WHERE id = ?`, answerId);
   let aiError = null;
   try {
-    const correction = await correctJournal(env, { body: row.body, topic: row.topic, note: student.note, debate: true });
-    await run(
-      env.DB, `UPDATE debate_answers SET correction = ?, corrected_at = ? WHERE id = ? AND correction IS NULL`,
-      JSON.stringify(correction), now(), answerId,
-    );
+    if (!row.body) {
+      const object = row.audio_key && (await env.FILES?.get(row.audio_key));
+      if (!object) throw new AiError("録音が見つかりませんでした。", `R2 にない: ${row.audio_key}`);
+      const text = await transcribe(env, await object.arrayBuffer());
+      await run(env.DB, `UPDATE debate_answers SET body = ? WHERE id = ?`, text, answerId);
+      row = { ...row, body: text };
+    }
+    if (aiEnabled(env)) {
+      const correction = await correctJournal(env, { body: row.body, topic: row.topic, note: student.note, debate: true });
+      await run(
+        env.DB, `UPDATE debate_answers SET correction = ?, corrected_at = ? WHERE id = ? AND correction IS NULL`,
+        JSON.stringify(correction), now(), answerId,
+      );
+    }
     await closeErrors(env.DB, debateErrorKey(answerId), "もう一度ためして、添削できた");
   } catch (error) {
     if (!(error instanceof AiError)) throw error;
     aiError = error.message;
     await recordError(env.DB, {
       kind: "debate",
-      message: `話す・ディベート練習 ${answerId} の添削ができなかった（生徒の画面：${error.message}）`,
+      message: `話す・ディベート練習 ${answerId} の${row.body ? "添削" : "文字起こし"}ができなかった（生徒の画面：${error.message}）`,
       detail: error.detail,
       studentId: student.id,
       ref: String(answerId),
@@ -917,6 +952,28 @@ async function correctDebate(env, student, answerId) {
     });
   }
   return json({ answer: debateRow(await first(env.DB, `SELECT * FROM debate_answers WHERE id = ?`, answerId)), ai_error: aiError });
+}
+
+// The recording of an answer (the student's own, or for the teacher).
+async function debateAudio(env, row) {
+  const object = row?.audio_key && (await env.FILES?.get(row.audio_key));
+  if (!object) throw new HttpError(404, "録音はありません（30日たつと消えます）。");
+  return new Response(object.body, {
+    headers: { "Content-Type": row.audio_type || "audio/webm", "Cache-Control": "private, max-age=3600" },
+  });
+}
+
+// Recordings are kept 30 days: older ones are deleted (a few at a time, after a new one comes in).
+async function dropOldDebateAudio(env) {
+  try {
+    const before = new Date(Date.now() - DEBATE_KEEP_DAYS * 86400e3).toISOString();
+    const old = await all(env.DB, `SELECT id, audio_key FROM debate_answers WHERE audio_key IS NOT NULL AND created_at < ? LIMIT 50`, before);
+    if (!old.length) return;
+    await env.FILES.delete(old.map((r) => r.audio_key));
+    await env.DB.batch(old.map((r) => env.DB.prepare(`UPDATE debate_answers SET audio_key = NULL WHERE id = ?`).bind(r.id)));
+  } catch (error) {
+    console.error("could not drop old recordings", error?.message ?? error);
+  }
 }
 
 // ---------- 言い換え問題 ----------
@@ -1763,6 +1820,17 @@ async function deleteRecordings(env, prefix) {
     const page = await env.AUDIO.list({ prefix, cursor });
     await Promise.all(page.keys.map((k) => env.AUDIO.delete(k.name)));
     cursor = page.list_complete ? null : page.cursor;
+  } while (cursor);
+}
+
+// Every file in R2 under a prefix (a student's 話す・ディベート練習 recordings).
+async function deleteFiles(env, prefix) {
+  if (!env.FILES) return;
+  let cursor;
+  do {
+    const page = await env.FILES.list({ prefix, cursor });
+    if (page.objects.length) await env.FILES.delete(page.objects.map((o) => o.key));
+    cursor = page.truncated ? page.cursor : null;
   } while (cursor);
 }
 

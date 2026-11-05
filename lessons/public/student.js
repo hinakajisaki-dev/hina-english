@@ -2,7 +2,7 @@
 // today's phrase, pronunciation, grammar and the journal with its correction.
 import {
   ApiError, api, diffHtml, esc, formatDate, icons, japanDayNumber,
-  SPEEDS, getSpeed, setApiParams, setSpeed, speak, startOfJapanDay, stopSpeaking, toast, watchErrors,
+  SPEEDS, getSpeed, setApiParams, setSpeed, speak, startOfJapanDay, stopSpeaking, toast, watchErrors, withParams,
 } from "./common.js";
 import { UNITS, findLesson, plain, questionCount } from "./grammar/lessons.js";
 import {
@@ -80,6 +80,7 @@ function render() {
   shownAnswer = null;
   closeQuiz();
   clearInterval(debateClock);
+  if (screen !== "debate") dropDebateRecording();
   // Opening a pronunciation month goes to the first phrase that isn't 完了 yet.
   if (screen === "pron") state.pron = { which: null, index: 0 };
   const screens = {
@@ -365,7 +366,11 @@ function todaysTasks() {
       title: "発音を1文 完了する",
       sub: pronDoneToday() ? "今日の発音はできました" : next ? `${monthLabel(myMonths(), next.month)} ・ ${next.index + 1}文目（${next.index + 1} / ${next.count}）` : "全部の Month が完了しています",
     },
-  ].filter((task) => shows(task.key));
+    state.me.debate && {
+      key: "debate", done: debateToday() >= DEBATE_GOAL, href: "#/debate", title: "話す・ディベート練習を1つ",
+      sub: debateToday() >= DEBATE_GOAL ? "今日はできました" : "トピックについて、1:30 話す",
+    },
+  ].filter((task) => task && shows(task.key));
 }
 
 function renderHome() {
@@ -457,9 +462,11 @@ function renderHome() {
             <div><b>${rephraseTitle}</b>
               <p class="muted">${rephraseDone ? `今日はクリア！（${rephrased} 問）おかわりもできます` : `今日 ${rephrased} / ${REPHRASE_GOAL}`}</p>
               ${rephraseDone ? "" : `<div class="bar"><i style="width:${Math.round((rephrased / REPHRASE_GOAL) * 100)}%"></i></div>`}</div>` },
-          state.me.debate && { key: "debate", wide: true, html: `
-            <span class="emoji" aria-hidden="true">🗣️</span>
-            <div><b>話す・ディベート練習</b><p class="muted">1:30 考えて、1:30 で書く${debateToday() ? ` ・ 今日 ${debateToday()} 回` : ""}</p></div>` },
+          state.me.debate && { key: "debate", wide: true, cls: debateToday() >= DEBATE_GOAL ? "done" : "", html: `
+            <span class="emoji" aria-hidden="true">${debateToday() >= DEBATE_GOAL ? "✅" : "🗣️"}</span>
+            <div><b>話す・ディベート練習</b><p class="muted">${debateToday() >= DEBATE_GOAL
+              ? `今日はクリア！${debateToday() < DEBATE_MAX ? ` おかわり あと ${DEBATE_MAX - debateToday()} 回` : ""}`
+              : "1:30 考えて、1:30 話す ・ 今日 0 / 1"}</p></div>` },
           NOTES_FOR_STUDENTS && { key: "notes", wide: true, html: `
             <span class="emoji" aria-hidden="true">📝</span>
             <div><b>授業メモ</b><p class="muted">${[
@@ -2593,7 +2600,7 @@ async function finishPhrase(key, recording) {
   const query = `key=${encodeURIComponent(key)}${recording ? `&seconds=${recording.seconds.toFixed(1)}` : ""}`;
   let response;
   try {
-    response = await fetch(`/api/pron/done?${query}`, {
+    response = await fetch(withParams(`/api/pron/done?${query}`), {
       method: "POST",
       headers: { "Content-Type": recording ? recording.blob.type : "application/json" },
       body: recording ? recording.blob : "{}",
@@ -3617,10 +3624,11 @@ function renderTeacherProblems() {
 // ---------- 話す・ディベート練習 ----------
 // For a student with debate on (the teacher's switch). The student picks a level
 // and the AI makes a topic (別のトピック: another; ten a day). 1:30 to think,
-// with a memo in Japanese (it goes on to writing by itself, or スキップ); then
-// 1:30 to write, with the memo in sight. At the end the text stops, and ＋30秒
-// gives half a minute more, once. 送る has the AI correct it like a journal,
-// with one tip (もっと伝わるひとこと).
+// with a memo in Japanese (it goes on by itself, or スキップ); then 1:30 to speak,
+// recorded, with the memo in sight. At the end the recording pauses, and ＋30秒
+// gives half a minute more, once. After listening back, 送る: the server keeps the
+// recording, writes down what was said and has the AI correct it like a journal,
+// with one tip (もっと伝わるひとこと). One a day is the goal, three at most.
 
 const DEBATE_SECONDS = 90;
 const DEBATE_EXTRA = 30;
@@ -3631,6 +3639,8 @@ const DEBATE_LEVELS = [
   { level: 3, name: "むずかしい", sub: "賛成・反対" },
 ];
 const DEBATE_KEY = "hina-debate-topic";
+const DEBATE_GOAL = 1;
+const DEBATE_MAX = 3;
 let debateClock = null;
 const debateToday = () => {
   const start = startOfJapanDay();
@@ -3659,13 +3669,17 @@ function renderDebate(id) {
   if (id) return renderDebateAnswer(Number(id));
   const D = state.debate;
   if (D?.phase === "think") return renderDebateThink();
-  if (D?.phase === "write" || D?.phase === "sending") return renderDebateWrite();
+  if (D) return renderDebateSpeak();
   const pick = debatePick();
   const topic = pick.topic;
   const past = state.me.debateAnswers || [];
+  const doneToday = debateToday();
+  const full = doneToday >= DEBATE_MAX;
   app.innerHTML = `${topbar(DEBATE_NAME)}
     <main class="wrap stack">
-      <ol class="debate-steps"><li><b>1:30</b> 考える<small>（日本語でメモ）</small></li><li><b>1:30</b> 書く<small>（＋30秒）</small></li><li>AI が添削</li></ol>
+      <p class="debate-goal ${doneToday >= DEBATE_GOAL ? "done" : ""}">${full ? "今日はここまで（3回）。また明日！"
+        : doneToday >= DEBATE_GOAL ? `✅ 今日はクリア！ おかわりは あと ${DEBATE_MAX - doneToday} 回` : "1日1回が目標（おかわりは3回まで）"}</p>
+      <ol class="debate-steps"><li><b>1:30</b> 考える<small>（日本語でメモ）</small></li><li><b>1:30</b> 話す<small>（＋30秒）</small></li><li>AI が添削</li></ol>
       <section class="card stack debate-pick">
         <p class="label">レベルをえらぶ</p>
         <div class="level-picks" role="group" aria-label="レベル">${DEBATE_LEVELS.map((l) => `<button type="button" class="level-pick" data-level="${l.level}" aria-pressed="${pick.level === l.level}">
@@ -3677,11 +3691,11 @@ function renderDebate(id) {
             : `<p class="muted">レベルをえらんで「トピックを出す」を押すと、AI がトピックを作ります。</p>`}
         </div>
         <div class="topic-actions">
-          <button type="button" class="btn secondary small-btn" id="debate-new">${topic && topic.level === pick.level ? "別のトピック →" : "トピックを出す"}</button>
+          <button type="button" class="btn secondary small-btn" id="debate-new" ${full ? "disabled" : ""}>${topic && topic.level === pick.level ? "別のトピック →" : "トピックを出す"}</button>
           ${pick.left !== null && pick.left !== undefined ? `<span class="muted small">今日あと ${pick.left} 回</span>` : ""}
         </div>
       </section>
-      ${topic && topic.level === pick.level ? `<button type="button" class="btn block" id="debate-start">スタート（1:30 考える）</button>` : ""}
+      ${topic && topic.level === pick.level && !full ? `<button type="button" class="btn block" id="debate-start">スタート（1:30 考える）</button>` : ""}
       ${past.length ? `<section class="card">
         <h3>これまでの練習</h3>
         <ul class="history">${past.map((a) => `<li><a href="#/debate/${a.id}">
@@ -3697,7 +3711,7 @@ function renderDebate(id) {
     renderDebate();
   }));
   const make = document.getElementById("debate-new");
-  make.addEventListener("click", async () => {
+  make?.addEventListener("click", async () => {
     make.disabled = true;
     make.innerHTML = `<span class="spinner" aria-hidden="true"></span>作っています…`;
     try {
@@ -3711,7 +3725,7 @@ function renderDebate(id) {
     }
   });
   document.getElementById("debate-start")?.addEventListener("click", () => {
-    state.debate = { phase: "think", topic, endsAt: Date.now() + DEBATE_SECONDS * 1000, memo: "", body: "", extra: false };
+    state.debate = { phase: "think", topic, endsAt: Date.now() + DEBATE_SECONDS * 1000, memo: "", extra: false };
     renderDebate();
   });
 }
@@ -3749,7 +3763,7 @@ function runClock(D, total, done) {
 function renderDebateThink() {
   const D = state.debate;
   const toWrite = () => {
-    Object.assign(D, { phase: "write", endsAt: Date.now() + DEBATE_SECONDS * 1000 });
+    D.phase = "ready";
     renderDebate();
   };
   if (Date.now() >= D.endsAt) return toWrite();
@@ -3760,8 +3774,8 @@ function renderDebateThink() {
       <label class="field card stack debate-memo"><span>日本語でメモ</span>
         <textarea name="memo" rows="5" placeholder="言いたいこと・理由・例を、日本語でメモ">${esc(D.memo)}</textarea>
       </label>
-      <p class="muted small debate-hint">時間になると、書く画面に進みます。</p>
-      <button type="button" class="btn secondary block" id="debate-skip">スキップして書く →</button>
+      <p class="muted small debate-hint">時間になると、話す画面に進みます。</p>
+      <button type="button" class="btn secondary block" id="debate-skip">スキップして話す →</button>
       <button type="button" class="btn ghost block" id="debate-quit">やめる</button>
     </main>`;
   const memo = app.querySelector("textarea[name=memo]");
@@ -3775,59 +3789,118 @@ function renderDebateThink() {
   runClock(D, DEBATE_SECONDS, toWrite);
 }
 
-function renderDebateWrite() {
+// Speaking: ready → recording (1:30) → at the end paused, with ＋30秒 once →
+// listen back → 送る (or 録りなおす). D keeps the recorder and the recording.
+function dropDebateRecording() {
+  const D = state.debate;
+  if (D?.recorder && D.recorder.state !== "inactive") {
+    D.discard = true;
+    D.recorder.stop();
+  }
+  if (D?.url) URL.revokeObjectURL(D.url);
+  if (D && (D.recorder || D.url)) Object.assign(D, { recorder: null, blob: null, url: null, phase: D.phase === "think" ? "think" : "ready" });
+}
+
+function renderDebateSpeak() {
   const D = state.debate;
   const total = D.extra ? DEBATE_EXTRA : DEBATE_SECONDS;
-  const over = Date.now() >= D.endsAt;
-  const sending = D.phase === "sending";
+  const head = {
+    ready: `<div class="debate-timer" role="timer"><span class="label">② 話す</span><b>1:30</b></div>`,
+    recording: timerHtml(`<span class="rec-dot" aria-hidden="true"></span> 録音中${D.extra ? "（＋30秒）" : ""}`, D, total),
+    paused: `<div class="debate-timer over" role="status"><span class="label">② 話す</span><b>⏰ 時間です</b></div>`,
+    review: `<div class="debate-timer done" role="status"><span class="label">② 話す</span><b>録音できました</b></div>`,
+    sending: `<div class="debate-timer done" role="status"><span class="label">② 話す</span><b>送っています</b></div>`,
+  }[D.phase];
   app.innerHTML = `${topbar(DEBATE_NAME, "#/debate")}
     <main class="wrap stack">
-      ${over ? `<div class="debate-timer over" role="status"><span class="label">② 書く</span><b>⏰ 時間です</b></div>` : timerHtml(`② 書く${D.extra ? "（＋30秒）" : ""}`, D, total)}
+      ${head}
       ${debateTopicHtml(D.topic)}
       ${D.memo.trim() ? `<section class="card debate-memo-view"><p class="label">メモ</p><p>${noteHtml(D.memo.trim())}</p></section>` : ""}
-      <form id="debate-form" class="card stack">
-        <textarea name="body" lang="en" rows="8" spellcheck="false" placeholder="英語で書こう" ${over || sending ? "readonly" : ""}>${esc(D.body)}</textarea>
-        <p class="wordcount" id="wordcount">${countWords(D.body)} words</p>
-        ${over && !D.extra && !sending ? `<button type="button" class="btn secondary block" id="debate-more">＋30秒 書く</button>` : ""}
-        <button class="btn block" type="submit" ${sending ? "disabled" : ""}>${sending ? `<span class="spinner" aria-hidden="true"></span>添削中…（30秒〜1分ほど）` : over ? "送る" : "できたら送る"}</button>
-      </form>
+      <section class="card stack debate-speak">
+        ${D.phase === "ready" ? `<button type="button" class="rec-button" id="rec-start"><span aria-hidden="true">🎤</span>話しはじめる</button>
+          <p class="muted small" style="text-align:center">押すと録音がはじまります（1:30）。</p>` : ""}
+        ${D.phase === "recording" ? `<button type="button" class="rec-button stop" id="rec-stop"><span aria-hidden="true">■</span>おわる</button>` : ""}
+        ${D.phase === "paused" ? `<button type="button" class="btn secondary block" id="rec-more">＋30秒 話す</button>
+          <button type="button" class="btn block" id="rec-stop">おわる</button>` : ""}
+        ${D.phase === "review" || D.phase === "sending" ? `<audio controls src="${D.url}" class="rec-audio"></audio>
+          <button type="button" class="btn block" id="debate-send" ${D.phase === "sending" ? "disabled" : ""}>${D.phase === "sending"
+            ? `<span class="spinner" aria-hidden="true"></span>文字起こしと添削中…（1分ほど）` : "送る"}</button>
+          ${D.phase === "review" ? `<button type="button" class="btn ghost block" id="rec-again">録りなおす</button>` : ""}` : ""}
+      </section>
     </main>`;
-  const form = document.getElementById("debate-form");
-  form.body.addEventListener("input", () => {
-    D.body = form.body.value;
-    document.getElementById("wordcount").textContent = `${countWords(D.body)} words`;
-  });
-  if (!over && !sending) form.body.focus();
-  document.getElementById("debate-more")?.addEventListener("click", () => {
-    Object.assign(D, { extra: true, endsAt: Date.now() + DEBATE_EXTRA * 1000 });
-    renderDebate();
-  });
-  form.addEventListener("submit", async (event) => {
-    event.preventDefault();
-    if (sending) return;
-    D.body = form.body.value;
-    if (!D.body.trim()) return toast("英語で書いてから送ってください。");
+
+  const finish = () => {
     clearInterval(debateClock);
-    D.phase = "sending";
-    renderDebateWrite();
+    if (D.recorder && D.recorder.state !== "inactive") D.recorder.stop();
+  };
+  document.getElementById("rec-start")?.addEventListener("click", async (event) => {
+    event.currentTarget.disabled = true;
     try {
-      const result = await api("/api/debate", {
-        method: "POST",
-        body: { topic: D.topic.id, memo: D.memo, body: D.body, extra: D.extra },
+      D.recorder = await startRecording((blob, seconds) => {
+        if (D.discard) { D.discard = false; return; }
+        Object.assign(D, { blob, seconds: Math.min(seconds, DEBATE_SECONDS + DEBATE_EXTRA), url: URL.createObjectURL(blob), phase: "review", recorder: null });
+        if (state.debate === D && location.hash.startsWith("#/debate")) renderDebateSpeak();
       });
+      Object.assign(D, { phase: "recording", extra: false, endsAt: Date.now() + DEBATE_SECONDS * 1000 });
+      renderDebateSpeak();
+    } catch (error) {
+      toast(error.message);
+      renderDebateSpeak();
+    }
+  });
+  document.getElementById("rec-stop")?.addEventListener("click", finish);
+  document.getElementById("rec-more")?.addEventListener("click", () => {
+    D.recorder.resume();
+    Object.assign(D, { phase: "recording", extra: true, endsAt: Date.now() + DEBATE_EXTRA * 1000 });
+    renderDebateSpeak();
+  });
+  document.getElementById("rec-again")?.addEventListener("click", () => {
+    if (D.url) URL.revokeObjectURL(D.url);
+    Object.assign(D, { blob: null, url: null, phase: "ready", extra: false });
+    renderDebateSpeak();
+  });
+  document.getElementById("debate-send")?.addEventListener("click", async () => {
+    D.phase = "sending";
+    renderDebateSpeak();
+    const form = new FormData();
+    form.set("topic", String(D.topic.id));
+    form.set("memo", D.memo);
+    form.set("extra", D.extra ? "1" : "0");
+    form.set("seconds", String(Math.round(D.seconds || 0)));
+    form.set("audio", D.blob, `answer.${(D.blob.type.split("/")[1] || "webm").split(";")[0]}`);
+    try {
+      let response;
+      try {
+        response = await fetch(withParams("/api/debate"), { method: "POST", body: form, credentials: "same-origin" });
+      } catch {
+        throw new Error("インターネットにつながっていないようです。");
+      }
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(result.error || "送れませんでした。もう一度ためしてください。");
       (state.me.debateAnswers ||= []).unshift(result.answer);
       if (result.ai_error) state.aiError[`debate${result.answer.id}`] = result.ai_error;
+      if (D.url) URL.revokeObjectURL(D.url);
       state.debate = null;
-      const pick = debatePick();
-      saveDebatePick({ ...pick, topic: null });
+      saveDebatePick({ ...debatePick(), topic: null });
       location.hash = `#/debate/${result.answer.id}`;
     } catch (error) {
       toast(error.message);
-      D.phase = "write";
-      renderDebateWrite();
+      D.phase = "review";
+      renderDebateSpeak();
     }
   });
-  if (!over && !sending) runClock(D, total, () => renderDebateWrite());
+  if (D.phase === "recording") {
+    runClock(D, total, () => {
+      // Time's up: the first time, a pause with ＋30秒 (where the phone can pause a recording).
+      if (!D.extra && typeof D.recorder?.pause === "function") {
+        D.recorder.pause();
+        D.phase = "paused";
+        renderDebateSpeak();
+      } else {
+        finish();
+      }
+    });
+  }
 }
 
 function renderDebateAnswer(id) {
@@ -3843,9 +3916,11 @@ function renderDebateAnswer(id) {
   app.innerHTML = `${topbar(formatDate(a.created_at), "#/debate")}
     <main class="wrap stack">
       ${debateTopicHtml({ topic: a.topic, ja: a.topic_ja })}
+      ${a.audio ? `<section class="card stack"><p class="label">🎤 録音</p><audio controls preload="none" class="rec-audio" src="${withParams(`/api/debate/${a.id}/audio`)}"></audio></section>` : ""}
       ${c ? `
         <section class="card stack">
-          <h3>添削した文</h3>
+          <h3>話したこと（添削）</h3>
+          <p class="muted small">AI が聞きとった文を、直しています。</p>
           <p class="journal-text diff" lang="en">${diffHtml(a.body, c.corrected, spelling)}</p>
           ${spelling.size ? `<p class="muted small"><ins class="spell">青い字</ins>は、つづりを直したところです。</p>` : ""}
         </section>
@@ -3857,11 +3932,11 @@ function renderDebateAnswer(id) {
           </div>`).join("")}
         </section>` : spelling.size ? "" : `<p class="notice good">まちがいはありませんでした！すばらしい！</p>`}
         ${c.tip ? `<section class="card band-tip"><p class="label">もっと伝わるひとこと</p><p>💡 ${esc(c.tip)}</p></section>` : ""}
-        <details class="card"><summary>はじめに書いた文を見る</summary><p class="journal-text" lang="en" style="margin-top:10px">${esc(a.body)}</p></details>
+        <details class="card"><summary>AI が聞きとった文を見る</summary><p class="journal-text" lang="en" style="margin-top:10px">${esc(a.body)}</p></details>
       ` : `
-        ${state.me.ai ? `<p class="notice ${aiError ? "bad" : ""}">${esc(aiError || "まだ添削がありません。")}</p>` : ""}
-        <section class="card"><p class="journal-text" lang="en">${esc(a.body)}</p></section>
-        ${state.me.ai ? `<button class="btn block" id="retry">${aiError ? "もう一度ためす" : "添削してもらう"}</button>` : ""}
+        <p class="notice ${aiError ? "bad" : ""}">${esc(aiError || "まだ添削がありません。")}</p>
+        ${a.body ? `<section class="card"><p class="label">AI が聞きとった文</p><p class="journal-text" lang="en">${esc(a.body)}</p></section>` : ""}
+        <button class="btn block" id="retry">${aiError ? "もう一度ためす" : "添削してもらう"}</button>
       `}
       ${a.memo ? `<details class="card"><summary>メモを見る</summary><p style="margin-top:10px">${noteHtml(a.memo)}</p></details>` : ""}
       <a class="btn block" href="#/debate">つぎのトピックへ</a>
@@ -3869,7 +3944,7 @@ function renderDebateAnswer(id) {
   const retry = document.getElementById("retry");
   retry?.addEventListener("click", async () => {
     retry.disabled = true;
-    retry.innerHTML = `<span class="spinner" aria-hidden="true"></span>添削中…（30秒〜1分ほど）`;
+    retry.innerHTML = `<span class="spinner" aria-hidden="true"></span>文字起こしと添削中…（1分ほど）`;
     try {
       const result = await api(`/api/debate/${a.id}/correct`, { method: "POST", body: {} });
       Object.assign(a, result.answer);

@@ -40,7 +40,7 @@
 // node scripts/teacher.mjs toeic えいし [--on | --off]             (TOEIC単語 at the top of the home screen)
 // node scripts/teacher.mjs debate なおみ [--on | --off]            (話す・ディベート練習 on the home screen)
 // node scripts/teacher.mjs debate-note なおみ [note.txt | --clear] (what kind of topics the AI makes for the student)
-// node scripts/teacher.mjs debates なおみ [--days 7]               (what the student wrote in 話す・ディベート練習, with corrections)
+// node scripts/teacher.mjs debates なおみ [--days 7]               (what the student said in 話す・ディベート練習 (transcript), with corrections)
 // node scripts/teacher.mjs stars なおみ                           (the ★ examples and their お題)
 // node scripts/teacher.mjs lesson-days なおみ [--add 2026-08-03,2026-08-16] [--remove 2026-08-03]   (the numbered lessons)
 //
@@ -711,7 +711,7 @@ const commands = {
       const c = a.correction;
       console.log(`\n[${japanTime(a.created_at)}] ${a.topic}（${levels[a.level] || "レベルなし"}）${a.extra ? "（＋30秒）" : ""}`);
       if (a.memo) console.log(`メモ：${a.memo.replace(/\n/g, " / ")}`);
-      console.log(`書いた文：${a.body}`);
+      console.log(`話したこと（文字起こし）：${a.body || "（なし）"}${a.audio ? "" : "（録音は消えました）"}`);
       if (!c) { console.log("添削なし"); continue; }
       console.log(`直した文：${c.corrected}`);
       for (const fix of c.corrections || []) console.log(`- ${fix.before} → ${fix.after}：${fix.why}`);

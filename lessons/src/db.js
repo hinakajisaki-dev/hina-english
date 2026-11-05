@@ -72,8 +72,9 @@ const SCHEMA = [
     PRIMARY KEY (student_id, step_key)
   )`,
   // 話す・ディベート練習: the topics the AI made for a student (level 1 やさしい・
-  // 2 ふつう・3 むずかしい; ten a day), and what the student wrote on one: the
-  // memo in Japanese from the thinking time, the English and its correction
+  // 2 ふつう・3 むずかしい; ten a day), and the student's answers: the memo in
+  // Japanese from the thinking time, the recording of what they said (in R2:
+  // audio_key; kept 30 days), its transcript (body) and the correction of it
   // (like a journal's, with a tip).
   `CREATE TABLE IF NOT EXISTS debate_topics (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -94,6 +95,10 @@ const SCHEMA = [
     source TEXT NOT NULL,
     body TEXT NOT NULL,
     extra INTEGER NOT NULL DEFAULT 0,
+    audio_key TEXT,
+    audio_type TEXT,
+    audio_bytes INTEGER,
+    seconds REAL,
     correction TEXT,
     created_at TEXT NOT NULL,
     corrected_at TEXT
@@ -371,6 +376,8 @@ export function debateRow(row) {
     source: row.source,
     body: row.body,
     extra: !!row.extra,
+    audio: !!row.audio_key,
+    seconds: row.seconds,
     correction: row.correction ? JSON.parse(row.correction) : null,
     created_at: row.created_at,
   };

@@ -78,10 +78,12 @@ This student is practising IELTS Speaking Part 1 in writing: the <topic> is the 
 Also fill "band_tip": one short line in Japanese (about 40 characters at most) with the one thing that would most help this answer reach band 6.5, such as adding a sentence with a reason or an example, or joining ideas with because / although. Don't repeat a correction.
 </ielts_part1>`;
 // 話す・ディベート練習: the topic is a conversation question or a debate statement, and
-// the entry is the student's answer, written in a minute and a half; "tip" is one line on making it clearer.
+// the entry is a transcript of what the student said in a minute and a half; "tip" is
+// one line on making it clearer.
 const DEBATE_NOTE = `<debate>
-This is a timed speaking and debate exercise: the <topic> is a conversation question or a debate statement, and the journal is the student's answer, written in about a minute and a half (so it may be short or unfinished; don't correct it for being short).
-Also fill "tip": one short line in Japanese (about 40 characters at most) with the one thing that would most make this answer clearer or more convincing, such as giving the answer or opinion first, adding a reason or an example, or ending with the opinion again. Don't repeat a correction.
+This is a timed speaking exercise: the <topic> is a conversation question or a debate statement, and the journal is a speech-to-text transcript of the student's spoken answer (about a minute and a half, so it may be short or unfinished; don't correct it for being short).
+It was spoken, not written: never correct punctuation, capital letters, filler words (um, uh, like) or repeated words. The speech-to-text may have misheard a word: when a word only looks wrong because it was probably misheard, leave it.
+Also fill "tip": one short line in Japanese (about 40 characters at most) with the one thing that would most make this answer clearer or more convincing when spoken, such as giving the answer or opinion first, adding a reason or an example, or joining ideas with because / so / but. Don't repeat a correction.
 </debate>`;
 const IELTS_SCHEMA = {
   ...SCHEMA,
@@ -591,4 +593,28 @@ export async function makeStarPrompts(env, { word, meaning, example, ja, note })
     console.error("could not parse star prompts", text?.slice(0, 200));
     throw new AiError("お題を作れませんでした。", `could not parse the prompts (stop_reason ${response.stop_reason}): ${text?.slice(0, 200)}`);
   }
+}
+
+// ---------- speech to text (話す・ディベート練習) ----------
+// What the student said, from their recording, with Workers AI's Whisper. Returns
+// the text, or throws an AiError (the student's recording is kept either way).
+
+function toBase64(bytes) {
+  let binary = "";
+  for (let i = 0; i < bytes.length; i += 0x8000) binary += String.fromCharCode(...bytes.subarray(i, i + 0x8000));
+  return btoa(binary);
+}
+
+export async function transcribe(env, audio) {
+  if (!env.AI) throw new AiError("文字起こしの設定がまだです。先生に知らせてください。", "AI binding がない");
+  const bytes = new Uint8Array(audio);
+  let result;
+  try {
+    result = await env.AI.run("@cf/openai/whisper-large-v3-turbo", { audio: toBase64(bytes), language: "en" });
+  } catch (error) {
+    throw new AiError("文字起こしができませんでした。少し待ってから、もう一度ためしてください。", `Workers AI whisper: ${error?.message ?? error}`);
+  }
+  const text = String(result?.text ?? "").replace(/\s+/g, " ").trim();
+  if (!text) throw new AiError("声が聞きとれませんでした。もう少し大きな声で、もう一度録音してみてください。", "whisper: empty text");
+  return text;
 }

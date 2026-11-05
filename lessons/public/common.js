@@ -13,7 +13,7 @@ let apiParams = "";
 export function setApiParams(params) {
   apiParams = new URLSearchParams(params).toString();
 }
-const withParams = (path) => (apiParams ? `${path}${path.includes("?") ? "&" : "?"}${apiParams}` : path);
+export const withParams = (path) => (apiParams ? `${path}${path.includes("?") ? "&" : "?"}${apiParams}` : path);
 
 export async function api(path, { method = "GET", body } = {}) {
   let response;

@@ -19,6 +19,11 @@
   "kv_namespaces": [
     { "binding": "AUDIO" }
   ],
+  // Files (CLAUDE.md: files go in R2, never in D1): the students' 話す・ディベート練習
+  // recordings, kept 30 days. Like the database, the bucket is made on the first deploy.
+  "r2_buckets": [
+    { "binding": "FILES", "bucket_name": "hina-coaching-files" }
+  ],
   "vars": {
     "AI_MODEL": "claude-opus-5-5",
     // Voice for the audio (one of Deepgram Aura 2's English voices).
