@@ -10,7 +10,7 @@ import {
 import { USUAL_MONTHS, currentMonth, monthLabel, monthPhrases, pronMonths, studentMonths } from "./pron/phrases.js";
 import { CURRENT_WEEK, NOTES_FOR_STUDENTS } from "./course.js";
 import { MENUS } from "./menus.js";
-import { phraseSetKey, phraseSets, phraseWeeks, testSize } from "./phrases/book.js";
+import { phraseSetKey, phraseSets, phraseWeeks, testSize, weekTitle as phraseWeekTitle } from "./phrases/book.js";
 import { lessonDayLabel, lessonList, noteDayLabel, noteHtml, notePages, noteProblems } from "./notes/format.js";
 import { shownPoints, spellingMap } from "./journal/spelling.js";
 import { allTime, bindPanels, formatMinutes, monthPanel, monthStart, summary, today, totalPanel, weekDays, weekPanel, weekStart } from "./study.js";
@@ -73,7 +73,7 @@ async function loadStudents() {
 async function render() {
   const [, page, id, tab] = location.hash.split("/");
   try {
-    if (page === "s" && id) await renderStudent(Number(id), tab || "journals");
+    if (page === "s" && id) await renderStudent(Number(id), tab || "progress");
     else await renderList();
   } catch (error) {
     if (error instanceof ApiError && error.status === 401) return renderLogin();
@@ -252,6 +252,7 @@ async function renderStudent(id, tab) {
   const phraseTested = phraseTestSets.filter((s) => data.phraseTests?.[s.key]).length;
 
   const tabs = [
+    ["progress", "進み具合"],
     ["journals", `日記${unread ? `（未読 ${unread}）` : ""}`],
     ["notes", `授業メモ ${data.notes.length}`],
     ["study", "勉強時間"],
@@ -292,6 +293,7 @@ async function renderStudent(id, tab) {
   bindPlanForm(student);
   const panel = document.getElementById("tab");
   if (tab === "journals") renderJournals(panel);
+  else if (tab === "progress") panel.innerHTML = progressHtml();
   else if (tab === "study") renderStudyTab(panel);
   else if (tab === "settings") renderSettings(panel);
   else if (tab === "notes") renderNotes(panel);
@@ -344,6 +346,132 @@ function bindPlanForm(student) {
       save();
     }
   });
+}
+
+// ---------- 進み具合 ----------
+// How far the student has got, at a glance: each week's 単語 sets and フレーズ
+// sets (✓ with the best score once tested; orange when under 70%), the grammar
+// lessons by unit, the pronunciation months and the diary. The set tested last
+// is ringed. Cards only count once their set's test is done (viewing isn't kept).
+
+const weekTitleFor = (week) => `Week ${week}（${phraseWeekTitle(week, state.current.phraseBooks)}）`;
+const shortDay = (iso) => new Date(iso).toLocaleDateString("ja-JP", { month: "numeric", day: "numeric", weekday: "short", timeZone: "Asia/Tokyo" });
+
+// A chip: label, and the best score when done (r: { best, total, updated_at }).
+function progressChip(label, r, last) {
+  if (!r) return `<span class="pchip">${esc(label)}</span>`;
+  const weak = r.total && r.best / r.total < 0.7;
+  return `<span class="pchip ${weak ? "weak" : "done"}${last ? " last" : ""}" title="${esc(`${shortDay(r.updated_at)} ・ ${r.times} 回`)}">${esc(label)} <b>${r.best}/${r.total}</b></span>`;
+}
+
+const progressBar = (done, of) => `<span class="pbar"><i style="width:${of ? Math.round((done / of) * 100) : 0}%"></i></span><span class="pcount">${done} / ${of}</span>`;
+
+// The latest of results ({ key: { updated_at } }), as [key, result].
+const latest = (results, keys) => keys.map((k) => [k, results[k]]).filter(([, r]) => r)
+  .sort((a, b) => String(b[1].updated_at).localeCompare(String(a[1].updated_at)))[0] || null;
+
+function progressHtml() {
+  const data = state.current;
+  // 単語: the student's sets by week (TOEIC単語's 例文の聞きとり as their own row).
+  const vocabTests = data.vocabTests || {};
+  const sets = vocabSetList(data);
+  const vocabRows = [];
+  for (const set of sets) {
+    const id = `${set.week}${set.listen ? "/listen" : ""}`;
+    let row = vocabRows.find((r) => r.id === id);
+    if (!row) vocabRows.push((row = { id, week: set.week, listen: !!set.listen, sets: [] }));
+    row.sets.push(set);
+  }
+  // The weeks in order, then a pace's weeks, the student's own words, and TOEIC単語 last.
+  const rank = (row) => (typeof row.week === "number" ? 0 : String(row.week).startsWith("p") ? 1 : isToeicWeek(row.week) ? 3 : 2);
+  vocabRows.sort((a, b) => rank(a) - rank(b));
+  const lastVocab = latest(vocabTests, sets.map((s) => s.key));
+  const lastVocabSet = lastVocab && sets.find((s) => s.key === lastVocab[0]);
+  const vocabDone = sets.filter((s) => vocabTests[s.key]).length;
+  const chipLabel = (set) => (set.day ? `Day ${set.number}` : set.week === "mine" || isToeicWeek(set.week) ? set.label.replace(/（.*）$/, "") : `セット${set.number}`);
+
+  // 文法: every lesson by unit.
+  const lessons = data.lessons || {};
+  const ready = UNITS.flatMap((u) => u.lessons.filter((l) => l.steps).map((l) => ({ unit: u, lesson: l })));
+  const grammarDone = ready.filter(({ lesson }) => lessons[lesson.id]).length;
+  const lastLesson = latest(lessons, ready.map(({ lesson }) => lesson.id));
+  const lastLessonInfo = lastLesson && ready.find(({ lesson }) => lesson.id === lastLesson[0]);
+
+  // フレーズ: by week.
+  const phraseTests = data.phraseTests || {};
+  const psets = phraseSetList();
+  const phraseWeeksShown = [...new Set(psets.map((s) => s.week))];
+  const lastPhrase = latest(phraseTests, psets.map((s) => s.key));
+  const lastPhraseSet = lastPhrase && psets.find((s) => s.key === lastPhrase[0]);
+
+  // 発音: the student's months.
+  const months = studentMonths(data.pronMonths);
+
+  // 日記: this month.
+  const month = today().slice(0, 7);
+  const japanDate = (iso) => new Date(new Date(iso).getTime() + 9 * 3600e3).toISOString().slice(0, 10);
+  const diaryDays = new Set((data.journals || []).map((j) => japanDate(j.created_at)).filter((d) => d.startsWith(month))).size;
+  const [y, m] = month.split("-").map(Number);
+  const monthDays = new Date(Date.UTC(y, m, 0)).getUTCDate();
+  const lastDiary = (data.journals || [])[0];
+
+  const lastLine = (text) => `<p class="plast">${text}</p>`;
+  return `<div class="stack progress">
+    <section class="card stack">
+      <div class="phead"><h3>単語カード</h3>${progressBar(vocabDone, sets.length)}</div>
+      ${lastVocab ? lastLine(`最後のテスト：<b>${esc(vocabWeekName(data, lastVocabSet.week))} ・ ${esc(chipLabel(lastVocabSet))}</b>${lastVocabSet.listen ? "（例文の聞きとり）" : ""}　${lastVocab[1].best}/${lastVocab[1].total}（${esc(shortDay(lastVocab[1].updated_at))}）`) : lastLine("まだテストをしていません")}
+      <ul class="prows">${vocabRows.map((row) => {
+        const done = row.sets.filter((s) => vocabTests[s.key]).length;
+        const book = typeof row.week === "number" ? weekBook(row.week, data.vocabBooks) : null;
+        const bookTitle = book && vocabBooks().find((b) => b.id === book && !b.shared)?.title;
+        return `<li>
+          <div class="pname"><b>${esc(vocabWeekName(data, row.week))}${row.listen ? "（聞きとり）" : ""}</b>${bookTitle ? `<small>${esc(bookTitle)}</small>` : ""}<span class="pcount">${done} / ${row.sets.length}</span></div>
+          <div class="pchips">${row.sets.map((s) => progressChip(chipLabel(s), vocabTests[s.key], lastVocab?.[0] === s.key)).join("")}</div>
+        </li>`;
+      }).join("")}</ul>
+      <p class="muted small">✓ はテストをしたセット（ベストの点）。オレンジは 7 割より下。カードを見ただけでは残りません。</p>
+    </section>
+
+    <section class="card stack">
+      <div class="phead"><h3>文法</h3>${progressBar(grammarDone, ready.length)}</div>
+      ${lastLesson ? lastLine(`最後：<b>${esc(lastLessonInfo.unit.title)} ・ ${esc(lastLessonInfo.lesson.title)}</b>　${lastLesson[1].best}/${lastLesson[1].total}（${esc(shortDay(lastLesson[1].updated_at))}）`) : lastLine("まだレッスンをしていません")}
+      <ul class="prows">${UNITS.map((u) => {
+        const ls = u.lessons.filter((l) => l.steps);
+        const done = ls.filter((l) => lessons[l.id]).length;
+        return `<li>
+          <div class="pname"><b>${esc(u.title)}</b><span class="pcount">${done} / ${ls.length}</span></div>
+          <div class="pchips">${ls.map((l) => progressChip(l.theme ? l.theme.name : l.title, lessons[l.id], lastLesson?.[0] === l.id)).join("")}</div>
+        </li>`;
+      }).join("")}</ul>
+      <p class="muted small">文法復習：${(data.grammarReview || []).length} こ</p>
+    </section>
+
+    ${psets.length && !(data.hidden || []).includes("phrases") ? `<section class="card stack">
+      <div class="phead"><h3>フレーズ</h3>${progressBar(psets.filter((s) => phraseTests[s.key]).length, psets.length)}</div>
+      ${lastPhrase ? lastLine(`最後のテスト：<b>${esc(weekTitleFor(lastPhraseSet.week))} ・ ${esc(lastPhraseSet.title)}</b>　${lastPhrase[1].best}/${lastPhrase[1].total}（${esc(shortDay(lastPhrase[1].updated_at))}）`) : lastLine("まだテストをしていません")}
+      <ul class="prows">${phraseWeeksShown.map((week) => {
+        const ws = psets.filter((s) => s.week === week);
+        return `<li>
+          <div class="pname"><b>${esc(weekTitleFor(week))}</b><span class="pcount">${ws.filter((s) => phraseTests[s.key]).length} / ${ws.length}</span></div>
+          <div class="pchips">${ws.map((s) => progressChip(s.title, phraseTests[s.key], lastPhrase?.[0] === s.key)).join("")}</div>
+        </li>`;
+      }).join("")}</ul>
+    </section>` : ""}
+
+    <section class="card stack">
+      <h3>発音課題</h3>
+      <ul class="prows">${months.map((mo) => {
+        const ps = monthPhrases(mo.month);
+        const done = ps.filter((p) => data.pronDone?.[p.key]).length;
+        return `<li><div class="pname"><b>${esc(mo.label)}</b>${progressBar(done, ps.length)}</div></li>`;
+      }).join("")}</ul>
+    </section>
+
+    <section class="card stack">
+      <div class="phead"><h3>日記</h3>${progressBar(diaryDays, monthDays)}</div>
+      ${lastLine(`${m}月に書いた日：${diaryDays} 日${lastDiary ? `　最後：${esc(shortDay(lastDiary.created_at))}` : ""}`)}
+    </section>
+  </div>`;
 }
 
 // ---------- journals ----------
