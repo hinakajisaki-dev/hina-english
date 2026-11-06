@@ -3978,7 +3978,7 @@ function tipBodyHtml(tip) {
       .map((x) => `<span class="tip-chip">${fmt(x)}</span>`).join("")}</div>`).join("")}`;
 }
 const tipCardHtml = (group) => (rephraseTip(group) ? `<section class="card stack tip-card">
-    <p class="label">💡 コツ ・ <span class="tip-group">${esc(group)}</span></p>
+    <p class="label">💡 コツ</p>
     ${tipBodyHtml(rephraseTip(group))}
   </section>` : "");
 const rephraseGroups = () => [...new Set(rephraseItems().map((item) => item.data.group))];
@@ -4080,24 +4080,84 @@ function startRephrase() {
   state.rephrase = { group, extra, before: done, questions: pickRephrase(pool, size), index: 0, answers: [] };
 }
 
-function renderRephrase(page) {
+// The latest answer to each problem (⭕ when right).
+function rephraseLatest() {
+  const last = {};
+  for (const a of state.me.rephrase) if (a.item_id && !(a.item_id in last)) last[a.item_id] = a;
+  return last;
+}
+const rephraseGoing = () => {
+  const R = state.rephrase;
+  return R && R.index < R.questions.length && R.answers.length ? R : null;
+};
+// A grammar's screen: #/rephrase/g/<name>, ぜんぶ #/rephrase/all, ★ 復習 #/rephrase/stars.
+const rephraseHref = (group) => (group === STAR_GROUP ? "#/rephrase/stars" : group ? `#/rephrase/g/${encodeURIComponent(group)}` : "#/rephrase/all");
+const rephraseStats = (list, last = rephraseLatest()) => ({
+  right: list.filter((item) => last[item.id]?.ok).length,
+  tried: list.filter((item) => last[item.id]).length,
+  total: list.length,
+});
+const rephraseTodayBar = (done) => `<div class="lesson-progress rephrase-today ${done >= REPHRASE_GOAL ? "cleared" : ""}">
+    <div class="bar"><i style="width:${Math.min(100, Math.round((done / REPHRASE_GOAL) * 100))}%"></i></div>
+    <span class="counter">${done >= REPHRASE_GOAL ? `✅ 今日はクリア（${done} 問）` : `今日 <b>${done}</b> / ${REPHRASE_GOAL}`}</span>
+  </div>`;
+
+// The first screen, like 発音: a card for each grammar (⭕: problems right the
+// last time), then ぜんぶ and ★ 復習. On the right ✅ 完了 (all ⭕), つづきから
+// (the grammar being practised), or how many are ⭕.
+function renderRephrase(page, arg) {
   if (!rephraseItems().length) {
     app.innerHTML = `${topbar("言い換え問題")}<main class="wrap stack">${emptyState("先生が、問題を用意しています。")}</main>`;
     return;
   }
   if (page === "play") return renderRephrasePlay();
+  if (page === "stars") return renderRephraseStart(STAR_GROUP);
+  if (page === "all") return renderRephraseStart(null);
+  if (page === "g" && rephraseGroups().includes(arg)) return renderRephraseStart(arg);
   const groups = rephraseGroups();
+  const last = rephraseLatest();
+  const going = rephraseGoing();
+  const latest = rephraseItems().find((item) => item.id === state.me.rephrase.find((a) => a.item_id)?.item_id);
+  const current = going ? going.group ?? "" : latest?.data.group;
+  const stars = rephraseStarred();
+  const card = (key, name, list) => {
+    const { right, tried, total } = rephraseStats(list, last);
+    const badge = right === total ? `<span class="badge done">✅ 完了</span>`
+      : key === current && (tried || going) ? `<span class="badge start">つづきから</span>`
+      : `<span class="badge">${right} / ${total}</span>`;
+    return `<a class="lesson-card" href="${rephraseHref(key)}">
+      <div><b>${name}</b><span class="muted small">${total} 問 ・ ⭕ ${right} / ${total}</span></div>
+      ${badge}
+    </a>`;
+  };
+
+  app.innerHTML = `${topbar("言い換え問題")}
+    <main class="wrap stack rephrase-list">
+      <p class="muted">日本語を見て、英語で書こう。<br>1日 <b>${REPHRASE_GOAL} 問</b>でクリア。書いた文には添削がつきます。</p>
+      ${rephraseTodayBar(rephraseToday())}
+      ${groups.map((g) => card(g, esc(g), rephraseItems().filter((item) => item.data.group === g))).join("")}
+      ${groups.length > 1 ? card("", "ぜんぶ<small>（まぜて）</small>", rephraseItems()) : ""}
+      ${stars.length ? `<a class="lesson-card star-card" href="#/rephrase/stars">
+          <div><b>★ 復習</b><span class="muted small">頭に入らない問題 ・ ${stars.length} 問</span></div>
+          ${going?.stars ? `<span class="badge start">つづきから</span>` : `<span class="badge star">★ ${stars.length}</span>`}
+        </a>`
+        : `<div class="lesson-card soon"><div><b>★ 復習</b><span class="muted small">答えのあとの ☆ で、ここに入ります</span></div></div>`}
+    </main>`;
+}
+
+// One grammar (or ぜんぶ, or ★ 復習): its コツ (or the ★ problems), then start.
+function renderRephraseStart(group) {
+  state.rephraseGroup = group;
+  const starMode = group === STAR_GROUP;
   const done = rephraseToday();
   const cleared = done >= REPHRASE_GOAL;
-  const R = state.rephrase;
-  const going = R && R.index < R.questions.length && R.answers.length;
-  const count = (group) => rephraseItems().filter((item) => item.data.group === group).length;
-  const starMode = state.rephraseGroup === STAR_GROUP;
+  const going = rephraseGoing();
+  const resume = going && (going.group ?? null) === group ? going : null;
   const stars = rephraseStarred();
-  const chosen = groups.includes(state.rephraseGroup) ? state.rephraseGroup : null;
-  const starPick = `<button type="button" class="star-pick" data-group="${STAR_GROUP}" aria-pressed="${starMode}">★ 復習<small>${stars.length}</small></button>`;
+  const list = starMode ? stars : rephraseItems().filter((item) => !group || item.data.group === group);
+  const { right, total } = rephraseStats(list);
+  const name = starMode ? "★ 復習" : group ? esc(group) : "ぜんぶ<small>（まぜて）</small>";
   const starList = `<section class="card stack star-list">
-      <p class="label">★ 復習の問題</p>
       ${stars.length ? `<ul class="star-rows">${stars.map((item) => `<li>
           <div><p>${esc(item.data.ja)}</p><span class="muted small">${esc(item.data.group)}</span></div>
           ${rephraseStarIcon(item.id)}
@@ -4105,37 +4165,30 @@ function renderRephrase(page) {
         <p class="muted small">覚えたら <b>★ を押して外そう</b>。</p>`
       : `<p class="muted small">答えのあとで <b>☆ ★ 復習に入れる</b> を押した問題が、ここに入ります。</p>`}
     </section>`;
+  const startLabel = starMode ? `★ 復習をはじめる（${Math.min(stars.length, STAR_ROUND)} 問）`
+    : cleared ? `おかわり（もう ${REPHRASE_GOAL} 問）` : done ? `はじめる（あと ${REPHRASE_GOAL - done} 問でクリア）` : `はじめる（${REPHRASE_GOAL} 問）`;
 
-  app.innerHTML = `${topbar("言い換え問題")}
+  app.innerHTML = `${topbar("言い換え問題", "#/rephrase")}
     <main class="wrap stack">
-      <section class="card stack rephrase-hero ${cleared ? "cleared" : ""}">
-        <h2>${rephraseTitle}</h2>
-        <p class="muted">会話や日記で使う英語（<b>自分のこと・今日のこと・これからのこと</b>）を練習しよう。書いた文には添削がつきます。</p>
-        <div class="lesson-progress">
-          <div class="bar"><i style="width:${Math.min(100, Math.round((done / REPHRASE_GOAL) * 100))}%"></i></div>
-          <span class="counter">${cleared ? `クリア！ 今日 ${done} 問` : `今日 ${done} / ${REPHRASE_GOAL}`}</span>
-        </div>
+      <section class="card stack rephrase-head">
+        <h2>${name}</h2>
+        <p class="muted small">${starMode ? `頭に入らない問題 ・ ${total} 問` : `${total} 問 ・ ⭕ ${right} / ${total}`}</p>
+        ${rephraseTodayBar(done)}
       </section>
-      <section class="stack">
-        <p class="label">文法をえらぶ</p>
-        <div class="group-pick" role="group" aria-label="文法">
-          ${groups.length > 1 ? `<button type="button" data-group="" aria-pressed="${!chosen && !starMode}">ぜんぶ<small>${rephraseItems().length}</small></button>` : ""}
-          ${groups.map((g) => `<button type="button" data-group="${esc(groups.length > 1 ? g : "")}" aria-pressed="${groups.length > 1 ? g === chosen : !starMode}">${esc(g)}<small>${count(g)}</small></button>`).join("")}
-          ${starPick}
-        </div>
-      </section>
-      ${starMode ? starList : tipCardHtml(chosen || (groups.length === 1 ? groups[0] : ""))}
-      ${going ? `<a class="btn block" href="#/rephrase/play">つづける（${R.stars ? "★ 復習 ・ " : ""}${R.index + 1}問目から）</a>` : ""}
-      ${starMode
-        ? (stars.length ? `<button type="button" class="btn ${going ? "secondary" : ""} block" id="start">★ 復習をはじめる（${Math.min(stars.length, STAR_ROUND)} 問）</button>` : "")
-        : `<button type="button" class="btn ${going ? "secondary" : ""} block" id="start">${cleared ? `おかわり（もう ${REPHRASE_GOAL} 問）` : done ? `はじめる（あと ${REPHRASE_GOAL - done} 問でクリア）` : `はじめる（${REPHRASE_GOAL} 問）`}</button>`}
+      ${starMode ? starList : group ? tipCardHtml(group) : ""}
+      ${resume ? `<a class="btn block" href="#/rephrase/play">つづける（${resume.index + 1}問目から）</a>` : ""}
+      ${starMode && !stars.length ? "" : `<button type="button" class="btn ${resume ? "secondary" : ""} block" id="start">${startLabel}</button>`}
     </main>`;
 
-  app.querySelectorAll("[data-group]").forEach((button) => button.addEventListener("click", () => {
-    state.rephraseGroup = button.dataset.group || null;
-    renderRephrase();
-  }));
-  bindRephraseStars(app);
+  // Taking a ★ away here updates the count on the button.
+  bindRephraseStars(app, () => {
+    const start = document.getElementById("start");
+    const n = rephraseStarred().length;
+    if (starMode && start) {
+      start.hidden = !n;
+      start.textContent = `★ 復習をはじめる（${Math.min(n, STAR_ROUND)} 問）`;
+    }
+  });
   document.getElementById("start")?.addEventListener("click", () => {
     startRephrase();
     location.hash = "#/rephrase/play";
@@ -4222,7 +4275,7 @@ function renderRephrasePlay() {
   // The コツ is open when this grammar starts (the first problem, or a new one in ぜんぶ), then folded away.
   const tipOpen = !entry && (R.index === 0 || R.questions[R.index - 1].data.group !== item.data.group);
 
-  app.innerHTML = `${topbar("言い換え問題", "#/rephrase")}
+  app.innerHTML = `${topbar("言い換え問題", rephraseHref(R.group))}
     <main class="wrap stack">
       <div class="lesson-progress" role="progressbar" aria-valuemin="1" aria-valuemax="${size}" aria-valuenow="${n}">
         <div class="bar"><i style="width:${Math.round(barWidth * 100)}%"></i></div>
