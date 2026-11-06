@@ -614,3 +614,29 @@ body.quiz-open .wrap { padding-bottom: 62vh; }
 .rec-audio { width: 100%; }
 .rec-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--bad); margin-right: 2px; animation: rec-blink 1s infinite; }
 @keyframes rec-blink { 50% { opacity: .2; } }
+
+/* 言い換え問題のコツ: the form, then examples as chips. */
+.tip-card { background: var(--sky-soft); border-color: transparent; }
+.tip-group { text-transform: none; letter-spacing: 0; }
+.tip-form { font-weight: 800; font-size: 16px; line-height: 1.6; }
+.tip-examples { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+.tip-chip { font-family: var(--en); font-size: 14px; padding: 3px 10px; border-radius: 99px; background: var(--card); border: 1px solid var(--line); }
+.tip-box { border-radius: 12px; background: var(--sky-soft); padding: 8px 12px; }
+.tip-box summary { cursor: pointer; font-weight: 800; font-size: 14px; color: var(--accent-text); }
+.tip-box[open] summary { margin-bottom: 6px; }
+
+/* 言い換え問題の ★ 復習 */
+.group-pick button.star-pick { border-color: #F0C75E; color: #9A6B00; }
+.group-pick button.star-pick[aria-pressed="true"] { background: #E0A100; border-color: #E0A100; color: #fff; }
+.star-toggle {
+  align-self: flex-start; border: 1px solid var(--line); background: var(--card); color: var(--ink-2);
+  border-radius: 99px; padding: 8px 14px; font-weight: 800; font-size: 14px; cursor: pointer;
+}
+.star-toggle[aria-pressed="true"] { background: #FFF4D6; border-color: #F0C75E; color: #9A6B00; }
+.star-rows { list-style: none; margin: 0; padding: 0; display: grid; }
+.star-rows li { display: flex; align-items: center; gap: 8px; padding: 6px 0; border-top: 1px solid var(--line); }
+.star-rows li:first-child { border-top: 0; }
+.star-rows li > div { flex: 1; min-width: 0; }
+.rephrase-row .row-head { display: flex; align-items: flex-start; gap: 6px; }
+.rephrase-row .row-head p { flex: 1; }
+.rephrase-row .row-head .star-btn { margin: -8px -6px 0 0; }

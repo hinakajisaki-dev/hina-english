@@ -71,6 +71,14 @@ const SCHEMA = [
     added_at TEXT NOT NULL,
     PRIMARY KEY (student_id, step_key)
   )`,
+  // 言い換え問題の ★ 復習: problems (items of kind rephrase) the student starred
+  // ("it doesn't stick"). A ★ stays until the student takes it away, or the problem is deleted.
+  `CREATE TABLE IF NOT EXISTS rephrase_stars (
+    student_id INTEGER NOT NULL REFERENCES students(id) ON DELETE CASCADE,
+    item_id INTEGER NOT NULL REFERENCES items(id) ON DELETE CASCADE,
+    created_at TEXT NOT NULL,
+    PRIMARY KEY (student_id, item_id)
+  )`,
   // 話す・ディベート練習: the topics the AI made for a student (level 1 やさしい・
   // 2 ふつう・3 むずかしい; ten a day), and the student's answers: the memo in
   // Japanese from the thinking time, the recording of what they said (in R2:
@@ -414,7 +422,7 @@ export function noteRow(row) {
 export async function studentBundle(db, studentId) {
   const [
     items, progress, lessonRows, reviewRows, testRows, phraseReviewRows, phraseTestRows, pronRows, studyRows, journals, plan,
-    menus, settings, lessonDays, rephraseRows, starRows, grammarReviewRows, debateRows,
+    menus, settings, lessonDays, rephraseRows, starRows, grammarReviewRows, debateRows, rephraseStarRows,
   ] = await Promise.all([
     all(db, `SELECT * FROM items WHERE student_id = ? ORDER BY id`, studentId),
     all(db, `SELECT * FROM progress WHERE student_id = ?`, studentId),
@@ -445,6 +453,7 @@ export async function studentBundle(db, studentId) {
     all(db, `SELECT * FROM example_stars WHERE student_id = ? ORDER BY created_at`, studentId),
     all(db, `SELECT * FROM grammar_review WHERE student_id = ? ORDER BY added_at`, studentId),
     all(db, `SELECT * FROM debate_answers WHERE student_id = ? ORDER BY id DESC LIMIT 30`, studentId),
+    all(db, `SELECT item_id, created_at FROM rephrase_stars WHERE student_id = ? ORDER BY created_at`, studentId),
   ]);
   const setting = (name) => {
     const row = settings.find((r) => r.name === name);
@@ -499,6 +508,8 @@ export async function studentBundle(db, studentId) {
     journalIelts: !!setting("journal_ielts"),
     debate: !!setting("debate"),
     debateNote: setting("debate_note"),
+    rephraseTips: setting("rephrase_tips") || {},
+    rephraseStars: rephraseStarRows.map((r) => ({ item_id: r.item_id, created_at: r.created_at })),
     debateAnswers: debateRows.map(debateRow),
     grammarReview,
     stars: starRows.map(starRow),

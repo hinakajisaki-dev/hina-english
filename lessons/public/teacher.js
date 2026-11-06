@@ -823,6 +823,8 @@ function renderItems(panel, kind) {
     ${kind === "vocab" ? vocabResultsHtml() : ""}
     ${kind === "pron" ? pronRecordingsHtml() : ""}
     ${kind === "rephrase" ? rephraseResultsHtml() : ""}
+    ${kind === "rephrase" ? rephraseStarsHtml() : ""}
+    ${kind === "rephrase" ? rephraseTipsHtml() : ""}
     <section class="card stack">
       ${weekPicker}
       ${bookInfo ? `<p class="notice">${weekName} には、${bookInfo.shared ? "全員共通の単語帳" : `この生徒の単語帳「${esc(bookInfo.title)}」`}（${bookInfo.count} 語）が入っています。ここで足した単語は、この生徒の ${weekName} の最後に加わります。</p>` : ""}
@@ -886,6 +888,7 @@ function renderItems(panel, kind) {
   });
 
   bindStars(panel);
+  bindRephraseTips(student);
   // 言い換え問題: the AI's drafts go in the box above, to read and fix before 追加.
   const make = document.getElementById("ai-make");
   make?.addEventListener("submit", async (event) => {
@@ -1003,6 +1006,60 @@ function debateResultsHtml(answers) {
         ${c?.tip ? `<p><b>もっと伝わるひとこと：</b>${esc(c.tip)}</p>` : ""}
       </div></li>`;
     }).join("")}</ul>` : `<p class="muted small">まだありません。</p>`}
+  </section>`;
+}
+
+// 言い換え問題のコツ: one card a grammar, shown to the student when they pick
+// that grammar and on its problems. Line 1 is the form, the next lines examples
+// (split by ／); **bold** works.
+function rephraseTipsHtml() {
+  const tips = state.current.rephraseTips || {};
+  const groups = [...new Set([...state.current.items.filter((i) => i.kind === "rephrase").map((i) => i.data.group), ...Object.keys(tips)])];
+  if (!groups.length) return "";
+  return `<form class="card stack" id="rephrase-tips">
+    <h3>コツ（文法ごと）</h3>
+    <p class="muted small">1行目が「形」、2行目から例（／で区切る）。**太字** も使えます。空にすると消えます。</p>
+    ${groups.map((g, i) => `<label class="field"><span>${esc(g)}</span>
+      <textarea name="tip-${i}" data-group="${esc(g)}" rows="2" maxlength="600" placeholder="make ＋ A ＋ B ＝ AをBの状態にする&#10;make me happy ／ make English fun">${esc(tips[g] || "")}</textarea>
+    </label>`).join("")}
+    <button class="btn" type="submit" style="align-self:flex-start">コツを保存</button>
+  </form>`;
+}
+
+function bindRephraseTips(student) {
+  const form = document.getElementById("rephrase-tips");
+  form?.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const button = form.querySelector("button");
+    busy(button, "保存中…");
+    const tips = Object.fromEntries([...form.querySelectorAll("textarea[data-group]")].map((t) => [t.dataset.group, t.value]));
+    try {
+      const result = await api(`/api/teacher/students/${student.id}/rephrase-tips`, { method: "PUT", body: { tips } });
+      state.current.rephraseTips = result.tips;
+      toast("コツを保存しました");
+    } catch (error) {
+      toast(error.message);
+    }
+    done(button);
+  });
+}
+
+// ★ 復習: the problems the student starred ("it doesn't stick"), with how the
+// last answer went. The student takes a ★ away themselves.
+function rephraseStarsHtml() {
+  const stars = state.current.rephraseStars || [];
+  const byId = new Map(state.current.items.filter((i) => i.kind === "rephrase").map((i) => [i.id, i]));
+  const rows = stars.map((s) => ({ ...s, item: byId.get(s.item_id) })).filter((s) => s.item);
+  if (!rows.length) return "";
+  const lastOf = (id) => (state.current.rephrase || []).find((a) => a.item_id === id);
+  const mark = (a) => (!a ? "まだ" : a.ok === null ? "添削なし" : a.ok ? "⭕ 正解" : "✏️ まちがい・答えを見た");
+  return `<section class="card stack">
+    <h3>★ 復習（${rows.length}）</h3>
+    <p class="muted small">生徒が「頭に入らない」と ★ をつけた問題です。</p>
+    <ul class="rows">${rows.map((s) => `<li><div class="main">
+      <div><b>${esc(s.item.data.ja)}</b></div>
+      <div class="sub">${esc(s.item.data.group)} ・ 前回：${mark(lastOf(s.item_id))}　（★ ${esc(formatDateTime(s.created_at))}）</div>
+    </div></li>`).join("")}</ul>
   </section>`;
 }
 

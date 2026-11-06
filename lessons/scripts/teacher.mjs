@@ -28,7 +28,9 @@
 // node scripts/teacher.mjs menu なおみ [--only 日記,発音課題,勉強時間 | --all]   (what the home screen shows)
 // node scripts/teacher.mjs journals なおみ diaries.md [--dry]   (past diaries, no AI correction)
 // node scripts/teacher.mjs diaries なおみ [--days 7]           (the latest diaries and their corrections: weak grammar)
-// node scripts/teacher.mjs rephrase なおみ [--days 7]          (言い換え問題: what the student wrote and its corrections)
+// node scripts/teacher.mjs rephrase なおみ [--days 7]          (言い換え問題: what the student wrote and its corrections, and the ★ 復習)
+// node scripts/teacher.mjs rephrase-tips けいじ [tips.md | --clear "make AをBに"]   (言い換え問題のコツ, one a grammar:
+//                                                                 "## 文法" then the form, then example lines split by ／)
 // node scripts/teacher.mjs study-days なおみ days.txt [--dry | --replace | --undo]   (past study time: "2026-09-02 55")
 // node scripts/teacher.mjs pron-months なおみ [--set "1=Month 2" | --default]   (発音 months and their names)
 // node scripts/teacher.mjs pron-done なおみ (--month 1 | --keys m1/01,m1/02) [--day 2026-09-30] [--dry | --undo]
@@ -524,6 +526,50 @@ const commands = {
         for (const fix of c.corrections || []) console.log(`- ${fix.before} → ${fix.after}：${fix.why}`);
       }
     }
+    // ★ 復習: the problems the student starred ("it doesn't stick").
+    const starred = (data.rephraseStars || []).map((s) => problems.find((i) => i.id === s.item_id)).filter(Boolean);
+    if (starred.length) {
+      console.log(`\n## ★ 復習（${starred.length}）`);
+      for (const item of starred) console.log(`- ${item.data.group}・${item.data.ja}`);
+    }
+  },
+
+  // 言い換え問題のコツ. A file has a "## 文法" heading for each grammar (its name as on the
+  // student's button), then the tip: the form on the first line, examples on the next (split by ／).
+  async "rephrase-tips"([name, file], options) {
+    const student = await findStudent(name);
+    const data = await studentData(student);
+    const groups = [...new Set(data.items.filter((i) => i.kind === "rephrase").map((i) => i.data.group))];
+    if (options.clear) {
+      // --clear is a flag, so the grammar's name comes as the next word: rephrase-tips けいじ --clear "make AをBに"
+      if (!file) stop('消す文法の名前を書いてください：--clear "make AをBに"');
+      if (!(data.rephraseTips || {})[file]) stop(`「${file}」のコツはありません。`);
+      const result = await api(`/api/teacher/students/${student.id}/rephrase-tips`, { method: "PUT", body: { tips: { [file]: "" } } });
+      return console.log(`${student.name}さんの「${file}」のコツを消しました（のこり ${Object.keys(result.tips).length} こ）。`);
+    }
+    if (!file) {
+      const tips = data.rephraseTips || {};
+      console.log(`# ${student.name}さんの言い換え問題のコツ（${Object.keys(tips).length} こ）`);
+      for (const g of [...new Set([...groups, ...Object.keys(tips)])]) {
+        console.log(`\n## ${g}${groups.includes(g) ? "" : "（この文法の問題はまだありません）"}\n${tips[g] || "（コツなし）"}`);
+      }
+      return;
+    }
+    const tips = {};
+    let current = null;
+    for (const line of readText(file).split("\n")) {
+      const head = line.match(/^##\s+(.+?)\s*$/);
+      if (head) { current = head[1]; tips[current] = ""; continue; }
+      if (current && line.trim()) tips[current] += `${tips[current] ? "\n" : ""}${line.trim()}`;
+    }
+    const names = Object.keys(tips);
+    if (!names.length) stop("「## 文法」の見出しのあとに、コツを書いてください。");
+    const empty = names.filter((g) => !tips[g]);
+    if (empty.length) stop(`コツがない文法があります：${empty.join("、")}（消すときは --clear "文法"）`);
+    const unknown = names.filter((g) => !groups.includes(g));
+    const result = await api(`/api/teacher/students/${student.id}/rephrase-tips`, { method: "PUT", body: { tips } });
+    console.log(`${student.name}さんの言い換え問題のコツを ${names.length} こ入れました（ぜんぶで ${Object.keys(result.tips).length} こ）。`);
+    if (unknown.length) console.log(`※ この文法の問題は、まだありません（ボタンの名前と同じか確かめてください）：${unknown.join("、")}`);
   },
 
   async "pron-done"([name], options) {
