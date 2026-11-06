@@ -460,14 +460,14 @@ API キーを入れると、そのあとに送られた日記から、AI が 1 �
 | 生徒の添削で「AI の設定に問題があります」 | `ANTHROPIC_API_KEY` が正しいか、Anthropic のクレジットが残っているか。本当の原因は `node scripts/teacher.mjs errors` の「くわしく」に出る |
 | デプロイでデータベースのエラー | Cloudflare の「Storage & Databases」→「D1」で `hina-lessons` を作り、その ID を `wrangler.jsonc` の `d1_databases` に `"database_id"` として書く |
 | 生徒の画面や先生ページで「ただいまサーバーが混み合っています」 | データベース（D1）が答えていない。まず https://www.cloudflarestatus.com/ で D1 の障害を見る（2026-10-29 の夜に数時間あった）。障害なら、直るのを待つだけでよい（データは消えない）。障害がないときは、Worker の「Logs」で `D1_ERROR` の文を見る |
-| 本番に出した（マージした）のに、画面が変わらない | Worker の「Builds」で、いちばん新しいビルドが失敗していないか見る。Cloudflare の障害中に失敗したビルドは、自動ではやり直されないので「Retry」を押す（次に何かを本番に出したときも、いっしょに入る） |
+| 本番に出した（マージした）のに、画面が変わらない | Worker の「Builds」で、いちばん新しいビルドが失敗していないか見る。Cloudflare の障害中に失敗したビルドは、自動ではやり直されないので「Retry」を押す（次に何かを本番に出したときも、いっしょに入る。2026-10-29 と 11-06 にあった） |
 
 ## ファイル
 
 | ファイル | 内容 |
 | --- | --- |
 | `public/index.html`、`student.js`、`student.css` | 生徒の画面 |
-| `public/teacher.html`、`teacher.js`、`teacher.css` | 先生ページ |
+| `public/teacher.html`、`teacher.js`、`teacher.css` | 先生ページ（生徒ごとの進み具合・日記・教材・設定） |
 | `public/common.js`、`app.css` | 両方で使う部品と色 |
 | `public/menus.js` | 生徒のホームに出すものの一覧（生徒ごとに出さないものを選べる） |
 | `public/course.js` | いまの週（ホームと先生ページの、単語とフレーズの進み具合はこの週の分）と、授業メモを生徒に出すかどうか |
