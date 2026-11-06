@@ -485,18 +485,7 @@ body.quiz-open .wrap { padding-bottom: 62vh; }
 .tile.solo { grid-column: 1 / -1; }
 
 /* 言い換え問題 */
-.tile b small, .rephrase-hero h2 small { font-size: 12px; font-weight: 700; color: var(--muted); margin-left: 2px; }
-.rephrase-hero h2 { font-size: 20px; font-weight: 900; }
-.rephrase-hero.cleared { background: var(--good-soft); border-color: transparent; }
-.rephrase-hero.cleared .counter { color: var(--good); font-weight: 900; }
-.group-pick { display: flex; flex-wrap: wrap; gap: 8px; }
-.group-pick button {
-  border: 2px solid var(--line); background: var(--card); color: var(--ink-2); border-radius: 999px;
-  padding: 6px 14px; font-weight: 700; font-size: 15px; cursor: pointer;
-}
-.group-pick button small { font-family: var(--en); font-size: 12px; margin-left: 6px; color: var(--muted); }
-.group-pick button[aria-pressed="true"] { border-color: var(--ink); background: var(--ink); color: #fff; }
-.group-pick button[aria-pressed="true"] small { color: #fff; }
+.tile b small { font-size: 12px; font-weight: 700; color: var(--muted); margin-left: 2px; }
 .q-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
 .verdict.fixed { color: var(--accent-text); }
 .model-answer { background: var(--sky-soft); border-radius: 14px; padding: 10px 14px; display: grid; gap: 4px; }
@@ -614,3 +603,30 @@ body.quiz-open .wrap { padding-bottom: 62vh; }
 .rec-audio { width: 100%; }
 .rec-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--bad); margin-right: 2px; animation: rec-blink 1s infinite; }
 @keyframes rec-blink { 50% { opacity: .2; } }
+
+/* 言い換え問題のコツ: the form, then examples as chips. */
+.tip-card { background: var(--sky-soft); border-color: transparent; }
+.tip-form { font-weight: 800; font-size: 16px; line-height: 1.6; }
+.tip-examples { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+.tip-chip { font-family: var(--en); font-size: 14px; padding: 3px 10px; border-radius: 99px; background: var(--card); border: 1px solid var(--line); }
+.tip-box { border-radius: 12px; background: var(--sky-soft); padding: 8px 12px; }
+.tip-box summary { cursor: pointer; font-weight: 800; font-size: 14px; color: var(--accent-text); }
+.tip-box[open] summary { margin-bottom: 6px; }
+
+/* 言い換え問題: the list of grammars (like 発音), a grammar's screen; 言い換え復習 (★) */
+.rephrase-today .counter b { font-size: 16px; }
+.rephrase-today.cleared .counter { color: var(--good); font-weight: 900; }
+.rephrase-list .lesson-card b small, .rephrase-head h2 small { font-size: 12px; font-weight: 700; color: var(--muted); }
+.rephrase-head h2 { font-size: 22px; font-weight: 900; }
+.star-toggle {
+  align-self: flex-start; border: 1px solid var(--line); background: var(--card); color: var(--ink-2);
+  border-radius: 99px; padding: 8px 14px; font-weight: 800; font-size: 14px; cursor: pointer;
+}
+.star-toggle[aria-pressed="true"] { background: #FFF4D6; border-color: #F0C75E; color: #9A6B00; }
+.star-rows { list-style: none; margin: 0; padding: 0; display: grid; }
+.star-rows li { display: flex; align-items: center; gap: 8px; padding: 6px 0; border-top: 1px solid var(--line); }
+.star-rows li:first-child { border-top: 0; }
+.star-rows li > div { flex: 1; min-width: 0; }
+.rephrase-row .row-head { display: flex; align-items: flex-start; gap: 6px; }
+.rephrase-row .row-head p { flex: 1; }
+.rephrase-row .row-head .star-btn { margin: -8px -6px 0 0; }

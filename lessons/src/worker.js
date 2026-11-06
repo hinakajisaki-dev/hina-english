@@ -148,6 +148,7 @@ async function route(request, env, url, who, ctx) {
       return studentNote(env, student, id(1));
     }
     if (path === "/api/rephrase" && method === "POST") return answerRephrase(request, env, student);
+    if (path === "/api/rephrase/stars" && method === "POST") return saveRephraseStar(request, env, student);
     if (path === "/api/stars" && method === "POST") return saveStar(request, env, student, ctx);
     if (path === "/api/stars/make" && method === "POST") return remakeStar(request, env, student);
     if (path === "/api/stars/result" && method === "POST") return saveStarResult(request, env, student);
@@ -287,6 +288,24 @@ async function route(request, env, url, who, ctx) {
   if (parts[1] === "debate" && parts[3] === "audio" && parts.length === 4 && method === "GET") {
     return debateAudio(env, await first(db, `SELECT * FROM debate_answers WHERE id = ?`, id(2)));
   }
+  // 言い換え問題のコツ: one card a grammar (group) for this student, { "make AをBに": "形\n例 ／ 例" }.
+  // The tips sent are put in (an empty one takes that grammar's tip out); the others stay.
+  if (parts[1] === "students" && parts[3] === "rephrase-tips" && parts.length === 4 && method === "PUT") {
+    const student = await findStudent(db, id(2));
+    const { tips } = await readJson(request);
+    if (!tips || typeof tips !== "object" || Array.isArray(tips)) throw new HttpError(400, "コツが読めませんでした。");
+    const all = (await studentSetting(db, student, "rephrase_tips")) || {};
+    for (const [group, text] of Object.entries(tips)) {
+      const name = String(group).trim().slice(0, 60);
+      const tip = String(text ?? "").replace(/\r\n?/g, "\n").trim().slice(0, 600);
+      if (!name) continue;
+      if (tip) all[name] = tip;
+      else delete all[name];
+    }
+    if (Object.keys(all).length > 60) throw new HttpError(400, "コツが多すぎます（60 こまで）。");
+    await saveSetting(db, student, "rephrase_tips", Object.keys(all).length ? all : null);
+    return json({ tips: all });
+  }
   // What kind of topics the AI makes for this student (話す・ディベート練習); empty is the usual.
   if (parts[1] === "students" && parts[3] === "debate-note" && parts.length === 4 && method === "PUT") {
     const student = await findStudent(db, id(2));
@@ -349,6 +368,7 @@ async function route(request, env, url, who, ctx) {
         db.prepare(`DELETE FROM items WHERE id = ?`).bind(row.id),
         db.prepare(`DELETE FROM vocab_review WHERE student_id = ? AND word_key = ?`).bind(row.student_id, key),
         db.prepare(`DELETE FROM pron_progress WHERE student_id = ? AND phrase_key = ?`).bind(row.student_id, key),
+        db.prepare(`DELETE FROM rephrase_stars WHERE item_id = ?`).bind(row.id),
       ]);
       if (row.kind === "pron") await env.AUDIO.delete(recordingKey(row.student_id, key));
       return json({ ok: true });
@@ -987,6 +1007,19 @@ const REPHRASE_CORRECTED_PER_DAY = 100;
 const rephraseAnswers = (en) => String(en).split(/\/|／/).map((a) => a.trim()).filter(Boolean);
 const rephraseErrorKey = (answerId) => `rephrase|${answerId}`;
 const sameWords = (a, b) => normalizeWords(a).join(" ") === normalizeWords(b).join(" ");
+
+// 言い換え復習 (★): on puts one of the student's problems in (it stays until taken out).
+async function saveRephraseStar(request, env, student) {
+  const { item, on } = await readJson(request);
+  const row = await first(env.DB, `SELECT id FROM items WHERE id = ? AND student_id = ? AND kind = 'rephrase'`, Number(item), student.id);
+  if (!row) throw new HttpError(404, "その問題は見つかりません。");
+  if (on) {
+    await run(env.DB, `INSERT OR IGNORE INTO rephrase_stars (student_id, item_id, created_at) VALUES (?, ?, ?)`, student.id, row.id, now());
+  } else {
+    await run(env.DB, `DELETE FROM rephrase_stars WHERE student_id = ? AND item_id = ?`, student.id, row.id);
+  }
+  return json({ ok: true });
+}
 
 async function answerRephrase(request, env, student) {
   const input = await readJson(request);
