@@ -1008,7 +1008,7 @@ const rephraseAnswers = (en) => String(en).split(/\/|／/).map((a) => a.trim()).
 const rephraseErrorKey = (answerId) => `rephrase|${answerId}`;
 const sameWords = (a, b) => normalizeWords(a).join(" ") === normalizeWords(b).join(" ");
 
-// ★ 復習: on puts one of the student's problems in (it stays until taken out).
+// 言い換え復習 (★): on puts one of the student's problems in (it stays until taken out).
 async function saveRephraseStar(request, env, student) {
   const { item, on } = await readJson(request);
   const row = await first(env.DB, `SELECT id FROM items WHERE id = ? AND student_id = ? AND kind = 'rephrase'`, Number(item), student.id);

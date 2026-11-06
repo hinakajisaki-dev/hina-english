@@ -28,7 +28,7 @@
 // node scripts/teacher.mjs menu なおみ [--only 日記,発音課題,勉強時間 | --all]   (what the home screen shows)
 // node scripts/teacher.mjs journals なおみ diaries.md [--dry]   (past diaries, no AI correction)
 // node scripts/teacher.mjs diaries なおみ [--days 7]           (the latest diaries and their corrections: weak grammar)
-// node scripts/teacher.mjs rephrase なおみ [--days 7]          (言い換え問題: what the student wrote and its corrections, and the ★ 復習)
+// node scripts/teacher.mjs rephrase なおみ [--days 7]          (言い換え問題: what the student wrote and its corrections, and the 言い換え復習 ★)
 // node scripts/teacher.mjs rephrase-tips けいじ [tips.md | --clear "make AをBに"]   (言い換え問題のコツ, one a grammar:
 //                                                                 "## 文法" then the form, then example lines split by ／)
 // node scripts/teacher.mjs study-days なおみ days.txt [--dry | --replace | --undo]   (past study time: "2026-09-02 55")
@@ -526,10 +526,10 @@ const commands = {
         for (const fix of c.corrections || []) console.log(`- ${fix.before} → ${fix.after}：${fix.why}`);
       }
     }
-    // ★ 復習: the problems the student starred ("it doesn't stick").
+    // 言い換え復習: the problems the student starred ("it doesn't stick").
     const starred = (data.rephraseStars || []).map((s) => problems.find((i) => i.id === s.item_id)).filter(Boolean);
     if (starred.length) {
-      console.log(`\n## ★ 復習（${starred.length}）`);
+      console.log(`\n## 言い換え復習（★ ${starred.length}）`);
       for (const item of starred) console.log(`- ${item.data.group}・${item.data.ja}`);
     }
   },

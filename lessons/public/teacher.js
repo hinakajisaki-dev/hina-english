@@ -1044,7 +1044,7 @@ function bindRephraseTips(student) {
   });
 }
 
-// ★ 復習: the problems the student starred ("it doesn't stick"), with how the
+// 言い換え復習: the problems the student starred ("it doesn't stick"), with how the
 // last answer went. The student takes a ★ away themselves.
 function rephraseStarsHtml() {
   const stars = state.current.rephraseStars || [];
@@ -1054,7 +1054,7 @@ function rephraseStarsHtml() {
   const lastOf = (id) => (state.current.rephrase || []).find((a) => a.item_id === id);
   const mark = (a) => (!a ? "まだ" : a.ok === null ? "添削なし" : a.ok ? "⭕ 正解" : "✏️ まちがい・答えを見た");
   return `<section class="card stack">
-    <h3>★ 復習（${rows.length}）</h3>
+    <h3>言い換え復習（★ ${rows.length}）</h3>
     <p class="muted small">生徒が「頭に入らない」と ★ をつけた問題です。</p>
     <ul class="rows">${rows.map((s) => `<li><div class="main">
       <div><b>${esc(s.item.data.ja)}</b></div>

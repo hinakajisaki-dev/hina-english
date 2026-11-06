@@ -613,13 +613,11 @@ body.quiz-open .wrap { padding-bottom: 62vh; }
 .tip-box summary { cursor: pointer; font-weight: 800; font-size: 14px; color: var(--accent-text); }
 .tip-box[open] summary { margin-bottom: 6px; }
 
-/* 言い換え問題: the list of grammars (like 発音), a grammar's screen, and ★ 復習 */
+/* 言い換え問題: the list of grammars (like 発音), a grammar's screen; 言い換え復習 (★) */
 .rephrase-today .counter b { font-size: 16px; }
 .rephrase-today.cleared .counter { color: var(--good); font-weight: 900; }
 .rephrase-list .lesson-card b small, .rephrase-head h2 small { font-size: 12px; font-weight: 700; color: var(--muted); }
 .rephrase-head h2 { font-size: 22px; font-weight: 900; }
-.badge.star { background: #FFF4D6; color: #9A6B00; }
-.lesson-card.star-card { border-color: #F0C75E; }
 .star-toggle {
   align-self: flex-start; border: 1px solid var(--line); background: var(--card); color: var(--ink-2);
   border-radius: 99px; padding: 8px 14px; font-weight: 800; font-size: 14px; cursor: pointer;

@@ -71,7 +71,7 @@ const SCHEMA = [
     added_at TEXT NOT NULL,
     PRIMARY KEY (student_id, step_key)
   )`,
-  // 言い換え問題の ★ 復習: problems (items of kind rephrase) the student starred
+  // 言い換え復習: 言い換え問題 problems (items of kind rephrase) the student starred
   // ("it doesn't stick"). A ★ stays until the student takes it away, or the problem is deleted.
   `CREATE TABLE IF NOT EXISTS rephrase_stars (
     student_id INTEGER NOT NULL REFERENCES students(id) ON DELETE CASCADE,
