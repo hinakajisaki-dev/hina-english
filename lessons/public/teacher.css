@@ -101,3 +101,24 @@ textarea.bulk { font-family: var(--en); min-height: 140px; }
 .plan-head, .plan-foot { display: flex; align-items: baseline; justify-content: space-between; gap: 6px 12px; flex-wrap: wrap; }
 .plan-foot { align-items: center; justify-content: flex-start; }
 .plan-quick textarea { width: 100%; resize: vertical; }
+
+/* 進み具合: rows of chips, one a set or lesson (green ✓ done, orange under 70%, ringed: the latest). */
+.progress .phead { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.progress .phead h3 { margin-right: auto; }
+.pbar { display: inline-block; width: 160px; height: 8px; border-radius: 99px; background: var(--sky-soft); overflow: hidden; vertical-align: middle; }
+.pbar > i { display: block; height: 100%; background: var(--accent); border-radius: 99px; }
+.pcount { font-family: var(--en); font-weight: 800; font-size: 14px; margin-left: 8px; white-space: nowrap; }
+.plast { font-size: 14px; }
+.prows { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.prows > li { display: grid; gap: 6px; padding-top: 10px; border-top: 1px solid var(--line); }
+.prows > li:first-child { padding-top: 0; border-top: 0; }
+.pname { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+.pname small { color: var(--muted); font-size: 12px; }
+.pname .pcount { margin-left: auto; }
+.pchips { display: flex; flex-wrap: wrap; gap: 6px; }
+.pchip { font-size: 12px; padding: 3px 9px; border-radius: 99px; border: 1px solid var(--line); color: var(--muted); background: var(--card); white-space: nowrap; }
+.pchip b { font-family: var(--en); }
+.pchip.done { background: var(--good-soft); border-color: transparent; color: var(--good); }
+.pchip.done::before { content: "✓ "; }
+.pchip.weak { background: #FFF1E0; border-color: transparent; color: #B45309; }
+.pchip.last { outline: 2px solid var(--accent); outline-offset: 1px; }
