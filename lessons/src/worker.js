@@ -1614,7 +1614,7 @@ async function saveVocabBooks(request, db, student) {
     if (!id) continue;
     const book = have.find((b) => b.id === id);
     if (!book) throw new HttpError(400, `「${id}」という単語帳はありません（あるのは ${have.map((b) => b.id).join("・")}）。`);
-    if (String(book.week) !== String(week)) throw new HttpError(400, `${book.title} は Week ${book.week} の単語帳です。`);
+    if (String(book.week) !== String(week)) throw new HttpError(400, `${book.title} は「${book.week}=${book.id}」で入れる単語帳です。`);
     if (!book.shared) clean[book.week] = book.id;
   }
   if (!Object.keys(clean).length) {

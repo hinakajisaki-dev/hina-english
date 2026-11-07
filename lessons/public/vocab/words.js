@@ -20,13 +20,21 @@ import { IELTS3 } from "./ielts3.js";
 import { LINKUP1 } from "./linkup1.js";
 import { LINKUP2 } from "./linkup2.js";
 import { LINKUP3 } from "./linkup3.js";
+import { PP1 } from "./pp1.js";
 
-const BOOKS = [WEEK1, WEEK2, WEEK3, WEEK4, WEEK5, WEEK6, IELTS1, IELTS2, IELTS3, LINKUP1, LINKUP2, LINKUP3];
+const BOOKS = [WEEK1, WEEK2, WEEK3, WEEK4, WEEK5, WEEK6, IELTS1, IELTS2, IELTS3, LINKUP1, LINKUP2, LINKUP3, PP1];
 export const SET_SIZE = 10;
 
 const findBook = (id) => BOOKS.find((b) => b.id === id) || null;
 const sharedBook = (week) => `w${week}`;
 const isShared = (book) => book.id === sharedBook(book.week) && book.everyone !== false;
+
+// What the screens call a week: "Week 3", or the name of a 単語帳 that sits
+// between two weeks (過去分詞 is week 3.5: after Week 3, before Week 4).
+export function weekName(week) {
+  if (Number.isInteger(Number(week))) return `Week ${week}`;
+  return BOOKS.find((b) => String(b.week) === String(week))?.label || `Week ${week}`;
+}
 
 // Every 単語帳: { id, week, title, count, shared } (shared: the one everyone gets that week).
 export const vocabBooks = () =>
@@ -53,6 +61,8 @@ export function bookWords(id) {
       pos: w.pos || group.pos,
       group: group.title,
       examples: w.examples,
+      // 過去分詞: a verb's past and past participle (ppAlso: other right answers).
+      ...(w.past ? { past: w.past, pp: w.pp, ppAlso: w.ppAlso || [] } : {}),
     })),
   );
 }
@@ -156,9 +166,9 @@ export function paceWeeks(items, books, pace) {
     // "1〜40語", or "81〜100語 ＋ Week 4 の 1〜20語" when it runs into the next book.
     const range = [...new Set(part.map((p) => p.week))].map((week, i) => {
       const ns = part.filter((p) => p.week === week).map((p) => p.n);
-      return `${i ? `Week ${week} の ` : ""}${ns[0]}〜${ns.at(-1)}語`;
+      return `${i ? `${weekName(week)} の ` : ""}${ns[0]}〜${ns.at(-1)}語`;
     }).join(" ＋ ");
-    weeks.push({ week: `p${weeks.length + 1}`, words: part.map((p) => p.word), label: `Week ${first} ${"①②③④⑤⑥⑦⑧⑨⑩"[started[first] - 1] || started[first]}`, range });
+    weeks.push({ week: `p${weeks.length + 1}`, words: part.map((p) => p.word), label: `${weekName(first)} ${"①②③④⑤⑥⑦⑧⑨⑩"[started[first] - 1] || started[first]}`, range });
   }
   return weeks;
 }
@@ -220,10 +230,30 @@ export function bookSentences() {
   for (const book of BOOKS) {
     for (const w of bookWords(book.id)) {
       texts.add(speakable(w.word));
+      if (w.past) texts.add(wordVoice(w));
       for (const ex of w.examples) texts.add(ex.en);
     }
   }
   return texts;
+}
+
+// A word as the screens show it: "drink – drank – drunk" for a 過去分詞 verb.
+export const wordText = (w) => (w.past ? `${w.word} – ${w.past} – ${w.pp}` : w.word);
+// What 🔊 reads for a word: its three forms for a 過去分詞 verb ("be, was, were, been").
+export const wordVoice = (w) => (w.past ? [w.word, ...w.past.split("/"), w.pp].map((x) => x.trim()).join(", ") : speakable(w.word));
+
+// The past and past participle typed in the test, each checked against its right
+// answers ("was / were": either, or both; case and spaces don't count).
+export function formsRight(w, past, pp) {
+  const norm = (x) => String(x).toLowerCase().replace(/[’`]/g, "'").trim();
+  const ok = (given, answers) => {
+    const parts = norm(given).split(/\s*(?:\/|,|\bor\b)\s*/).filter(Boolean);
+    return parts.length > 0 && parts.every((p) => answers.includes(p));
+  };
+  return {
+    past: ok(past, w.past.split("/").map(norm)),
+    pp: ok(pp, [w.pp, ...(w.ppAlso || [])].map(norm)),
+  };
 }
 
 // What the voice reads: "〜 off" is "off", "end up ~ing" is "end up", "How long ...?" is "How long?".

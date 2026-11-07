@@ -4,8 +4,8 @@
 import { ApiError, api, diffHtml, esc, formatDateTime, icons, startOfJapanDay, toast, watchErrors } from "./common.js";
 import { UNITS } from "./grammar/lessons.js";
 import {
-  TOEIC_PARTS, bookWeeks, isToeicWeek, itemWeek, listenSetKey, paceWeeks, setKey, toeicPart, toeicWeek, vocabBooks, weekBook, weekWords,
-  wordSets,
+  TOEIC_PARTS, bookWeeks, isToeicWeek, itemWeek, listenSetKey, paceWeeks, setKey, toeicPart, toeicWeek, vocabBooks, weekBook, weekName,
+  weekWords, wordSets,
 } from "./vocab/words.js";
 import { USUAL_MONTHS, currentMonth, monthLabel, monthPhrases, pronMonths, studentMonths } from "./pron/phrases.js";
 import { CURRENT_WEEK, NOTES_FOR_STUDENTS } from "./course.js";
@@ -1138,7 +1138,7 @@ function vocabBooksForm() {
   return `<form class="card stack" id="vocab-books">
     <h3>単語帳</h3>
     <p class="muted small">Week ごとに、この生徒に出す単語帳です。ほかの単語帳にすると、全員共通の単語帳はこの生徒には出ません（覚えた記録は残ります）。生徒ごとのチャットからも変えられます。</p>
-    ${weeks.map((week) => `<label class="field"><span>Week ${week}</span>
+    ${weeks.map((week) => `<label class="field"><span>${esc(weekName(week))}${Number.isInteger(week) ? "" : `（Week ${Math.floor(week)} のあと）`}</span>
       <select name="week-${week}">${vocabBooks().some((b) => b.week === week && b.shared) ? "" : `<option value="">（なし）</option>`}${vocabBooks().filter((b) => b.week === week).map((b) =>
         `<option value="${esc(b.id)}" ${weekBook(week, state.current.vocabBooks) === b.id ? "selected" : ""}>${esc(b.title)}（${b.count} 語${b.shared ? "・全員共通" : ""}）</option>`).join("")}</select>
     </label>`).join("")}
@@ -1171,7 +1171,7 @@ function vocabWeekName(data, week) {
   if (week === "mine") return "生徒が追加した単語";
   if (isToeicWeek(week)) return `TOEIC Part ${toeicPart(week).part}`;
   if (typeof week === "string") return paceWeeks(data.items, data.vocabBooks, data.vocabPace).find((p) => p.week === week)?.label || week;
-  return `Week ${week}`;
+  return weekName(week);
 }
 
 function vocabResultsHtml() {

@@ -6,8 +6,8 @@ import {
 } from "./common.js";
 import { UNITS, findLesson, plain, questionCount } from "./grammar/lessons.js";
 import {
-  TOEIC_PARTS, bookWeeks, isPaceWeek, isToeicWeek, itemWeek, listenSetKey, paceWeeks, setKey, speakable, splitOnForm, toeicPart, toeicWeek,
-  weekWords, wordSets,
+  TOEIC_PARTS, bookWeeks, formsRight, isPaceWeek, isToeicWeek, itemWeek, listenSetKey, paceWeeks, setKey, speakable, splitOnForm, toeicPart,
+  toeicWeek, weekName, weekWords, wordSets, wordText, wordVoice,
 } from "./vocab/words.js";
 import { MONTHS, currentMonth, monthLabel, monthPhrases, studentMonths } from "./pron/phrases.js";
 import { CURRENT_WEEK, NOTES_FOR_STUDENTS } from "./course.js";
@@ -873,7 +873,7 @@ const myPace = () => state.me.vocabPace || null;
 const myPaceWeeks = () => paceWeeks(state.me.items, state.me.vocabBooks, myPace());
 const paceWeek = (week) => myPaceWeeks().find((p) => p.week === week);
 const weekLabel = (week) => (week === "other" ? "そのほか" : week === "mine" ? "自分の単語"
-  : isPaceWeek(week) ? paceWeek(week)?.label || "" : isToeicWeek(week) ? toeicPart(week).title : `Week ${week}`);
+  : isPaceWeek(week) ? paceWeek(week)?.label || "" : isToeicWeek(week) ? toeicPart(week).title : weekName(week));
 // "Week 1 ・ 1. 動詞 ①・②", "Part 1 ・ セット 2" (TOEIC単語), or just "My vocabs" for 自分の単語.
 const setName = (week, set) => (week === "mine" ? set.label
   : isToeicWeek(week) ? `Part ${toeicPart(week).part} ・ ${set.label}` : `${weekLabel(week)} ・ ${set.label}`);
@@ -891,6 +891,9 @@ const studentSetKey = (week, number) => setKey(week, number, state.me.vocabBooks
 function studyWeeks() {
   const pace = myPace();
   const weeks = Array.from({ length: pace ? pace.week : WEEKS }, (_, i) => i + 1);
+  // A 単語帳 between two weeks (過去分詞 is 3.5) after its week (with a pace, it is in the pace weeks).
+  weeks.push(...bookWeeks(state.me.vocabBooks).filter((w) => !Number.isInteger(w) && w < weeks.length));
+  weeks.sort((a, b) => a - b);
   if (pace) weeks.push(...myPaceWeeks().map((p) => p.week));
   if (items("vocab").some((v) => itemWeek(v) === "other")) weeks.push("other");
   return weeks;
@@ -924,6 +927,9 @@ function exampleHtml(ex, { blank = false } = {}) {
 }
 
 const noteHtml = (note) => esc(note).replace(/\n/g, "<br>");
+// A word big on its card: the word, or a 過去分詞 verb's three forms with their names.
+const wordHeadHtml = (word) => (word.past ? `<div class="forms" lang="en">${[["原形", word.word], ["過去形", word.past], ["過去分詞", word.pp]]
+  .map(([name, text]) => `<div><span>${name}</span><b>${esc(text)}</b></div>`).join("")}</div>` : `<p class="word" lang="en">${esc(word.word)}</p>`);
 // 名詞 / 動詞 above an example, when a word's examples use it in different ways.
 const exTag = (ex) => (ex.tag ? `<span class="ex-tag">${esc(ex.tag)}</span>` : "");
 
@@ -1087,7 +1093,8 @@ function renderVocabDay(week, number, tab) {
       ])}
       ${tab === "test" ? `<section class="card stack test-intro">
         <p class="score">${set.words.length}<small> 問</small></p>
-        <p>英語を見て、意味を<b>4つから</b>えらぼう。</p>
+        ${set.words.some((w) => !w.past) ? `<p>英語を見て、意味を<b>4つから</b>えらぼう。</p>` : ""}
+        ${set.words.some((w) => w.past) ? `<p>${set.words.every((w) => w.past) ? "" : "過去分詞の単語は、"}原形を見て、<b>過去形と過去分詞</b>を書こう。</p>` : ""}
         <p class="muted small">まちがえた単語は「復習」に入ります。</p>
         ${result ? `<p><span class="badge done">ベスト ${result.best} / ${result.total}</span></p>` : ""}
         <a class="btn block" href="${base}/test/start">テストをはじめる</a>
@@ -1095,7 +1102,7 @@ function renderVocabDay(week, number, tab) {
       : `<p class="muted small">単語をタップすると、カードが開きます。</p>
       <ol class="vocab-list">${set.words.map((w, i) => `<li><a href="${base}/card/${i + 1}">
         <span class="num">${i + 1}</span>
-        <b lang="en">${esc(w.word)}</b>
+        <b lang="en">${esc(wordText(w))}</b>
         ${place?.index === i ? '<span class="badge start">つづき</span>' : ""}
         <span class="chev" aria-hidden="true">›</span>
       </a></li>`).join("")}</ol>`}
@@ -1127,8 +1134,8 @@ function renderVocabSet(week, number, at) {
       ${V.turned.has(index) ? `<section class="card stack word-card">
         ${word.pos ? `<p class="pos">${esc(word.pos)}</p>` : ""}
         <div class="word-row">
-          <p class="word" lang="en">${esc(word.word)}</p>
-          ${sayIcon(speakable(word.word))}
+          ${wordHeadHtml(word)}
+          ${sayIcon(wordVoice(word))}
         </div>
         <p class="meaning">${noteHtml(word.meaning)}</p>
         ${wordExamplesHtml(word)}
@@ -1142,8 +1149,8 @@ function renderVocabSet(week, number, at) {
       : `<section class="card word-card word-front" id="word-front" role="button" tabindex="0" aria-label="意味と例文を見る">
         ${word.pos ? `<p class="pos">${esc(word.pos)}</p>` : ""}
         <div class="word-row center-row">
-          <p class="word" lang="en">${esc(word.word)}</p>
-          ${sayIcon(speakable(word.word))}
+          ${wordHeadHtml(word)}
+          ${sayIcon(wordVoice(word))}
         </div>
         <p class="hint">タップして、意味と例文を見る</p>
       </section>`}
@@ -1372,7 +1379,8 @@ function renderListenSet(week, number, at) {
 }
 
 // ---------- set test ----------
-// Pick the meaning of each word from four. A miss goes into the 復習 list.
+// Pick the meaning of each word from four; a 過去分詞 verb instead asks for its
+// past and past participle (typed). A miss goes into the 復習 list.
 
 function meaningChoices(word, pool) {
   const others = shuffle(pool.filter((w) => w.word !== word.word && w.meaning !== word.meaning));
@@ -1395,7 +1403,7 @@ function renderVocabTest(week, number) {
     if (pool.length < 4) pool.push(...studentWeekWords(bookWeeks(state.me.vocabBooks)[0] ?? 1));
     state.vocabTest = {
       id,
-      questions: shuffle(set.words).map((word) => ({ word, choices: meaningChoices(word, pool) })),
+      questions: shuffle(set.words).map((word) => (word.past ? { word, forms: true } : { word, choices: meaningChoices(word, pool) })),
       index: 0,
       answers: [],
       saved: false,
@@ -1410,8 +1418,9 @@ function renderVocabTest(week, number) {
 
   if (T.index >= T.questions.length) return renderVocabTestResult(week, set, rerender);
 
-  const { word, choices } = T.questions[T.index];
+  const { word, choices, forms } = T.questions[T.index];
   const answer = T.answers[T.index];
+  if (forms) return renderFormsQuestion(T, word, answer, set, back, rerender);
   app.innerHTML = `${topbar(`テスト ・ ${set.label}`, back)}
     <main class="wrap stack">
       <div class="lesson-progress" role="progressbar" aria-valuemin="1" aria-valuemax="${T.questions.length}" aria-valuenow="${T.index + 1}">
@@ -1457,6 +1466,68 @@ function renderVocabTest(week, number) {
   );
 }
 
+// A 過去分詞 verb in the test: its base form (🔊) and meaning, then the past
+// and past participle typed in two boxes. Right only when both are.
+function renderFormsQuestion(T, word, answer, set, back, rerender) {
+  const mark = (ok) => (ok ? "right" : "wrong");
+  app.innerHTML = `${topbar(`テスト ・ ${set.label}`, back)}
+    <main class="wrap stack">
+      <div class="lesson-progress" role="progressbar" aria-valuemin="1" aria-valuemax="${T.questions.length}" aria-valuenow="${T.index + 1}">
+        <div class="bar"><i style="width:${Math.round((T.index / T.questions.length) * 100)}%"></i></div>
+        <span class="counter">${T.index + 1} / ${T.questions.length}</span>
+      </div>
+      <section class="card stack">
+        <p class="muted"><b>過去形</b>と<b>過去分詞</b>は？</p>
+        <div class="word-row">
+          <p class="word" lang="en">${esc(word.word)}</p>
+          ${sayIcon(speakable(word.word))}
+        </div>
+        <p class="meaning">${esc(word.meaning)}</p>
+        <form id="forms" class="forms-answer">
+          <label><span>過去形</span><input name="past" lang="en" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="next" ${answer ? `value="${esc(answer.past)}" disabled class="${mark(answer.ok.past)}"` : ""}></label>
+          <label><span>過去分詞</span><input name="pp" lang="en" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="done" ${answer ? `value="${esc(answer.pp)}" disabled class="${mark(answer.ok.pp)}"` : ""}></label>
+          ${answer ? "" : `<button class="btn block" type="submit">答える</button>`}
+        </form>
+      </section>
+      ${answer ? `<section class="card stack" id="verdict" aria-live="polite">
+        <p class="verdict ${answer.right ? "right" : "wrong"}">${answer.right ? "⭕ 正解！" : "❌ ざんねん"}</p>
+        <div class="word-row">${wordHeadHtml(word)}${sayIcon(wordVoice(word))}</div>
+        ${answer.right ? "" : `<p class="muted small">復習カードに入れました。</p>`}
+      </section>
+      <div class="lesson-nav"><span></span><button type="button" class="btn" id="next">${T.index === T.questions.length - 1 ? "結果を見る" : "次へ"}</button></div>` : ""}
+    </main>`;
+
+  if (answer) {
+    document.getElementById("next").addEventListener("click", () => {
+      T.index += 1;
+      rerender();
+    });
+    document.getElementById("next").focus();
+    return;
+  }
+  const form = document.getElementById("forms");
+  form.past.focus();
+  // Enter in the first box goes to the second.
+  form.past.addEventListener("keydown", (event) => {
+    if (event.key === "Enter" && !event.isComposing) {
+      event.preventDefault();
+      form.pp.focus();
+    }
+  });
+  form.addEventListener("submit", (event) => {
+    event.preventDefault();
+    const past = form.past.value.trim();
+    const pp = form.pp.value.trim();
+    if (!past) return form.past.focus();
+    if (!pp) return form.pp.focus();
+    const ok = formsRight(word, past, pp);
+    const right = ok.past && ok.pp;
+    T.answers[T.index] = { past, pp, ok, right };
+    if (!right) setReview(word.key, true, "test");
+    rerender();
+  });
+}
+
 function renderVocabTestResult(week, set, rerender) {
   const T = state.vocabTest;
   const score = T.answers.filter((a) => a.right).length;
@@ -1482,7 +1553,7 @@ function renderVocabTestResult(week, set, rerender) {
       </section>
       ${missed.length ? `<section class="card stack">
         <h3>復習カードに入れた単語</h3>
-        <ul class="plain-list">${missed.map((w) => `<li><b lang="en">${esc(w.word)}</b>　${esc(w.meaning)}</li>`).join("")}</ul>
+        <ul class="plain-list">${missed.map((w) => `<li><b lang="en">${esc(wordText(w))}</b>　${esc(w.meaning)}</li>`).join("")}</ul>
       </section>` : ""}
       ${next ? `<a class="btn block" href="${weekHref(week)}/${next.number}">${next.day ? "次の日へ" : "次の10語へ"}（${esc(next.label)}）</a>` : ""}
       <button type="button" class="btn secondary block" id="again">もう一度テスト</button>
@@ -1542,7 +1613,7 @@ function renderReview(level) {
             <div class="word-item-row">
               <button type="button" class="word-item-head" data-open aria-expanded="false">
                 <span class="word-main">
-                  <b lang="en">${esc(w.word)}</b>
+                  <b lang="en">${esc(wordText(w))}</b>
                   <span class="word-open"><span class="when-closed">例文を見る ▾</span><span class="when-open">とじる ▴</span></span>
                 </span>
                 <span class="word-tag ${w.source === "test" ? "test" : ""}">${w.source === "test" ? "テスト" : "チェック"}</span>
@@ -1676,8 +1747,8 @@ function renderWritePractice() {
       </div>
       <section class="card stack write-word">
         <div class="detail-head">
-          <div><b class="word" lang="en">${esc(star.word)}</b><p class="meaning">${noteHtml(star.meaning)}</p></div>
-          ${sayIcon(speakable(star.word))}
+          <div><b class="word" lang="en">${esc(word ? wordText(word) : star.word)}</b><p class="meaning">${noteHtml(star.meaning)}</p></div>
+          ${sayIcon(word ? wordVoice(word) : speakable(star.word))}
         </div>
         <div class="write-example">
           ${sayIcon(star.example)}
@@ -1872,8 +1943,8 @@ function level1Html(word, example, answer, R) {
   return `<section class="card stack word-card">
       <p class="muted">単語の意味と例文を頭の中で言えるか確かめてみましょう！</p>
       <div class="word-row">
-        <p class="word" lang="en">${esc(word.word)}</p>
-        ${sayIcon(speakable(word.word))}
+        ${wordHeadHtml(word)}
+        ${sayIcon(wordVoice(word))}
       </div>
       ${example ? `<div class="word-examples one">${sayIcon(example.en)}<div>
         ${exTag(example)}<p class="en" lang="en">${exampleHtml(example)}</p>
@@ -1900,7 +1971,7 @@ function level2Html(word, example, answer, R) {
       <p class="verdict ${answer.right ? "right" : "wrong"}">${answer.right ? "⭕ 正解！" : close ? "🔺 おしい！" : "❌ ざんねん"}</p>
       ${close ? `<p>この文では <b lang="en">${esc(form)}</b> になります（<span lang="en">${esc(speakable(word.word))}</span> の形が変わっています）。</p>` : ""}
       ${answer.right || close ? "" : `<p>正解は <b lang="en">${esc(form)}</b></p>`}
-      <p><b lang="en">${esc(word.word)}</b>　${esc(word.meaning)}</p>
+      <p><b lang="en">${esc(wordText(word))}</b>　${esc(word.meaning)}</p>
     </section>
     <div class="lesson-nav"><span></span><button type="button" class="btn" id="next">${R.index === R.questions.length - 1 ? "結果を見る" : "次へ"}</button></div>`;
   }
@@ -1935,14 +2006,14 @@ function renderReviewResult(level, rerender) {
       </section>
       ${missed.length ? `<section class="card stack">
         <h3>${level === 1 ? "わからなかった単語" : "まちがえた単語"}</h3>
-        <ul class="plain-list">${missed.map((w) => `<li><b lang="en">${esc(w.word)}</b>　${esc(w.meaning)}</li>`).join("")}</ul>
+        <ul class="plain-list">${missed.map((w) => `<li><b lang="en">${esc(wordText(w))}</b>　${esc(w.meaning)}</li>`).join("")}</ul>
       </section>` : ""}
       ${known.length ? `<section class="card stack" id="known-box">
         <h3>${level === 1 ? "わかった" : "正解した"}単語（${known.length} 語）</h3>
         <p class="muted small">復習カードから外す単語にチェックを入れてください。チェックを外した単語は、復習カードに残ります。</p>
         <ul class="pick-list">${known.map((w) => `<li><label>
           <input type="checkbox" data-key="${esc(w.key)}" checked>
-          <span><b lang="en">${esc(w.word)}</b><span class="muted small">${esc(w.meaning)}</span></span>
+          <span><b lang="en">${esc(wordText(w))}</b><span class="muted small">${esc(w.meaning)}</span></span>
         </label></li>`).join("")}</ul>
         <button type="button" class="btn secondary block" id="remove-known">チェックした単語を外す</button>
       </section>` : ""}

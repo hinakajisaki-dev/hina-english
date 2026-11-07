@@ -630,3 +630,17 @@ body.quiz-open .wrap { padding-bottom: 62vh; }
 .rephrase-row .row-head { display: flex; align-items: flex-start; gap: 6px; }
 .rephrase-row .row-head p { flex: 1; }
 .rephrase-row .row-head .star-btn { margin: -8px -6px 0 0; }
+
+/* 過去分詞: a verb's three forms on its card, and the two boxes of its test. */
+.forms { display: grid; grid-template-columns: repeat(3, auto); gap: 4px 14px; justify-content: start; }
+.center-row .forms { justify-content: center; }
+.forms > div { display: flex; flex-direction: column; align-items: flex-start; }
+.forms span { font-size: 11px; font-weight: 700; color: var(--muted); }
+.forms b { font-family: var(--en); font-size: 26px; font-weight: 800; line-height: 1.2; }
+.forms > div:not(:first-child) b { color: var(--accent-text); }
+.forms-answer { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.forms-answer label { display: grid; gap: 4px; font-size: 13px; font-weight: 700; color: var(--ink-2); }
+.forms-answer input { font-family: var(--en); font-size: 18px; padding: 10px 12px; border: 2px solid var(--line); border-radius: 12px; min-width: 0; }
+.forms-answer input.right { border-color: var(--good); background: var(--good-soft); }
+.forms-answer input.wrong { border-color: var(--bad); background: #FFF0EE; }
+.forms-answer .btn { grid-column: 1 / -1; }
