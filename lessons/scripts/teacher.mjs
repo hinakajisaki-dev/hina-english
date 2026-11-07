@@ -40,6 +40,7 @@
 // node scripts/teacher.mjs vocab-pace なおみ [--week 2 --days 4 --size 40 | --off]   (fewer words a week, across the 単語帳)
 // node scripts/teacher.mjs write-practice なおみ [--on | --off]   (★ on 復習 examples and 書く練習)
 // node scripts/teacher.mjs toeic えいし [--on | --off]             (TOEIC単語 at the top of the home screen)
+// node scripts/teacher.mjs grammar-units なおみ [--set pronouns | --clear]   (文法の単元 just for some students: see, give, take away)
 // node scripts/teacher.mjs debate なおみ [--on | --off]            (話す・ディベート練習 on the home screen)
 // node scripts/teacher.mjs debate-note なおみ [note.txt | --clear] (what kind of topics the AI makes for the student)
 // node scripts/teacher.mjs debates なおみ [--days 7]               (what the student said in 話す・ディベート練習 (transcript), with corrections)
@@ -58,6 +59,7 @@ import { lessonDayLabel, lessonList, noteDayLabel, noteProblems } from "../publi
 import { MENUS, menuKey } from "../public/menus.js";
 import { monthPhrases, pronMonths, studentMonths } from "../public/pron/phrases.js";
 import { vocabBooks, weekBook, weekName } from "../public/vocab/words.js";
+import { ONLY_UNITS } from "../public/grammar/lessons.js";
 import { phraseBooks } from "../public/phrases/book.js";
 
 // Node's fetch only goes through the environment's proxy when asked to.
@@ -776,6 +778,21 @@ const commands = {
     }
     await api(`/api/teacher/students/${student.id}/toeic`, { method: "PUT", body: { on: !!options.on } });
     console.log(`${student.name}さんの TOEIC単語を${options.on ? "出しました（ホームのいちばん上。Part 1〜3）" : "しまいました（単語と結果は残ります）"}。`);
+  },
+
+  // 文法の単元 just for some students (only: true): which ones this student has.
+  async "grammar-units"([name], options) {
+    const student = await findStudent(name);
+    const line = (ids) => (ids.length ? ONLY_UNITS.filter((u) => ids.includes(u.id)).map((u) => `${u.id}（${u.title}・${u.lessons.length} レッスン）`).join("、") : "なし");
+    if (!options.set && !options.clear) {
+      const { grammarUnits } = await studentData(student);
+      console.log(`${student.name}さんだけの文法の単元：${line(grammarUnits || [])}`);
+      console.log(`出し分けられる単元：${ONLY_UNITS.map((u) => `${u.id}（${u.title}）`).join("、") || "なし"}`);
+      return;
+    }
+    const units = options.clear ? [] : String(options.set).split(/[,、，]/).map((u) => u.trim()).filter(Boolean);
+    const result = await api(`/api/teacher/students/${student.id}/grammar-units`, { method: "PUT", body: { units } });
+    console.log(`${student.name}さんだけの文法の単元を変えました：${line(result.units)}`);
   },
 
   async stars([name]) {

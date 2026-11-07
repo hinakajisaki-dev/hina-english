@@ -4,7 +4,7 @@ import {
   ApiError, api, diffHtml, esc, formatDate, icons, japanDayNumber,
   SPEEDS, getSpeed, setApiParams, setSpeed, speak, startOfJapanDay, stopSpeaking, toast, watchErrors, withParams,
 } from "./common.js";
-import { UNITS, findLesson, plain, questionCount } from "./grammar/lessons.js";
+import { findLesson, plain, questionCount, unitsFor } from "./grammar/lessons.js";
 import {
   TOEIC_PARTS, bookWeeks, formsRight, isPaceWeek, isToeicWeek, itemWeek, listenSetKey, paceWeeks, setKey, speakable, splitOnForm, toeicPart,
   toeicWeek, weekName, weekWords, wordSets, wordText, wordVoice,
@@ -228,9 +228,12 @@ function diaryMonth() {
   return { month: m, written: days.size, of: new Date(Date.UTC(y, m, 0)).getUTCDate() };
 }
 
+// The grammar units this student has (a unit for some students only shows for them).
+const myUnits = () => unitsFor(state.me.grammarUnits);
+
 // The grammar lessons done (a lesson counts once its questions are answered to the end).
 function grammarDone() {
-  const ready = UNITS.flatMap((u) => u.lessons.filter((l) => l.steps));
+  const ready = myUnits().flatMap((u) => u.lessons.filter((l) => l.steps));
   return { done: ready.filter((l) => state.me.lessons?.[l.id]).length, of: ready.length };
 }
 
@@ -2896,7 +2899,7 @@ function phrased(text, format = fmt) {
 // that lesson's questions only (no explanations).
 function renderGrammar(unitId, lessonId, mode) {
   if (unitId === "teacher") return renderTeacherProblems();
-  const unit = UNITS.find((u) => u.id === unitId);
+  const unit = myUnits().find((u) => u.id === unitId);
   if (unit && lessonId === "test") return renderUnit(unit, "test");
   if (unit && lessonId) return renderLesson(unit, lessonId, mode === "test");
   if (unit) return renderUnit(unit);
@@ -2910,7 +2913,7 @@ function renderGrammar(unitId, lessonId, mode) {
         <p><b>${all.done} / ${all.of}</b> <span class="muted small">レッスン完了</span></p>
         ${barHtml(all.done, all.of)}
       </section>
-      ${UNITS.map((u, i) => {
+      ${myUnits().map((u, i) => {
         const ready = u.lessons.filter((l) => l.steps);
         const done = ready.filter((l) => state.me.lessons?.[l.id]).length;
         return `<a class="unit-card" href="#/grammar/${u.id}">

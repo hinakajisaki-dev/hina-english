@@ -29,8 +29,14 @@ import { PERFECT } from "./perfect.js";
 import { CONJUNCTIONS } from "./conjunctions.js";
 import { PREPOSITIONS } from "./prepositions.js";
 import { OF } from "./of.js";
+import { PRONOUNS } from "./pronouns.js";
 
-export const UNITS = [BE, TENSE, ARTICLES, PERFECT, CONJUNCTIONS, PREPOSITIONS, OF];
+export const UNITS = [BE, TENSE, ARTICLES, PERFECT, CONJUNCTIONS, PREPOSITIONS, OF, PRONOUNS];
+
+// A unit with only: true is just for the students the teacher gives it to
+// (student setting grammar_units, like ["pronouns"]); the others are everyone's.
+export const ONLY_UNITS = UNITS.filter((u) => u.only);
+export const unitsFor = (given = []) => UNITS.filter((u) => !u.only || (given || []).includes(u.id));
 
 export function findLesson(lessonId) {
   for (const unit of UNITS) {

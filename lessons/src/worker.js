@@ -10,7 +10,7 @@ import { SpeechError, speechFor } from "./speech.js";
 import {
   closeErrors, journalErrorKey, listErrors, markErrorDone, markErrorsSeen, noteStuckJournals, recordError,
 } from "./errors.js";
-import { findLesson, lessonExampleSentences, plain, questionCount } from "../public/grammar/lessons.js";
+import { ONLY_UNITS, findLesson, lessonExampleSentences, plain, questionCount } from "../public/grammar/lessons.js";
 import { findMistakes, normalizeWords } from "../public/mistakes.js";
 import {
   bookSentences, bookWord, isPaceWeek, isToeicWeek, itemWord, listenSetKey, setKey, speakable, vocabBooks, weekWords, wordSets,
@@ -321,6 +321,17 @@ async function route(request, env, url, who, ctx) {
     return json({ on: on === true });
   }
   // TOEIC単語 on the student's home screen (for a student studying for TOEIC).
+  // 文法の単元 just for some students (only: true in public/grammar): the ones this student has.
+  if (parts[1] === "students" && parts[3] === "grammar-units" && parts.length === 4 && method === "PUT") {
+    const student = await findStudent(db, id(2));
+    const { units } = await readJson(request);
+    if (!Array.isArray(units)) throw new HttpError(400, "単元が読めませんでした。");
+    const unknown = units.filter((u) => !ONLY_UNITS.some((o) => o.id === u));
+    if (unknown.length) throw new HttpError(400, `「${unknown.join("・")}」は出し分けられる単元ではありません（あるのは ${ONLY_UNITS.map((u) => u.id).join("・") || "なし"}）。`);
+    const clean = ONLY_UNITS.map((u) => u.id).filter((u) => units.includes(u));
+    await saveSetting(db, student, "grammar_units", clean.length ? clean : null);
+    return json({ units: clean });
+  }
   if (parts[1] === "students" && parts[3] === "toeic" && parts.length === 4 && method === "PUT") {
     const student = await findStudent(db, id(2));
     const { on } = await readJson(request);

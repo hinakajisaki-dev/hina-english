@@ -2,7 +2,7 @@
 // pronunciation sentences, grammar problems and journal topics, and read
 // their journals with the AI corrections.
 import { ApiError, api, diffHtml, esc, formatDateTime, icons, startOfJapanDay, toast, watchErrors } from "./common.js";
-import { UNITS } from "./grammar/lessons.js";
+import { unitsFor } from "./grammar/lessons.js";
 import {
   TOEIC_PARTS, bookWeeks, isToeicWeek, itemWeek, listenSetKey, paceWeeks, setKey, toeicPart, toeicWeek, vocabBooks, weekBook, weekName,
   weekWords, wordSets,
@@ -392,7 +392,8 @@ function progressHtml() {
 
   // 文法: every lesson by unit.
   const lessons = data.lessons || {};
-  const ready = UNITS.flatMap((u) => u.lessons.filter((l) => l.steps).map((l) => ({ unit: u, lesson: l })));
+  const units = unitsFor(data.grammarUnits);
+  const ready = units.flatMap((u) => u.lessons.filter((l) => l.steps).map((l) => ({ unit: u, lesson: l })));
   const grammarDone = ready.filter(({ lesson }) => lessons[lesson.id]).length;
   const lastLesson = latest(lessons, ready.map(({ lesson }) => lesson.id));
   const lastLessonInfo = lastLesson && ready.find(({ lesson }) => lesson.id === lastLesson[0]);
@@ -435,7 +436,7 @@ function progressHtml() {
     <section class="card stack">
       <div class="phead"><h3>文法</h3>${progressBar(grammarDone, ready.length)}</div>
       ${lastLesson ? lastLine(`最後：<b>${esc(lastLessonInfo.unit.title)} ・ ${esc(lastLessonInfo.lesson.title)}</b>　${lastLesson[1].best}/${lastLesson[1].total}（${esc(shortDay(lastLesson[1].updated_at))}）`) : lastLine("まだレッスンをしていません")}
-      <ul class="prows">${UNITS.map((u) => {
+      <ul class="prows">${units.map((u) => {
         const ls = u.lessons.filter((l) => l.steps);
         const done = ls.filter((l) => lessons[l.id]).length;
         return `<li>
@@ -1097,7 +1098,7 @@ function rephraseResultsHtml() {
 // How the student did in each grammar lesson (shown on the 文法 tab).
 function lessonResultsHtml() {
   const results = state.current.lessons || {};
-  const lessons = UNITS.flatMap((unit) => unit.lessons.filter((l) => l.steps).map((l) => ({ unit, lesson: l })));
+  const lessons = unitsFor(state.current.grammarUnits).flatMap((unit) => unit.lessons.filter((l) => l.steps).map((l) => ({ unit, lesson: l })));
   // 文法復習: the lesson screens the student answered wrong or put in themselves.
   const review = (state.current.grammarReview || []).map((r) => {
     const [lessonId, index] = r.key.split("/");
