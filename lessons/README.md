@@ -335,7 +335,7 @@ TOEIC 対策の生徒だけに出ます（生徒ごとのチャットの `toeic 
 
 ## 文法の単元とレッスン
 
-文法の単元とレッスンは、生徒全員に共通です。中身は `public/grammar/` に、単元ごとのファイルで書いてあります（`be.js`・`tense.js`・`articles.js`・`perfect.js`・`conjunctions.js`・`prepositions.js`・`of.js`。並び順は `lessons.js`）。どれも先生の「中学文法」ドキュメントの同じ名前の章をもとにしています。
+文法の単元とレッスンは、生徒全員に共通です。中身は `public/grammar/` に、単元ごとのファイルで書いてあります（`be.js`・`tense.js`・`articles.js`・`perfect.js`・`conjunctions.js`・`prepositions.js`・`of.js`・`pronouns.js`。並び順は `lessons.js`）。どれも先生の「中学文法」ドキュメントの同じ名前の章をもとにしています。
 
 初めて習う生徒が置いていかれないように、説明はどのレッスンも同じ作りです：
 

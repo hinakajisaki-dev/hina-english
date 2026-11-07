@@ -29,8 +29,9 @@ import { PERFECT } from "./perfect.js";
 import { CONJUNCTIONS } from "./conjunctions.js";
 import { PREPOSITIONS } from "./prepositions.js";
 import { OF } from "./of.js";
+import { PRONOUNS } from "./pronouns.js";
 
-export const UNITS = [BE, TENSE, ARTICLES, PERFECT, CONJUNCTIONS, PREPOSITIONS, OF];
+export const UNITS = [BE, TENSE, ARTICLES, PERFECT, CONJUNCTIONS, PREPOSITIONS, OF, PRONOUNS];
 
 export function findLesson(lessonId) {
   for (const unit of UNITS) {
