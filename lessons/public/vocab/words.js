@@ -145,30 +145,48 @@ function inDays(words) {
 // as they were (done already), and the rest of its words are spread over 7 more
 // days (Day 5〜11). From the next week on, the words of all later 単語帳 run on in
 // order, 40 a week across the books ("p1", "p2" …, each in 7 days): Week 3's
-// 1〜40, 41〜80, then its 81〜100 with Week 4's 1〜20, and so on.
+// 1〜40, 41〜80, then its 81〜100 with Week 4's 1〜20, and so on. A 単語帳
+// between two weeks (過去分詞) is a section of its own instead (paceWeeks).
 
 export const isPaceWeek = (week) => /^p\d+$/.test(String(week));
 
 // Every pace week of a student: [{ week: "p1", words, label: "Week 3 ①", range: "1〜40語" }].
+// A 単語帳 between two weeks (過去分詞, 3.5) is a pace week of its own, all its
+// words, with nothing else: the weeks before it stop there (Week 3 ③ is just
+// 81〜100語) and the next week starts from its first word.
 export function paceWeeks(items, books, pace) {
   if (!pace) return [];
   const later = [...new Set([
     ...bookWeeks(books),
     ...items.filter((item) => item.kind === "vocab").map(itemWeek).filter((w) => typeof w === "number"),
   ])].filter((w) => w > pace.week).sort((a, b) => a - b);
-  const stream = later.flatMap((week) => weekWords(week, items, books).map((word, i) => ({ word, week, n: i + 1 })));
+  // Runs of weeks that flow into each other, broken at each book between two weeks.
+  const runs = [];
+  for (const week of later) {
+    if (!Number.isInteger(week)) runs.push({ alone: true, weeks: [week] });
+    else if (runs.at(-1) && !runs.at(-1).alone) runs.at(-1).weeks.push(week);
+    else runs.push({ alone: false, weeks: [week] });
+  }
   const weeks = [];
   const started = {};
-  for (let at = 0; at < stream.length; at += pace.size) {
-    const part = stream.slice(at, at + pace.size);
-    const first = part[0].week;
-    started[first] = (started[first] || 0) + 1;
-    // "1〜40語", or "81〜100語 ＋ Week 4 の 1〜20語" when it runs into the next book.
-    const range = [...new Set(part.map((p) => p.week))].map((week, i) => {
-      const ns = part.filter((p) => p.week === week).map((p) => p.n);
-      return `${i ? `${weekName(week)} の ` : ""}${ns[0]}〜${ns.at(-1)}語`;
-    }).join(" ＋ ");
-    weeks.push({ week: `p${weeks.length + 1}`, words: part.map((p) => p.word), label: `${weekName(first)} ${"①②③④⑤⑥⑦⑧⑨⑩"[started[first] - 1] || started[first]}`, range });
+  const add = (words, label, range) => weeks.push({ week: `p${weeks.length + 1}`, words, label, range });
+  for (const run of runs) {
+    const stream = run.weeks.flatMap((week) => weekWords(week, items, books).map((word, i) => ({ word, week, n: i + 1 })));
+    if (run.alone) {
+      if (stream.length) add(stream.map((p) => p.word), weekName(run.weeks[0]), `${stream.length}語`);
+      continue;
+    }
+    for (let at = 0; at < stream.length; at += pace.size) {
+      const part = stream.slice(at, at + pace.size);
+      const first = part[0].week;
+      started[first] = (started[first] || 0) + 1;
+      // "1〜40語", or "81〜100語 ＋ Week 4 の 1〜20語" when it runs into the next book.
+      const range = [...new Set(part.map((p) => p.week))].map((week, i) => {
+        const ns = part.filter((p) => p.week === week).map((p) => p.n);
+        return `${i ? `${weekName(week)} の ` : ""}${ns[0]}〜${ns.at(-1)}語`;
+      }).join(" ＋ ");
+      add(part.map((p) => p.word), `${weekName(first)} ${"①②③④⑤⑥⑦⑧⑨⑩"[started[first] - 1] || started[first]}`, range);
+    }
   }
   return weeks;
 }
