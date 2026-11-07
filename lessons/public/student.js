@@ -454,9 +454,6 @@ function renderHome() {
           { key: "grammar-review", html: `
             <span class="emoji" aria-hidden="true">🔂</span><b>文法復習</b>
             <span class="muted">${grammarReviewCount ? `${grammarReviewCount} こ` : "まだありません"}</span>` },
-          { key: "study", wide: true, html: `
-            <span class="emoji" aria-hidden="true">⏱️</span>
-            <div><b>勉強時間</b><p class="muted">今日 ${formatMinutes(totalMinutes(todayRow))} ・ 今週 ${formatMinutes(week.total)} ・ これまで ${formatMinutes(allTime(state.me.study).total)}</p></div>` },
           groups.length && { key: "rephrase", cls: rephraseDone ? "done" : "", html: `
             <span class="emoji" aria-hidden="true">${rephraseDone ? "✅" : "⚡"}</span><b>言い換え問題</b>
             <span class="muted">${rephraseDone ? `今日はクリア！（${rephrased} 問）` : `今日 ${rephrased} / ${REPHRASE_GOAL}`}</span>
@@ -464,6 +461,9 @@ function renderHome() {
           groups.length && { key: "rephrase-review", html: `
             <span class="emoji" aria-hidden="true">⭐</span><b>言い換え復習</b>
             <span class="muted">${rephraseStarred().length ? `★ ${rephraseStarred().length} 問` : "まだありません"}</span>` },
+          { key: "study", wide: true, html: `
+            <span class="emoji" aria-hidden="true">⏱️</span>
+            <div><b>勉強時間</b><p class="muted">今日 ${formatMinutes(totalMinutes(todayRow))} ・ 今週 ${formatMinutes(week.total)} ・ これまで ${formatMinutes(allTime(state.me.study).total)}</p></div>` },
           state.me.debate && { key: "debate", wide: true, cls: debateToday() >= DEBATE_GOAL ? "done" : "", html: `
             <span class="emoji" aria-hidden="true">${debateToday() >= DEBATE_GOAL ? "✅" : "🗣️"}</span>
             <div><b>話す・ディベート練習</b><p class="muted">${debateToday() >= DEBATE_GOAL
