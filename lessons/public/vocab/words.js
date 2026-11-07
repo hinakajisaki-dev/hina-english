@@ -20,13 +20,21 @@ import { IELTS3 } from "./ielts3.js";
 import { LINKUP1 } from "./linkup1.js";
 import { LINKUP2 } from "./linkup2.js";
 import { LINKUP3 } from "./linkup3.js";
+import { PP1 } from "./pp1.js";
 
-const BOOKS = [WEEK1, WEEK2, WEEK3, WEEK4, WEEK5, WEEK6, IELTS1, IELTS2, IELTS3, LINKUP1, LINKUP2, LINKUP3];
+const BOOKS = [WEEK1, WEEK2, WEEK3, WEEK4, WEEK5, WEEK6, IELTS1, IELTS2, IELTS3, LINKUP1, LINKUP2, LINKUP3, PP1];
 export const SET_SIZE = 10;
 
 const findBook = (id) => BOOKS.find((b) => b.id === id) || null;
 const sharedBook = (week) => `w${week}`;
 const isShared = (book) => book.id === sharedBook(book.week) && book.everyone !== false;
+
+// What the screens call a week: "Week 3", or the name of a 単語帳 that sits
+// between two weeks (過去分詞 is week 3.5: after Week 3, before Week 4).
+export function weekName(week) {
+  if (Number.isInteger(Number(week))) return `Week ${week}`;
+  return BOOKS.find((b) => String(b.week) === String(week))?.label || `Week ${week}`;
+}
 
 // Every 単語帳: { id, week, title, count, shared } (shared: the one everyone gets that week).
 export const vocabBooks = () =>
@@ -53,6 +61,8 @@ export function bookWords(id) {
       pos: w.pos || group.pos,
       group: group.title,
       examples: w.examples,
+      // 過去分詞: a verb's past and past participle (ppAlso: other right answers).
+      ...(w.past ? { past: w.past, pp: w.pp, ppAlso: w.ppAlso || [] } : {}),
     })),
   );
 }
@@ -135,30 +145,48 @@ function inDays(words) {
 // as they were (done already), and the rest of its words are spread over 7 more
 // days (Day 5〜11). From the next week on, the words of all later 単語帳 run on in
 // order, 40 a week across the books ("p1", "p2" …, each in 7 days): Week 3's
-// 1〜40, 41〜80, then its 81〜100 with Week 4's 1〜20, and so on.
+// 1〜40, 41〜80, then its 81〜100 with Week 4's 1〜20, and so on. A 単語帳
+// between two weeks (過去分詞) is a section of its own instead (paceWeeks).
 
 export const isPaceWeek = (week) => /^p\d+$/.test(String(week));
 
 // Every pace week of a student: [{ week: "p1", words, label: "Week 3 ①", range: "1〜40語" }].
+// A 単語帳 between two weeks (過去分詞, 3.5) is a pace week of its own, all its
+// words, with nothing else: the weeks before it stop there (Week 3 ③ is just
+// 81〜100語) and the next week starts from its first word.
 export function paceWeeks(items, books, pace) {
   if (!pace) return [];
   const later = [...new Set([
     ...bookWeeks(books),
     ...items.filter((item) => item.kind === "vocab").map(itemWeek).filter((w) => typeof w === "number"),
   ])].filter((w) => w > pace.week).sort((a, b) => a - b);
-  const stream = later.flatMap((week) => weekWords(week, items, books).map((word, i) => ({ word, week, n: i + 1 })));
+  // Runs of weeks that flow into each other, broken at each book between two weeks.
+  const runs = [];
+  for (const week of later) {
+    if (!Number.isInteger(week)) runs.push({ alone: true, weeks: [week] });
+    else if (runs.at(-1) && !runs.at(-1).alone) runs.at(-1).weeks.push(week);
+    else runs.push({ alone: false, weeks: [week] });
+  }
   const weeks = [];
   const started = {};
-  for (let at = 0; at < stream.length; at += pace.size) {
-    const part = stream.slice(at, at + pace.size);
-    const first = part[0].week;
-    started[first] = (started[first] || 0) + 1;
-    // "1〜40語", or "81〜100語 ＋ Week 4 の 1〜20語" when it runs into the next book.
-    const range = [...new Set(part.map((p) => p.week))].map((week, i) => {
-      const ns = part.filter((p) => p.week === week).map((p) => p.n);
-      return `${i ? `Week ${week} の ` : ""}${ns[0]}〜${ns.at(-1)}語`;
-    }).join(" ＋ ");
-    weeks.push({ week: `p${weeks.length + 1}`, words: part.map((p) => p.word), label: `Week ${first} ${"①②③④⑤⑥⑦⑧⑨⑩"[started[first] - 1] || started[first]}`, range });
+  const add = (words, label, range) => weeks.push({ week: `p${weeks.length + 1}`, words, label, range });
+  for (const run of runs) {
+    const stream = run.weeks.flatMap((week) => weekWords(week, items, books).map((word, i) => ({ word, week, n: i + 1 })));
+    if (run.alone) {
+      if (stream.length) add(stream.map((p) => p.word), weekName(run.weeks[0]), `${stream.length}語`);
+      continue;
+    }
+    for (let at = 0; at < stream.length; at += pace.size) {
+      const part = stream.slice(at, at + pace.size);
+      const first = part[0].week;
+      started[first] = (started[first] || 0) + 1;
+      // "1〜40語", or "81〜100語 ＋ Week 4 の 1〜20語" when it runs into the next book.
+      const range = [...new Set(part.map((p) => p.week))].map((week, i) => {
+        const ns = part.filter((p) => p.week === week).map((p) => p.n);
+        return `${i ? `${weekName(week)} の ` : ""}${ns[0]}〜${ns.at(-1)}語`;
+      }).join(" ＋ ");
+      add(part.map((p) => p.word), `${weekName(first)} ${"①②③④⑤⑥⑦⑧⑨⑩"[started[first] - 1] || started[first]}`, range);
+    }
   }
   return weeks;
 }
@@ -220,10 +248,30 @@ export function bookSentences() {
   for (const book of BOOKS) {
     for (const w of bookWords(book.id)) {
       texts.add(speakable(w.word));
+      if (w.past) texts.add(wordVoice(w));
       for (const ex of w.examples) texts.add(ex.en);
     }
   }
   return texts;
+}
+
+// A word as the screens show it: "drink – drank – drunk" for a 過去分詞 verb.
+export const wordText = (w) => (w.past ? `${w.word} – ${w.past} – ${w.pp}` : w.word);
+// What 🔊 reads for a word: its three forms for a 過去分詞 verb ("be, was, were, been").
+export const wordVoice = (w) => (w.past ? [w.word, ...w.past.split("/"), w.pp].map((x) => x.trim()).join(", ") : speakable(w.word));
+
+// The past and past participle typed in the test, each checked against its right
+// answers ("was / were": either, or both; case and spaces don't count).
+export function formsRight(w, past, pp) {
+  const norm = (x) => String(x).toLowerCase().replace(/[’`]/g, "'").trim();
+  const ok = (given, answers) => {
+    const parts = norm(given).split(/\s*(?:\/|,|\bor\b)\s*/).filter(Boolean);
+    return parts.length > 0 && parts.every((p) => answers.includes(p));
+  };
+  return {
+    past: ok(past, w.past.split("/").map(norm)),
+    pp: ok(pp, [w.pp, ...(w.ppAlso || [])].map(norm)),
+  };
 }
 
 // What the voice reads: "〜 off" is "off", "end up ~ing" is "end up", "How long ...?" is "How long?".

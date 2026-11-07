@@ -57,7 +57,7 @@ import { readFileSync } from "node:fs";
 import { lessonDayLabel, lessonList, noteDayLabel, noteProblems } from "../public/notes/format.js";
 import { MENUS, menuKey } from "../public/menus.js";
 import { monthPhrases, pronMonths, studentMonths } from "../public/pron/phrases.js";
-import { vocabBooks, weekBook } from "../public/vocab/words.js";
+import { vocabBooks, weekBook, weekName } from "../public/vocab/words.js";
 import { phraseBooks } from "../public/phrases/book.js";
 
 // Node's fetch only goes through the environment's proxy when asked to.
@@ -236,12 +236,15 @@ const japanDay = (offset = 0) => new Date(Date.now() + 9 * 3600e3 + offset * 864
 // The Japan date of a saved time ("2026-10-14").
 const japanDate = (iso) => new Date(Date.parse(iso) + 9 * 3600e3).toISOString().slice(0, 10);
 
+// "Week 3", or "過去分詞（Week 3 のあと・3.5）" for a 単語帳 between two weeks.
+const weekLine = (week) => (Number.isInteger(Number(week)) ? `Week ${week}` : `${weekName(week)}（Week ${Math.floor(week)} のあと・${week}）`);
+
 // "Week 1：IELTS 語彙 Week 1（ielts1・100 語）" for each week the app has a 単語帳 for.
 function bookLine(books) {
   const all = vocabBooks();
   return [...new Set(all.map((b) => b.week))].sort((a, b) => a - b).map((week) => {
     const book = all.find((b) => b.id === weekBook(week, books));
-    return `Week ${week}：${book ? `${book.title}（${book.id}・${book.count} 語${book.shared ? "・全員共通" : ""}）` : "（なし）"}`;
+    return `${weekLine(week)}：${book ? `${book.title}（${book.id}・${book.count} 語${book.shared ? "・全員共通" : ""}）` : "（なし）"}`;
   }).join("\n");
 }
 
@@ -624,14 +627,14 @@ const commands = {
     const student = await findStudent(name);
     if (!options.set && !options.default) {
       const { vocabBooks: books } = await studentData(student);
-      const list = vocabBooks().map((b) => `${b.id}：Week ${b.week}・${b.title}（${b.count} 語${b.shared ? "・全員共通" : ""}）`).join("\n");
+      const list = vocabBooks().map((b) => `${b.id}：${weekLine(b.week)}・${b.title}（${b.count} 語${b.shared ? "・全員共通" : ""}）`).join("\n");
       console.log(`${student.name}さんの単語帳：\n${bookLine(books)}\n\nアプリにある単語帳：\n${list}`);
       return;
     }
     const books = {};
     if (options.set) {
       for (const part of String(options.set).split(/[,、，]/).map((p) => p.trim()).filter(Boolean)) {
-        const m = part.match(/^(\d+)\s*[=＝:：]\s*(.+)$/);
+        const m = part.match(/^(\d+(?:\.\d+)?)\s*[=＝:：]\s*(.+)$/);
         if (!m) stop(`「${part}」が読めません。「1=ielts1」のように、Week の番号と単語帳の名前（vocab-books ${name} で出る左の名前）を書いてください。`);
         books[m[1]] = m[2].trim();
       }
