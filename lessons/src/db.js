@@ -509,6 +509,7 @@ export async function studentBundle(db, studentId) {
     debate: !!setting("debate"),
     debateNote: setting("debate_note"),
     rephraseTips: setting("rephrase_tips") || {},
+    grammarUnits: setting("grammar_units") || [],
     rephraseStars: rephraseStarRows.map((r) => ({ item_id: r.item_id, created_at: r.created_at })),
     debateAnswers: debateRows.map(debateRow),
     grammarReview,

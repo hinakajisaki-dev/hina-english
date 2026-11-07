@@ -1,9 +1,11 @@
 // Unit: 代名詞. Follows the 代名詞 chapter of the teacher's 中学文法 document
 // (they / them, this / that, 再帰代名詞), with the practice questions from it
 // (six a lesson). Step format is described in lessons.js. Red marks the pronoun.
+// only: just for the students the teacher gives it to (grammar-units).
 
 export const PRONOUNS = {
   id: "pronouns",
+  only: true,
   title: "代名詞",
   subtitle: "they / them・this / that・myself",
   lessons: [
