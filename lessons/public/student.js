@@ -957,7 +957,8 @@ function renderVocab(week, setNumber, mode, arg) {
   if (week) return renderWeek(w);
 
   const weeks = studyWeeks();
-  const tiles = weeks.filter((week) => !isPaceWeek(week)).map((week) => {
+  // Every week a box, the weeks of a student's own pace too (Week 3 ①, 過去分詞 …).
+  const tiles = weeks.map((week) => {
     const words = studentWeekWords(week);
     if (!words.length) return `<div class="week empty-week"><b>${weekLabel(week)}</b><span>まだありません</span></div>`;
     const sets = studentSets(week);
@@ -977,25 +978,8 @@ function renderVocab(week, setNumber, mode, arg) {
       ${lastSet ? resumeCard(`#/vocab/${last.week}/${last.number}/card/${last.index + 1}`, esc(setName(last.week, lastSet)), last.of) : ""}
       ${mineCard()}
       <div class="weeks">${tiles.join("")}</div>
-      ${myPace() ? paceCards() : ""}
+      ${myPace() && !myPaceWeeks().length ? `<p class="muted small">つぎの単語は、先生が用意します。</p>` : ""}
     </main>`;
-}
-
-// The pace weeks, under Week 1〜: "Week 3 ①　1〜40語 ・ テスト 0 / 7".
-function paceCards() {
-  const weeks = myPaceWeeks();
-  return `<section class="stack">
-    <p class="label">1週間 ${myPace().size} 語</p>
-    ${weeks.length ? weeks.map((p) => {
-      const sets = studentSets(p.week);
-      const tested = sets.filter((s) => testResult(p.week, s.number)).length;
-      return `<a class="lesson-card pace-card ${tested === sets.length ? "done" : ""}" href="#/vocab/${p.week}">
-        <div><b>${esc(p.label)}</b><span class="muted small">${esc(p.range)} ・ テスト ${tested} / ${sets.length}</span>
-          <div class="bar"><i style="width:${Math.round((tested / sets.length) * 100)}%"></i></div></div>
-        <span class="chev" aria-hidden="true">›</span>
-      </a>`;
-    }).join("") : `<p class="muted small">つぎの単語は、先生が用意します。</p>`}
-  </section>`;
 }
 
 // 自分の単語 at the top of 単語カード: words the student adds themselves.

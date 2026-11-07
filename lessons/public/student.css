@@ -502,8 +502,6 @@ body.quiz-open .wrap { padding-bottom: 62vh; }
 .word-form .field small { font-weight: 400; }
 
 /* 単語のペース（1週間 40 語など） */
-.pace-card > div { flex: 1; min-width: 0; }
-.pace-card .bar { margin-top: 6px; }
 .pace-range { font-weight: 700; color: var(--ink-2); }
 
 /* 書く練習（★） */
