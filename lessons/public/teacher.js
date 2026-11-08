@@ -1,7 +1,7 @@
 // Teacher page: add students, give each one their own words,
 // pronunciation sentences, grammar problems and journal topics, and read
 // their journals with the AI corrections.
-import { ApiError, api, diffHtml, esc, formatDateTime, icons, startOfJapanDay, toast, watchErrors } from "./common.js";
+import { ApiError, api, diffHtml, esc, formatDateTime, icons, keepUpdated, startOfJapanDay, toast, watchErrors } from "./common.js";
 import { unitsFor } from "./grammar/lessons.js";
 import {
   TOEIC_PARTS, bookWeeks, isToeicWeek, itemWeek, listenSetKey, paceWeeks, setKey, toeicPart, toeicWeek, vocabBooks, weekBook, weekName,
@@ -87,6 +87,8 @@ window.addEventListener("hashchange", () => {
   window.scrollTo(0, 0);
 });
 render();
+// After a deploy, the page updates itself on the list of students (not while a student's page is open).
+keepUpdated(() => !location.hash.split("/")[1] && !document.querySelector("input:focus, textarea:focus"));
 
 // ---------- small helpers ----------
 
