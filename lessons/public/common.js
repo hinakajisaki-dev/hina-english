@@ -82,6 +82,56 @@ export const icons = {
   home: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l9-8 9 8"/><path d="M5 9.5V20h5v-6h4v6h5V9.5"/></svg>`,
 };
 
+// ---------- updates ----------
+// A page left open (a phone keeps the app for days) updates itself after a
+// deploy: it checks the version when it comes back to the front and every 15
+// minutes, and once there is a new one, reloads when atRest() says nothing is
+// going on (the home screen), so nothing being done is lost. A toast says so
+// after. At most once in 10 minutes, so a bad answer can't keep reloading it.
+const UPDATED_KEY = "hina-updated";
+const RELOADED_KEY = "hina-reloaded-at";
+
+export function keepUpdated(atRest) {
+  let mine = null;
+  let pending = false;
+  const session = (fn) => {
+    try { return fn(sessionStorage); } catch { return null; }
+  };
+  const reloadIfReady = () => {
+    if (!pending || !atRest()) return;
+    if (Date.now() - Number(session((s) => s.getItem(RELOADED_KEY)) || 0) < 10 * 60e3) return;
+    session((s) => {
+      s.setItem(RELOADED_KEY, String(Date.now()));
+      s.setItem(UPDATED_KEY, "1");
+    });
+    location.reload();
+  };
+  const check = async () => {
+    try {
+      const response = await fetch("/api/version", { cache: "no-store" });
+      if (!response.ok) return;
+      const { version } = await response.json();
+      if (!mine) mine = version;
+      else if (version !== mine) pending = true;
+    } catch {
+      return; // offline: the next check
+    }
+    reloadIfReady();
+  };
+  check();
+  setInterval(() => {
+    if (document.visibilityState === "visible") check();
+  }, 15 * 60e3);
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible") check();
+  });
+  addEventListener("hashchange", () => setTimeout(reloadIfReady, 0));
+  if (session((s) => s.getItem(UPDATED_KEY))) {
+    session((s) => s.removeItem(UPDATED_KEY));
+    setTimeout(() => toast("アプリを最新にしました"), 300);
+  }
+}
+
 export function toast(message) {
   document.querySelector(".toast")?.remove();
   const el = document.createElement("div");

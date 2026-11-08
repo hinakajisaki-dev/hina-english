@@ -92,6 +92,8 @@ async function route(request, env, url, who, ctx) {
   const id = (i) => Number(parts[i]);
 
   // ---------- student ----------
+  // The deploy running now: open pages check it and update themselves (common.js keepUpdated).
+  if (path === "/api/version" && method === "GET") return json({ version: env.CF_VERSION_METADATA?.id || "dev" });
   if (path === "/api/login" && method === "POST") return studentLogin(request, env, url);
   if (path === "/api/logout" && method === "POST") {
     return json({ ok: true }, 200, { "Set-Cookie": cookie(STUDENT_COOKIE, "", 0, url) });

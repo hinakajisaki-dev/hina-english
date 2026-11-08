@@ -2,7 +2,7 @@
 // today's phrase, pronunciation, grammar and the journal with its correction.
 import {
   ApiError, api, diffHtml, esc, formatDate, icons, japanDayNumber,
-  SPEEDS, getSpeed, setApiParams, setSpeed, speak, startOfJapanDay, stopSpeaking, toast, watchErrors, withParams,
+  SPEEDS, getSpeed, keepUpdated, setApiParams, setSpeed, speak, startOfJapanDay, stopSpeaking, toast, watchErrors, withParams,
 } from "./common.js";
 import { findLesson, plain, questionCount, unitsFor } from "./grammar/lessons.js";
 import {
@@ -119,6 +119,10 @@ document.addEventListener("click", (event) => {
   if (await load()) render();
   if (state.me) startClock();
 })();
+
+// After a deploy, the app updates itself on the home screen (or the sign-in screen):
+// nothing is going on there, so nothing being done is lost.
+keepUpdated(() => !location.hash.split("/")[1] && !document.querySelector("input:focus, textarea:focus"));
 
 // Time in the app counts as study time once signed in (see study.js).
 let clockStarted = false;
