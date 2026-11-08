@@ -223,9 +223,10 @@ function diaryMonth() {
   const now = today();
   const month = now.slice(0, 7);
   const japanDay = (iso) => new Date(new Date(iso).getTime() + 9 * 3600e3).toISOString().slice(0, 10);
-  const days = new Set(state.me.journals.map((j) => japanDay(j.created_at)).filter((d) => d.startsWith(month)));
+  // Every diary this month counts (two on one day are two: written ahead for busy days).
+  const written = state.me.journals.filter((j) => japanDay(j.created_at).startsWith(month)).length;
   const [y, m] = month.split("-").map(Number);
-  return { month: m, written: days.size, of: new Date(Date.UTC(y, m, 0)).getUTCDate() };
+  return { month: m, written, of: new Date(Date.UTC(y, m, 0)).getUTCDate() };
 }
 
 // The grammar units this student has (a unit for some students only shows for them).
@@ -391,6 +392,7 @@ function renderHome() {
   const grammarReviewCount = grammarReviewSteps().length;
   const diary = diaryMonth();
   const done = wroteToday();
+  const pronToday = pronDoneToday() || !nextPhrase();
   const tasks = todaysTasks();
   const left = tasks.filter((t) => !t.done).length;
   const now = today();
@@ -430,10 +432,11 @@ function renderHome() {
         ${homeTiles([
           { key: "journal", cls: done ? "done" : "", html: `
             <span class="emoji" aria-hidden="true">${done ? "✅" : "✍️"}</span><b>日記${ielts() ? "<small>（IELTS問題練習）</small>" : ""}</b>
-            <span class="muted">${diary.month}月 ${diary.written} / ${diary.of} 日</span>
-            ${barHtml(diary.written, diary.of)}` },
-          { key: "pron", html: `
-            <span class="emoji" aria-hidden="true">🎤</span><b>発音課題</b>
+            <span class="muted">${diary.month}月 ${diary.written} / ${diary.of} 回</span>
+            ${barHtml(Math.min(diary.written, diary.of), diary.of)}` },
+          // Green like 日記 once today's 発音 is done (or every Month is).
+          { key: "pron", cls: pronToday ? "done" : "", html: `
+            <span class="emoji" aria-hidden="true">${pronToday ? "✅" : "🎤"}</span><b>発音課題</b>
             <span class="muted">${shared.length ? `${esc(monthLabel(myMonths(), pronMonth))} ・ 完了 ${pronFinished} / ${shared.length}` : "まだありません"}</span>
             ${shared.length ? `<div class="bar"><i style="width:${Math.round((pronFinished / shared.length) * 100)}%"></i></div>` : ""}` },
           { key: "vocab", html: `
