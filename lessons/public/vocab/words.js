@@ -20,10 +20,12 @@ import { IELTS3 } from "./ielts3.js";
 import { LINKUP1 } from "./linkup1.js";
 import { LINKUP2 } from "./linkup2.js";
 import { LINKUP3 } from "./linkup3.js";
+import { LINKUP4 } from "./linkup4.js";
+import { LINKUP5 } from "./linkup5.js";
 import { PP1 } from "./pp1.js";
 import { KAIWA1 } from "./kaiwa1.js";
 
-const BOOKS = [WEEK1, WEEK2, WEEK3, WEEK4, WEEK5, WEEK6, IELTS1, IELTS2, IELTS3, LINKUP1, LINKUP2, LINKUP3, PP1, KAIWA1];
+const BOOKS = [WEEK1, WEEK2, WEEK3, WEEK4, WEEK5, WEEK6, IELTS1, IELTS2, IELTS3, LINKUP1, LINKUP2, LINKUP3, LINKUP4, LINKUP5, PP1, KAIWA1];
 export const SET_SIZE = 10;
 
 const findBook = (id) => BOOKS.find((b) => b.id === id) || null;
