@@ -1046,7 +1046,7 @@ function renderWeek(week) {
         const day = talk && (set.number - 1) % talk.perDay === 0 ? dayHead(week, sets, Math.ceil(set.number / talk.perDay), talk.perDay) : "";
         const place = resumeAt(resumeKind(week), studentSetKey(week, set.number));
         return `${day}<a class="lesson-card" href="${weekHref(week)}/${set.number}">
-          <div><b>${set.talk ? `${set.number}. ${talkOf(talk.id, set.number)?.emoji || ""} ${esc(set.title)}` : esc(set.label)}</b>${set.day ? `<span class="muted small">${esc(set.title)} ・ ${set.words.length}語</span>` : ""}<span class="muted small" lang="en">${set.words.map((w) => esc(w.word)).join(" ・ ")}</span></div>
+          <div>${set.talk ? talkWeekHtml(talkOf(talk.id, set.number)) : ""}<b>${set.talk ? `${set.number}. ${talkOf(talk.id, set.number)?.emoji || ""} ${esc(set.title)}` : esc(set.label)}</b>${set.day ? `<span class="muted small">${esc(set.title)} ・ ${set.words.length}語</span>` : ""}<span class="muted small" lang="en">${set.words.map((w) => esc(w.word)).join(" ・ ")}</span></div>
           ${place ? `<span class="badge start">つづきから ${esc(place.of)}</span>`
             : result ? `<span class="badge">✓ ${result.best} / ${result.total}</span>` : `<span class="badge start">はじめる</span>`}
         </a>`;
@@ -1126,19 +1126,25 @@ function renderVocabDay(week, number, tab) {
 // ---------- 会話で復習 ----------
 // A talk: its lines as chat bubbles (Mia on the left, Ken on the right), the
 // talk's words in red. A tap on a bubble plays it; 全部きく plays them all in
-// turn, at the speed chosen under it (also while playing). 日本語 shows or
-// hides the Japanese (remembered on the phone).
+// turn, at the speed chosen under it (also while playing). The Japanese is
+// shown; 日本語をかくす hides it (remembered on the phone).
 const TALK_JA_KEY = "hina-talk-ja";
 const talkJa = () => {
-  try { return localStorage.getItem(TALK_JA_KEY) === "1"; } catch { return false; }
+  try { return localStorage.getItem(TALK_JA_KEY) !== "0"; } catch { return true; }
 };
+const talkJaLabel = (on) => (on ? "日本語をかくす" : "日本語を見る");
+// "Week 1 の単語": which week's words a talk reviews.
+const talkWeekHtml = (talk) => (talk.week ? `<span class="talk-week">${esc(weekName(talk.week))}</span>` : "");
 const talkSrc = (line) => withParams(`/api/talk/audio?who=${line.who}&text=${encodeURIComponent(talkText(line.en))}`);
 
 function talkHtml(talk, base) {
   return `<section class="card talk ${talkJa() ? "" : "no-ja"}">
       <div class="talk-head">
-        <p class="talk-scene"><span aria-hidden="true">${talk.emoji || "💬"}</span> ${esc(talk.title)}</p>
-        <button type="button" class="chip-toggle" id="talk-ja" aria-pressed="${talkJa()}">日本語</button>
+        <div>
+          <p class="talk-scene"><span aria-hidden="true">${talk.emoji || "💬"}</span> ${esc(talk.title)}</p>
+          ${talk.week ? `<p class="talk-from">${talkWeekHtml(talk)} の単語</p>` : ""}
+        </div>
+        <button type="button" class="chip-toggle" id="talk-ja">${talkJaLabel(talkJa())}</button>
       </div>
       <button type="button" class="btn block talk-play" id="talk-play">${icons.speaker}全部きく</button>
       <div class="talk-speed">${speedControl()}</div>
@@ -1181,7 +1187,7 @@ function bindTalk(talk) {
   }));
   document.getElementById("talk-ja").addEventListener("click", (event) => {
     const on = box.classList.toggle("no-ja") === false;
-    event.currentTarget.setAttribute("aria-pressed", on);
+    event.currentTarget.textContent = talkJaLabel(on);
     try { localStorage.setItem(TALK_JA_KEY, on ? "1" : "0"); } catch { /* private mode */ }
   });
 }
