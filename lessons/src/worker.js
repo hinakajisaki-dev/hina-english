@@ -13,7 +13,8 @@ import {
 import { ONLY_UNITS, findLesson, lessonExampleSentences, plain, questionCount } from "../public/grammar/lessons.js";
 import { findMistakes, normalizeWords } from "../public/mistakes.js";
 import {
-  bookSentences, bookWord, isPaceWeek, isToeicWeek, itemWord, listenSetKey, setKey, speakable, vocabBooks, weekWords, wordSets,
+  bookSentences, bookWord, isPaceWeek, isTalkLine, isToeicWeek, itemWord, listenSetKey, setKey, speakable, talkAudioKey, vocabBooks,
+  weekWords, wordSets,
 } from "../public/vocab/words.js";
 import { findPhrase, pronMonths } from "../public/pron/phrases.js";
 import { phraseBooks, phraseByKey, phraseSentences, phraseSetKey, phraseSets, testSize } from "../public/phrases/book.js";
@@ -115,6 +116,7 @@ async function route(request, env, url, who, ctx) {
     if (path === "/api/errors" && method === "POST") return saveBrowserError(request, env, student.id);
     if (path === "/api/progress" && method === "POST") return saveProgress(request, env, student);
     if (path === "/api/speech" && method === "GET") return speech(env, student, url.searchParams.get("text"));
+    if (path === "/api/talk/audio" && method === "GET") return talkAudio(env, url.searchParams.get("who"), url.searchParams.get("text"));
     if (parts[0] === "lessons" && parts.length === 2 && method === "POST") {
       return saveLessonResult(request, env, student, parts[1]);
     }
@@ -192,6 +194,11 @@ async function route(request, env, url, who, ctx) {
       return json({ errors: await listErrors(db, { everything: url.searchParams.get("all") === "1" }), now: at });
     }
     if (method === "POST") return saveBrowserError(request, env, null);
+  }
+  // 会話で復習's voices, made with ElevenLabs by scripts/teacher.mjs talk-audio and kept in R2.
+  if (path === "/api/teacher/talk-audio") {
+    if (method === "GET") return listTalkAudio(env);
+    if (method === "PUT") return saveTalkAudio(request, env, url.searchParams.get("who"), url.searchParams.get("text"));
   }
   if (path === "/api/teacher/errors/seen" && method === "POST") {
     const { until } = await readJson(request);
@@ -569,6 +576,43 @@ async function speech(env, student, text) {
     // The page falls back to the phone's own voice.
     throw new HttpError(503, "音声を作れませんでした。");
   }
+}
+
+// 会話で復習: a line of a talk in its person's voice (R2, "talk/v1/mia/<sha256>.mp3").
+// A line whose audio hasn't been made yet is read in the app's usual voice.
+async function talkAudio(env, who, text) {
+  if (!who || !text || !isTalkLine(who, text)) throw new HttpError(404, "見つかりません。");
+  const object = await env.FILES?.get(await talkAudioKey(who, text));
+  if (object) return new Response(object.body, { headers: { "Content-Type": "audio/mpeg", "Cache-Control": "private, max-age=86400" } });
+  try {
+    return new Response(await speechFor(env, text), { headers: { "Content-Type": "audio/mpeg", "Cache-Control": "no-store" } });
+  } catch (error) {
+    if (!(error instanceof SpeechError)) throw error;
+    throw new HttpError(503, "音声を作れませんでした。");
+  }
+}
+
+async function listTalkAudio(env) {
+  if (!env.FILES) return json({ keys: [] });
+  const keys = [];
+  let cursor;
+  do {
+    const page = await env.FILES.list({ prefix: "talk/", cursor });
+    keys.push(...page.objects.map((o) => o.key));
+    cursor = page.truncated ? page.cursor : null;
+  } while (cursor);
+  return json({ keys });
+}
+
+async function saveTalkAudio(request, env, who, text) {
+  if (!who || !text || !isTalkLine(who, text)) throw new HttpError(404, "その会話の文は見つかりません。");
+  if (!env.FILES) throw new HttpError(500, "ファイルの置き場所（R2）の設定がまだです。");
+  const audio = new Uint8Array(await request.arrayBuffer());
+  const mp3 = audio.length > 4 && ((audio[0] === 0x49 && audio[1] === 0x44 && audio[2] === 0x33) || (audio[0] === 0xff && (audio[1] & 0xe0) === 0xe0));
+  if (!mp3 || audio.length > 2_000_000) throw new HttpError(400, "MP3 の音声を送ってください。");
+  const key = await talkAudioKey(who, text);
+  await env.FILES.put(key, audio, { httpMetadata: { contentType: "audio/mpeg" } });
+  return json({ ok: true, key });
 }
 
 async function saveLessonResult(request, env, student, lessonId) {
