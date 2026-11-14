@@ -191,6 +191,7 @@ Week ごとに、全員共通の単語帳のかわりに、別の単語帳を出
   - `linkup1`「英単語 Week 1」（`public/vocab/linkup1.js`。先生の PDF「LinkUp英単語」の最初の 10 ページから。動詞 30・名詞 20・形容詞 20・副詞 10・前置詞 20 の 100 語、例文は 1 語に 1 つ（日本語訳つき）。PDF の発音記号は入れていない）
   - `linkup2`「英単語 Week 2」（`public/vocab/linkup2.js`。同じ PDF の 11〜20 ページから、なおみさんのチャットで先生が OK した 100 語。形は linkup1 と同じ。Week 2 なので Day 1〜7 に分かれる）
   - `linkup3`「英単語 Week 3」（`public/vocab/linkup3.js`。同じ PDF の 21〜30 ページの 100 語：動詞 30・名詞 20・形容詞 20・副詞 10・イディオム 20。Day 1〜7）
+  - `linkup4`「英単語 Week 4」・`linkup5`「英単語 Week 5」（`public/vocab/linkup4.js`・`linkup5.js`。先生の PDF「中級まとめ」の 31〜40 ページ・41〜50 ページの 100 語ずつ。形は linkup3 と同じ。なおみさんのチャットで、先生の「Week 4、5」を受けて作った）
   - `pp1`「過去分詞（不規則動詞 25）」（`public/vocab/pp1.js`。けいじさんのチャットで先生が OK した、原形・過去形・過去分詞が全部ちがう動詞 25 語。Week 3 と Week 4 のあいだ（`3.5=pp1`）に入る。くわしくは下の「過去分詞」）
   - `kaiwa1`「会話で復習（Week 1〜3 の単語）」（`public/vocab/kaiwa1.js`。Week 4 に入る。くわしくは下の「会話で復習」）
   - `w2`〜`w6`「単語帳 Week 2〜6」（`public/vocab/week2.js`〜`week6.js`。先生のスライド「単語帳 week 2〜6」から。100 語・例文 200 ずつ）。Week 1 のつづきですが、いまは全員共通ではなく、出した生徒だけに出ます（`everyone: false`。全員に出すときは、その行を消す）
