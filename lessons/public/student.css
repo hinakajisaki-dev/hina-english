@@ -644,7 +644,7 @@ body.quiz-open .wrap { padding-bottom: 62vh; }
 .forms-answer .btn { grid-column: 1 / -1; }
 
 /* 会話で復習: a talk as chat bubbles (Mia left, Ken right); a tap plays a line. */
-.talk { gap: 14px; }
+.talk { display: flex; flex-direction: column; gap: 14px; }
 .talk-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
 .talk-scene { font-size: 18px; font-weight: 800; }
 .chip-toggle {
@@ -652,6 +652,7 @@ body.quiz-open .wrap { padding-bottom: 62vh; }
   font: inherit; font-size: 13px; font-weight: 700; color: var(--ink-2); cursor: pointer;
 }
 .chip-toggle[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: #fff; }
+.talk-speed { display: flex; justify-content: center; margin-top: -4px; }
 .talk-play svg { width: 18px; height: 18px; margin-right: 6px; vertical-align: -3px; }
 .talk-lines { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
 .talk-line { display: flex; flex-direction: column; align-items: flex-start; gap: 3px; }

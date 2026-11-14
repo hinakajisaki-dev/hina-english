@@ -1126,7 +1126,8 @@ function renderVocabDay(week, number, tab) {
 // ---------- 会話で復習 ----------
 // A talk: its lines as chat bubbles (Mia on the left, Ken on the right), the
 // talk's words in red. A tap on a bubble plays it; 全部きく plays them all in
-// turn. 日本語 shows or hides the Japanese (remembered on the phone).
+// turn, at the speed chosen under it (also while playing). 日本語 shows or
+// hides the Japanese (remembered on the phone).
 const TALK_JA_KEY = "hina-talk-ja";
 const talkJa = () => {
   try { return localStorage.getItem(TALK_JA_KEY) === "1"; } catch { return false; }
@@ -1140,6 +1141,7 @@ function talkHtml(talk, base) {
         <button type="button" class="chip-toggle" id="talk-ja" aria-pressed="${talkJa()}">日本語</button>
       </div>
       <button type="button" class="btn block talk-play" id="talk-play">${icons.speaker}全部きく</button>
+      <div class="talk-speed">${speedControl()}</div>
       <ol class="talk-lines">${talk.lines.map((line, i) => `<li class="talk-line ${line.who === "ken" ? "right" : "left"} ${esc(line.who)}">
         <span class="who">${esc(TALK_PEOPLE[line.who] || line.who)}</span>
         <button type="button" class="bubble" data-line="${i}" aria-label="${esc(talkText(line.en))} を聞く">
@@ -1147,7 +1149,6 @@ function talkHtml(talk, base) {
           <span class="ja">${esc(line.ja)}</span>
         </button>
       </li>`).join("")}</ol>
-      ${speedControl()}
     </section>
     <a class="btn secondary block" href="${base}/test">テストへ</a>`;
 }
