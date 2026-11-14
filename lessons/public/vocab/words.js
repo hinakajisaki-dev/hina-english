@@ -361,10 +361,13 @@ export function talkBook(week, books) {
   return book?.talk ? book : null;
 }
 
-// One talk of a book (number from 1): { title, emoji, words, lines: [{ who, en, ja }] }.
+// One talk of a book (number from 1): { title, emoji, words, lines: [{ who, en, ja }],
+// week: the week of its words' 単語帳 (1 for Week 1's) }.
 export function talkOf(bookId, number) {
-  const talk = findBook(bookId)?.talks?.[number - 1];
-  return talk ? { ...talk, lines: talk.lines.map(([who, en, ja]) => ({ who, en, ja })) } : null;
+  const book = findBook(bookId);
+  const talk = book?.talks?.[number - 1];
+  if (!talk) return null;
+  return { ...talk, week: findBook(talk.from || book.from)?.week, lines: talk.lines.map(([who, en, ja]) => ({ who, en, ja })) };
 }
 
 // "I [left] home." → ["I ", "left", " home."]: the odd entries are the talk's words.

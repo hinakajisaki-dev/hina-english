@@ -647,6 +647,12 @@ body.quiz-open .wrap { padding-bottom: 62vh; }
 .talk { display: flex; flex-direction: column; gap: 14px; }
 .talk-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
 .talk-scene { font-size: 18px; font-weight: 800; }
+.talk-from { font-size: 13px; color: var(--muted); margin-top: 4px; }
+.lesson-card .talk-week { align-self: flex-start; margin-bottom: 4px; }
+.talk-week {
+  display: inline-block; font-family: var(--en); font-size: 12px; font-weight: 800; padding: 2px 9px; border-radius: 99px;
+  background: var(--sky-soft); color: var(--ink-2); vertical-align: 2px;
+}
 .chip-toggle {
   flex: none; padding: 6px 14px; border-radius: 999px; border: 1.5px solid var(--line); background: var(--card);
   font: inherit; font-size: 13px; font-weight: 700; color: var(--ink-2); cursor: pointer;
