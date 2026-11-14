@@ -361,13 +361,26 @@ export function talkBook(week, books) {
   return book?.talk ? book : null;
 }
 
-// One talk of a book (number from 1): { title, emoji, words, lines: [{ who, en, ja }],
-// week: the week of its words' 単語帳 (1 for Week 1's) }.
+// One talk of a book (number from 1): { title, emoji, words, lines: [{ who, en, ja, key }],
+// week: the week of its words' 単語帳 (1 for Week 1's) }. A line's key ("kaiwa1/3/2":
+// talk 3's second line) is how it is kept in フレーズ復習.
 export function talkOf(bookId, number) {
   const book = findBook(bookId);
   const talk = book?.talks?.[number - 1];
   if (!talk) return null;
-  return { ...talk, week: findBook(talk.from || book.from)?.week, lines: talk.lines.map(([who, en, ja]) => ({ who, en, ja })) };
+  return {
+    ...talk,
+    week: findBook(talk.from || book.from)?.week,
+    lines: talk.lines.map(([who, en, ja], i) => ({ who, en, ja, key: `${bookId}/${number}/${i + 1}` })),
+  };
+}
+
+// A line of a talk by its key, with its talk; null when there is none.
+export function talkLineByKey(key) {
+  const m = String(key).match(/^([a-z0-9]+)\/(\d+)\/(\d+)$/);
+  const talk = m && findBook(m[1])?.talk ? talkOf(m[1], Number(m[2])) : null;
+  const line = talk?.lines[Number(m[3]) - 1];
+  return line ? { ...line, talk } : null;
 }
 
 // "I [left] home." → ["I ", "left", " home."]: the odd entries are the talk's words.

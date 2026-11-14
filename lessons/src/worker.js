@@ -13,7 +13,7 @@ import {
 import { ONLY_UNITS, findLesson, lessonExampleSentences, plain, questionCount } from "../public/grammar/lessons.js";
 import { findMistakes, normalizeWords } from "../public/mistakes.js";
 import {
-  bookSentences, bookWord, isPaceWeek, isTalkLine, isToeicWeek, itemWord, listenSetKey, setKey, speakable, talkAudioKey, vocabBooks,
+  bookSentences, bookWord, isPaceWeek, isTalkLine, isToeicWeek, itemWord, listenSetKey, setKey, speakable, talkAudioKey, talkLineByKey, vocabBooks,
   weekWords, wordSets,
 } from "../public/vocab/words.js";
 import { findPhrase, pronMonths } from "../public/pron/phrases.js";
@@ -821,11 +821,12 @@ async function saveVocabTest(request, env, student, weekParam, number) {
 
 // The フレーズ復習 list, like the words' 復習 list: on adds a phrase (source
 // "check" from its card, "test" when missed in a set test), off takes it out.
-// Cards of the student's 授業メモ ("n12/3") go in the same list; one whose memo
-// has changed or gone can still be taken out.
+// Cards of the student's 授業メモ ("n12/3") and lines of 会話で復習 ("kaiwa1/3/2", their ☆)
+// go in the same list; a memo card whose memo has changed or gone can still be taken out.
 async function savePhraseReview(request, env, student) {
   const { key, on, source } = await readJson(request);
-  const known = phraseByKey(key) || (on ? await findNoteCard(env.DB, student, key) : NOTE_CARD_KEY.test(String(key)));
+  const known = phraseByKey(key) || talkLineByKey(key)
+    || (on ? await findNoteCard(env.DB, student, key) : NOTE_CARD_KEY.test(String(key)));
   if (!known) throw new HttpError(404, "見つかりません。");
   if (on) {
     await run(

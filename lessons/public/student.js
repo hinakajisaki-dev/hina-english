@@ -7,7 +7,7 @@ import {
 import { findLesson, plain, questionCount, unitsFor } from "./grammar/lessons.js";
 import {
   TALK_PEOPLE, TOEIC_PARTS, bookWeeks, formsRight, isPaceWeek, isToeicWeek, itemWeek, listenSetKey, paceWeeks, setKey, speakable, splitOnForm,
-  talkBook, talkOf, talkParts, talkText, toeicPart, toeicWeek, weekName, weekWords, wordSets, wordText, wordVoice,
+  talkBook, talkLineByKey, talkOf, talkParts, talkText, toeicPart, toeicWeek, weekName, weekWords, wordSets, wordText, wordVoice,
 } from "./vocab/words.js";
 import { MONTHS, currentMonth, monthLabel, monthPhrases, studentMonths } from "./pron/phrases.js";
 import { CURRENT_WEEK, NOTES_FOR_STUDENTS } from "./course.js";
@@ -1148,19 +1148,38 @@ function talkHtml(talk, base) {
       </div>
       <button type="button" class="btn block talk-play" id="talk-play">${icons.speaker}全部きく</button>
       <div class="talk-speed">${speedControl()}</div>
+      <p class="muted small talk-hint">☆ を押すと、その文が<b>フレーズ復習</b>に入ります</p>
       <ol class="talk-lines">${talk.lines.map((line, i) => `<li class="talk-line ${line.who === "ken" ? "right" : "left"} ${esc(line.who)}">
         <span class="who">${esc(TALK_PEOPLE[line.who] || line.who)}</span>
-        <button type="button" class="bubble" data-line="${i}" aria-label="${esc(talkText(line.en))} を聞く">
-          <span class="en" lang="en">${talkParts(line.en).map((part, j) => (j % 2 ? `<span class="hl">${esc(part)}</span>` : esc(part))).join("")}</span>
-          <span class="ja">${esc(line.ja)}</span>
-        </button>
+        <div class="talk-row">
+          <button type="button" class="bubble" data-line="${i}" aria-label="${esc(talkText(line.en))} を聞く">
+            <span class="en" lang="en">${talkParts(line.en).map((part, j) => (j % 2 ? `<span class="hl">${esc(part)}</span>` : esc(part))).join("")}</span>
+            <span class="ja">${esc(line.ja)}</span>
+          </button>
+          ${talkStarHtml(line.key)}
+        </div>
       </li>`).join("")}</ol>
     </section>
     <a class="btn secondary block" href="${base}/test">テストへ</a>`;
 }
 
+// ☆ beside a line: puts it in フレーズ復習 (★ while it is there; a tap takes it out).
+const talkStarHtml = (key) => {
+  const on = inPhraseReview(key);
+  return `<button type="button" class="talk-star" data-star="${esc(key)}" aria-pressed="${on}" aria-label="${on ? "フレーズ復習から外す" : "フレーズ復習に入れる"}">${on ? "★" : "☆"}</button>`;
+};
+
 function bindTalk(talk) {
   const box = app.querySelector(".talk");
+  box.addEventListener("click", (event) => {
+    const star = event.target.closest("[data-star]");
+    if (!star) return;
+    const key = star.dataset.star;
+    const on = !inPhraseReview(key);
+    setPhraseReview(key, on); // (the list changes at once; saving goes on behind)
+    star.outerHTML = talkStarHtml(key);
+    toast(on ? "フレーズ復習に入れました ★" : "フレーズ復習から外しました");
+  });
   const bubbles = [...box.querySelectorAll(".bubble")];
   const play = document.getElementById("talk-play");
   const mark = (i) => bubbles.forEach((b, j) => b.classList.toggle("playing", j === i));
@@ -2262,7 +2281,7 @@ function phraseCardHtml(phrase, revealed) {
       ${head}
       <div class="word-row center-row">
         <p class="phrase-en" lang="en">${esc(phrase.en)}</p>
-        ${sayIcon(phrase.say)}
+        ${sayIcon(phrase.say, phrase.src)}
       </div>
       <p class="hint">タップするか「次へ」で、日本語訳と解説を見る</p>
     </section>`;
@@ -2271,7 +2290,7 @@ function phraseCardHtml(phrase, revealed) {
     ${head}
     <div class="word-row">
       <p class="phrase-en" lang="en">${esc(phrase.en)}</p>
-      ${sayIcon(phrase.say)}
+      ${sayIcon(phrase.say, phrase.src)}
     </div>
     <p ${oneLine(phrase.ja)}>${esc(phrase.ja)}</p>
     ${phrase.chunk ? `<div class="chunk-box"><p class="label">塊</p><p class="chunk" lang="en">${noteHtml(phrase.chunk)}</p>
@@ -2540,9 +2559,18 @@ function memoPhrase(key) {
   };
 }
 
+// A line of 会話で復習 put in with its ☆, shaped like a phrase with no 瞬間英作文.
+function talkPhrase(key) {
+  const line = talkLineByKey(key);
+  return line && {
+    key, no: null, scene: `💬 ${line.talk.emoji || ""} ${line.talk.title}`, replyTo: null, en: talkText(line.en), say: talkText(line.en),
+    src: talkSrc(line), ja: line.ja, chunk: "", chunkJa: "", note: "", example: null, drills: [],
+  };
+}
+
 function reviewPhrases() {
   return state.me.phraseReview.map((r) => {
-    const phrase = phraseByKey(r.key) || memoPhrase(r.key);
+    const phrase = phraseByKey(r.key) || memoPhrase(r.key) || talkPhrase(r.key);
     return phrase && { ...phrase, source: r.source };
   }).filter(Boolean);
 }
@@ -3372,9 +3400,10 @@ function highlighter(step) {
   return (html) => html.replace(words, '<span class="hl">$1</span>');
 }
 
-function sayIcon(text) {
+// src: audio to play instead of the usual voice (会話で復習's lines).
+function sayIcon(text, src = "") {
   const words = plain(text);
-  return `<button type="button" class="speak icon-only" data-say="${esc(words)}" aria-label="${esc(words)} を聞く">${icons.speaker}</button>`;
+  return `<button type="button" class="speak icon-only" data-say="${esc(words)}"${src ? ` data-src="${esc(src)}"` : ""} aria-label="${esc(words)} を聞く">${icons.speaker}</button>`;
 }
 
 // One side of a compare row: an English sentence, its Japanese and its audio.
