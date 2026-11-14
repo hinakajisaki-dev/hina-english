@@ -4,7 +4,7 @@
 import { ApiError, api, diffHtml, esc, formatDateTime, icons, keepUpdated, startOfJapanDay, toast, watchErrors } from "./common.js";
 import { unitsFor } from "./grammar/lessons.js";
 import {
-  TOEIC_PARTS, bookWeeks, isToeicWeek, itemWeek, listenSetKey, paceWeeks, setKey, toeicPart, toeicWeek, vocabBooks, weekBook, weekName,
+  TOEIC_PARTS, bookWeeks, isToeicWeek, itemWeek, listenSetKey, paceWeeks, setKey, talkBook, toeicPart, toeicWeek, vocabBooks, weekBook, weekName,
   weekWords, wordSets,
 } from "./vocab/words.js";
 import { USUAL_MONTHS, currentMonth, monthLabel, monthPhrases, pronMonths, studentMonths } from "./pron/phrases.js";
@@ -390,7 +390,7 @@ function progressHtml() {
   const lastVocab = latest(vocabTests, sets.map((s) => s.key));
   const lastVocabSet = lastVocab && sets.find((s) => s.key === lastVocab[0]);
   const vocabDone = sets.filter((s) => vocabTests[s.key]).length;
-  const chipLabel = (set) => (set.day ? `Day ${set.number}` : set.week === "mine" || isToeicWeek(set.week) ? set.label.replace(/（.*）$/, "") : `セット${set.number}`);
+  const chipLabel = (set) => (set.day ? `Day ${set.number}` : set.talk || set.week === "mine" || isToeicWeek(set.week) ? set.label.replace(/（.*）$/, "") : `セット${set.number}`);
 
   // 文法: every lesson by unit.
   const lessons = data.lessons || {};
@@ -1156,7 +1156,14 @@ function vocabSetList(data) {
   const books = data.vocabBooks;
   const pace = data.vocabPace;
   let weeks = [...new Set([...bookWeeks(books), ...data.items.filter((i) => i.kind === "vocab").map(itemWeek)])];
-  if (pace) weeks = [...weeks.filter((w) => typeof w !== "number" || w <= pace.week), ...paceWeeks(data.items, books, pace).map((p) => p.week)];
+  // (会話で復習 is outside the pace, after its weeks.)
+  if (pace) {
+    weeks = [
+      ...weeks.filter((w) => typeof w !== "number" || w <= pace.week),
+      ...paceWeeks(data.items, books, pace).map((p) => p.week),
+      ...weeks.filter((w) => typeof w === "number" && w > pace.week && talkBook(w, books)),
+    ];
+  }
   return weeks.flatMap((week) => {
     const sets = wordSets(weekWords(week, data.items, books, pace), week, pace);
     const list = sets.map((set) => ({ week, ...set, key: setKey(week, set.number, books, pace) }));
@@ -1174,7 +1181,8 @@ function vocabWeekName(data, week) {
   if (week === "mine") return "生徒が追加した単語";
   if (isToeicWeek(week)) return `TOEIC Part ${toeicPart(week).part}`;
   if (typeof week === "string") return paceWeeks(data.items, data.vocabBooks, data.vocabPace).find((p) => p.week === week)?.label || week;
-  return weekName(week);
+  const talk = talkBook(week, data.vocabBooks);
+  return talk ? `${weekName(week)} ${talk.title}` : weekName(week);
 }
 
 function vocabResultsHtml() {

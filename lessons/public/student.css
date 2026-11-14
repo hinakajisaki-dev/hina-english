@@ -238,7 +238,7 @@ a.week:hover { border-color: var(--sky); }
 .lesson-nav .btn:not(.ghost) { min-width: 140px; }
 
 /* 単語カード: a day's words and its テスト, as two tabs */
-.tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; padding: 4px; background: var(--card); border: 1px solid var(--line); border-radius: 999px; }
+.tabs { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 4px; padding: 4px; background: var(--card); border: 1px solid var(--line); border-radius: 999px; }
 .tabs a { display: block; padding: 10px; border-radius: 999px; text-align: center; font-weight: 700; color: var(--ink-2); text-decoration: none; }
 .tabs a small { font-family: var(--en); font-size: 13px; margin-left: 2px; }
 .tabs a[aria-current="page"] { background: var(--ink); color: #fff; }
@@ -642,3 +642,33 @@ body.quiz-open .wrap { padding-bottom: 62vh; }
 .forms-answer input.right { border-color: var(--good); background: var(--good-soft); }
 .forms-answer input.wrong { border-color: var(--bad); background: #FFF0EE; }
 .forms-answer .btn { grid-column: 1 / -1; }
+
+/* 会話で復習: a talk as chat bubbles (Mia left, Ken right); a tap plays a line. */
+.talk { display: flex; flex-direction: column; gap: 14px; }
+.talk-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.talk-scene { font-size: 18px; font-weight: 800; }
+.chip-toggle {
+  flex: none; padding: 6px 14px; border-radius: 999px; border: 1.5px solid var(--line); background: var(--card);
+  font: inherit; font-size: 13px; font-weight: 700; color: var(--ink-2); cursor: pointer;
+}
+.chip-toggle[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: #fff; }
+.talk-speed { display: flex; justify-content: center; margin-top: -4px; }
+.talk-play svg { width: 18px; height: 18px; margin-right: 6px; vertical-align: -3px; }
+.talk-lines { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.talk-line { display: flex; flex-direction: column; align-items: flex-start; gap: 3px; }
+.talk-line.right { align-items: flex-end; }
+.talk-line .who { font-family: var(--en); font-size: 12px; font-weight: 800; color: var(--muted); padding: 0 6px; }
+.bubble {
+  max-width: 85%; text-align: left; font: inherit; color: var(--ink); cursor: pointer;
+  padding: 10px 14px; border-radius: 18px 18px 18px 6px; border: 2px solid transparent; background: var(--sky-soft);
+  display: flex; flex-direction: column; gap: 3px; transition: border-color .15s;
+}
+.talk-line.right .bubble { background: var(--cream); border-radius: 18px 18px 6px 18px; }
+.talk-line.tom .bubble { background: var(--pink); }
+.bubble .en { font-family: var(--en); font-size: 17px; line-height: 1.45; }
+.bubble .ja { font-size: 13px; color: var(--ink-2); }
+.talk.no-ja .bubble .ja { display: none; }
+.bubble.playing { border-color: var(--accent); }
+.day-head { display: flex; align-items: baseline; justify-content: space-between; font-size: 17px; margin: 10px 2px -4px; }
+.day-head span { font-family: var(--en); font-size: 13px; font-weight: 700; color: var(--muted); }
+.day-head.done span { color: var(--good); }

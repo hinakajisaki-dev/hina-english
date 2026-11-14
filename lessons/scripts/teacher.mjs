@@ -37,6 +37,7 @@
 //                                                                 (発音 finished before the app, as 完了 with no recording)
 // node scripts/teacher.mjs vocab-books なおみ [--set "1=ielts1" | --default]   (単語帳 per week instead of the shared one)
 // node scripts/teacher.mjs phrase-books なおみ [--set talk1 | --default]   (フレーズ: own books instead of スモールトーク)
+// node scripts/teacher.mjs talk-audio [--dry | --force | --out dir | --from dir]   (会話で復習: makes the missing voices with ElevenLabs)
 // node scripts/teacher.mjs vocab-pace なおみ [--week 2 --days 4 --size 40 | --off]   (fewer words a week, across the 単語帳)
 // node scripts/teacher.mjs write-practice なおみ [--on | --off]   (★ on 復習 examples and 書く練習)
 // node scripts/teacher.mjs toeic えいし [--on | --off]             (TOEIC単語 at the top of the home screen)
@@ -54,11 +55,11 @@
 //
 // A file of "-" is read from stdin.
 import { spawnSync } from "node:child_process";
-import { readFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
 import { lessonDayLabel, lessonList, noteDayLabel, noteProblems } from "../public/notes/format.js";
 import { MENUS, menuKey } from "../public/menus.js";
 import { monthPhrases, pronMonths, studentMonths } from "../public/pron/phrases.js";
-import { vocabBooks, weekBook, weekName } from "../public/vocab/words.js";
+import { talkAudioKey, talkLines, vocabBooks, weekBook, weekName } from "../public/vocab/words.js";
 import { ONLY_UNITS } from "../public/grammar/lessons.js";
 import { phraseBooks } from "../public/phrases/book.js";
 
@@ -110,6 +111,38 @@ async function api(path, { method = "GET", body } = {}) {
   return data;
 }
 
+// ---------- 会話で復習's voices (ElevenLabs) ----------
+// The key is the environment's ELEVENLABS_API_KEY, or (in a cloud session) the
+// network secret the proxy adds for api.elevenlabs.io.
+const TALK_VOICE_IDS = { mia: "cgSgspJ2msm6clMCkdW9", ken: "bIHbv24MWmeRgasZH58o", tom: "iP95p4xoKVk53GoZ742B" }; // Jessica, Will, Chris (talk/v1)
+const TALK_MODEL = "eleven_multilingual_v2";
+
+async function elevenLabs(line) {
+  const response = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${TALK_VOICE_IDS[line.who]}?output_format=mp3_44100_128`, {
+    method: "POST",
+    headers: { "xi-api-key": process.env.ELEVENLABS_API_KEY || "from-proxy", "Content-Type": "application/json", Accept: "audio/mpeg" },
+    body: JSON.stringify({
+      text: line.text,
+      model_id: TALK_MODEL,
+      // The lines around it, so it sounds like part of the talk.
+      previous_text: line.before || undefined,
+      next_text: line.after || undefined,
+      voice_settings: { stability: 0.5, similarity_boost: 0.75, speed: 0.9 },
+    }),
+  }).catch((error) => stop(`ElevenLabs につながりません：${error.cause?.message || error.message}`));
+  if (!response.ok) stop(`ElevenLabs のエラー ${response.status}：${(await response.text()).slice(0, 300)}`);
+  return Buffer.from(await response.arrayBuffer());
+}
+
+async function upload(path, audio) {
+  const response = await fetch(`${BASE}${path}`, {
+    method: "PUT",
+    headers: { Authorization: `Bearer ${TOKEN}`, "Content-Type": "audio/mpeg" },
+    body: audio,
+  });
+  if (!response.ok) stop((await response.json().catch(() => ({}))).error || `エラー ${response.status}`);
+}
+
 // Options (--week 2, --publish) and the rest, in order.
 function parseArgs(args) {
   const options = {};
@@ -127,6 +160,7 @@ function parseArgs(args) {
     else if (arg === "--mine") options.mine = true;
     else if (arg === "--on") options.on = true;
     else if (arg === "--off") options.off = true;
+    else if (arg === "--force") options.force = true;
     else if (arg.startsWith("--")) options[arg.slice(2)] = args[++i];
     else rest.push(arg);
   }
@@ -781,6 +815,32 @@ const commands = {
   },
 
   // 文法の単元 just for some students (only: true): which ones this student has.
+  // 会話で復習: every line of every talk in its person's ElevenLabs voice, into R2.
+  // Only the lines not in the app yet (--force: all again; --dry: just count).
+  // --out dir saves the MP3s there instead (to listen first); --from dir then
+  // puts those files in the app without making them again.
+  async "talk-audio"(_, options) {
+    const lines = talkLines();
+    // (With --out, what is already in that folder.)
+    const have = options.force ? new Set()
+      : options.out ? new Set(existsSync(options.out) ? readdirSync(options.out).map((f) => f.replaceAll("_", "/")) : [])
+      : new Set((await api("/api/teacher/talk-audio")).keys);
+    const missing = [];
+    for (const line of lines) if (!have.has(await talkAudioKey(line.who, line.text))) missing.push(line);
+    const chars = missing.reduce((n, l) => n + l.text.length, 0);
+    console.log(`会話の文 ${lines.length} こ（まだ音声がないもの ${missing.length} こ・${chars} 文字）`);
+    if (options.dry || !missing.length) return;
+    if (options.out) mkdirSync(options.out, { recursive: true });
+    for (const [i, line] of missing.entries()) {
+      const name = (await talkAudioKey(line.who, line.text)).replaceAll("/", "_");
+      const audio = options.from ? readFileSync(`${options.from}/${name}`) : await elevenLabs(line);
+      if (options.out) writeFileSync(`${options.out}/${name}`, audio);
+      else await upload(`/api/teacher/talk-audio?who=${line.who}&text=${encodeURIComponent(line.text)}`, audio);
+      console.log(`${i + 1} / ${missing.length}  ${line.who}: ${line.text}`);
+    }
+    console.log(options.out ? `${options.out} に保存しました。` : "音声を入れました。");
+  },
+
   async "grammar-units"([name], options) {
     const student = await findStudent(name);
     const line = (ids) => (ids.length ? ONLY_UNITS.filter((u) => ids.includes(u.id)).map((u) => `${u.id}（${u.title}・${u.lessons.length} レッスン）`).join("、") : "なし");

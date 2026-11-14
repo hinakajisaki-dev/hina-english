@@ -2,12 +2,12 @@
 // today's phrase, pronunciation, grammar and the journal with its correction.
 import {
   ApiError, api, diffHtml, esc, formatDate, icons, japanDayNumber,
-  SPEEDS, getSpeed, keepUpdated, setApiParams, setSpeed, speak, startOfJapanDay, stopSpeaking, toast, watchErrors, withParams,
+  SPEEDS, getSpeed, keepUpdated, setApiParams, setSpeed, speak, speakLines, startOfJapanDay, stopSpeaking, toast, watchErrors, withParams,
 } from "./common.js";
 import { findLesson, plain, questionCount, unitsFor } from "./grammar/lessons.js";
 import {
-  TOEIC_PARTS, bookWeeks, formsRight, isPaceWeek, isToeicWeek, itemWeek, listenSetKey, paceWeeks, setKey, speakable, splitOnForm, toeicPart,
-  toeicWeek, weekName, weekWords, wordSets, wordText, wordVoice,
+  TALK_PEOPLE, TOEIC_PARTS, bookWeeks, formsRight, isPaceWeek, isToeicWeek, itemWeek, listenSetKey, paceWeeks, setKey, speakable, splitOnForm,
+  talkBook, talkOf, talkParts, talkText, toeicPart, toeicWeek, weekName, weekWords, wordSets, wordText, wordVoice,
 } from "./vocab/words.js";
 import { MONTHS, currentMonth, monthLabel, monthPhrases, studentMonths } from "./pron/phrases.js";
 import { CURRENT_WEEK, NOTES_FOR_STUDENTS } from "./course.js";
@@ -905,10 +905,14 @@ function studyWeeks() {
   weeks.push(...bookWeeks(state.me.vocabBooks).filter((w) => !Number.isInteger(w) && w < weeks.length));
   weeks.sort((a, b) => a - b);
   if (pace) weeks.push(...myPaceWeeks().map((p) => p.week));
+  // 会話で復習 sits outside the pace, after its weeks.
+  if (pace) weeks.push(...bookWeeks(state.me.vocabBooks).filter((w) => w > pace.week && myTalkBook(w)));
   if (items("vocab").some((v) => itemWeek(v) === "other")) weeks.push("other");
   return weeks;
 }
 const inReview = (key) => state.me.review.some((r) => r.key === key);
+// The 会話で復習 book of a week, or null (#/vocab/4 is its talks, #/vocab/4/1 the first talk).
+const myTalkBook = (week) => (typeof week === "number" ? talkBook(week, state.me.vocabBooks) : null);
 const testResult = (week, number) => state.me.vocabTests[studentSetKey(week, number)];
 
 // Every word this student has, by key, so the 復習 list can find its words.
@@ -963,7 +967,8 @@ function renderVocab(week, setNumber, mode, arg) {
   const w = week === "other" || week === "mine" || isPaceWeek(week) || isToeicWeek(week) ? week : Number(week);
   if (week && setNumber && mode === "test") return arg === "start" ? renderVocabTest(w, Number(setNumber)) : renderVocabDay(w, Number(setNumber), "test");
   if (week && setNumber && mode === "card") return renderVocabSet(w, Number(setNumber), Number(arg) - 1);
-  if (week && setNumber) return renderVocabDay(w, Number(setNumber), "words");
+  // A talk opens on its conversation; its words are #/vocab/4/1/words.
+  if (week && setNumber) return renderVocabDay(w, Number(setNumber), myTalkBook(w) && mode !== "words" ? "talk" : "words");
   if (week) return renderWeek(w);
 
   const weeks = studyWeeks();
@@ -975,7 +980,7 @@ function renderVocab(week, setNumber, mode, arg) {
     const tested = sets.filter((s) => testResult(week, s.number)).length;
     return `<a class="week ${tested === sets.length ? "done" : ""}" href="#/vocab/${week}">
       <b>${weekLabel(week)}</b>
-      <span>${words.length} 語 ・ テスト ${tested} / ${sets.length}</span>
+      <span>${myTalkBook(week) ? "💬 会話" : `${words.length} 語`} ・ テスト ${tested} / ${sets.length}</span>
       <div class="bar"><i style="width:${Math.round((tested / sets.length) * 100)}%"></i></div>
     </a>`;
   });
@@ -1021,6 +1026,7 @@ const wordFormData = (form) => ({ word: form.word.value, meaning: form.meaning.v
 function renderWeek(week) {
   state.vocabTest = null;
   const sets = studentSets(week);
+  const talk = myTalkBook(week);
   const mine = week === "mine";
   const toeic = isToeicWeek(week);
   app.innerHTML = `${topbar(toeic ? weekLabel(week) : `単語カード ・ ${weekLabel(week)}`, toeic ? "#/toeic" : "#/vocab")}
@@ -1030,14 +1036,17 @@ function renderWeek(week) {
         ${wordFormHtml(null)}
       </section>` : ""}
       ${isPaceWeek(week) ? `<p class="pace-range">${esc(paceWeek(week)?.range || "")}</p>` : ""}
-      ${sets.length ? `<p class="muted">${sets[0].day ? "Day" : "セット"}をえらぶと、単語の一覧が出ます。<br>テストは「テスト」タブから、いつでもできます。</p>` : ""}
+      ${talk ? `<p class="muted">${esc(talk.about)}を、<b>会話</b>で復習します。<br><b>1日 ${talk.perDay} つ</b>が目安。会話を聞いたら、テストをしよう。</p>`
+        : sets.length ? `<p class="muted">${sets[0].day ? "Day" : "セット"}をえらぶと、単語の一覧が出ます。<br>テストは「テスト」タブから、いつでもできます。</p>` : ""}
       ${sets.length ? "" : mine ? `<p class="muted small" style="text-align:center">追加した単語は、10 語ずつのセットになって、カードとテストで練習できます。</p>`
         : emptyState(toeic ? "この Part の単語は、先生が用意します。" : "この週の単語は、まだありません。")}
       ${sets.map((set) => {
         const result = testResult(week, set.number);
+        // 会話で復習: Day 1 is the first five talks, and so on.
+        const day = talk && (set.number - 1) % talk.perDay === 0 ? dayHead(week, sets, Math.ceil(set.number / talk.perDay), talk.perDay) : "";
         const place = resumeAt(resumeKind(week), studentSetKey(week, set.number));
-        return `<a class="lesson-card" href="${weekHref(week)}/${set.number}">
-          <div><b>${esc(set.label)}</b>${set.day ? `<span class="muted small">${esc(set.title)} ・ ${set.words.length}語</span>` : ""}<span class="muted small" lang="en">${set.words.map((w) => esc(w.word)).join(" ・ ")}</span></div>
+        return `${day}<a class="lesson-card" href="${weekHref(week)}/${set.number}">
+          <div><b>${set.talk ? `${set.number}. ${talkOf(talk.id, set.number)?.emoji || ""} ${esc(set.title)}` : esc(set.label)}</b>${set.day ? `<span class="muted small">${esc(set.title)} ・ ${set.words.length}語</span>` : ""}<span class="muted small" lang="en">${set.words.map((w) => esc(w.word)).join(" ・ ")}</span></div>
           ${place ? `<span class="badge start">つづきから ${esc(place.of)}</span>`
             : result ? `<span class="badge">✓ ${result.best} / ${result.total}</span>` : `<span class="badge start">はじめる</span>`}
         </a>`;
@@ -1062,6 +1071,13 @@ function renderWeek(week) {
   });
 }
 
+// "Day 2  3 / 5" above a day's talks (green once all five are tested).
+function dayHead(week, sets, day, perDay) {
+  const its = sets.slice((day - 1) * perDay, day * perDay);
+  const done = its.filter((s) => testResult(week, s.number)).length;
+  return `<h3 class="day-head ${done === its.length ? "done" : ""}">Day ${day}<span>${done === its.length ? "✓ " : ""}${done} / ${its.length}</span></h3>`;
+}
+
 function findSet(week, number) {
   return studentSets(week).find((s) => s.number === number);
 }
@@ -1079,13 +1095,16 @@ function renderVocabDay(week, number, tab) {
   const result = testResult(week, number);
   const place = resumeAt(resumeKind(week), studentSetKey(week, number));
 
+  const talk = set.talk ? talkOf(myTalkBook(week).id, number) : null;
   app.innerHTML = `${topbar(setName(week, set), weekHref(week))}
     <main class="wrap stack">
-      ${tabsHtml("単語とテスト", [
-        { href: base, label: `単語 <small>${set.words.length}</small>`, on: tab !== "test" },
+      ${tabsHtml(talk ? "会話と単語とテスト" : "単語とテスト", [
+        ...(talk ? [{ href: base, label: "会話", on: tab === "talk" }] : []),
+        { href: talk ? `${base}/words` : base, label: `単語 <small>${set.words.length}</small>`, on: tab === "words" },
         { href: `${base}/test`, label: `テスト${result ? " <small>✓</small>" : ""}`, on: tab === "test" },
       ])}
-      ${tab === "test" ? `<section class="card stack test-intro">
+      ${tab === "talk" ? talkHtml(talk, base)
+      : tab === "test" ? `<section class="card stack test-intro">
         <p class="score">${set.words.length}<small> 問</small></p>
         ${set.words.some((w) => !w.past) ? `<p>英語を見て、意味を<b>4つから</b>えらぼう。</p>` : ""}
         ${set.words.some((w) => w.past) ? `<p>${set.words.every((w) => w.past) ? "" : "過去分詞の単語は、"}原形を見て、<b>過去形と過去分詞</b>を書こう。</p>` : ""}
@@ -1101,6 +1120,70 @@ function renderVocabDay(week, number, tab) {
         <span class="chev" aria-hidden="true">›</span>
       </a></li>`).join("")}</ol>`}
     </main>`;
+  if (tab === "talk") bindTalk(talk);
+}
+
+// ---------- 会話で復習 ----------
+// A talk: its lines as chat bubbles (Mia on the left, Ken on the right), the
+// talk's words in red. A tap on a bubble plays it; 全部きく plays them all in
+// turn, at the speed chosen under it (also while playing). 日本語 shows or
+// hides the Japanese (remembered on the phone).
+const TALK_JA_KEY = "hina-talk-ja";
+const talkJa = () => {
+  try { return localStorage.getItem(TALK_JA_KEY) === "1"; } catch { return false; }
+};
+const talkSrc = (line) => withParams(`/api/talk/audio?who=${line.who}&text=${encodeURIComponent(talkText(line.en))}`);
+
+function talkHtml(talk, base) {
+  return `<section class="card talk ${talkJa() ? "" : "no-ja"}">
+      <div class="talk-head">
+        <p class="talk-scene"><span aria-hidden="true">${talk.emoji || "💬"}</span> ${esc(talk.title)}</p>
+        <button type="button" class="chip-toggle" id="talk-ja" aria-pressed="${talkJa()}">日本語</button>
+      </div>
+      <button type="button" class="btn block talk-play" id="talk-play">${icons.speaker}全部きく</button>
+      <div class="talk-speed">${speedControl()}</div>
+      <ol class="talk-lines">${talk.lines.map((line, i) => `<li class="talk-line ${line.who === "ken" ? "right" : "left"} ${esc(line.who)}">
+        <span class="who">${esc(TALK_PEOPLE[line.who] || line.who)}</span>
+        <button type="button" class="bubble" data-line="${i}" aria-label="${esc(talkText(line.en))} を聞く">
+          <span class="en" lang="en">${talkParts(line.en).map((part, j) => (j % 2 ? `<span class="hl">${esc(part)}</span>` : esc(part))).join("")}</span>
+          <span class="ja">${esc(line.ja)}</span>
+        </button>
+      </li>`).join("")}</ol>
+    </section>
+    <a class="btn secondary block" href="${base}/test">テストへ</a>`;
+}
+
+function bindTalk(talk) {
+  const box = app.querySelector(".talk");
+  const bubbles = [...box.querySelectorAll(".bubble")];
+  const play = document.getElementById("talk-play");
+  const mark = (i) => bubbles.forEach((b, j) => b.classList.toggle("playing", j === i));
+  let playing = false;
+  const stopped = () => {
+    playing = false;
+    mark(-1);
+    play.innerHTML = `${icons.speaker}全部きく`;
+  };
+  play.addEventListener("click", async () => {
+    if (playing) return stopSpeaking();
+    playing = true;
+    play.textContent = "■ とめる";
+    await speakLines(talk.lines.map((line) => ({ text: talkText(line.en), src: talkSrc(line) })), (i) => {
+      mark(i);
+      if (i >= 0) bubbles[i].scrollIntoView({ block: "nearest", behavior: "smooth" });
+    });
+    stopped();
+  });
+  bubbles.forEach((bubble, i) => bubble.addEventListener("click", async () => {
+    const line = talk.lines[i];
+    mark(i);
+    await speak(talkText(line.en), { src: talkSrc(line) });
+  }));
+  document.getElementById("talk-ja").addEventListener("click", (event) => {
+    const on = box.classList.toggle("no-ja") === false;
+    event.currentTarget.setAttribute("aria-pressed", on);
+    try { localStorage.setItem(TALK_JA_KEY, on ? "1" : "0"); } catch { /* private mode */ }
+  });
 }
 
 // One card of a day, opened from its list: まえ / つぎ go through the day
@@ -1110,6 +1193,8 @@ function renderVocabSet(week, number, at) {
   const set = findSet(week, number);
   if (!set) return renderWeek(week);
   const base = `${weekHref(week)}/${number}`;
+  // (A talk's word list is its /words: the talk itself is the set's first page.)
+  const list = set.talk ? `${base}/words` : base;
   const index = at >= 0 && at < set.words.length ? at : 0;
   const id = studentSetKey(week, number);
   if (state.vocab?.id !== id) state.vocab = { id, turned: new Set() };
@@ -1119,7 +1204,7 @@ function renderVocabSet(week, number, at) {
   const last = index === set.words.length - 1;
   const go = (i) => location.replace(`${base}/card/${i + 1}`);
 
-  app.innerHTML = `${topbar(setName(week, set), base)}
+  app.innerHTML = `${topbar(setName(week, set), list)}
     <main class="wrap stack">
       <div class="lesson-progress" role="progressbar" aria-valuemin="1" aria-valuemax="${set.words.length}" aria-valuenow="${index + 1}">
         <div class="bar"><i style="width:${Math.round(((index + 1) / set.words.length) * 100)}%"></i></div>
@@ -1150,7 +1235,7 @@ function renderVocabSet(week, number, at) {
       </section>`}
       <div class="card-nav">
         ${index > 0 ? `<button type="button" class="btn ghost" id="prev">← まえ</button>` : "<span></span>"}
-        <a class="btn ghost list-btn" href="${base}">一覧</a>
+        <a class="btn ghost list-btn" href="${list}">一覧</a>
         <button type="button" class="btn" id="next">${last ? "おわり" : "つぎ →"}</button>
       </div>
     </main>`;
@@ -1213,7 +1298,7 @@ function renderVocabSet(week, number, at) {
     if (!last) return go(index + 1);
     saveResume(resumeKind(week), id, null);
     state.vocab = null;
-    location.hash = base;
+    location.hash = list;
   });
 }
 

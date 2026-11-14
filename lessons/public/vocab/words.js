@@ -21,8 +21,9 @@ import { LINKUP1 } from "./linkup1.js";
 import { LINKUP2 } from "./linkup2.js";
 import { LINKUP3 } from "./linkup3.js";
 import { PP1 } from "./pp1.js";
+import { KAIWA1 } from "./kaiwa1.js";
 
-const BOOKS = [WEEK1, WEEK2, WEEK3, WEEK4, WEEK5, WEEK6, IELTS1, IELTS2, IELTS3, LINKUP1, LINKUP2, LINKUP3, PP1];
+const BOOKS = [WEEK1, WEEK2, WEEK3, WEEK4, WEEK5, WEEK6, IELTS1, IELTS2, IELTS3, LINKUP1, LINKUP2, LINKUP3, PP1, KAIWA1];
 export const SET_SIZE = 10;
 
 const findBook = (id) => BOOKS.find((b) => b.id === id) || null;
@@ -49,10 +50,17 @@ export function weekBook(week, books) {
   return shared && isShared(shared) ? shared.id : null;
 }
 
-// The words of one 単語帳, in its order.
+// The words of one 単語帳, in its order. A 会話で復習 book's words are another
+// book's (same keys, so 復習 is the same word), each with its talk's number.
 export function bookWords(id) {
   const book = findBook(id);
   if (!book) return [];
+  if (book.talk) {
+    return book.talks.flatMap((talk, i) => talk.words
+      .map((w) => bookWord(w.includes("/") ? w : `${talk.from || book.from}/${w}`))
+      .filter(Boolean)
+      .map((word) => ({ ...word, group: talk.title, talk: i + 1 })));
+  }
   return book.groups.flatMap((group) =>
     group.words.map((w) => ({
       key: `${book.id}/${w.id}`,
@@ -114,8 +122,10 @@ export function itemWord(item) {
 // "p1", "p2" … a week of a student's own pace (paceWeeks below).
 export function weekWords(week, items = [], books = null, pace = null) {
   if (isPaceWeek(week)) return paceWeeks(items, books, pace).find((p) => p.week === week)?.words || [];
-  const own = items.filter((item) => item.kind === "vocab" && itemWeek(item) === week).map(itemWord);
   const book = week === "other" || week === "mine" || isToeicWeek(week) ? null : weekBook(week, books);
+  // (A 会話で復習 week is its talks only.)
+  if (findBook(book)?.talk) return bookWords(book);
+  const own = items.filter((item) => item.kind === "vocab" && itemWeek(item) === week).map(itemWord);
   return [...(book ? bookWords(book) : []), ...own];
 }
 
@@ -159,7 +169,7 @@ export function paceWeeks(items, books, pace) {
   const later = [...new Set([
     ...bookWeeks(books),
     ...items.filter((item) => item.kind === "vocab").map(itemWeek).filter((w) => typeof w === "number"),
-  ])].filter((w) => w > pace.week).sort((a, b) => a - b);
+  ])].filter((w) => w > pace.week && !talkBook(w, books)).sort((a, b) => a - b);
   // Runs of weeks that flow into each other, broken at each book between two weeks.
   const runs = [];
   for (const week of later) {
@@ -196,6 +206,13 @@ export function paceWeeks(items, books, pace) {
 // screens call the set ("1. 動詞 ①・②", or "Day 1"). With a pace, its week
 // keeps its first days and spreads the rest over 7 more, and a pace week is 7 days.
 export function wordSets(words, week, pace = null) {
+  // 会話で復習: a set is one talk ("1. 朝の駅で").
+  if (words.length && words.every((w) => w.talk)) {
+    return [...new Set(words.map((w) => w.talk))].map((n) => {
+      const chunk = words.filter((w) => w.talk === n);
+      return { number: n, words: chunk, title: chunk[0].group, label: `${n}. ${chunk[0].group}`, day: false, talk: true };
+    });
+  }
   const paced = isPaceWeek(week);
   const days = paced || byDays(week, words.some((w) => !w.key.startsWith("item/")));
   let chunks = [];
@@ -237,6 +254,7 @@ export function setKey(week, number, books = null, pace = null) {
   if (isPaceWeek(week)) return `pace/${week}/d${number}`;
   if (isToeicWeek(week)) return `${week}/s${number}`;
   const book = week !== "other" && weekBook(week, books);
+  if (findBook(book)?.talk) return `${book}/s${number}`;
   // The days after the kept ones in a pace's week are new days ("w2/p5").
   if (pace && book && Number(week) === pace.week && number > pace.days) return `${book}/p${number}`;
   return `${book || `w${week}`}/${byDays(week, !!book) ? "d" : "s"}${number}`;
@@ -327,4 +345,55 @@ export function splitOnForm(sentence, form) {
   }
   parts.push(sentence.slice(last));
   return parts;
+}
+
+// ---------- 会話で復習 ----------
+// A 単語帳 of talks (kaiwa1.js): earlier words again, a few at a time, each
+// group in a short conversation. It sits at a week of its own (vocab_books),
+// outside a student's pace, and each talk is a set with its own test.
+
+// The people talking (Ken on the right); their voices are ElevenLabs' (scripts/teacher.mjs talk-audio).
+export const TALK_PEOPLE = { mia: "Mia", ken: "Ken", tom: "Tom" };
+
+// The 会話で復習 book a student has for a week, or null.
+export function talkBook(week, books) {
+  const book = findBook(weekBook(week, books));
+  return book?.talk ? book : null;
+}
+
+// One talk of a book (number from 1): { title, emoji, words, lines: [{ who, en, ja }] }.
+export function talkOf(bookId, number) {
+  const talk = findBook(bookId)?.talks?.[number - 1];
+  return talk ? { ...talk, lines: talk.lines.map(([who, en, ja]) => ({ who, en, ja })) } : null;
+}
+
+// "I [left] home." → ["I ", "left", " home."]: the odd entries are the talk's words.
+export const talkParts = (en) => en.split(/\[([^\]]+)\]/);
+// What is said, without the marks.
+export const talkText = (en) => en.replace(/\[([^\]]+)\]/g, "$1");
+
+// Every line of every talk, as said: [{ who, text, before, after }] (once each;
+// before and after are the lines around it, for the voice's intonation).
+export function talkLines() {
+  const seen = new Map();
+  for (const book of BOOKS.filter((b) => b.talk)) {
+    for (const talk of book.talks) {
+      const texts = talk.lines.map(([who, en]) => ({ who, text: talkText(en) }));
+      texts.forEach((line, i) => {
+        const id = `${line.who}|${line.text}`;
+        if (!seen.has(id)) seen.set(id, { ...line, before: texts[i - 1]?.text || "", after: texts[i + 1]?.text || "" });
+      });
+    }
+  }
+  return [...seen.values()];
+}
+
+export const isTalkLine = (who, text) => talkLines().some((l) => l.who === who && l.text === text);
+
+// Where a line's audio is kept in R2. (v1: this pair of voices; a new pair is v2.)
+export const TALK_VOICES = "v1";
+export async function talkAudioKey(who, text) {
+  const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(text));
+  const hex = [...new Uint8Array(digest)].map((b) => b.toString(16).padStart(2, "0")).join("");
+  return `talk/${TALK_VOICES}/${who}/${hex}.mp3`;
 }

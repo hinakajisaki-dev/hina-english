@@ -218,9 +218,58 @@ export function speak(text, { device = false, src = null } = {}) {
   });
 }
 
+let played = 0; // bumped by every stop, so a playing speakLines knows to end
 export function stopSpeaking() {
+  played += 1;
   player?.pause();
   window.speechSynthesis?.cancel();
+}
+
+// Plays lines one after another ([{ text, src }], 会話で復習): onLine(i) as
+// each starts, onLine(-1) at the end. Any other playback (or stopSpeaking) stops it.
+export async function speakLines(lines, onLine = () => {}) {
+  stopSpeaking();
+  const run = played;
+  for (let i = 0; i < lines.length; i++) {
+    if (run !== played) return;
+    onLine(i);
+    await playToEnd(lines[i]);
+    await new Promise((resolve) => setTimeout(resolve, 450));
+  }
+  if (run === played) onLine(-1);
+}
+
+// One line, resolving when it has been heard (or stopped).
+function playToEnd({ text, src }) {
+  const speed = getSpeed();
+  const byDevice = () => new Promise((resolve) => {
+    if (!("speechSynthesis" in window)) return resolve();
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = "en-US";
+    utterance.rate = speed === 1 ? 0.95 : speed;
+    const voice = pickVoice();
+    if (voice) utterance.voice = voice;
+    utterance.onend = utterance.onerror = () => resolve();
+    speechSynthesis.speak(utterance);
+  });
+  if (!player) return byDevice();
+  return new Promise((resolve) => {
+    const done = () => {
+      player.removeEventListener("ended", done);
+      player.removeEventListener("pause", done);
+      resolve();
+    };
+    player.addEventListener("ended", done);
+    player.addEventListener("pause", done);
+    player.src = src || withParams(`/api/speech?text=${encodeURIComponent(text)}`);
+    player.defaultPlaybackRate = player.playbackRate = speed;
+    player.play().catch((error) => {
+      player.removeEventListener("ended", done);
+      player.removeEventListener("pause", done);
+      if (error?.name === "AbortError") resolve();
+      else byDevice().then(resolve);
+    });
+  });
 }
 
 function speakWithDevice(text, speed) {
