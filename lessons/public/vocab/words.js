@@ -57,7 +57,7 @@ export function bookWords(id) {
   if (!book) return [];
   if (book.talk) {
     return book.talks.flatMap((talk, i) => talk.words
-      .map((w) => bookWord(w.includes("/") ? w : `${book.from}/${w}`))
+      .map((w) => bookWord(w.includes("/") ? w : `${talk.from || book.from}/${w}`))
       .filter(Boolean)
       .map((word) => ({ ...word, group: talk.title, talk: i + 1 })));
   }
@@ -352,13 +352,13 @@ export function splitOnForm(sentence, form) {
 // group in a short conversation. It sits at a week of its own (vocab_books),
 // outside a student's pace, and each talk is a set with its own test.
 
-// The two people talking; their voices are ElevenLabs' (scripts/teacher.mjs talk-audio).
-export const TALK_PEOPLE = { mia: "Mia", ken: "Ken" };
+// The people talking (Ken on the right); their voices are ElevenLabs' (scripts/teacher.mjs talk-audio).
+export const TALK_PEOPLE = { mia: "Mia", ken: "Ken", tom: "Tom" };
 
-// The 会話で復習 book a student has for a week (with fromWeek, the week of its words), or null.
+// The 会話で復習 book a student has for a week, or null.
 export function talkBook(week, books) {
   const book = findBook(weekBook(week, books));
-  return book?.talk ? { ...book, fromWeek: findBook(book.from)?.week } : null;
+  return book?.talk ? book : null;
 }
 
 // One talk of a book (number from 1): { title, emoji, words, lines: [{ who, en, ja }] }.

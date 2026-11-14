@@ -55,7 +55,7 @@
 //
 // A file of "-" is read from stdin.
 import { spawnSync } from "node:child_process";
-import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
 import { lessonDayLabel, lessonList, noteDayLabel, noteProblems } from "../public/notes/format.js";
 import { MENUS, menuKey } from "../public/menus.js";
 import { monthPhrases, pronMonths, studentMonths } from "../public/pron/phrases.js";
@@ -114,7 +114,7 @@ async function api(path, { method = "GET", body } = {}) {
 // ---------- 会話で復習's voices (ElevenLabs) ----------
 // The key is the environment's ELEVENLABS_API_KEY, or (in a cloud session) the
 // network secret the proxy adds for api.elevenlabs.io.
-const TALK_VOICE_IDS = { mia: "cgSgspJ2msm6clMCkdW9", ken: "bIHbv24MWmeRgasZH58o" }; // Jessica, Will (talk/v1)
+const TALK_VOICE_IDS = { mia: "cgSgspJ2msm6clMCkdW9", ken: "bIHbv24MWmeRgasZH58o", tom: "iP95p4xoKVk53GoZ742B" }; // Jessica, Will, Chris (talk/v1)
 const TALK_MODEL = "eleven_multilingual_v2";
 
 async function elevenLabs(line) {
@@ -821,7 +821,10 @@ const commands = {
   // puts those files in the app without making them again.
   async "talk-audio"(_, options) {
     const lines = talkLines();
-    const have = options.force || options.out ? new Set() : new Set((await api("/api/teacher/talk-audio")).keys);
+    // (With --out, what is already in that folder.)
+    const have = options.force ? new Set()
+      : options.out ? new Set(existsSync(options.out) ? readdirSync(options.out).map((f) => f.replaceAll("_", "/")) : [])
+      : new Set((await api("/api/teacher/talk-audio")).keys);
     const missing = [];
     for (const line of lines) if (!have.has(await talkAudioKey(line.who, line.text))) missing.push(line);
     const chars = missing.reduce((n, l) => n + l.text.length, 0);

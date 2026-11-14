@@ -1036,14 +1036,16 @@ function renderWeek(week) {
         ${wordFormHtml(null)}
       </section>` : ""}
       ${isPaceWeek(week) ? `<p class="pace-range">${esc(paceWeek(week)?.range || "")}</p>` : ""}
-      ${talk ? `<p class="muted">${esc(weekName(talk.fromWeek))} の単語を、<b>会話</b>で復習します。<br>会話を聞いたら、その単語のテストをしよう。</p>`
+      ${talk ? `<p class="muted">${esc(talk.about)}を、<b>会話</b>で復習します。<br><b>1日 ${talk.perDay} つ</b>が目安。会話を聞いたら、テストをしよう。</p>`
         : sets.length ? `<p class="muted">${sets[0].day ? "Day" : "セット"}をえらぶと、単語の一覧が出ます。<br>テストは「テスト」タブから、いつでもできます。</p>` : ""}
       ${sets.length ? "" : mine ? `<p class="muted small" style="text-align:center">追加した単語は、10 語ずつのセットになって、カードとテストで練習できます。</p>`
         : emptyState(toeic ? "この Part の単語は、先生が用意します。" : "この週の単語は、まだありません。")}
       ${sets.map((set) => {
         const result = testResult(week, set.number);
+        // 会話で復習: Day 1 is the first five talks, and so on.
+        const day = talk && (set.number - 1) % talk.perDay === 0 ? dayHead(week, sets, Math.ceil(set.number / talk.perDay), talk.perDay) : "";
         const place = resumeAt(resumeKind(week), studentSetKey(week, set.number));
-        return `<a class="lesson-card" href="${weekHref(week)}/${set.number}">
+        return `${day}<a class="lesson-card" href="${weekHref(week)}/${set.number}">
           <div><b>${set.talk ? `${set.number}. ${talkOf(talk.id, set.number)?.emoji || ""} ${esc(set.title)}` : esc(set.label)}</b>${set.day ? `<span class="muted small">${esc(set.title)} ・ ${set.words.length}語</span>` : ""}<span class="muted small" lang="en">${set.words.map((w) => esc(w.word)).join(" ・ ")}</span></div>
           ${place ? `<span class="badge start">つづきから ${esc(place.of)}</span>`
             : result ? `<span class="badge">✓ ${result.best} / ${result.total}</span>` : `<span class="badge start">はじめる</span>`}
@@ -1067,6 +1069,13 @@ function renderWeek(week) {
       button.disabled = false;
     }
   });
+}
+
+// "Day 2  3 / 5" above a day's talks (green once all five are tested).
+function dayHead(week, sets, day, perDay) {
+  const its = sets.slice((day - 1) * perDay, day * perDay);
+  const done = its.filter((s) => testResult(week, s.number)).length;
+  return `<h3 class="day-head ${done === its.length ? "done" : ""}">Day ${day}<span>${done === its.length ? "✓ " : ""}${done} / ${its.length}</span></h3>`;
 }
 
 function findSet(week, number) {
@@ -1131,7 +1140,7 @@ function talkHtml(talk, base) {
         <button type="button" class="chip-toggle" id="talk-ja" aria-pressed="${talkJa()}">日本語</button>
       </div>
       <button type="button" class="btn block talk-play" id="talk-play">${icons.speaker}全部きく</button>
-      <ol class="talk-lines">${talk.lines.map((line, i) => `<li class="talk-line ${line.who === "ken" ? "right" : "left"}">
+      <ol class="talk-lines">${talk.lines.map((line, i) => `<li class="talk-line ${line.who === "ken" ? "right" : "left"} ${esc(line.who)}">
         <span class="who">${esc(TALK_PEOPLE[line.who] || line.who)}</span>
         <button type="button" class="bubble" data-line="${i}" aria-label="${esc(talkText(line.en))} を聞く">
           <span class="en" lang="en">${talkParts(line.en).map((part, j) => (j % 2 ? `<span class="hl">${esc(part)}</span>` : esc(part))).join("")}</span>

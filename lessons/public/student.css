@@ -663,7 +663,11 @@ body.quiz-open .wrap { padding-bottom: 62vh; }
   display: flex; flex-direction: column; gap: 3px; transition: border-color .15s;
 }
 .talk-line.right .bubble { background: var(--cream); border-radius: 18px 18px 6px 18px; }
+.talk-line.tom .bubble { background: var(--pink); }
 .bubble .en { font-family: var(--en); font-size: 17px; line-height: 1.45; }
 .bubble .ja { font-size: 13px; color: var(--ink-2); }
 .talk.no-ja .bubble .ja { display: none; }
 .bubble.playing { border-color: var(--accent); }
+.day-head { display: flex; align-items: baseline; justify-content: space-between; font-size: 17px; margin: 10px 2px -4px; }
+.day-head span { font-family: var(--en); font-size: 13px; font-weight: 700; color: var(--muted); }
+.day-head.done span { color: var(--good); }
