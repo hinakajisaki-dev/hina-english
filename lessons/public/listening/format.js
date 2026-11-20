@@ -1,6 +1,6 @@
 // 会話リスニング: a long conversation for one student (3〜10 minutes), cut into
 // parts. The student hears it all the way through (全部きく), one part at a time
-// or one line at a time, again and again (くり返し).
+// or one line at a time, again and again; each part heard gets a ✓.
 //
 // The teacher's chat writes it as text (scripts/teacher.mjs listening):
 //
@@ -162,11 +162,14 @@ export async function lineAudioKey(studentId, talkId, who, en) {
   return `listen/${studentId}/${talkId}/${who}-${hex.slice(0, 32)}.mp3`;
 }
 
-// The student's list: { id, title, parts, lines, seconds, plays, played_at }.
+// The student's list: { id, title, parts, part_titles, done, lines, seconds, voiced, plays, played_at }.
+// done: the parts the student has heard (each line to the end), [0, 2].
 export const talkSummary = (row, talk) => ({
   id: row.id,
   title: talk.title,
   parts: talk.parts.length,
+  part_titles: talk.parts.map((p) => p.title),
+  done: JSON.parse(row.parts_done || "[]").filter((p) => p < talk.parts.length),
   lines: talkLines(talk).length,
   seconds: Math.round(talkSeconds(talk)),
   voiced: talkLines(talk).filter((l) => l.audio).length,

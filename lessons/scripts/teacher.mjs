@@ -957,7 +957,7 @@ const commands = {
     }
     console.log(`# ${student.name}さんの会話リスニング（${list.length}）`);
     for (const t of list) {
-      console.log(`[${t.id}] ${t.title}　${minutesLabel(t.seconds)}・${t.parts}パート・${t.lines}文・声 ${t.voiced}/${t.lines}・${t.plays}回きいた${t.played_at ? `（最後 ${japanTime(t.played_at)}）` : ""}`);
+      console.log(`[${t.id}] ${t.title}　${minutesLabel(t.seconds)}・${t.parts}パート・${t.lines}文・声 ${t.voiced}/${t.lines}・きいたパート ${t.done.length}/${t.parts}・全部 ${t.plays}回${t.played_at ? `（最後 ${japanTime(t.played_at)}）` : ""}`);
     }
   },
 

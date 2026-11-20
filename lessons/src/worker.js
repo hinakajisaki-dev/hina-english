@@ -125,7 +125,15 @@ async function route(request, env, url, who, ctx) {
       return json({ talk: { ...talkSummary(row, JSON.parse(row.body)), ...studentTalk(JSON.parse(row.body)), updated_at: row.updated_at } });
     }
     if (parts[0] === "listening" && parts[2] === "audio" && parts.length === 5 && method === "GET") {
-      return listenAudio(env, await listenRow(env.DB, id(1), student.id), id(3), id(4));
+      return listenAudio(request, env, await listenRow(env.DB, id(1), student.id), id(3), id(4));
+    }
+    if (parts[0] === "listening" && parts[2] === "heard" && parts.length === 3 && method === "POST") {
+      const row = await listenRow(env.DB, id(1), student.id);
+      const part = Number((await readJson(request)).part);
+      if (!Number.isInteger(part) || !JSON.parse(row.body).parts[part]) throw new HttpError(400, "そのパートはありません。");
+      const done = [...new Set([...JSON.parse(row.parts_done || "[]"), part])].sort((a, b) => a - b);
+      await run(env.DB, `UPDATE listen_talks SET parts_done = ? WHERE id = ?`, JSON.stringify(done), row.id);
+      return json({ done });
     }
     if (parts[0] === "listening" && parts[2] === "played" && parts.length === 3 && method === "POST") {
       const row = await listenRow(env.DB, id(1), student.id);
@@ -693,11 +701,21 @@ const studentTalk = (talk) => ({
 });
 
 // A line in its person's voice (R2). A line with no voice made yet is read in the app's usual voice.
-async function listenAudio(env, row, partIndex, lineIndex) {
+// A part of the file can be asked for (Range), so the player can start in the middle of a line.
+async function listenAudio(request, env, row, partIndex, lineIndex) {
   const line = JSON.parse(row.body).parts[partIndex]?.lines[lineIndex];
   if (!line) throw new HttpError(404, "見つかりません。");
-  const object = line.audio && (await env.FILES?.get(line.audio));
-  if (object) return new Response(object.body, { headers: { "Content-Type": "audio/mpeg", "Cache-Control": "private, max-age=86400" } });
+  const range = /^bytes=\d*-\d*$/.test(request.headers.get("Range") || "");
+  const object = line.audio && (await env.FILES?.get(line.audio, range ? { range: request.headers } : undefined));
+  if (object) {
+    const headers = { "Content-Type": "audio/mpeg", "Cache-Control": "private, max-age=86400", "Accept-Ranges": "bytes" };
+    if (range && object.range) {
+      const { offset = object.size - object.range.suffix, length = object.range.suffix } = object.range;
+      const end = Math.min(object.size, offset + (length ?? object.size - offset)) - 1;
+      return new Response(object.body, { status: 206, headers: { ...headers, "Content-Range": `bytes ${offset}-${end}/${object.size}`, "Content-Length": String(end - offset + 1) } });
+    }
+    return new Response(object.body, { headers: { ...headers, "Content-Length": String(object.size) } });
+  }
   try {
     return new Response(await speechFor(env, lineText(line.en)), { headers: { "Content-Type": "audio/mpeg", "Cache-Control": "no-store" } });
   } catch (error) {
