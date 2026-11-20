@@ -2,7 +2,7 @@
 // today's phrase, pronunciation, grammar and the journal with its correction.
 import {
   ApiError, api, diffHtml, esc, formatDate, icons, japanDayNumber,
-  SPEEDS, getSpeed, keepUpdated, setApiParams, setSpeed, speak, speakLines, startOfJapanDay, stopSpeaking, toast, watchErrors, withParams,
+  SPEEDS, getSpeed, keepUpdated, overrideSpeed, setApiParams, setSpeed, speak, speakLines, startOfJapanDay, stopSpeaking, toast, watchErrors, withParams,
 } from "./common.js";
 import { findLesson, plain, questionCount, unitsFor } from "./grammar/lessons.js";
 import {
@@ -86,6 +86,7 @@ function render() {
   clearInterval(debateClock);
   if (screen !== "debate") dropDebateRecording();
   stopListening();
+  overrideSpeed(null);
   dropIeltsRecording();
   // Opening a pronunciation month goes to the first phrase that isn't 完了 yet.
   if (screen === "pron") state.pron = { which: null, index: 0 };
@@ -524,6 +525,15 @@ function renderHome() {
 // heard to the end, it counts (N 回きいた).
 const LISTEN_SHOW_KEY = "hina-listen-show";
 const LISTEN_LOOP_KEY = "hina-listen-loop";
+// The speed: a slider from 0.75 to ふつう (its own, remembered on the phone; the
+// other screens keep their buttons).
+const LISTEN_SPEED_KEY = "hina-listen-speed";
+const LISTEN_SLOWEST = 0.75;
+const listenSpeed = () => {
+  const saved = Number(remembered(LISTEN_SPEED_KEY, "1"));
+  return saved >= LISTEN_SLOWEST && saved <= 1 ? Math.round(saved * 20) / 20 : 1;
+};
+const speedLabel = (speed) => (speed >= 1 ? "ふつう" : `${speed.toFixed(2).replace(/0$/, "")} 倍`);
 const remembered = (key, fallback) => {
   try { return localStorage.getItem(key) ?? fallback; } catch { return fallback; }
 };
@@ -566,6 +576,8 @@ async function renderListenTalk(id) {
   const total = lines.reduce((s, l) => s + l.span, 0);
   const show = remembered(LISTEN_SHOW_KEY, "");
   const loop = remembered(LISTEN_LOOP_KEY, "0") === "1";
+  const speed = listenSpeed();
+  overrideSpeed(speed);
   const partSeconds = talk.parts.map((_, p) => lines.filter((l) => l.part === p).reduce((s, l) => s + l.span, 0));
 
   app.innerHTML = `${topbar(talk.title, "#/listening")}
@@ -576,9 +588,13 @@ async function renderListenTalk(id) {
           ${talk.parts.map(() => `<span><i></i></span>`).join("")}
         </div>
         <div class="listen-time"><span id="listen-at">0:00</span><span>${clock(total)}</span></div>
+        <div class="listen-speed">
+          <div class="listen-speed-head"><label for="listen-speed">速さ</label><b id="listen-speed-label">${speedLabel(speed)}</b></div>
+          <input type="range" id="listen-speed" min="${LISTEN_SLOWEST}" max="1" step="0.05" value="${speed}">
+          <div class="listen-speed-ends" aria-hidden="true"><span>ゆっくり</span><span>ふつう</span></div>
+        </div>
         <div class="listen-controls">
           <button type="button" class="chip-toggle" id="listen-loop" aria-pressed="${loop}">🔁 くり返し</button>
-          ${speedControl()}
         </div>
         <p class="muted small center" id="listen-plays">${talk.plays ? `全部 <b>${talk.plays}</b> 回きいた` : "全部きいたら、1回と数えます"}</p>
       </section>
@@ -732,6 +748,12 @@ function bindListenTalk(talk, lines, total) {
       main.classList.toggle(`no-${show.dataset.show}`, !on);
       remember(LISTEN_SHOW_KEY, [...main.querySelectorAll("[data-show][aria-pressed=true]")].map((b) => b.dataset.show).join(" "));
     }
+  });
+  document.getElementById("listen-speed").addEventListener("input", (event) => {
+    const speed = Math.round(Number(event.target.value) * 20) / 20;
+    overrideSpeed(speed);
+    document.getElementById("listen-speed-label").textContent = speedLabel(speed);
+    remember(LISTEN_SPEED_KEY, String(speed));
   });
   loopButton.addEventListener("click", () => {
     const on = loopButton.getAttribute("aria-pressed") !== "true";

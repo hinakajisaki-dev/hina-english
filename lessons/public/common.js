@@ -186,7 +186,16 @@ const player = typeof Audio === "function" ? new Audio() : null;
 export const SPEEDS = [0.5, 0.75, 1];
 const SPEED_KEY = "hina-lessons-speed";
 
+// A screen with a speed of its own (会話リスニング's slider) sets it here while it is
+// open; null goes back to the speed of the buttons.
+let speedOverride = null;
+export function overrideSpeed(speed) {
+  speedOverride = speed;
+  if (speed && player && !player.paused) player.playbackRate = speed;
+}
+
 export function getSpeed() {
+  if (speedOverride) return speedOverride;
   try {
     const saved = Number(localStorage.getItem(SPEED_KEY));
     return SPEEDS.includes(saved) ? saved : 1;
