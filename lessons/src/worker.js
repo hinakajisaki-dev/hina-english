@@ -4,7 +4,7 @@
 // Students sign in with a personal code (kept in an HttpOnly cookie).
 // The teacher signs in with TEACHER_PASSWORD; the cookie holds an HMAC of it.
 import {
-  AiError, correctJournal, correctSentence, judgeAnswer, makeDebateTopic, makeRephraseProblems, makeStarPrompts, transcribe,
+  AiError, correctIelts, correctJournal, correctSentence, judgeAnswer, makeDebateTopic, makeRephraseProblems, makeStarPrompts, transcribe,
 } from "./ai.js";
 import { SpeechError, speechFor } from "./speech.js";
 import {
@@ -22,7 +22,7 @@ import { noteProblems, noteSentences } from "../public/notes/format.js";
 import { NOTES_FOR_STUDENTS } from "../public/course.js";
 import { MENUS } from "../public/menus.js";
 import { checkTalk, cleanTalk, lineAudioKey, lineText, talkLines, talkSummary } from "../public/listening/format.js";
-import { findIeltsItem, ieltsSentences } from "../public/ielts/speaking.js";
+import { PART2_CARDS, findIeltsItem, ieltsSentences } from "../public/ielts/speaking.js";
 import {
   all, debateRow, ensureSchema, first, ieltsRow, isDbBusy, itemRow, japanDay, journalRow, noteRow, now, rephraseRow, run, starRow, studentBundle,
 } from "./db.js";
@@ -183,6 +183,14 @@ async function route(request, env, url, who, ctx) {
       return retryDebate(env, student, id(1));
     }
     if (path === "/api/ielts" && method === "POST") return answerIelts(request, env, student, ctx);
+    if (parts[0] === "ielts" && parts[1] === "rounds" && parts[3] === "correct" && parts.length === 4 && method === "POST") {
+      return correctIeltsRound(env, student, parts[2]);
+    }
+    if (parts[0] === "ielts" && parts[2] === "correct" && parts.length === 3 && method === "POST") {
+      const row = await first(env.DB, `SELECT * FROM ielts_answers WHERE id = ? AND student_id = ? AND part = 2`, id(1), student.id);
+      if (!row) throw new HttpError(404, "見つかりません。");
+      return json(await correctIeltsTalk(env, student, row));
+    }
     if (parts[0] === "ielts" && parts[2] === "audio" && parts.length === 3 && method === "GET") {
       return ieltsAudio(env, await first(env.DB, `SELECT * FROM ielts_answers WHERE id = ? AND student_id = ?`, id(1), student.id));
     }
@@ -1193,11 +1201,17 @@ async function dropOldDebateAudio(env) {
 // in public/ielts/speaking.js. Each recording goes to R2 (FILES,
 // "ielts/<student>/<answer>"); D1 keeps only where it is, its type, size and length.
 // The teacher listens on 先生ページ. Kept 90 days.
+// Each answer is written down by Whisper as it comes in. The AI then corrects
+// lightly (only what is worth fixing) and estimates the band (without
+// pronunciation), with one tip to 6.5: a Part 2 talk at once, a Part 1 round
+// in one go when it ends (ielts_rounds keeps the round's band).
 
 const IELTS_PER_DAY = 80;
 const IELTS_KEEP_DAYS = 90;
 const MAX_IELTS_AUDIO = 4 * 1024 * 1024;
 const ieltsAudioKey = (studentId, answerId) => `ielts/${studentId}/${answerId}`;
+const IELTS_AI_PER_DAY = 15;
+const ieltsErrorKey = (what) => `ielts|${what}`;
 
 // A form: key (the question or card), round (Part 1), memo (Part 2), seconds and audio.
 async function answerIelts(request, env, student, ctx) {
@@ -1233,7 +1247,106 @@ async function answerIelts(request, env, student, ctx) {
   await env.FILES.put(key, await audio.arrayBuffer(), { httpMetadata: { contentType: type } });
   await run(env.DB, `UPDATE ielts_answers SET audio_key = ? WHERE id = ?`, key, answerId);
   if (ctx?.waitUntil) ctx.waitUntil(dropOldIeltsAudio(env));
+  const row = await first(env.DB, `SELECT * FROM ielts_answers WHERE id = ?`, answerId);
+  // Part 2 is corrected at once; a Part 1 answer is only written down (the round is corrected at the end).
+  if (item.part === 2) return json(await correctIeltsTalk(env, student, row));
+  await writeDownIelts(env, row).catch(() => {});
   return json({ answer: ieltsRow(await first(env.DB, `SELECT * FROM ielts_answers WHERE id = ?`, answerId)) });
+}
+
+// What was said, by Whisper (once). Throws an AiError when it can't.
+async function writeDownIelts(env, row) {
+  if (row.body) return row.body;
+  const object = row.audio_key && (await env.FILES?.get(row.audio_key));
+  if (!object) throw new AiError("録音が見つかりませんでした。", `R2 にない: ${row.audio_key}`);
+  const text = await transcribe(env, await object.arrayBuffer());
+  await run(env.DB, `UPDATE ielts_answers SET body = ? WHERE id = ?`, text, row.id);
+  row.body = text;
+  return text;
+}
+
+const ieltsAiToday = async (env, student) => {
+  const since = japanDayStart();
+  const rounds = await first(env.DB, `SELECT COUNT(*) AS n FROM ielts_rounds WHERE student_id = ? AND created_at >= ?`, student.id, since);
+  const talks = await first(env.DB, `SELECT COUNT(*) AS n FROM ielts_answers WHERE student_id = ? AND part = 2 AND corrected_at >= ?`, student.id, since);
+  return rounds.n + talks.n;
+};
+
+// A Part 2 talk: written down, then corrected with its band. { answer, ai_error }.
+async function correctIeltsTalk(env, student, row) {
+  let aiError = null;
+  try {
+    await writeDownIelts(env, row);
+    if (aiEnabled(env) && !row.correction) {
+      if ((await ieltsAiToday(env, student)) >= IELTS_AI_PER_DAY) throw new HttpError(429, "今日の添削は、ここまでです。録音は先生に届いています。");
+      const card = PART2_CARDS.find((c) => c.key === findIeltsItem(row.item_key)?.card);
+      const result = await correctIelts(env, {
+        part: 2, card, note: student.note, answers: [{ question: row.question, body: row.body, seconds: row.seconds }],
+      });
+      const { answers: [answer], ...rest } = result;
+      await run(
+        env.DB, `UPDATE ielts_answers SET correction = ?, corrected_at = ? WHERE id = ? AND correction IS NULL`,
+        JSON.stringify({ ...answer, ...rest }), now(), row.id,
+      );
+    }
+    await closeErrors(env.DB, ieltsErrorKey(`a${row.id}`), "もう一度ためして、添削できた");
+  } catch (error) {
+    if (error instanceof HttpError) aiError = error.message;
+    else if (!(error instanceof AiError)) throw error;
+    else {
+      aiError = error.message;
+      await recordError(env.DB, {
+        kind: "ielts",
+        message: `IELTS Part 2 ${row.id} の${row.body ? "添削" : "文字起こし"}ができなかった（生徒の画面：${error.message}）`,
+        detail: error.detail, studentId: student.id, ref: String(row.id), key: ieltsErrorKey(`a${row.id}`),
+      });
+    }
+  }
+  return { answer: ieltsRow(await first(env.DB, `SELECT * FROM ielts_answers WHERE id = ?`, row.id)), ai_error: aiError };
+}
+
+// A Part 1 round, when it ends: every answer written down, then one AI look at
+// them all (each answer's light correction and tip; the round's band and tip).
+// Asked again, it gives what was made before.
+async function correctIeltsRound(env, student, round) {
+  const rows = await all(env.DB, `SELECT * FROM ielts_answers WHERE student_id = ? AND round = ? AND part = 1 ORDER BY id`, student.id, round);
+  if (!rows.length) throw new HttpError(404, "見つかりません。");
+  const reply = async (aiError = null) => {
+    const saved = await first(env.DB, `SELECT result FROM ielts_rounds WHERE student_id = ? AND round = ?`, student.id, round);
+    const fresh = await all(env.DB, `SELECT * FROM ielts_answers WHERE student_id = ? AND round = ? ORDER BY id`, student.id, round);
+    return json({ answers: fresh.map(ieltsRow), round: saved ? JSON.parse(saved.result) : null, ai_error: aiError });
+  };
+  if (await first(env.DB, `SELECT 1 FROM ielts_rounds WHERE student_id = ? AND round = ?`, student.id, round)) return reply();
+  if (!aiEnabled(env)) return reply();
+  if ((await ieltsAiToday(env, student)) >= IELTS_AI_PER_DAY) return reply("今日の添削は、ここまでです。録音は先生に届いています。");
+  try {
+    let whisperError = null;
+    for (const row of rows) {
+      await writeDownIelts(env, row).catch((error) => { whisperError ||= error; });
+    }
+    const spoken = rows.filter((r) => r.body);
+    if (!spoken.length) throw whisperError || new AiError("声が聞きとれませんでした。", "no transcript");
+    const result = await correctIelts(env, {
+      part: 1, note: student.note, answers: spoken.map((r) => ({ question: r.question, body: r.body, seconds: r.seconds })),
+    });
+    const at = now();
+    await env.DB.batch([
+      ...spoken.map((r, i) => env.DB.prepare(`UPDATE ielts_answers SET correction = ?, corrected_at = ? WHERE id = ?`)
+        .bind(JSON.stringify(result.answers[i]), at, r.id)),
+      env.DB.prepare(`INSERT OR IGNORE INTO ielts_rounds (student_id, round, result, created_at) VALUES (?, ?, ?, ?)`)
+        .bind(student.id, round, JSON.stringify({ band: result.band, band_tip: result.band_tip, model: result.model }), at),
+    ]);
+    await closeErrors(env.DB, ieltsErrorKey(`r${student.id}/${round}`), "もう一度ためして、添削できた");
+    return reply();
+  } catch (error) {
+    if (!(error instanceof AiError)) throw error;
+    await recordError(env.DB, {
+      kind: "ielts",
+      message: `IELTS Part 1 の練習（${rows.length} 問）の添削ができなかった（生徒の画面：${error.message}）`,
+      detail: error.detail, studentId: student.id, ref: round, key: ieltsErrorKey(`r${student.id}/${round}`),
+    });
+    return reply(error.message);
+  }
 }
 
 async function ieltsAudio(env, row) {

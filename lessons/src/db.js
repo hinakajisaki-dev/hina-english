@@ -133,6 +133,15 @@ const SCHEMA = [
     created_at TEXT NOT NULL
   )`,
   `CREATE INDEX IF NOT EXISTS ielts_answers_student ON ielts_answers(student_id, created_at)`,
+  // The AI's look at a whole Part 1 round (the band estimate and the tip to 6.5);
+  // each answer's own correction is on its ielts_answers row.
+  `CREATE TABLE IF NOT EXISTS ielts_rounds (
+    student_id INTEGER NOT NULL REFERENCES students(id) ON DELETE CASCADE,
+    round TEXT NOT NULL,
+    result TEXT NOT NULL,
+    created_at TEXT NOT NULL,
+    PRIMARY KEY (student_id, round)
+  )`,
   // Best and latest score of each ten-word set test; set_key is "w1/s3".
   `CREATE TABLE IF NOT EXISTS vocab_tests (
     student_id INTEGER NOT NULL REFERENCES students(id) ON DELETE CASCADE,
@@ -335,6 +344,11 @@ const SCHEMA = [
 const ADDED_COLUMNS = [
   `ALTER TABLE journals ADD COLUMN imported INTEGER NOT NULL DEFAULT 0`,
   `ALTER TABLE pron_progress ADD COLUMN before_app INTEGER NOT NULL DEFAULT 0`,
+  // IELTS スピーキング練習: what was said (Whisper) and the AI's light correction of it
+  // (Part 2: with the band estimate and the cue card points covered).
+  `ALTER TABLE ielts_answers ADD COLUMN body TEXT NOT NULL DEFAULT ''`,
+  `ALTER TABLE ielts_answers ADD COLUMN correction TEXT`,
+  `ALTER TABLE ielts_answers ADD COLUMN corrected_at TEXT`,
 ];
 
 let ready = false;
@@ -437,6 +451,8 @@ export function ieltsRow(row) {
     memo: row.memo,
     audio: !!row.audio_key,
     seconds: row.seconds,
+    body: row.body || "",
+    correction: row.correction ? JSON.parse(row.correction) : null,
     created_at: row.created_at,
   };
 }
@@ -472,7 +488,7 @@ export function noteRow(row) {
 export async function studentBundle(db, studentId) {
   const [
     items, progress, lessonRows, reviewRows, testRows, phraseReviewRows, phraseTestRows, pronRows, studyRows, journals, plan,
-    menus, settings, lessonDays, rephraseRows, starRows, grammarReviewRows, debateRows, rephraseStarRows, ieltsRows, listenRows,
+    menus, settings, lessonDays, rephraseRows, starRows, grammarReviewRows, debateRows, rephraseStarRows, ieltsRows, ieltsRoundRows, listenRows,
   ] = await Promise.all([
     all(db, `SELECT * FROM items WHERE student_id = ? ORDER BY id`, studentId),
     all(db, `SELECT * FROM progress WHERE student_id = ?`, studentId),
@@ -505,6 +521,7 @@ export async function studentBundle(db, studentId) {
     all(db, `SELECT * FROM debate_answers WHERE student_id = ? ORDER BY id DESC LIMIT 30`, studentId),
     all(db, `SELECT item_id, created_at FROM rephrase_stars WHERE student_id = ? ORDER BY created_at`, studentId),
     all(db, `SELECT * FROM ielts_answers WHERE student_id = ? ORDER BY id DESC LIMIT 200`, studentId),
+    all(db, `SELECT round, result FROM ielts_rounds WHERE student_id = ? ORDER BY created_at DESC LIMIT 60`, studentId),
     all(db, `SELECT * FROM listen_talks WHERE student_id = ? ORDER BY id`, studentId),
   ]);
   const setting = (name) => {
@@ -566,6 +583,7 @@ export async function studentBundle(db, studentId) {
     debateAnswers: debateRows.map(debateRow),
     ieltsSpeaking: !!setting("ielts_speaking"),
     ieltsAnswers: ieltsRows.map(ieltsRow),
+    ieltsRounds: Object.fromEntries(ieltsRoundRows.map((r) => [r.round, JSON.parse(r.result)])),
     grammarReview,
     stars: starRows.map(starRow),
     // 会話リスニング: the list (a talk itself is fetched when it is opened).

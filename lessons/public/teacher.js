@@ -1008,22 +1008,33 @@ function ieltsTabHtml() {
     if (group) group.answers.unshift(a);
     else groups.push({ key, part: a.part, created_at: a.created_at, answers: [a] });
   }
+  const band = (b, tip) => (b?.overall ? `<p><b>バンド目安 ${b.overall.toFixed(1)}</b> <span class="muted small">（流暢さ ${b.fluency?.toFixed(1)} ・ 語彙 ${b.lexical?.toFixed(1)} ・ 文法 ${b.grammar?.toFixed(1)}。発音なし）</span>${tip ? `<br>💡 ${esc(tip)}` : ""}</p>` : "");
+  const said = (a) => {
+    const c = a.correction;
+    if (!a.body) return `<p class="muted small">（文字起こしなし）</p>`;
+    return `<p class="journal-text${c ? " diff" : ""}" lang="en">${c ? diffHtml(a.body, c.corrected) : esc(a.body)}</p>
+      ${c ? (c.corrections || []).map((fix) => `<div class="fix"><p class="change" lang="en"><del>${esc(fix.before)}</del><span class="arrow">→</span><ins>${esc(fix.after)}</ins></p><p>${esc(fix.why)}</p></div>`).join("") : ""}
+      ${c?.tip ? `<p class="muted small">💡 ${esc(c.tip)}</p>` : ""}`;
+  };
+  const POINT = { yes: "✓", short: "△", no: "✗" };
   const audio = (a) => (a.audio ? `<audio controls preload="none" src="/api/teacher/ielts/${a.id}/audio" style="width:100%"></audio>`
     : `<p class="muted small">録音なし（90日たって消えました）</p>`);
   return `<div class="stack">
     ${state.current.ieltsSpeaking ? "" : `<p class="notice">この生徒の画面には、いま出ていません（「設定・コード」の「IELTS スピーキング練習」）。</p>`}
     <section class="card stack">
       <h3>生徒が話したもの（${groups.length} 回）</h3>
-      <p class="muted small">Part 1 は1問ずつ、Part 2 は1回ずつの録音です（目安：Part 1 は 1問 20〜30秒、Part 2 は 1:30〜2:00）。録音は90日で消えます。</p>
+      <p class="muted small">Part 1 は1問ずつ、Part 2 は1回ずつの録音です（目安：Part 1 は 1問 20〜30秒、Part 2 は 1:30〜2:00）。録音は90日で消えます。英語は AI が聞きとった文の、軽い添削です。バンドは AI が文字から出した目安（発音なし）。</p>
       ${groups.length ? `<ul class="rows">${groups.map((g) => {
         if (g.part === 1) {
           const topics = [...new Set(g.answers.map((a) => findIeltsItem(a.key)?.topicName).filter(Boolean))].join(" ・ ");
           return `<li><div class="main stack">
             <div><span class="pill">Part 1</span> <b lang="en">${esc(topics)}</b> <span class="muted small">${g.answers.length} 問</span></div>
             <div class="sub">${esc(formatDateTime(g.created_at))}</div>
+            ${band((state.current.ieltsRounds || {})[g.key]?.band, (state.current.ieltsRounds || {})[g.key]?.band_tip)}
             ${g.answers.map((a, i) => `<div class="stack" style="gap:4px">
               <p lang="en"><span class="muted">Q${i + 1}.</span> ${esc(a.question)} <span class="muted small">${a.seconds ? `${Math.round(a.seconds)}秒` : ""}</span></p>
               ${audio(a)}
+              ${said(a)}
             </div>`).join("")}
           </div></li>`;
         }
@@ -1032,9 +1043,11 @@ function ieltsTabHtml() {
         return `<li><div class="main stack">
           <div><span class="pill">Part 2</span> <b lang="en">${esc(a.question)}</b> ${a.seconds ? `<span class="muted small">${secondsText(a.seconds)}</span>` : ""}</div>
           <div class="sub">${esc(formatDateTime(a.created_at))}</div>
-          ${card ? `<p class="muted small" lang="en">${card.points.map(esc).join(" / ")} / ${esc(card.explain)}</p>` : ""}
+          ${card ? `<p class="muted small" lang="en">${[...card.points, card.explain].map((line, i) => `${a.correction?.points?.[i] ? `${POINT[a.correction.points[i]] || ""} ` : ""}${esc(line)}`).join(" / ")}</p>` : ""}
+          ${band(a.correction?.band, a.correction?.band_tip)}
           ${a.memo ? `<p class="muted small">メモ：${esc(a.memo)}</p>` : ""}
           ${audio(a)}
+          ${said(a)}
         </div></li>`;
       }).join("")}</ul>` : `<p class="muted small">まだありません。</p>`}
     </section>
