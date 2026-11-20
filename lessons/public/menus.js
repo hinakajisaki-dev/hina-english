@@ -16,6 +16,7 @@ export const MENUS = [
   { key: "rephrase", name: "言い換え問題" },
   { key: "rephrase-review", name: "言い換え復習" },
   { key: "pron", name: "発音課題" },
+  { key: "listening", name: "会話リスニング" },
   { key: "notes", name: "授業メモ" },
   { key: "study", name: "勉強時間" },
 ];
