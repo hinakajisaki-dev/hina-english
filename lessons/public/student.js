@@ -664,6 +664,33 @@ function bindListenTalk(talk, lines, total, openPart) {
   let lock = null;
   const heard = new Set(); // lines heard to the end, on this visit
 
+  // Each line's audio is fetched before it is needed (three at a time, in order
+  // from where the student is), so a line starts at once instead of after a
+  // second or two of loading. A line that can't be fetched plays from the server.
+  const loaded = new Map(); // line → a promise of its URL (a blob: URL once fetched)
+  let gone = false;
+  let next = 0; // where the loading goes on from
+  const load = (index) => {
+    if (!loaded.has(index)) {
+      loaded.set(index, fetch(lines[index].src)
+        .then((response) => (response.ok ? response.blob() : Promise.reject(new Error(response.status))))
+        .then((blob) => (gone ? lines[index].src : URL.createObjectURL(blob)))
+        .catch(() => lines[index].src));
+    }
+    return loaded.get(index);
+  };
+  const loadAhead = async () => {
+    for (;;) {
+      while (next < lines.length && loaded.has(next)) next++;
+      if (gone || next >= lines.length) return;
+      await load(next);
+    }
+  };
+  const loadFrom = (index) => {
+    next = index;
+    load(index);
+  };
+
   const openSection = (p, on = true) => {
     const section = main.querySelector(`.listen-part[data-part="${p}"]`);
     section.querySelector(".talk-lines").hidden = !on;
@@ -706,7 +733,7 @@ function bindListenTalk(talk, lines, total, openPart) {
   // stopped (stop calls finishLine) or if its audio fails. (A line that ends
   // also fires "pause" first, so only "ended" counts.)
   let finishLine = null;
-  const playLine = (line, offset) => new Promise((resolve) => {
+  const playLine = (line, offset) => new Promise(async (resolve) => {
     const token = {};
     const finish = (ended) => {
       if (finishLine?.token !== token) return;
@@ -720,7 +747,10 @@ function bindListenTalk(talk, lines, total, openPart) {
     finishLine = Object.assign(() => finish(false), { token });
     audio.addEventListener("ended", onEnd);
     audio.addEventListener("error", onError);
-    audio.src = line.src;
+    loadFrom(line.at);
+    const url = await load(line.at);
+    if (finishLine?.token !== token) return;
+    audio.src = url;
     audio.defaultPlaybackRate = audio.playbackRate = speed;
     if (offset > 0.05) {
       audio.addEventListener("loadedmetadata", () => {
@@ -750,6 +780,8 @@ function bindListenTalk(talk, lines, total, openPart) {
   stopListening = () => {
     if (playing !== null) stop();
     audio.removeAttribute("src");
+    gone = true;
+    for (const url of loaded.values()) url.then((u) => u.startsWith("blob:") && URL.revokeObjectURL(u));
   };
 
   // Plays lines from..to (indexes), starting offset seconds into the first.
@@ -814,10 +846,12 @@ function bindListenTalk(talk, lines, total, openPart) {
 
   if (openPart !== null) {
     cursor = { line: lines.find((l) => l.part === openPart).at, offset: 0 };
+    next = cursor.line;
     main.querySelector(`.listen-part[data-part="${openPart}"]`).scrollIntoView({ block: "start" });
   }
   showPosition();
   buttons();
+  for (let i = 0; i < 3; i++) loadAhead();
 
   all.addEventListener("click", () => (playing === "all" ? stop() : play("all", cursor.line, lines.length - 1, cursor.offset)));
   seek.addEventListener("input", () => {
