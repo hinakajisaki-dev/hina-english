@@ -303,7 +303,8 @@ const SCHEMA = [
   // in parts. body is JSON { title, parts: [{ title, lines: [{ name, who, en, ja,
   // audio, sec }] }] }: audio is the R2 key of the line's voice (FILES, under
   // listen/<student_id>/<id>/) and sec its length; the audio itself is never here.
-  // plays: how many times the student heard it all the way through.
+  // plays: how many times the student heard it all the way through; parts_done: the
+  // parts (by number) whose every line the student has heard, JSON [0, 2].
   `CREATE TABLE IF NOT EXISTS listen_talks (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     student_id INTEGER NOT NULL REFERENCES students(id) ON DELETE CASCADE,
@@ -349,6 +350,7 @@ const ADDED_COLUMNS = [
   `ALTER TABLE ielts_answers ADD COLUMN body TEXT NOT NULL DEFAULT ''`,
   `ALTER TABLE ielts_answers ADD COLUMN correction TEXT`,
   `ALTER TABLE ielts_answers ADD COLUMN corrected_at TEXT`,
+  `ALTER TABLE listen_talks ADD COLUMN parts_done TEXT NOT NULL DEFAULT '[]'`,
 ];
 
 let ready = false;

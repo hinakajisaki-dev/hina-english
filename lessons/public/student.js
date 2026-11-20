@@ -2,7 +2,7 @@
 // today's phrase, pronunciation, grammar and the journal with its correction.
 import {
   ApiError, api, diffHtml, esc, formatDate, icons, japanDayNumber,
-  SPEEDS, getSpeed, keepUpdated, overrideSpeed, setApiParams, setSpeed, speak, speakLines, startOfJapanDay, stopSpeaking, toast, watchErrors, withParams,
+  SPEEDS, getSpeed, keepUpdated, setApiParams, setSpeed, speak, speakLines, startOfJapanDay, stopSpeaking, toast, watchErrors, withParams,
 } from "./common.js";
 import { findLesson, plain, questionCount, unitsFor } from "./grammar/lessons.js";
 import {
@@ -86,7 +86,6 @@ function render() {
   clearInterval(debateClock);
   if (screen !== "debate") dropDebateRecording();
   stopListening();
-  overrideSpeed(null);
   dropIeltsRecording();
   // Opening a pronunciation month goes to the first phrase that isn't 完了 yet.
   if (screen === "pron") state.pron = { which: null, index: 0 };
@@ -483,7 +482,7 @@ function renderHome() {
             <span class="muted">${rephraseStarred().length ? `★ ${rephraseStarred().length} 問` : "まだありません"}</span>` },
           state.me.listening?.length && { key: "listening", wide: true, html: `
             <span class="emoji" aria-hidden="true">🎧</span>
-            <div><b>会話リスニング</b><p class="muted">${state.me.listening.length === 1 ? esc(state.me.listening[0].title) : `会話 ${state.me.listening.length} こ`} ・ ${listenPlays() ? `これまで ${listenPlays()} 回きいた` : "長い会話を何回も聞こう"}</p></div>` },
+            <div><b>会話リスニング</b><p class="muted">${state.me.listening.map((t) => `${esc(t.title)}${t.parts > 1 ? ` ${partsDone(t)} / ${t.parts}` : t.done.includes(0) ? " ✓" : ""}`).join(" ・ ")}</p></div>` },
           { key: "study", wide: true, html: `
             <span class="emoji" aria-hidden="true">⏱️</span>
             <div><b>勉強時間</b><p class="muted">今日 ${formatMinutes(totalMinutes(todayRow))} ・ 今週 ${formatMinutes(week.total)} ・ これまで ${formatMinutes(allTime(state.me.study).total)}</p></div>` },
@@ -518,85 +517,92 @@ function renderHome() {
 
 // ---------- 会話リスニング ----------
 // The student's long conversations (listening/format.js), from the teacher.
-// 全部きく plays the whole talk; ▶ on a part plays that part; 🔊 beside a line
-// plays that line. くり返し keeps playing what is playing, again and again.
-// The English and the Japanese are hidden at first ("listen first"), and
-// what is shown is remembered on the phone. Each time the whole talk has been
-// heard to the end, it counts (N 回きいた).
+// The list shows every talk with all its parts; a part gets a ✓ once each of
+// its lines has been heard to the end (saved, so it shows on any phone).
+// The player is like a video's: 全部きく plays from where the student is (and
+// pauses), the bar under it goes to any point, and 10秒もどる / 10秒すすむ jump.
+// ▶ on a part plays that part; 🔊 beside a line plays that line. The speed is a
+// slider from 0.75 to ふつう. The English and the Japanese are hidden at first;
+// what is shown and the speed are remembered on the phone.
 const LISTEN_SHOW_KEY = "hina-listen-show";
-const LISTEN_LOOP_KEY = "hina-listen-loop";
-// The speed: a slider from 0.75 to ふつう (its own, remembered on the phone; the
-// other screens keep their buttons).
 const LISTEN_SPEED_KEY = "hina-listen-speed";
 const LISTEN_SLOWEST = 0.75;
-const listenSpeed = () => {
-  const saved = Number(remembered(LISTEN_SPEED_KEY, "1"));
-  return saved >= LISTEN_SLOWEST && saved <= 1 ? Math.round(saved * 20) / 20 : 1;
-};
-const speedLabel = (speed) => (speed >= 1 ? "ふつう" : `${speed.toFixed(2).replace(/0$/, "")} 倍`);
+const LISTEN_GAP = 0.45; // seconds between two lines
+const jumpIcon = (back) => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${back
+  ? `<path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/>` : `<path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 4v5h-5"/>`}</svg>`;
 const remembered = (key, fallback) => {
   try { return localStorage.getItem(key) ?? fallback; } catch { return fallback; }
 };
 const remember = (key, value) => {
   try { localStorage.setItem(key, value); } catch { /* private mode */ }
 };
+const listenSpeed = () => {
+  const saved = Number(remembered(LISTEN_SPEED_KEY, "1"));
+  return saved >= LISTEN_SLOWEST && saved <= 1 ? Math.round(saved * 20) / 20 : 1;
+};
+const speedLabel = (speed) => (speed >= 1 ? "ふつう" : `${speed.toFixed(2).replace(/0$/, "")} 倍`);
 const myTalks = () => state.me.listening || [];
-const listenPlays = () => myTalks().reduce((n, t) => n + t.plays, 0);
-const listenInfo = (t) => [minutesLabel(t.seconds), t.parts > 1 ? `${t.parts}パート` : "", t.plays ? `${t.plays}回きいた` : "まだ"].filter(Boolean).join(" ・ ");
+const partsDone = (t) => t.done.filter((p) => p < t.parts).length;
+const checkHtml = (on) => `<span class="part-check ${on ? "on" : ""}" aria-label="${on ? "きいた" : "まだ"}">${on ? "✓" : ""}</span>`;
 let stopListening = () => {};
 
-function renderListening(id) {
-  if (id) return renderListenTalk(Number(id));
+function renderListening(id, part) {
+  if (id) return renderListenTalk(Number(id), part === undefined ? null : Number(part));
   const talks = myTalks();
   app.innerHTML = `${topbar("会話リスニング")}
     <main class="wrap stack">
-      ${talks.length ? `<p class="muted center">長い会話を、<b>何回も</b>聞こう</p>
-        ${talks.map((t) => `<a class="card listen-item" href="#/listening/${t.id}">
+      ${talks.length ? talks.map((t) => `<section class="card listen-talk">
+        <a class="listen-item" href="#/listening/${t.id}">
           <span class="listen-icon" aria-hidden="true">🎧</span>
-          <div><b>${esc(t.title)}</b><span class="muted small">${esc(listenInfo(t))}</span></div>
-          <span class="go" aria-hidden="true">›</span>
-        </a>`).join("")}`
+          <div><b>${esc(t.title)}</b><span class="muted small">${minutesLabel(t.seconds)}${t.parts > 1
+            ? ` ・ <b class="${partsDone(t) === t.parts ? "good" : ""}">${partsDone(t)} / ${t.parts} パート</b>` : t.done.includes(0) ? " ・ ✓ きいた" : ""}</span></div>
+        </a>
+        ${t.parts > 1 ? `<div class="listen-bar done-bar" aria-hidden="true">${t.part_titles.map((_, p) => `<span class="${t.done.includes(p) ? "on" : ""}"></span>`).join("")}</div>
+        <ol class="listen-parts">${t.part_titles.map((title, p) => `<li><a href="#/listening/${t.id}/${p}">
+          ${checkHtml(t.done.includes(p))}<span class="listen-part-no">Part ${p + 1}</span><b>${esc(title)}</b><span class="go" aria-hidden="true">›</span>
+        </a></li>`).join("")}</ol>` : ""}
+      </section>`).join("")
       : emptyState("まだ会話がありません。<br>先生が、会話をここに入れます。")}
     </main>`;
 }
 
-async function renderListenTalk(id) {
+async function renderListenTalk(id, openPart) {
+  const here = location.hash;
   app.innerHTML = `${topbar("会話リスニング", "#/listening")}<main class="wrap"><div class="card empty">読みこみ中…</div></main>`;
   let talk;
   try {
     ({ talk } = await api(`/api/listening/${id}`));
   } catch (error) {
-    if (location.hash !== `#/listening/${id}`) return;
+    if (location.hash !== here) return;
     app.innerHTML = `${topbar("会話リスニング", "#/listening")}<main class="wrap">${emptyState(esc(error.message))}</main>`;
     return;
   }
-  if (location.hash !== `#/listening/${id}`) return;
+  if (location.hash !== here) return;
   const lines = listenLines(talk);
   const first = lines[0]?.who;
   const total = lines.reduce((s, l) => s + l.span, 0);
   const show = remembered(LISTEN_SHOW_KEY, "");
-  const loop = remembered(LISTEN_LOOP_KEY, "0") === "1";
   const speed = listenSpeed();
-  overrideSpeed(speed);
-  const partSeconds = talk.parts.map((_, p) => lines.filter((l) => l.part === p).reduce((s, l) => s + l.span, 0));
+  const open = openPart !== null && talk.parts[openPart] ? openPart : 0;
+  const many = talk.parts.length > 1;
 
   app.innerHTML = `${topbar(talk.title, "#/listening")}
     <main class="wrap stack listen ${show.includes("en") ? "" : "no-en"} ${show.includes("ja") ? "" : "no-ja"}">
       <section class="card listen-player">
         <button type="button" class="btn block listen-all" id="listen-all"></button>
-        <div class="listen-bar" style="grid-template-columns:${partSeconds.map((s) => `${Math.max(1, Math.round(s))}fr`).join(" ")}" aria-hidden="true">
-          ${talk.parts.map(() => `<span><i></i></span>`).join("")}
+        <div class="listen-seek">
+          <input type="range" id="listen-seek" min="0" max="${total.toFixed(1)}" step="0.1" value="0" aria-label="いまの場所">
+          <div class="listen-time"><span id="listen-at">0:00</span><span>${clock(total)}</span></div>
         </div>
-        <div class="listen-time"><span id="listen-at">0:00</span><span>${clock(total)}</span></div>
+        <div class="listen-jump">
+          <button type="button" class="btn secondary" data-jump="-10">${jumpIcon(true)}10秒もどる</button>
+          <button type="button" class="btn secondary" data-jump="10">10秒すすむ${jumpIcon(false)}</button>
+        </div>
         <div class="listen-speed">
           <div class="listen-speed-head"><label for="listen-speed">速さ</label><b id="listen-speed-label">${speedLabel(speed)}</b></div>
           <input type="range" id="listen-speed" min="${LISTEN_SLOWEST}" max="1" step="0.05" value="${speed}">
           <div class="listen-speed-ends" aria-hidden="true"><span>ゆっくり</span><span>ふつう</span></div>
         </div>
-        <div class="listen-controls">
-          <button type="button" class="chip-toggle" id="listen-loop" aria-pressed="${loop}">🔁 くり返し</button>
-        </div>
-        <p class="muted small center" id="listen-plays">${talk.plays ? `全部 <b>${talk.plays}</b> 回きいた` : "全部きいたら、1回と数えます"}</p>
       </section>
       <div class="listen-show">
         <button type="button" class="chip-toggle" data-show="en" aria-pressed="${show.includes("en")}">英語を見る</button>
@@ -605,12 +611,12 @@ async function renderListenTalk(id) {
       <p class="muted small center listen-tip">はじめは<b>文字なし</b>で聞いてみよう</p>
       ${talk.parts.map((part, p) => `<section class="card listen-part" data-part="${p}">
         <div class="listen-part-head">
-          <button type="button" class="listen-part-name" data-open="${p}" aria-expanded="${p === 0}">
-            ${talk.parts.length > 1 ? `<span class="listen-part-no">Part ${p + 1}</span>` : ""}<b>${esc(part.title || (talk.parts.length > 1 ? "" : "会話"))}</b>
+          <button type="button" class="listen-part-name" data-open="${p}" aria-expanded="${p === open}">
+            ${checkHtml(talk.done.includes(p))}${many ? `<span class="listen-part-no">Part ${p + 1}</span>` : ""}<b>${esc(part.title || (many ? "" : "会話"))}</b>
           </button>
           <button type="button" class="round-btn" data-play="${p}" aria-label="Part ${p + 1} を聞く"></button>
         </div>
-        <ol class="talk-lines" ${p === 0 ? "" : "hidden"}>${lines.filter((l) => l.part === p).map((l) => `
+        <ol class="talk-lines" ${p === open ? "" : "hidden"}>${lines.filter((l) => l.part === p).map((l) => `
           <li class="talk-line ${l.who === first ? "left" : "right"} v-${esc(l.who)}">
             <span class="who">${esc(l.name)}</span>
             <div class="talk-row">
@@ -624,54 +630,63 @@ async function renderListenTalk(id) {
           </li>`).join("")}</ol>
       </section>`).join("")}
     </main>`;
-  bindListenTalk(talk, lines, total);
+  bindListenTalk(talk, lines, total, openPart !== null ? open : null);
 }
 
-// Every line in order, with its place (at), its part, its audio and how long it takes with the pause after it (span).
+// Every line in order: its place (at), its part, where it starts in the talk
+// (start), how long it takes with the pause after it (span) and its audio.
 function listenLines(talk) {
   let at = 0;
-  return talk.parts.flatMap((part, p) => part.lines.map((line, l) => ({
-    ...line, part: p, at: at++, span: lineSeconds(line) + 0.45,
-    text: lineText(line.en),
-    src: withParams(`/api/listening/${talk.id}/audio/${p}/${l}?v=${encodeURIComponent(`${talk.updated_at}-${line.sec || 0}`)}`),
-  })));
+  let start = 0;
+  return talk.parts.flatMap((part, p) => part.lines.map((line, l) => {
+    const span = lineSeconds(line) + LISTEN_GAP;
+    const entry = {
+      ...line, part: p, at: at++, start, span, text: lineText(line.en),
+      src: withParams(`/api/listening/${talk.id}/audio/${p}/${l}?v=${encodeURIComponent(`${talk.updated_at}-${line.sec || 0}`)}`),
+    };
+    start += span;
+    return entry;
+  }));
 }
 
-function bindListenTalk(talk, lines, total) {
+function bindListenTalk(talk, lines, total, openPart) {
   const main = app.querySelector(".listen");
   const all = document.getElementById("listen-all");
-  const loopButton = document.getElementById("listen-loop");
-  const bubbles = [...main.querySelectorAll(".bubble")];
-  const fills = [...main.querySelectorAll(".listen-bar i")];
+  const seek = document.getElementById("listen-seek");
   const at = document.getElementById("listen-at");
-  const starts = [];
-  lines.reduce((s, l) => (starts.push(s), s + l.span), 0);
-  let run = 0; // bumped by every new play or stop, so an older loop knows to end
-  let playing = null; // "all", a part's number, or null
+  const bubbles = [...main.querySelectorAll(".bubble")];
+  const audio = new Audio();
+  let speed = listenSpeed();
+  let run = 0; // bumped by every play and stop, so an older loop knows to end
+  let playing = null; // "all", a part's number, "line", or null
+  let cursor = { line: 0, offset: 0 }; // where 全部きく goes on from
+  let dragging = false;
   let lock = null;
+  const heard = new Set(); // lines heard to the end, on this visit
 
-  const open = (p, on = true) => {
+  const openSection = (p, on = true) => {
     const section = main.querySelector(`.listen-part[data-part="${p}"]`);
     section.querySelector(".talk-lines").hidden = !on;
     section.querySelector("[data-open]").setAttribute("aria-expanded", on);
   };
-  // The line being heard: its bubble, the bar and the time.
-  const mark = (line) => {
-    bubbles.forEach((b) => b.classList.toggle("playing", line && Number(b.dataset.at) === line.at));
-    if (!line) return;
-    const s = starts[line.at];
-    at.textContent = clock(s);
-    fills.forEach((fill, p) => {
-      const mine = lines.filter((l) => l.part === p);
-      const from = starts[mine[0].at];
-      const span = mine.reduce((n, l) => n + l.span, 0);
-      fill.style.width = `${Math.max(0, Math.min(100, ((s - from) / span) * 100))}%`;
-    });
-    open(line.part);
-    bubbles[line.at].scrollIntoView({ block: "nearest", behavior: "smooth" });
+  const lineAt = (t) => {
+    const found = lines.findLast((l) => l.start <= t) || lines[0];
+    return { line: found.at, offset: Math.max(0, Math.min(t - found.start, found.span - LISTEN_GAP - 0.05)) };
+  };
+  const position = () => lines[cursor.line].start + cursor.offset;
+  const showPosition = (t = position()) => {
+    at.textContent = clock(t);
+    if (!dragging) seek.value = t.toFixed(1);
+    seek.style.setProperty("--done", `${(t / total) * 100}%`);
+  };
+  const mark = (index) => {
+    bubbles.forEach((b) => b.classList.toggle("playing", Number(b.dataset.at) === index));
+    if (index === null) return;
+    openSection(lines[index].part);
+    bubbles[index].scrollIntoView({ block: "nearest", behavior: "smooth" });
   };
   const buttons = () => {
-    all.innerHTML = playing === "all" ? "■ とめる" : `${icons.speaker}全部きく`;
+    all.innerHTML = playing === "all" ? "■ とめる" : position() > 0.5 ? `${icons.speaker}つづきから` : `${icons.speaker}全部きく`;
     main.querySelectorAll("[data-play]").forEach((b) => {
       const on = playing === Number(b.dataset.play);
       b.innerHTML = on ? "■" : "▶";
@@ -686,60 +701,156 @@ function bindListenTalk(talk, lines, total) {
       if (!on && lock) { await lock.release(); lock = null; }
     } catch { lock = null; }
   };
+
+  // One line from offset; true once it has played to the end, false if
+  // stopped (stop calls finishLine) or if its audio fails. (A line that ends
+  // also fires "pause" first, so only "ended" counts.)
+  let finishLine = null;
+  const playLine = (line, offset) => new Promise((resolve) => {
+    const token = {};
+    const finish = (ended) => {
+      if (finishLine?.token !== token) return;
+      finishLine = null;
+      audio.removeEventListener("ended", onEnd);
+      audio.removeEventListener("error", onError);
+      resolve(ended);
+    };
+    const onEnd = () => finish(true);
+    const onError = () => finish(false);
+    finishLine = Object.assign(() => finish(false), { token });
+    audio.addEventListener("ended", onEnd);
+    audio.addEventListener("error", onError);
+    audio.src = line.src;
+    audio.defaultPlaybackRate = audio.playbackRate = speed;
+    if (offset > 0.05) {
+      audio.addEventListener("loadedmetadata", () => {
+        if (finishLine?.token === token) audio.currentTime = Math.min(offset, Math.max(0, (audio.duration || offset) - 0.05));
+      }, { once: true });
+    }
+    audio.play().catch((error) => {
+      if (error?.name !== "AbortError") finish(false);
+    });
+  });
+  audio.addEventListener("timeupdate", () => {
+    if (playing === null || audio.paused) return;
+    cursor.offset = audio.currentTime;
+    showPosition();
+  });
+
   const stop = () => {
     run += 1;
     playing = null;
+    finishLine?.();
+    audio.pause();
     stopSpeaking();
     mark(null);
     buttons();
     keepAwake(false);
   };
-  stopListening = () => { if (playing !== null) stop(); };
+  stopListening = () => {
+    if (playing !== null) stop();
+    audio.removeAttribute("src");
+  };
 
-  const play = async (what) => {
+  // Plays lines from..to (indexes), starting offset seconds into the first.
+  const play = async (what, from, to, offset = 0) => {
     stop();
     const mine = run;
     playing = what;
     buttons();
     keepAwake(true);
-    const list = what === "all" ? lines : lines.filter((l) => l.part === what);
-    for (;;) {
-      let finished = false;
-      await speakLines(list, (i) => {
-        if (i < 0) finished = true;
-        else if (mine === run) mark(list[i]);
-      });
-      if (!finished || mine !== run) return;
-      if (what === "all") countPlay();
-      if (loopButton.getAttribute("aria-pressed") !== "true") break;
+    for (let i = from; i <= to; i++) {
+      cursor = { line: i, offset: i === from ? offset : 0 };
+      mark(i);
+      showPosition();
+      const ended = await playLine(lines[i], cursor.offset);
+      if (mine !== run) return;
+      if (!ended) return stop();
+      noteHeard(i);
+      if (i < to) await new Promise((resolve) => setTimeout(resolve, LISTEN_GAP * 1000));
+      if (mine !== run) return;
     }
+    const end = lines[to];
+    if (what === "all" && to === lines.length - 1) {
+      countPlay();
+      cursor = { line: 0, offset: 0 }; // the next 全部きく starts from the beginning
+    } else {
+      cursor = to + 1 < lines.length ? { line: to + 1, offset: 0 } : { line: end.at, offset: end.span - LISTEN_GAP };
+    }
+    showPosition();
     stop();
   };
-  const countPlay = async () => {
-    talk.plays += 1;
-    const entry = myTalks().find((t) => t.id === talk.id);
-    if (entry) entry.plays = talk.plays;
-    document.getElementById("listen-plays").innerHTML = `全部 <b>${talk.plays}</b> 回きいた`;
-    if (talk.plays > 1) toast(`${talk.plays}回目、きけました！`);
-    try { await api(`/api/listening/${talk.id}/played`, { method: "POST" }); } catch { /* a preview, or offline: only this screen counts it */ }
+  const goTo = (t) => {
+    t = Math.max(0, Math.min(total - 0.01, t));
+    if (playing === "line") stop();
+    cursor = lineAt(t);
+    showPosition();
+    if (playing === "all" || typeof playing === "number") {
+      const part = lines[cursor.line].part;
+      // Inside the part being played, it stays that part; elsewhere it goes on to the end.
+      if (playing === part) play(part, cursor.line, lines.findLast((l) => l.part === part).at, cursor.offset);
+      else play("all", cursor.line, lines.length - 1, cursor.offset);
+    } else {
+      buttons();
+    }
   };
 
+  // A part is done (✓) once each of its lines has been heard to the end.
+  const noteHeard = (index) => {
+    heard.add(index);
+    const p = lines[index].part;
+    if (talk.done.includes(p) || !lines.every((l) => l.part !== p || heard.has(l.at))) return;
+    talk.done.push(p);
+    const entry = myTalks().find((t) => t.id === talk.id);
+    if (entry && !entry.done.includes(p)) entry.done.push(p);
+    main.querySelector(`[data-open="${p}"] .part-check`).outerHTML = checkHtml(true);
+    const left = talk.parts.length - talk.done.length;
+    toast(talk.parts.length === 1 ? "きけました ✓" : left ? `Part ${p + 1} クリア ✓（あと ${left} パート）` : "全部のパートをクリア！🎉");
+    api(`/api/listening/${talk.id}/heard`, { method: "POST", body: { part: p } }).catch(() => { /* a preview, or offline */ });
+  };
+  const countPlay = () => {
+    api(`/api/listening/${talk.id}/played`, { method: "POST" }).catch(() => { /* a preview, or offline */ });
+  };
+
+  if (openPart !== null) {
+    cursor = { line: lines.find((l) => l.part === openPart).at, offset: 0 };
+    main.querySelector(`.listen-part[data-part="${openPart}"]`).scrollIntoView({ block: "start" });
+  }
+  showPosition();
   buttons();
-  all.addEventListener("click", () => (playing === "all" ? stop() : play("all")));
+
+  all.addEventListener("click", () => (playing === "all" ? stop() : play("all", cursor.line, lines.length - 1, cursor.offset)));
+  seek.addEventListener("input", () => {
+    dragging = true;
+    at.textContent = clock(Number(seek.value));
+    seek.style.setProperty("--done", `${(Number(seek.value) / total) * 100}%`);
+  });
+  seek.addEventListener("change", () => {
+    dragging = false;
+    goTo(Number(seek.value));
+  });
+  document.getElementById("listen-speed").addEventListener("input", (event) => {
+    speed = Math.round(Number(event.target.value) * 20) / 20;
+    audio.defaultPlaybackRate = audio.playbackRate = speed;
+    document.getElementById("listen-speed-label").textContent = speedLabel(speed);
+    remember(LISTEN_SPEED_KEY, String(speed));
+  });
   main.addEventListener("click", async (event) => {
+    const jump = event.target.closest("[data-jump]");
+    if (jump) return goTo(position() + Number(jump.dataset.jump));
     const part = event.target.closest("[data-play]");
-    if (part) return playing === Number(part.dataset.play) ? stop() : play(Number(part.dataset.play));
+    if (part) {
+      const p = Number(part.dataset.play);
+      if (playing === p) return stop();
+      const mine = lines.filter((l) => l.part === p);
+      return play(p, mine[0].at, mine.at(-1).at);
+    }
     const name = event.target.closest("[data-open]");
-    if (name) return open(Number(name.dataset.open), name.getAttribute("aria-expanded") !== "true");
+    if (name) return openSection(Number(name.dataset.open), name.getAttribute("aria-expanded") !== "true");
     const say = event.target.closest("[data-say-line]");
     if (say) {
-      const line = lines[Number(say.dataset.sayLine)];
-      stop();
-      bubbles[line.at].classList.add("playing");
-      say.classList.add("loading");
-      await speak(line.text, { src: line.src });
-      say.classList.remove("loading");
-      return;
+      const index = Number(say.dataset.sayLine);
+      return play("line", index, index);
     }
     const show = event.target.closest("[data-show]");
     if (show) {
@@ -748,17 +859,6 @@ function bindListenTalk(talk, lines, total) {
       main.classList.toggle(`no-${show.dataset.show}`, !on);
       remember(LISTEN_SHOW_KEY, [...main.querySelectorAll("[data-show][aria-pressed=true]")].map((b) => b.dataset.show).join(" "));
     }
-  });
-  document.getElementById("listen-speed").addEventListener("input", (event) => {
-    const speed = Math.round(Number(event.target.value) * 20) / 20;
-    overrideSpeed(speed);
-    document.getElementById("listen-speed-label").textContent = speedLabel(speed);
-    remember(LISTEN_SPEED_KEY, String(speed));
-  });
-  loopButton.addEventListener("click", () => {
-    const on = loopButton.getAttribute("aria-pressed") !== "true";
-    loopButton.setAttribute("aria-pressed", on);
-    remember(LISTEN_LOOP_KEY, on ? "1" : "0");
   });
 }
 

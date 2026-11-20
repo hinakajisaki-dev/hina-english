@@ -62,7 +62,7 @@ function r2() {
   const files = new Map();
   return {
     files,
-    async get(key) { return files.has(key) ? { body: files.get(key) } : null; },
+    async get(key) { return files.has(key) ? { body: files.get(key), size: files.get(key).length } : null; },
     async put(key, value) { files.set(key, new Uint8Array(value)); },
     async delete(keys) { for (const key of [].concat(keys)) files.delete(key); },
     async list({ prefix }) { return { objects: [...files.keys()].filter((k) => k.startsWith(prefix)).map((key) => ({ key })), truncated: false }; },
@@ -128,6 +128,14 @@ test("from the teacher's talk to the student hearing it", async () => {
   await call(`/api/listening/${id}/played`, { method: "POST", as: "NAOMI234" });
   assert.equal((await call(`/api/listening/${id}/played`, { method: "POST", as: "NAOMI234" })).data.plays, 2);
 
+  // A part heard (each line to the end) gets its ✓, once.
+  assert.deepEqual((await call(`/api/listening/${id}/heard`, { method: "POST", body: { part: 1 }, as: "NAOMI234" })).data.done, [1]);
+  assert.deepEqual((await call(`/api/listening/${id}/heard`, { method: "POST", body: { part: 1 }, as: "NAOMI234" })).data.done, [1]);
+  assert.equal((await call(`/api/listening/${id}/heard`, { method: "POST", body: { part: 5 }, as: "NAOMI234" })).status, 400);
+  assert.equal((await call(`/api/listening/${id}/heard`, { method: "POST", body: { part: 0 }, as: "KEIJI234" })).status, 404);
+  const listed = (await call("/api/me", { as: "NAOMI234" })).data.listening[0];
+  assert.deepEqual([listed.done, listed.part_titles], [[1], ["あいさつ", "予定を決める"]]);
+
   // Changed: a line still the same keeps its voice; the voice of a changed line is deleted.
   await call(`/api/teacher/listening/${id}/audio?part=0&line=1`, { method: "PUT", raw: mp3(16000, 2) });
   const keyOf = async (p, l) => (await call(`/api/teacher/listening/${id}`)).data.talk.parts[p].lines[l].audio;
@@ -136,6 +144,11 @@ test("from the teacher's talk to the student hearing it", async () => {
   const updated = await call(`/api/teacher/listening/${id}`, { method: "PUT", body: { talk: edited } });
   assert.equal(updated.data.talk.voiced, 1);
   assert.equal(updated.data.talk.plays, 2);
+  assert.deepEqual(updated.data.talk.done, [1]);
+  // With fewer parts, a ✓ of a part that is gone isn't counted.
+  const shorter = await call(`/api/teacher/listening/${id}`, { method: "PUT", body: { talk: { ...edited, parts: edited.parts.slice(0, 1) } } });
+  assert.deepEqual([shorter.data.talk.parts.length, shorter.data.talk.done], [1, []]);
+  await call(`/api/teacher/listening/${id}`, { method: "PUT", body: { talk: edited } });
   assert.equal(await keyOf(0, 0), kept);
   assert.equal(await keyOf(0, 1), undefined);
   assert.ok(env.FILES.files.has(kept));
