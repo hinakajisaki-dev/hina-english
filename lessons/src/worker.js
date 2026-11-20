@@ -21,8 +21,9 @@ import { phraseBooks, phraseByKey, phraseSentences, phraseSetKey, phraseSets, te
 import { noteProblems, noteSentences } from "../public/notes/format.js";
 import { NOTES_FOR_STUDENTS } from "../public/course.js";
 import { MENUS } from "../public/menus.js";
+import { findIeltsItem, ieltsSentences } from "../public/ielts/speaking.js";
 import {
-  all, debateRow, ensureSchema, first, isDbBusy, itemRow, japanDay, journalRow, noteRow, now, rephraseRow, run, starRow, studentBundle,
+  all, debateRow, ensureSchema, first, ieltsRow, isDbBusy, itemRow, japanDay, journalRow, noteRow, now, rephraseRow, run, starRow, studentBundle,
 } from "./db.js";
 
 const STUDENT_COOKIE = "hl_student";
@@ -167,6 +168,10 @@ async function route(request, env, url, who, ctx) {
     if (parts[0] === "debate" && parts[2] === "correct" && parts.length === 3 && method === "POST") {
       return retryDebate(env, student, id(1));
     }
+    if (path === "/api/ielts" && method === "POST") return answerIelts(request, env, student, ctx);
+    if (parts[0] === "ielts" && parts[2] === "audio" && parts.length === 3 && method === "GET") {
+      return ieltsAudio(env, await first(env.DB, `SELECT * FROM ielts_answers WHERE id = ? AND student_id = ?`, id(1), student.id));
+    }
     if (path === "/api/journals" && method === "POST") return newJournal(request, env, student);
     if (parts[0] === "journals" && parts[2] === "correct" && parts.length === 3 && method === "POST") {
       return retryCorrection(env, student, id(1));
@@ -233,6 +238,7 @@ async function route(request, env, url, who, ctx) {
       await run(db, `DELETE FROM students WHERE id = ?`, student.id);
       await deleteRecordings(env, `rec/${student.id}/`);
       await deleteFiles(env, `debate/${student.id}/`);
+      await deleteFiles(env, `ielts/${student.id}/`);
       return json({ ok: true });
     }
   }
@@ -292,6 +298,17 @@ async function route(request, env, url, who, ctx) {
     const { on } = await readJson(request);
     await saveSetting(db, student, "debate", on === true ? true : null);
     return json({ on: on === true });
+  }
+  // IELTS スピーキング練習 on the student's home screen (for one student).
+  if (parts[1] === "students" && parts[3] === "ielts-speaking" && parts.length === 4 && method === "PUT") {
+    const student = await findStudent(db, id(2));
+    const { on } = await readJson(request);
+    await saveSetting(db, student, "ielts_speaking", on === true ? true : null);
+    return json({ on: on === true });
+  }
+  // The recording of an IELTS スピーキング練習 answer.
+  if (parts[1] === "ielts" && parts[3] === "audio" && parts.length === 4 && method === "GET") {
+    return ieltsAudio(env, await first(db, `SELECT * FROM ielts_answers WHERE id = ?`, id(2)));
   }
   // The recording of a 話す・ディベート練習 answer.
   if (parts[1] === "debate" && parts[3] === "audio" && parts.length === 4 && method === "GET") {
@@ -522,9 +539,10 @@ const SPOKEN_FIELDS = { vocab: ["word", "example"], pron: ["text"], rephrase: ["
 const LESSON_SENTENCES = lessonExampleSentences();
 const BOOK_SENTENCES = bookSentences();
 const PHRASE_SENTENCES = phraseSentences();
+const IELTS_SENTENCES = ieltsSentences();
 
 async function speech(env, student, text) {
-  let allowed = LESSON_SENTENCES.has(text) || BOOK_SENTENCES.has(text) || PHRASE_SENTENCES.has(text);
+  let allowed = LESSON_SENTENCES.has(text) || BOOK_SENTENCES.has(text) || PHRASE_SENTENCES.has(text) || IELTS_SENTENCES.has(text);
   if (!allowed) {
     const rows = await all(
       env.DB,
@@ -1051,6 +1069,76 @@ async function dropOldDebateAudio(env) {
     await env.DB.batch(old.map((r) => env.DB.prepare(`UPDATE debate_answers SET audio_key = NULL WHERE id = ?`).bind(r.id)));
   } catch (error) {
     console.error("could not drop old recordings", error?.message ?? error);
+  }
+}
+
+// ---------- IELTS スピーキング練習 ----------
+// For a student with ielts_speaking on: Part 1 (a round of questions, one
+// recording each, sent as each answer ends) and Part 2 (a cue card: a minute to
+// prepare with a memo in Japanese, then two minutes to speak). The questions are
+// in public/ielts/speaking.js. Each recording goes to R2 (FILES,
+// "ielts/<student>/<answer>"); D1 keeps only where it is, its type, size and length.
+// The teacher listens on 先生ページ. Kept 90 days.
+
+const IELTS_PER_DAY = 80;
+const IELTS_KEEP_DAYS = 90;
+const MAX_IELTS_AUDIO = 4 * 1024 * 1024;
+const ieltsAudioKey = (studentId, answerId) => `ielts/${studentId}/${answerId}`;
+
+// A form: key (the question or card), round (Part 1), memo (Part 2), seconds and audio.
+async function answerIelts(request, env, student, ctx) {
+  if (!(await studentSetting(env.DB, student, "ielts_speaking"))) throw new HttpError(404, "見つかりません。");
+  if (!env.FILES) throw new HttpError(500, "録音の置き場所の設定がまだです。先生に知らせてください。");
+  const { n } = await first(env.DB, `SELECT COUNT(*) AS n FROM ielts_answers WHERE student_id = ? AND created_at >= ?`, student.id, japanDayStart());
+  if (n >= IELTS_PER_DAY) throw new HttpError(429, "今日の録音は、ここまでです。また明日ためしてください。");
+  if (Number(request.headers.get("Content-Length")) > MAX_IELTS_AUDIO + 64 * 1024) throw new HttpError(413, "録音が長すぎます。");
+  let form;
+  try {
+    form = await request.formData();
+  } catch {
+    throw new HttpError(400, "録音を送れませんでした。もう一度ためしてください。");
+  }
+  const item = findIeltsItem(form.get("key"));
+  if (!item) throw new HttpError(404, "その問題は見つかりません。");
+  const audio = form.get("audio");
+  if (!audio || typeof audio === "string" || !audio.size) throw new HttpError(400, "録音がありません。");
+  const type = String(audio.type || "").split(";")[0].trim().replace(/^video\//, "audio/");
+  if (!RECORDING_TYPES.includes(type)) throw new HttpError(415, "この録音の形式は送れません。");
+  if (audio.size > MAX_IELTS_AUDIO) throw new HttpError(413, "録音が長すぎます。");
+  const round = item.part === 1 ? String(form.get("round") ?? "").replace(/[^\w-]/g, "").slice(0, 40) || null : null;
+  const memo = item.part === 2 ? String(form.get("memo") ?? "").replace(/\r\n?/g, "\n").trim().slice(0, 1000) : "";
+  const seconds = Math.max(0, Math.min(180, Number(form.get("seconds")) || 0));
+  const { meta } = await run(
+    env.DB,
+    `INSERT INTO ielts_answers (student_id, part, round, item_key, question, memo, audio_type, audio_bytes, seconds, created_at)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    student.id, item.part, round, item.key, item.en, memo, type, audio.size, seconds, now(),
+  );
+  const answerId = meta.last_row_id;
+  const key = ieltsAudioKey(student.id, answerId);
+  await env.FILES.put(key, await audio.arrayBuffer(), { httpMetadata: { contentType: type } });
+  await run(env.DB, `UPDATE ielts_answers SET audio_key = ? WHERE id = ?`, key, answerId);
+  if (ctx?.waitUntil) ctx.waitUntil(dropOldIeltsAudio(env));
+  return json({ answer: ieltsRow(await first(env.DB, `SELECT * FROM ielts_answers WHERE id = ?`, answerId)) });
+}
+
+async function ieltsAudio(env, row) {
+  const object = row?.audio_key && (await env.FILES?.get(row.audio_key));
+  if (!object) throw new HttpError(404, `録音はありません（${IELTS_KEEP_DAYS}日たつと消えます）。`);
+  return new Response(object.body, {
+    headers: { "Content-Type": row.audio_type || "audio/webm", "Cache-Control": "private, max-age=3600" },
+  });
+}
+
+async function dropOldIeltsAudio(env) {
+  try {
+    const before = new Date(Date.now() - IELTS_KEEP_DAYS * 86400e3).toISOString();
+    const old = await all(env.DB, `SELECT id, audio_key FROM ielts_answers WHERE audio_key IS NOT NULL AND created_at < ? LIMIT 50`, before);
+    if (!old.length) return;
+    await env.FILES.delete(old.map((r) => r.audio_key));
+    await env.DB.batch(old.map((r) => env.DB.prepare(`UPDATE ielts_answers SET audio_key = NULL WHERE id = ?`).bind(r.id)));
+  } catch (error) {
+    console.error("could not drop old IELTS recordings", error?.message ?? error);
   }
 }
 

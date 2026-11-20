@@ -686,3 +686,33 @@ body.quiz-open .wrap { padding-bottom: 62vh; }
 .day-head { display: flex; align-items: baseline; justify-content: space-between; font-size: 17px; margin: 10px 2px -4px; }
 .day-head span { font-family: var(--en); font-size: 13px; font-weight: 700; color: var(--muted); }
 .day-head.done span { color: var(--good); }
+
+/* IELTS スピーキング練習: the tile at the top of home, the rules, Part 1 and Part 2. */
+.ielts-tile { border: 2px solid var(--sky); }
+.ielts-rules { margin: 0; padding-left: 1.2em; line-height: 1.8; }
+.ielts-rules b { color: var(--accent-text); }
+.ielts-test { background: var(--sky-soft); border-color: transparent; }
+.ielts-part { display: flex; align-items: center; gap: 14px; text-decoration: none; color: var(--ink); }
+.ielts-part > div { flex: 1; }
+.ielts-part b { font-size: 17px; }
+.ielts-part .go { font-size: 24px; color: var(--muted); }
+.part-no { flex: none; padding: 6px 10px; border-radius: 12px; background: var(--accent); color: #fff; font-family: var(--en); font-weight: 800; }
+.ielts-time { font-weight: 800; font-size: 18px; }
+.ielts-rule-card .label { margin-top: 4px; }
+.ielts-progress { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+.ielts-progress b { font-family: var(--en); font-size: 20px; }
+.ielts-question { border: 2px solid var(--accent); }
+.ielts-count { display: grid; justify-items: center; gap: 2px; }
+.ielts-count b { font-family: var(--en); font-size: 44px; font-weight: 800; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.ielts-pace { text-align: center; font-weight: 800; font-size: 14px; color: var(--muted); }
+.ielts-pace.good { color: var(--good); }
+.ielts-pace.long { color: var(--accent-text); }
+.ielts-hint { text-align: center; padding: 8px 12px; border-radius: 12px; background: var(--cream); font-size: 14px; }
+.ielts-q { font-family: var(--en); font-weight: 700; line-height: 1.5; }
+.cue-card { display: grid; gap: 6px; border: 2px solid var(--ink); background: var(--paper); }
+.cue-title { font-family: var(--en); font-size: 19px; font-weight: 800; line-height: 1.4; }
+.cue-card.small .cue-title { font-size: 16px; }
+.cue-say { font-family: var(--en); color: var(--ink-2); font-size: 15px; }
+.cue-card ul { margin: 0; padding-left: 1.3em; font-family: var(--en); line-height: 1.6; }
+.cue-explain { font-family: var(--en); font-weight: 700; }
+.cue-card details { margin-top: 2px; }

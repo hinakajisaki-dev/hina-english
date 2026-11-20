@@ -112,6 +112,26 @@ const SCHEMA = [
     corrected_at TEXT
   )`,
   `CREATE INDEX IF NOT EXISTS debate_answers_student ON debate_answers(student_id, created_at)`,
+  // IELTS スピーキング練習: one recording per answer. part 1: one question of a round
+  // (round: the same for every question of it); part 2: a cue card, with the memo
+  // from the minute to prepare. item_key is the question's key in
+  // public/ielts/speaking.js, question its English then. The recording is in R2
+  // (audio_key, "ielts/<student>/<answer>"); D1 keeps only where it is.
+  `CREATE TABLE IF NOT EXISTS ielts_answers (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    student_id INTEGER NOT NULL REFERENCES students(id) ON DELETE CASCADE,
+    part INTEGER NOT NULL,
+    round TEXT,
+    item_key TEXT NOT NULL,
+    question TEXT NOT NULL,
+    memo TEXT NOT NULL DEFAULT '',
+    audio_key TEXT,
+    audio_type TEXT,
+    audio_bytes INTEGER,
+    seconds REAL,
+    created_at TEXT NOT NULL
+  )`,
+  `CREATE INDEX IF NOT EXISTS ielts_answers_student ON ielts_answers(student_id, created_at)`,
   // Best and latest score of each ten-word set test; set_key is "w1/s3".
   `CREATE TABLE IF NOT EXISTS vocab_tests (
     student_id INTEGER NOT NULL REFERENCES students(id) ON DELETE CASCADE,
@@ -391,6 +411,20 @@ export function debateRow(row) {
   };
 }
 
+export function ieltsRow(row) {
+  return {
+    id: row.id,
+    part: row.part,
+    round: row.round,
+    key: row.item_key,
+    question: row.question,
+    memo: row.memo,
+    audio: !!row.audio_key,
+    seconds: row.seconds,
+    created_at: row.created_at,
+  };
+}
+
 export function starRow(row) {
   return {
     key: row.word_key,
@@ -422,7 +456,7 @@ export function noteRow(row) {
 export async function studentBundle(db, studentId) {
   const [
     items, progress, lessonRows, reviewRows, testRows, phraseReviewRows, phraseTestRows, pronRows, studyRows, journals, plan,
-    menus, settings, lessonDays, rephraseRows, starRows, grammarReviewRows, debateRows, rephraseStarRows,
+    menus, settings, lessonDays, rephraseRows, starRows, grammarReviewRows, debateRows, rephraseStarRows, ieltsRows,
   ] = await Promise.all([
     all(db, `SELECT * FROM items WHERE student_id = ? ORDER BY id`, studentId),
     all(db, `SELECT * FROM progress WHERE student_id = ?`, studentId),
@@ -454,6 +488,7 @@ export async function studentBundle(db, studentId) {
     all(db, `SELECT * FROM grammar_review WHERE student_id = ? ORDER BY added_at`, studentId),
     all(db, `SELECT * FROM debate_answers WHERE student_id = ? ORDER BY id DESC LIMIT 30`, studentId),
     all(db, `SELECT item_id, created_at FROM rephrase_stars WHERE student_id = ? ORDER BY created_at`, studentId),
+    all(db, `SELECT * FROM ielts_answers WHERE student_id = ? ORDER BY id DESC LIMIT 200`, studentId),
   ]);
   const setting = (name) => {
     const row = settings.find((r) => r.name === name);
@@ -512,6 +547,8 @@ export async function studentBundle(db, studentId) {
     grammarUnits: setting("grammar_units") || [],
     rephraseStars: rephraseStarRows.map((r) => ({ item_id: r.item_id, created_at: r.created_at })),
     debateAnswers: debateRows.map(debateRow),
+    ieltsSpeaking: !!setting("ielts_speaking"),
+    ieltsAnswers: ieltsRows.map(ieltsRow),
     grammarReview,
     stars: starRows.map(starRow),
   };
