@@ -21,6 +21,7 @@ import { phraseBooks, phraseByKey, phraseSentences, phraseSetKey, phraseSets, te
 import { noteProblems, noteSentences } from "../public/notes/format.js";
 import { NOTES_FOR_STUDENTS } from "../public/course.js";
 import { MENUS } from "../public/menus.js";
+import { checkTalk, cleanTalk, lineAudioKey, lineText, talkLines, talkSummary } from "../public/listening/format.js";
 import {
   all, debateRow, ensureSchema, first, isDbBusy, itemRow, japanDay, journalRow, noteRow, now, rephraseRow, run, starRow, studentBundle,
 } from "./db.js";
@@ -117,6 +118,19 @@ async function route(request, env, url, who, ctx) {
     if (path === "/api/progress" && method === "POST") return saveProgress(request, env, student);
     if (path === "/api/speech" && method === "GET") return speech(env, student, url.searchParams.get("text"));
     if (path === "/api/talk/audio" && method === "GET") return talkAudio(env, url.searchParams.get("who"), url.searchParams.get("text"));
+    // 会話リスニング: a talk, a line's voice, and one more time heard all the way through.
+    if (parts[0] === "listening" && parts.length === 2 && method === "GET") {
+      const row = await listenRow(env.DB, id(1), student.id);
+      return json({ talk: { ...talkSummary(row, JSON.parse(row.body)), ...studentTalk(JSON.parse(row.body)), updated_at: row.updated_at } });
+    }
+    if (parts[0] === "listening" && parts[2] === "audio" && parts.length === 5 && method === "GET") {
+      return listenAudio(env, await listenRow(env.DB, id(1), student.id), id(3), id(4));
+    }
+    if (parts[0] === "listening" && parts[2] === "played" && parts.length === 3 && method === "POST") {
+      const row = await listenRow(env.DB, id(1), student.id);
+      await run(env.DB, `UPDATE listen_talks SET plays = plays + 1, played_at = ? WHERE id = ?`, now(), row.id);
+      return json({ plays: row.plays + 1 });
+    }
     if (parts[0] === "lessons" && parts.length === 2 && method === "POST") {
       return saveLessonResult(request, env, student, parts[1]);
     }
@@ -233,6 +247,7 @@ async function route(request, env, url, who, ctx) {
       await run(db, `DELETE FROM students WHERE id = ?`, student.id);
       await deleteRecordings(env, `rec/${student.id}/`);
       await deleteFiles(env, `debate/${student.id}/`);
+      await deleteFiles(env, `listen/${student.id}/`);
       return json({ ok: true });
     }
   }
@@ -248,6 +263,24 @@ async function route(request, env, url, who, ctx) {
   }
   if (parts[1] === "students" && parts[3] === "items" && parts.length === 4 && method === "POST") {
     return addItems(request, db, await findStudent(db, id(2)));
+  }
+  // 会話リスニング (scripts/teacher.mjs listening): a new talk for a student; one talk
+  // (GET with its audio keys, PUT a changed one, DELETE it and its voices); a line's voice.
+  if (parts[1] === "students" && parts[3] === "listening" && parts.length === 4 && method === "POST") {
+    return saveListenTalk(request, env, await findStudent(db, id(2)), null);
+  }
+  if (parts[1] === "listening" && parts.length === 3) {
+    const row = await listenRow(db, id(2));
+    if (method === "GET") return json({ talk: { ...talkSummary(row, JSON.parse(row.body)), ...JSON.parse(row.body), student_id: row.student_id } });
+    if (method === "PUT") return saveListenTalk(request, env, { id: row.student_id }, row);
+    if (method === "DELETE") {
+      await run(db, `DELETE FROM listen_talks WHERE id = ?`, row.id);
+      await deleteFiles(env, `listen/${row.student_id}/${row.id}/`);
+      return json({ ok: true });
+    }
+  }
+  if (parts[1] === "listening" && parts[3] === "audio" && parts.length === 4 && method === "PUT") {
+    return saveListenAudio(request, env, await listenRow(db, id(2)), Number(url.searchParams.get("part")), Number(url.searchParams.get("line")));
   }
   if (parts[1] === "students" && parts[3] === "notes" && parts.length === 4 && method === "POST") {
     return saveNote(request, db, await findStudent(db, id(2)), null);
@@ -613,6 +646,87 @@ async function saveTalkAudio(request, env, who, text) {
   const key = await talkAudioKey(who, text);
   await env.FILES.put(key, audio, { httpMetadata: { contentType: "audio/mpeg" } });
   return json({ ok: true, key });
+}
+
+// ---------- 会話リスニング ----------
+
+// A talk (of this student, when studentId is given).
+async function listenRow(db, talkId, studentId = null) {
+  const row = await first(db, `SELECT * FROM listen_talks WHERE id = ?`, talkId);
+  if (!row || (studentId !== null && row.student_id !== studentId)) throw new HttpError(404, "その会話は見つかりません。");
+  return row;
+}
+
+// What the student's screen needs of a talk (no R2 keys).
+const studentTalk = (talk) => ({
+  title: talk.title,
+  parts: talk.parts.map((part) => ({
+    title: part.title,
+    lines: part.lines.map(({ name, who, en, ja, sec }) => ({ name, who, en, ja, ...(sec ? { sec } : {}) })),
+  })),
+});
+
+// A line in its person's voice (R2). A line with no voice made yet is read in the app's usual voice.
+async function listenAudio(env, row, partIndex, lineIndex) {
+  const line = JSON.parse(row.body).parts[partIndex]?.lines[lineIndex];
+  if (!line) throw new HttpError(404, "見つかりません。");
+  const object = line.audio && (await env.FILES?.get(line.audio));
+  if (object) return new Response(object.body, { headers: { "Content-Type": "audio/mpeg", "Cache-Control": "private, max-age=86400" } });
+  try {
+    return new Response(await speechFor(env, lineText(line.en)), { headers: { "Content-Type": "audio/mpeg", "Cache-Control": "no-store" } });
+  } catch (error) {
+    if (!(error instanceof SpeechError)) throw error;
+    throw new HttpError(503, "音声を作れませんでした。");
+  }
+}
+
+// A new talk, or a changed one: lines that are still the same keep their voice;
+// the voices of lines that are gone are deleted from R2.
+async function saveListenTalk(request, env, student, row) {
+  const { talk } = await readJson(request);
+  const problem = checkTalk(talk);
+  if (problem) throw new HttpError(400, problem);
+  const old = row ? JSON.parse(row.body) : null;
+  const clean = cleanTalk(talk, old);
+  const at = now();
+  let talkId = row?.id;
+  if (row) {
+    await run(env.DB, `UPDATE listen_talks SET body = ?, updated_at = ? WHERE id = ?`, JSON.stringify(clean), at, row.id);
+    const kept = new Set(talkLines(clean).map((l) => l.audio).filter(Boolean));
+    const gone = [...new Set(talkLines(old).map((l) => l.audio).filter((key) => key && !kept.has(key)))];
+    if (gone.length && env.FILES) await env.FILES.delete(gone);
+  } else {
+    const { meta } = await run(
+      env.DB,
+      `INSERT INTO listen_talks (student_id, body, created_at, updated_at) VALUES (?, ?, ?, ?)`,
+      student.id, JSON.stringify(clean), at, at,
+    );
+    talkId = meta.last_row_id;
+  }
+  const saved = await listenRow(env.DB, talkId);
+  return json({ talk: { ...talkSummary(saved, clean), ...clean, student_id: saved.student_id } });
+}
+
+// The voice of one line (an MP3 made by scripts/teacher.mjs with ElevenLabs, 128 kbps).
+async function saveListenAudio(request, env, row, partIndex, lineIndex) {
+  if (!env.FILES) throw new HttpError(500, "ファイルの置き場所（R2）の設定がまだです。");
+  const talk = JSON.parse(row.body);
+  const line = talk.parts[partIndex]?.lines[lineIndex];
+  if (!line) throw new HttpError(404, "その文は見つかりません。");
+  const audio = new Uint8Array(await request.arrayBuffer());
+  const mp3 = audio.length > 4 && ((audio[0] === 0x49 && audio[1] === 0x44 && audio[2] === 0x33) || (audio[0] === 0xff && (audio[1] & 0xe0) === 0xe0));
+  if (!mp3 || audio.length > 2_000_000) throw new HttpError(400, "MP3 の音声を送ってください。");
+  const key = await lineAudioKey(row.student_id, row.id, line.who, line.en);
+  await env.FILES.put(key, audio, { httpMetadata: { contentType: "audio/mpeg" } });
+  // (Read again just before writing, so lines saved one after another don't undo each other.)
+  const fresh = await listenRow(env.DB, row.id);
+  const body = JSON.parse(fresh.body);
+  const same = body.parts[partIndex]?.lines[lineIndex];
+  if (!same || same.who !== line.who || lineText(same.en) !== lineText(line.en)) throw new HttpError(409, "そのあいだに会話が変わりました。もう一度ためしてください。");
+  same.audio = key;
+  same.sec = Math.round((audio.length * 8) / 128000 * 10) / 10;
+  await run(env.DB, `UPDATE listen_talks SET body = ? WHERE id = ?`, JSON.stringify(body), row.id);
+  return json({ ok: true, key, sec: same.sec });
 }
 
 async function saveLessonResult(request, env, student, lessonId) {
