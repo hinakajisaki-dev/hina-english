@@ -13,6 +13,7 @@ import { MENUS } from "./menus.js";
 import { phraseSetKey, phraseSets, phraseWeeks, testSize, weekTitle as phraseWeekTitle } from "./phrases/book.js";
 import { lessonDayLabel, lessonList, noteDayLabel, noteHtml, notePages, noteProblems } from "./notes/format.js";
 import { shownPoints, spellingMap } from "./journal/spelling.js";
+import { PART2_CARDS, findIeltsItem } from "./ielts/speaking.js";
 import { allTime, bindPanels, formatMinutes, monthPanel, monthStart, summary, today, totalPanel, weekDays, weekPanel, weekStart } from "./study.js";
 
 document.body.classList.add("teacher");
@@ -264,6 +265,7 @@ async function renderStudent(id, tab) {
     ]),
     // 話す・ディベート only for a student with it on (or who has done it).
     ...(data.debate || data.debateAnswers?.length ? [["debate", "話す・ディベート"]] : []),
+    ...(data.ieltsSpeaking || data.ieltsAnswers?.length ? [["ielts", "IELTS スピーキング"]] : []),
     ["settings", "設定・コード"],
   ];
 
@@ -301,6 +303,7 @@ async function renderStudent(id, tab) {
   else if (tab === "notes") renderNotes(panel);
   else if (tab === "phrases") panel.innerHTML = phraseResultsHtml();
   else if (tab === "debate") renderDebateTab(panel, student);
+  else if (tab === "ielts") panel.innerHTML = ieltsTabHtml();
   else if (KINDS[tab]) renderItems(panel, tab);
   else renderJournals(panel);
 }
@@ -993,6 +996,51 @@ function renderDebateTab(panel, student) {
   });
 }
 
+// IELTS スピーキング練習: what the student recorded. A Part 1 round is one card
+// (each question with its recording); a Part 2 answer has its cue card and memo.
+const secondsText = (s) => `${Math.floor(s / 60)}:${String(Math.round(s % 60)).padStart(2, "0")}`;
+
+function ieltsTabHtml() {
+  const groups = [];
+  for (const a of state.current.ieltsAnswers || []) {
+    const key = a.part === 1 ? a.round || `one${a.id}` : `a${a.id}`;
+    const group = groups.find((g) => g.key === key);
+    if (group) group.answers.unshift(a);
+    else groups.push({ key, part: a.part, created_at: a.created_at, answers: [a] });
+  }
+  const audio = (a) => (a.audio ? `<audio controls preload="none" src="/api/teacher/ielts/${a.id}/audio" style="width:100%"></audio>`
+    : `<p class="muted small">録音なし（90日たって消えました）</p>`);
+  return `<div class="stack">
+    ${state.current.ieltsSpeaking ? "" : `<p class="notice">この生徒の画面には、いま出ていません（「設定・コード」の「IELTS スピーキング練習」）。</p>`}
+    <section class="card stack">
+      <h3>生徒が話したもの（${groups.length} 回）</h3>
+      <p class="muted small">Part 1 は1問ずつ、Part 2 は1回ずつの録音です（目安：Part 1 は 1問 20〜30秒、Part 2 は 1:30〜2:00）。録音は90日で消えます。</p>
+      ${groups.length ? `<ul class="rows">${groups.map((g) => {
+        if (g.part === 1) {
+          const topics = [...new Set(g.answers.map((a) => findIeltsItem(a.key)?.topicName).filter(Boolean))].join(" ・ ");
+          return `<li><div class="main stack">
+            <div><span class="pill">Part 1</span> <b lang="en">${esc(topics)}</b> <span class="muted small">${g.answers.length} 問</span></div>
+            <div class="sub">${esc(formatDateTime(g.created_at))}</div>
+            ${g.answers.map((a, i) => `<div class="stack" style="gap:4px">
+              <p lang="en"><span class="muted">Q${i + 1}.</span> ${esc(a.question)} <span class="muted small">${a.seconds ? `${Math.round(a.seconds)}秒` : ""}</span></p>
+              ${audio(a)}
+            </div>`).join("")}
+          </div></li>`;
+        }
+        const a = g.answers[0];
+        const card = PART2_CARDS.find((c) => c.key === findIeltsItem(a.key)?.card);
+        return `<li><div class="main stack">
+          <div><span class="pill">Part 2</span> <b lang="en">${esc(a.question)}</b> ${a.seconds ? `<span class="muted small">${secondsText(a.seconds)}</span>` : ""}</div>
+          <div class="sub">${esc(formatDateTime(a.created_at))}</div>
+          ${card ? `<p class="muted small" lang="en">${card.points.map(esc).join(" / ")} / ${esc(card.explain)}</p>` : ""}
+          ${a.memo ? `<p class="muted small">メモ：${esc(a.memo)}</p>` : ""}
+          ${audio(a)}
+        </div></li>`;
+      }).join("")}</ul>` : `<p class="muted small">まだありません。</p>`}
+    </section>
+  </div>`;
+}
+
 function debateResultsHtml(answers) {
   return `<section class="card stack">
     <h3>生徒が話したもの（${answers.length}）</h3>
@@ -1364,7 +1412,8 @@ function renderSettings(panel) {
       <p class="muted small">この生徒だけ：</p>
       <div class="menu-picks"><label><input type="checkbox" name="toeic" ${state.current.toeic ? "checked" : ""}> TOEIC単語（ホームのいちばん上）</label>
         <label><input type="checkbox" name="journal-ielts" ${state.current.journalIelts ? "checked" : ""}> 日記を「日記（IELTS問題練習）」にする</label>
-        <label><input type="checkbox" name="debate" ${state.current.debate ? "checked" : ""}> 話す・ディベート練習</label></div>
+        <label><input type="checkbox" name="debate" ${state.current.debate ? "checked" : ""}> 話す・ディベート練習</label>
+        <label><input type="checkbox" name="ielts-speaking" ${state.current.ieltsSpeaking ? "checked" : ""}> IELTS スピーキング練習（Part 1・2 の録音）</label></div>
       <button class="btn" type="submit" style="align-self:flex-start">保存</button>
     </form>
     <form class="card stack" id="pron-months">
@@ -1424,6 +1473,10 @@ function renderSettings(panel) {
       if (toeic !== !!state.current.toeic) await api(`/api/teacher/students/${student.id}/toeic`, { method: "PUT", body: { on: toeic } });
       const debate = menuForm.elements.debate.checked;
       if (debate !== !!state.current.debate) await api(`/api/teacher/students/${student.id}/debate`, { method: "PUT", body: { on: debate } });
+      const ieltsSpeaking = menuForm.elements["ielts-speaking"].checked;
+      if (ieltsSpeaking !== !!state.current.ieltsSpeaking) {
+        await api(`/api/teacher/students/${student.id}/ielts-speaking`, { method: "PUT", body: { on: ieltsSpeaking } });
+      }
       const journalIelts = menuForm.elements["journal-ielts"].checked;
       if (journalIelts !== !!state.current.journalIelts) {
         await api(`/api/teacher/students/${student.id}/journal-ielts`, { method: "PUT", body: { on: journalIelts } });

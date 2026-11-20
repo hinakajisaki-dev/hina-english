@@ -45,6 +45,8 @@
 // node scripts/teacher.mjs debate なおみ [--on | --off]            (話す・ディベート練習 on the home screen)
 // node scripts/teacher.mjs debate-note なおみ [note.txt | --clear] (what kind of topics the AI makes for the student)
 // node scripts/teacher.mjs debates なおみ [--days 7]               (what the student said in 話す・ディベート練習 (transcript), with corrections)
+// node scripts/teacher.mjs ielts-speaking はるき [--on | --off]   (IELTS スピーキング練習 (Part 1・2 の録音) on the home screen)
+// node scripts/teacher.mjs ielts-answers はるき [--days 7]         (what the student recorded in IELTS スピーキング練習)
 // node scripts/teacher.mjs stars なおみ                           (the ★ examples and their お題)
 // node scripts/teacher.mjs lesson-days なおみ [--add 2026-08-03,2026-08-16] [--remove 2026-08-03]   (the numbered lessons)
 //
@@ -337,7 +339,7 @@ const commands = {
   async show([name]) {
     const data = await studentData(await findStudent(name));
     console.log(`# ${data.student.name}さん`);
-    console.log(`\n## 生徒の画面に出すもの\n${menuLine(data.hidden)}${data.toeic ? "　○ TOEIC単語（いちばん上）" : ""}${data.journalIelts ? "　○ 日記（IELTS問題練習）" : ""}${data.debate ? "　○ 話す・ディベート練習" : ""}`);
+    console.log(`\n## 生徒の画面に出すもの\n${menuLine(data.hidden)}${data.toeic ? "　○ TOEIC単語（いちばん上）" : ""}${data.journalIelts ? "　○ 日記（IELTS問題練習）" : ""}${data.debate ? "　○ 話す・ディベート練習" : ""}${data.ieltsSpeaking ? "　○ IELTS スピーキング練習" : ""}`);
     console.log(`\n## 発音課題の Month\n${pronLine(data.pronMonths)}`);
     console.log(`\n## 発音課題の完了\n${pronProgress(data.pronDone)}`);
     console.log(`\n## 単語帳\n${bookLine(data.vocabBooks)}`);
@@ -770,6 +772,30 @@ const commands = {
     }
     await api(`/api/teacher/students/${student.id}/debate`, { method: "PUT", body: { on: !!options.on } });
     console.log(`${student.name}さんの話す・ディベート練習を${options.on ? "出しました（ホーム。トピックは AI がレベルごとに作る）" : "しまいました（書いたものは残ります）"}。`);
+  },
+
+  async "ielts-speaking"([name], options) {
+    const student = await findStudent(name);
+    if (!options.on && !options.off) {
+      const { ieltsSpeaking, ieltsAnswers } = await studentData(student);
+      return console.log(`${student.name}さんの IELTS スピーキング練習：${ieltsSpeaking ? "あり" : "なし"}（録音 ${(ieltsAnswers || []).length} こ）`);
+    }
+    await api(`/api/teacher/students/${student.id}/ielts-speaking`, { method: "PUT", body: { on: !!options.on } });
+    console.log(`${student.name}さんの IELTS スピーキング練習を${options.on ? "出しました（ホームのいちばん上。Part 1・Part 2）" : "しまいました（録音は残ります）"}。`);
+  },
+
+  // The recordings themselves are on 先生ページ (the IELTS スピーキング tab); this lists them.
+  async "ielts-answers"([name], options) {
+    const data = await studentData(await findStudent(name));
+    const days = Number(options.days) || 7;
+    const since = japanDay(-(days - 1));
+    const list = (data.ieltsAnswers || []).filter((a) => japanDate(a.created_at) >= since).reverse();
+    console.log(`# ${data.student.name}さんの IELTS スピーキング練習（${since} から 録音 ${list.length} こ。聞くのは先生ページの「IELTS スピーキング」タブ）`);
+    for (const a of list) {
+      const time = a.seconds ? `${Math.round(a.seconds)}秒` : "";
+      console.log(`[${japanTime(a.created_at)}] Part ${a.part}　${a.question}　${time}${a.audio ? "" : "（録音は消えました）"}`);
+      if (a.memo) console.log(`  メモ：${a.memo.replace(/\n/g, " / ")}`);
+    }
   },
 
   // What kind of topics the AI makes for this student (empty: everyday conversation and simple debates).
