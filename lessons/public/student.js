@@ -13,6 +13,9 @@ import { MONTHS, currentMonth, monthLabel, monthPhrases, studentMonths } from ".
 import { CURRENT_WEEK, NOTES_FOR_STUDENTS } from "./course.js";
 import { MENUS } from "./menus.js";
 import { clock, lineParts, lineSeconds, lineText, minutesLabel } from "./listening/format.js";
+import {
+  PART1_SECONDS, PART1_TOPICS, PART2_AIM, PART2_CARDS, PART2_PREP, PART2_SPEAK, RULES, cardKey, findIeltsItem, part1Round, shuffled,
+} from "./ielts/speaking.js";
 import { TOPICS } from "./journal/topics.js";
 import { shownPoints, spellingMap } from "./journal/spelling.js";
 import {
@@ -38,7 +41,7 @@ if (PREVIEW) setApiParams({ preview: PREVIEW });
 const app = document.getElementById("app");
 const state = {
   me: null, vocab: null, vocabTest: null, listen: null, review: null, pron: { which: null, index: 0 }, grammar: null, lesson: null, aiError: {},
-  study: null, notes: {}, quiz: null, rephrase: null, rephraseGroup: null, write: null, debate: null,
+  study: null, notes: {}, quiz: null, rephrase: null, rephraseGroup: null, write: null, debate: null, ielts: null,
 };
 
 // フレーズ of this student's own books (phrase_books), or スモールトーク.
@@ -83,6 +86,7 @@ function render() {
   clearInterval(debateClock);
   if (screen !== "debate") dropDebateRecording();
   stopListening();
+  dropIeltsRecording();
   // Opening a pronunciation month goes to the first phrase that isn't 完了 yet.
   if (screen === "pron") state.pron = { which: null, index: 0 };
   const screens = {
@@ -92,6 +96,7 @@ function render() {
     ...(state.me.toeic ? { toeic: renderToeic } : {}),
     ...(state.me.debate ? { debate: renderDebate } : {}),
     ...(state.me.listening?.length ? { listening: renderListening } : {}),
+    ...(state.me.ieltsSpeaking ? { ielts: renderIelts } : {}),
   };
   (screens[screen] || renderHome)(...rest.map(decodeURIComponent));
 }
@@ -423,6 +428,7 @@ function renderHome() {
       </div>
       ${installCard()}
       ${state.me.toeic ? toeicTile() : ""}
+      ${state.me.ieltsSpeaking ? ieltsTile() : ""}
       ${shows("plan") ? `<section class="card plan" aria-label="今週の勉強範囲">
         <p class="label">今週の勉強範囲</p>
         ${plan ? `<div class="note-body plan-body">${memoHtml(plan.body)}</div>` : `<p class="muted small">先生が、今週の勉強範囲をここに書きます。</p>`}
@@ -584,7 +590,7 @@ async function renderListenTalk(id) {
       ${talk.parts.map((part, p) => `<section class="card listen-part" data-part="${p}">
         <div class="listen-part-head">
           <button type="button" class="listen-part-name" data-open="${p}" aria-expanded="${p === 0}">
-            ${talk.parts.length > 1 ? `<span class="part-no">Part ${p + 1}</span>` : ""}<b>${esc(part.title || (talk.parts.length > 1 ? "" : "会話"))}</b>
+            ${talk.parts.length > 1 ? `<span class="listen-part-no">Part ${p + 1}</span>` : ""}<b>${esc(part.title || (talk.parts.length > 1 ? "" : "会話"))}</b>
           </button>
           <button type="button" class="round-btn" data-play="${p}" aria-label="Part ${p + 1} を聞く"></button>
         </div>
@@ -4372,6 +4378,490 @@ function renderDebateAnswer(id) {
     }
     renderDebateAnswer(id);
   });
+}
+
+// ---------- IELTS スピーキング練習 ----------
+// For a student with ielts_speaking on (the teacher's switch). The top page has
+// the test's rules and Part 1 / Part 2 (public/ielts/speaking.js).
+// - Part 1: a round of questions at random (like the test: an intro topic and
+//   two more, or one topic). Each question is voiced; the student records the
+//   answer (a clock counts up to the aim of 20〜30 seconds, a minute at most),
+//   and 次へ sends it at once while the next question comes.
+// - Part 2: a cue card; 1:00 to prepare with a memo in Japanese, then 2:00 to
+//   speak (recorded, stops at 2:00; 1:30 is the aim). Listen back, then 送る.
+// Recordings go to the teacher (R2 on the server).
+
+const IELTS_NAME = "IELTS スピーキング";
+let ieltsClock = null;
+const partLabel = (part) => `Part ${part}`;
+
+// This week's practice: Part 1 rounds and Part 2 answers in the last 7 days.
+function ieltsWeekCount() {
+  const since = Date.now() - 7 * 86400e3;
+  const recent = (state.me.ieltsAnswers || []).filter((a) => Date.parse(a.created_at) >= since);
+  return new Set(recent.map((a) => (a.part === 1 ? `r${a.round || a.id}` : `a${a.id}`))).size;
+}
+
+function ieltsTile() {
+  const n = ieltsWeekCount();
+  return `<nav class="tiles" aria-label="${IELTS_NAME}"><a class="tile wide ielts-tile" href="#/ielts">
+    <span class="emoji" aria-hidden="true">🎙️</span>
+    <div><b>IELTS スピーキング練習</b>
+      <p class="muted">Part 1 ・ Part 2 を録音して練習${n ? ` ・ この7日で <b>${n} 回</b>` : ""}</p></div>
+  </a></nav>`;
+}
+
+const ruleList = (lines) => `<ul class="ielts-rules">${lines.map((l) => `<li>${fmt(l)}</li>`).join("")}</ul>`;
+
+// The practices so far, newest first: a Part 1 round is one row.
+function ieltsHistory() {
+  const rows = [];
+  for (const a of state.me.ieltsAnswers || []) {
+    if (a.part === 1) {
+      const key = a.round || `one${a.id}`;
+      const row = rows.find((r) => r.key === key);
+      if (row) row.answers.push(a);
+      else rows.push({ key, part: 1, created_at: a.created_at, answers: [a] });
+    } else {
+      rows.push({ key: `a${a.id}`, part: 2, created_at: a.created_at, answers: [a] });
+    }
+  }
+  return rows;
+}
+const ieltsTopicNames = (answers) => [...new Set(answers.map((a) => findIeltsItem(a.key)?.topicName).filter(Boolean))].reverse().join(" ・ ");
+
+function renderIelts(page, id) {
+  if (page === "p1") return state.ielts?.part === 1 && !state.ielts.done ? renderPart1Question() : renderPart1Start();
+  if (page === "p2") return renderPart2();
+  if (page === "r") return renderPart1Result(id);
+  if (page === "a") return renderPart2Answer(Number(id));
+  const history = ieltsHistory();
+  app.innerHTML = `${topbar(IELTS_NAME)}
+    <main class="wrap stack">
+      <section class="card stack ielts-test">
+        <p class="label">IELTS Speaking とは</p>
+        ${ruleList(RULES.test)}
+      </section>
+      <a class="card ielts-part" href="#/ielts/p1">
+        <span class="part-no">Part 1</span>
+        <div><b>質問に答える</b><p class="muted small">4〜5分 ・ 1問 20〜30秒</p></div>
+        <span class="go" aria-hidden="true">›</span>
+      </a>
+      <a class="card ielts-part" href="#/ielts/p2">
+        <span class="part-no">Part 2</span>
+        <div><b>お題について話す</b><p class="muted small">1分 メモ → 2分 話す</p></div>
+        <span class="go" aria-hidden="true">›</span>
+      </a>
+      <p class="muted small center">録音は先生に届きます。</p>
+      ${history.length ? `<section class="card">
+        <h3>これまでの練習</h3>
+        <ul class="history">${history.slice(0, 30).map((r) => `<li><a href="${r.part === 1 ? `#/ielts/r/${encodeURIComponent(r.key)}` : `#/ielts/a/${r.answers[0].id}`}">
+          <div class="badges"><span class="badge ${r.part === 1 ? "" : "teacher"}">${partLabel(r.part)}</span><span class="muted small">${esc(formatDate(r.created_at))}</span>
+            ${r.part === 1 ? `<span class="muted small">${r.answers.length} 問</span>` : r.answers[0].seconds ? `<span class="muted small">${clockText(r.answers[0].seconds * 1000)}</span>` : ""}</div>
+          <p class="first-line" lang="en">${esc(r.part === 1 ? ieltsTopicNames(r.answers) : r.answers[0].question)}</p>
+        </a></li>`).join("")}</ul>
+      </section>` : ""}
+    </main>`;
+}
+
+// The rules of one part, before it starts.
+const partRulesHtml = (rules) => `<section class="card stack ielts-rule-card">
+    <p class="ielts-time">⏱ ${esc(rules.time)}</p>
+    ${ruleList(rules.lines)}
+    <p class="label">意識すること</p>
+    ${ruleList(rules.points)}
+  </section>`;
+
+// Stops a recording that is going (leaving the screen): it is not kept.
+function dropIeltsRecording() {
+  clearInterval(ieltsClock);
+  const I = state.ielts;
+  if (I?.recorder && I.recorder.state !== "inactive") {
+    I.discard = true;
+    I.recorder.stop();
+  }
+  if (I) I.recorder = null;
+  if (I?.part === 1 && I.phase === "recording") I.phase = "ask";
+  if (I?.part === 2 && I.phase === "recording") I.phase = "ready";
+}
+
+// Sends one recording (a form); the answer as kept on the server.
+async function sendIelts({ key, round = "", memo = "", seconds, blob }) {
+  const form = new FormData();
+  form.set("key", key);
+  form.set("round", round);
+  form.set("memo", memo);
+  form.set("seconds", String(Math.round(seconds || 0)));
+  form.set("audio", blob, `answer.${(blob.type.split("/")[1] || "webm").split(";")[0]}`);
+  let response;
+  try {
+    response = await fetch(withParams("/api/ielts"), { method: "POST", body: form, credentials: "same-origin" });
+  } catch {
+    throw new Error("インターネットにつながっていないようです。");
+  }
+  const result = await response.json().catch(() => ({}));
+  if (!response.ok) throw new Error(result.error || "送れませんでした。もう一度ためしてください。");
+  (state.me.ieltsAnswers ||= []).unshift(result.answer);
+  return result.answer;
+}
+
+// ----- Part 1 -----
+
+function renderPart1Start() {
+  app.innerHTML = `${topbar("Part 1 練習", "#/ielts")}
+    <main class="wrap stack">
+      ${partRulesHtml(RULES.part1)}
+      <p class="muted small center">質問は音声で流れます（🔊 でもう一度）。</p>
+      <button type="button" class="btn block" data-topics="3">本番と同じ（3テーマ ・ 12問）</button>
+      <button type="button" class="btn secondary block" data-topics="1">1テーマだけ（4問）</button>
+    </main>`;
+  app.querySelectorAll("[data-topics]").forEach((button) => button.addEventListener("click", () => {
+    // Topics of the last rounds come last, so each round is new.
+    const recent = (state.me.ieltsAnswers || []).filter((a) => a.part === 1).slice(0, 24).map((a) => findIeltsItem(a.key)?.topic);
+    const questions = part1Round({ topics: Number(button.dataset.topics), recent });
+    state.ielts = { part: 1, round: `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`, questions, i: 0, phase: "ask", results: [] };
+    speak(questions[0].en);
+    renderPart1Question();
+  }));
+}
+
+// Where the answer's length is, against the aim (20〜30 seconds).
+function part1Pace(seconds) {
+  const [low, high] = PART1_SECONDS.aim;
+  if (seconds < low) return { cls: "", text: `目安 ${low}〜${high}秒` };
+  if (seconds <= high + 5) return { cls: "good", text: "✓ ちょうどいい長さ" };
+  return { cls: "long", text: "そろそろまとめよう" };
+}
+
+function renderPart1Question() {
+  const I = state.ielts;
+  const q = I.questions[I.i];
+  const topic = PART1_TOPICS.find((t) => t.key === q.topic);
+  const newTopic = I.i === 0 || I.questions[I.i - 1].topic !== q.topic;
+  app.innerHTML = `${topbar("Part 1 練習", "#/ielts")}
+    <main class="wrap stack">
+      <div class="ielts-progress">
+        <span><b>Q ${I.i + 1}</b> / ${I.questions.length}</span>
+        <span class="badge ${newTopic ? "start" : ""}">${esc(topic.name)}（${esc(topic.ja)}）</span>
+      </div>
+      ${barHtml(I.i, I.questions.length)}
+      <section class="card stack ielts-question">
+        <div class="debate-topic-row"><p class="debate-topic" lang="en">${esc(q.en)}</p>${sayIcon(q.en)}</div>
+        <details><summary class="muted small">日本語</summary><p class="muted small">${esc(q.ja)}</p></details>
+      </section>
+      <section class="card stack debate-speak">
+        ${I.phase === "recording" ? `<div class="ielts-count" role="timer">
+            <span class="label"><span class="rec-dot" aria-hidden="true"></span> 録音中</span>
+            <b id="clock">0:00</b>
+            <p class="ielts-pace" id="pace">${part1Pace(0).text}</p>
+          </div>
+          <button type="button" class="btn block" id="p1-next">答えおわった → ${I.i + 1 < I.questions.length ? "次の質問" : "おわり"}</button>`
+          : `<button type="button" class="rec-button" id="p1-rec"><span aria-hidden="true">🎤</span>答える</button>
+          <p class="muted small center">質問を聞いてから押す ・ <b>${PART1_SECONDS.aim[0]}〜${PART1_SECONDS.aim[1]}秒</b>で答える</p>`}
+      </section>
+      ${I.phase === "recording" ? "" : `<p class="ielts-hint">💡 <b>答え → 理由・例</b></p>`}
+      <button type="button" class="btn ghost block" id="p1-quit">やめる</button>
+    </main>`;
+
+  document.getElementById("p1-rec")?.addEventListener("click", async (event) => {
+    event.currentTarget.disabled = true;
+    stopSpeaking();
+    const question = q;
+    try {
+      I.recorder = await startRecording((blob, seconds) => {
+        if (I.discard) { I.discard = false; return; }
+        queuePart1Send(I, { q: question, blob, seconds: Math.min(seconds, PART1_SECONDS.max), url: URL.createObjectURL(blob), status: "sending" });
+      });
+      Object.assign(I, { phase: "recording", startedAt: Date.now() });
+      renderPart1Question();
+    } catch (error) {
+      toast(error.message);
+      renderPart1Question();
+    }
+  });
+  const next = () => {
+    clearInterval(ieltsClock);
+    if (I.recorder && I.recorder.state !== "inactive") I.recorder.stop();
+    I.recorder = null;
+    I.i += 1;
+    I.phase = "ask";
+    if (I.i >= I.questions.length) {
+      I.done = true;
+      location.hash = `#/ielts/r/${I.round}`;
+      return;
+    }
+    speak(I.questions[I.i].en);
+    renderPart1Question();
+  };
+  document.getElementById("p1-next")?.addEventListener("click", next);
+  document.getElementById("p1-quit").addEventListener("click", () => {
+    if (I.results.length && !confirm("ここでやめますか？ 録音した答えは先生に届きます。")) return;
+    dropIeltsRecording();
+    I.done = true;
+    location.hash = I.results.length ? `#/ielts/r/${I.round}` : "#/ielts";
+  });
+  if (I.phase === "recording") {
+    clearInterval(ieltsClock);
+    const tick = () => {
+      const seconds = (Date.now() - I.startedAt) / 1000;
+      const clock = document.getElementById("clock");
+      if (clock) clock.textContent = clockText(seconds * 1000 - 999);
+      const pace = document.getElementById("pace");
+      if (pace) {
+        const p = part1Pace(seconds);
+        pace.textContent = p.text;
+        pace.className = `ielts-pace ${p.cls}`;
+      }
+      // A minute at most: the examiner would move on.
+      if (seconds >= PART1_SECONDS.max) next();
+    };
+    ieltsClock = setInterval(tick, 250);
+    tick();
+  }
+}
+
+// The answers of a round are sent one after another, in order.
+function queuePart1Send(I, result) {
+  I.results.push(result);
+  const send = async () => {
+    result.status = "sending";
+    try {
+      result.answer = await sendIelts({ key: result.q.key, round: I.round, seconds: result.seconds, blob: result.blob });
+      result.status = "sent";
+    } catch (error) {
+      result.status = "error";
+      result.error = error.message;
+    }
+    if (location.hash === `#/ielts/r/${I.round}`) renderPart1Result(I.round);
+  };
+  result.retry = () => { I.sending = I.sending.then(send); return I.sending; };
+  I.sending = (I.sending || Promise.resolve()).then(send);
+}
+
+function renderPart1Result(round) {
+  const local = state.ielts?.part === 1 && state.ielts.round === round ? state.ielts.results : [];
+  const saved = (state.me.ieltsAnswers || []).filter((a) => (a.round || `one${a.id}`) === round).reverse();
+  // Each answer once: the one on this phone (sending or not sent) or the one kept on the server.
+  const rows = [
+    ...saved.filter((a) => !local.some((r) => r.answer?.id === a.id)).map((a) => ({ q: findIeltsItem(a.key) || { en: a.question }, answer: a, seconds: a.seconds, status: "sent" })),
+    ...local,
+  ];
+  const sending = local.some((r) => r.status === "sending");
+  const failed = local.some((r) => r.status === "error");
+  app.innerHTML = `${topbar("Part 1 練習", "#/ielts")}
+    <main class="wrap stack">
+      ${local.length ? `<p class="debate-goal ${sending || failed ? "" : "done"}">${sending ? "先生に送っています…" : failed ? "送れなかった録音があります" : "✅ おつかれさまでした！ 先生に届きました"}</p>` : ""}
+      ${rows.length ? rows.map((r, i) => {
+        const pace = part1Pace(r.seconds || 0);
+        const src = r.status === "sent" && r.answer?.audio ? withParams(`/api/ielts/${r.answer.id}/audio`) : r.url;
+        return `<section class="card stack ielts-answer">
+          <p class="ielts-q" lang="en"><span class="muted">Q${i + 1}.</span> ${esc(r.q.en)}</p>
+          ${src ? `<audio controls preload="none" class="rec-audio" src="${src}"></audio>` : `<p class="muted small">録音はありません（90日たつと消えます）</p>`}
+          <div class="badges">${r.seconds ? `<span class="badge ${pace.cls === "good" ? "done" : pace.cls === "long" ? "waiting" : ""}">${Math.round(r.seconds)}秒</span>` : ""}
+            ${r.status === "sending" ? `<span class="muted small"><span class="spinner" aria-hidden="true"></span>送っています</span>` : ""}
+            ${r.status === "error" ? `<span class="muted small">${esc(r.error)}</span><button type="button" class="btn secondary small-btn" data-retry="${local.indexOf(r)}">もう一度送る</button>` : ""}</div>
+        </section>`;
+      }).join("") : emptyState("見つかりません。")}
+      <p class="ielts-hint">💡 聞き直して：<b>答え → 理由・例</b> になっている？</p>
+      <a class="btn block" href="#/ielts/p1">もう一度 Part 1</a>
+      <a class="btn secondary block" href="#/ielts">IELTS スピーキングへ</a>
+    </main>`;
+  app.querySelectorAll("[data-retry]").forEach((button) => button.addEventListener("click", () => {
+    local[Number(button.dataset.retry)].retry();
+    renderPart1Result(round);
+  }));
+}
+
+// ----- Part 2 -----
+
+const IELTS_CARD_KEY = "hina-ielts-card";
+// The card on screen, kept on the phone so opening the page again shows the same one.
+function part2Card() {
+  let key = null;
+  try { key = localStorage.getItem(IELTS_CARD_KEY); } catch { /* private mode */ }
+  return PART2_CARDS.find((c) => c.key === key) || newPart2Card();
+}
+// A card at random, one not done lately first.
+function newPart2Card(not = null) {
+  const done = (state.me.ieltsAnswers || []).filter((a) => a.part === 2).map((a) => findIeltsItem(a.key)?.card);
+  const pool = shuffled(PART2_CARDS.filter((c) => c.key !== not));
+  const card = pool.find((c) => !done.includes(c.key)) || pool[0];
+  try { localStorage.setItem(IELTS_CARD_KEY, card.key); } catch { /* private mode */ }
+  return card;
+}
+
+const cueCardHtml = (card, { small = false } = {}) => `<section class="card cue-card ${small ? "small" : ""}" lang="en">
+    <div class="debate-topic-row"><p class="cue-title">${esc(card.title)}</p>${small ? "" : sayIcon(card.title)}</div>
+    <p class="cue-say">You should say:</p>
+    <ul>${card.points.map((p) => `<li>${esc(p)}</li>`).join("")}</ul>
+    <p class="cue-explain">${esc(card.explain)}</p>
+    ${small ? "" : `<details lang="ja"><summary class="muted small">日本語</summary><p class="muted small">${esc(card.ja)}</p></details>`}
+  </section>`;
+
+function renderPart2() {
+  const I = state.ielts?.part === 2 ? state.ielts : null;
+  if (I?.phase === "prep") return renderPart2Prep();
+  if (I) return renderPart2Speak();
+  const card = part2Card();
+  app.innerHTML = `${topbar("Part 2 練習", "#/ielts")}
+    <main class="wrap stack">
+      ${partRulesHtml(RULES.part2)}
+      <p class="label">今日のお題</p>
+      ${cueCardHtml(card)}
+      <button type="button" class="btn secondary small-btn" id="p2-other" style="align-self:flex-start">別のお題 →</button>
+      <button type="button" class="btn block" id="p2-start">スタート（1分 メモ）</button>
+    </main>`;
+  document.getElementById("p2-other").addEventListener("click", () => {
+    newPart2Card(card.key);
+    renderPart2();
+  });
+  document.getElementById("p2-start").addEventListener("click", () => {
+    state.ielts = { part: 2, card, phase: "prep", endsAt: Date.now() + PART2_PREP * 1000, memo: "" };
+    renderPart2();
+  });
+}
+
+function renderPart2Prep() {
+  const I = state.ielts;
+  const toSpeak = () => {
+    clearInterval(debateClock);
+    I.phase = "ready";
+    renderPart2();
+  };
+  if (Date.now() >= I.endsAt) return toSpeak();
+  app.innerHTML = `${topbar("Part 2 練習", "#/ielts")}
+    <main class="wrap stack">
+      ${timerHtml("① 準備（メモ）", I, PART2_PREP)}
+      ${cueCardHtml(I.card, { small: true })}
+      <label class="field card stack debate-memo"><span>日本語でメモ <small class="muted">（キーワードだけ）</small></span>
+        <textarea name="memo" rows="5" placeholder="だれ・いつ・何をした・どう思った">${esc(I.memo)}</textarea>
+      </label>
+      <p class="muted small center">1分たつと、話す画面に進みます。</p>
+      <button type="button" class="btn secondary block" id="p2-skip">準備おわり → 話す</button>
+      <button type="button" class="btn ghost block" id="p2-quit">やめる</button>
+    </main>`;
+  const memo = app.querySelector("textarea[name=memo]");
+  memo.addEventListener("input", () => { I.memo = memo.value; });
+  memo.focus();
+  document.getElementById("p2-skip").addEventListener("click", toSpeak);
+  document.getElementById("p2-quit").addEventListener("click", () => {
+    clearInterval(debateClock);
+    state.ielts = null;
+    renderPart2();
+  });
+  runClock(I, PART2_PREP, toSpeak);
+}
+
+// Where the talk is, against the aim (1:30, up to 2:00).
+const part2Pace = (seconds) => (seconds < PART2_AIM
+  ? { cls: "", text: `${clockText(PART2_AIM * 1000)} までは話しつづける` }
+  : { cls: "good", text: `✓ ${clockText(PART2_AIM * 1000)} クリア！ 2:00 まで話そう` });
+
+function renderPart2Speak() {
+  const I = state.ielts;
+  const head = {
+    ready: `<div class="debate-timer" role="timer"><span class="label">② 話す</span><b>2:00</b></div>`,
+    recording: `${timerHtml(`<span class="rec-dot" aria-hidden="true"></span> 録音中`, I, PART2_SPEAK)}<p class="ielts-pace" id="pace">${part2Pace(0).text}</p>`,
+    review: `<div class="debate-timer done" role="status"><span class="label">② 話す</span><b>${I.timeUp ? "⏰ 2分です" : "録音できました"}</b></div>`,
+    sending: `<div class="debate-timer done" role="status"><span class="label">② 話す</span><b>送っています</b></div>`,
+  }[I.phase];
+  const pace = I.seconds ? part2Pace(I.seconds) : null;
+  app.innerHTML = `${topbar("Part 2 練習", "#/ielts")}
+    <main class="wrap stack">
+      ${head}
+      ${cueCardHtml(I.card, { small: true })}
+      ${I.memo.trim() ? `<section class="card debate-memo-view"><p class="label">メモ</p><p>${noteHtml(I.memo.trim())}</p></section>` : ""}
+      <section class="card stack debate-speak">
+        ${I.phase === "ready" ? `<button type="button" class="rec-button" id="rec-start"><span aria-hidden="true">🎤</span>話しはじめる</button>
+          <p class="muted small center">押すと録音がはじまります（<b>2分</b>で止まります）。</p>` : ""}
+        ${I.phase === "recording" ? `<button type="button" class="rec-button stop" id="rec-stop"><span aria-hidden="true">■</span>おわる</button>` : ""}
+        ${I.phase === "review" || I.phase === "sending" ? `<audio controls src="${I.url}" class="rec-audio"></audio>
+          ${pace ? `<p class="center"><span class="badge ${pace.cls === "good" ? "done" : "waiting"}">話した時間 ${clockText(I.seconds * 1000)}</span></p>` : ""}
+          ${pace && pace.cls !== "good" ? `<p class="muted small center">本番は <b>1分半〜2分</b> 話せるとよい</p>` : ""}
+          <button type="button" class="btn block" id="p2-send" ${I.phase === "sending" ? "disabled" : ""}>${I.phase === "sending"
+            ? `<span class="spinner" aria-hidden="true"></span>送っています…` : "先生に送る"}</button>
+          ${I.phase === "review" ? `<button type="button" class="btn ghost block" id="rec-again">録りなおす</button>` : ""}` : ""}
+      </section>
+    </main>`;
+
+  const finish = () => {
+    clearInterval(debateClock);
+    clearInterval(ieltsClock);
+    if (I.recorder && I.recorder.state !== "inactive") I.recorder.stop();
+  };
+  document.getElementById("rec-start")?.addEventListener("click", async (event) => {
+    event.currentTarget.disabled = true;
+    try {
+      I.recorder = await startRecording((blob, seconds) => {
+        if (I.discard) { I.discard = false; return; }
+        Object.assign(I, { blob, seconds: Math.min(seconds, PART2_SPEAK), url: URL.createObjectURL(blob), phase: "review", recorder: null });
+        if (state.ielts === I && location.hash.startsWith("#/ielts/p2")) renderPart2Speak();
+      });
+      Object.assign(I, { phase: "recording", timeUp: false, startedAt: Date.now(), endsAt: Date.now() + PART2_SPEAK * 1000 });
+      renderPart2Speak();
+    } catch (error) {
+      toast(error.message);
+      renderPart2Speak();
+    }
+  });
+  document.getElementById("rec-stop")?.addEventListener("click", finish);
+  document.getElementById("rec-again")?.addEventListener("click", () => {
+    if (I.url) URL.revokeObjectURL(I.url);
+    Object.assign(I, { blob: null, url: null, seconds: 0, phase: "ready" });
+    renderPart2Speak();
+  });
+  document.getElementById("p2-send")?.addEventListener("click", async () => {
+    I.phase = "sending";
+    renderPart2Speak();
+    try {
+      const answer = await sendIelts({ key: cardKey(I.card), memo: I.memo, seconds: I.seconds, blob: I.blob });
+      if (I.url) URL.revokeObjectURL(I.url);
+      state.ielts = null;
+      newPart2Card(I.card.key);
+      location.hash = `#/ielts/a/${answer.id}`;
+    } catch (error) {
+      toast(error.message);
+      I.phase = "review";
+      renderPart2Speak();
+    }
+  });
+  if (I.phase === "recording") {
+    runClock(I, PART2_SPEAK, () => {
+      I.timeUp = true;
+      finish();
+    });
+    clearInterval(ieltsClock);
+    ieltsClock = setInterval(() => {
+      const pace = document.getElementById("pace");
+      if (!pace) return;
+      const p = part2Pace((Date.now() - I.startedAt) / 1000);
+      pace.textContent = p.text;
+      pace.className = `ielts-pace ${p.cls}`;
+    }, 500);
+  }
+}
+
+function renderPart2Answer(id) {
+  const a = (state.me.ieltsAnswers || []).find((x) => x.id === id);
+  const card = a && PART2_CARDS.find((c) => c.key === findIeltsItem(a.key)?.card);
+  if (!a) {
+    app.innerHTML = `${topbar(IELTS_NAME, "#/ielts")}<main class="wrap stack">${emptyState("見つかりません。")}</main>`;
+    return;
+  }
+  const fresh = Date.now() - Date.parse(a.created_at) < 10 * 60e3;
+  app.innerHTML = `${topbar(`Part 2 ・ ${formatDate(a.created_at)}`, "#/ielts")}
+    <main class="wrap stack">
+      ${fresh ? `<p class="debate-goal done">✅ おつかれさまでした！ 先生に届きました</p>` : ""}
+      ${card ? cueCardHtml(card, { small: true }) : `<section class="card"><p class="cue-title" lang="en">${esc(a.question)}</p></section>`}
+      <section class="card stack">
+        <p class="label">🎤 録音${a.seconds ? ` ・ ${clockText(a.seconds * 1000)}` : ""}</p>
+        ${a.audio ? `<audio controls preload="none" class="rec-audio" src="${withParams(`/api/ielts/${a.id}/audio`)}"></audio>` : `<p class="muted small">録音はありません（90日たつと消えます）</p>`}
+      </section>
+      ${a.memo ? `<section class="card debate-memo-view"><p class="label">メモ</p><p>${noteHtml(a.memo)}</p></section>` : ""}
+      <p class="ielts-hint">💡 聞き直して：<b>カードの質問を全部</b> 話せた？</p>
+      <a class="btn block" href="#/ielts/p2">次のお題へ</a>
+      <a class="btn secondary block" href="#/ielts">IELTS スピーキングへ</a>
+    </main>`;
 }
 
 // ---------- 言い換え問題 ----------
