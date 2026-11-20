@@ -716,3 +716,14 @@ body.quiz-open .wrap { padding-bottom: 62vh; }
 .cue-card ul { margin: 0; padding-left: 1.3em; font-family: var(--en); line-height: 1.6; }
 .cue-explain { font-family: var(--en); font-weight: 700; }
 .cue-card details { margin-top: 2px; }
+/* IELTS の添削: the band estimate, the cue card check and each answer's tip. */
+.band-card { border: 2px solid var(--good); gap: 4px; }
+.band-big { font-family: var(--en); font-size: 48px; font-weight: 800; line-height: 1.1; color: var(--good); }
+.band-parts { font-weight: 700; font-size: 14px; }
+.band-tip-line { margin-top: 8px; padding-top: 10px; border-top: 1px dashed var(--line); }
+.band-tip-line p:last-child { font-weight: 800; line-height: 1.6; }
+.checks { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; font-family: var(--en); }
+.checks li { display: flex; gap: 8px; align-items: baseline; flex-wrap: wrap; }
+.checks .ok { color: var(--good); font-weight: 800; }
+.checks .short, .checks .no { color: var(--accent-text); font-weight: 800; }
+.ielts-tip { font-size: 14px; font-weight: 700; color: var(--ink-2); }

@@ -4197,6 +4197,7 @@ function ieltsHistory() {
   }
   return rows;
 }
+const historyBand = (r) => (r.part === 1 ? (state.me.ieltsRounds || {})[r.key]?.band?.overall : r.answers[0].correction?.band?.overall);
 const ieltsTopicNames = (answers) => [...new Set(answers.map((a) => findIeltsItem(a.key)?.topicName).filter(Boolean))].reverse().join(" ・ ");
 
 function renderIelts(page, id) {
@@ -4226,7 +4227,8 @@ function renderIelts(page, id) {
         <h3>これまでの練習</h3>
         <ul class="history">${history.slice(0, 30).map((r) => `<li><a href="${r.part === 1 ? `#/ielts/r/${encodeURIComponent(r.key)}` : `#/ielts/a/${r.answers[0].id}`}">
           <div class="badges"><span class="badge ${r.part === 1 ? "" : "teacher"}">${partLabel(r.part)}</span><span class="muted small">${esc(formatDate(r.created_at))}</span>
-            ${r.part === 1 ? `<span class="muted small">${r.answers.length} 問</span>` : r.answers[0].seconds ? `<span class="muted small">${clockText(r.answers[0].seconds * 1000)}</span>` : ""}</div>
+            ${r.part === 1 ? `<span class="muted small">${r.answers.length} 問</span>` : r.answers[0].seconds ? `<span class="muted small">${clockText(r.answers[0].seconds * 1000)}</span>` : ""}
+            ${historyBand(r) ? `<span class="badge done">目安 ${bandText(historyBand(r))}</span>` : ""}</div>
           <p class="first-line" lang="en">${esc(r.part === 1 ? ieltsTopicNames(r.answers) : r.answers[0].question)}</p>
         </a></li>`).join("")}</ul>
       </section>` : ""}
@@ -4271,6 +4273,7 @@ async function sendIelts({ key, round = "", memo = "", seconds, blob }) {
   const result = await response.json().catch(() => ({}));
   if (!response.ok) throw new Error(result.error || "送れませんでした。もう一度ためしてください。");
   (state.me.ieltsAnswers ||= []).unshift(result.answer);
+  if (result.ai_error) state.aiError[`ielts-a${result.answer.id}`] = result.ai_error;
   return result.answer;
 }
 
@@ -4338,6 +4341,7 @@ function renderPart1Question() {
     const question = q;
     try {
       I.recorder = await startRecording((blob, seconds) => {
+        I.stopping = false;
         if (I.discard) { I.discard = false; return; }
         queuePart1Send(I, { q: question, blob, seconds: Math.min(seconds, PART1_SECONDS.max), url: URL.createObjectURL(blob), status: "sending" });
       });
@@ -4350,12 +4354,17 @@ function renderPart1Question() {
   });
   const next = () => {
     clearInterval(ieltsClock);
-    if (I.recorder && I.recorder.state !== "inactive") I.recorder.stop();
+    // The answer comes a moment later (onStop); the round is corrected only once it is in.
+    if (I.recorder && I.recorder.state !== "inactive") {
+      I.stopping = true;
+      I.recorder.stop();
+    }
     I.recorder = null;
     I.i += 1;
     I.phase = "ask";
     if (I.i >= I.questions.length) {
       I.done = true;
+      maybeCorrectRound(I);
       location.hash = `#/ielts/r/${I.round}`;
       return;
     }
@@ -4367,6 +4376,7 @@ function renderPart1Question() {
     if (I.results.length && !confirm("ここでやめますか？ 録音した答えは先生に届きます。")) return;
     dropIeltsRecording();
     I.done = true;
+    maybeCorrectRound(I);
     location.hash = I.results.length ? `#/ielts/r/${I.round}` : "#/ielts";
   });
   if (I.phase === "recording") {
@@ -4401,11 +4411,61 @@ function queuePart1Send(I, result) {
       result.status = "error";
       result.error = error.message;
     }
+    maybeCorrectRound(I);
     if (location.hash === `#/ielts/r/${I.round}`) renderPart1Result(I.round);
   };
   result.retry = () => { I.sending = I.sending.then(send); return I.sending; };
   I.sending = (I.sending || Promise.resolve()).then(send);
 }
+
+// Once a finished round is all sent: the AI corrects it (each answer lightly,
+// and the band of the round). Asked once a round.
+function maybeCorrectRound(I) {
+  if (!I.done || I.asked || I.stopping || !I.results.length || !state.me.ai || I.results.some((r) => r.status !== "sent")) return;
+  I.asked = true;
+  correctRound(I.round);
+}
+
+async function correctRound(round) {
+  const key = `ielts-r${round}`;
+  state.aiError[key] = null;
+  state.ieltsWorking = { ...(state.ieltsWorking || {}), [round]: true };
+  const redraw = () => { if (location.hash === `#/ielts/r/${round}`) renderPart1Result(round); };
+  redraw();
+  try {
+    const result = await api(`/api/ielts/rounds/${encodeURIComponent(round)}/correct`, { method: "POST", body: {} });
+    for (const a of result.answers) {
+      const mine = (state.me.ieltsAnswers || []).find((x) => x.id === a.id);
+      if (mine) Object.assign(mine, a);
+    }
+    if (result.round) (state.me.ieltsRounds ||= {})[round] = result.round;
+    state.aiError[key] = result.ai_error;
+  } catch (error) {
+    state.aiError[key] = error.message;
+  }
+  state.ieltsWorking[round] = false;
+  redraw();
+}
+
+// The band estimate (without pronunciation) and the one line to 6.5 (or the next half band).
+const bandText = (n) => (n ? Number(n).toFixed(1) : "—");
+function bandHtml(band, tip) {
+  if (!band?.overall) return "";
+  const aim = band.overall < 6.5 ? 6.5 : Math.min(9, band.overall + 0.5);
+  return `<section class="card stack band-card">
+    <p class="label">バンドスコア（目安）</p>
+    <p class="band-big">${bandText(band.overall)}</p>
+    <p class="band-parts">流暢さ ${bandText(band.fluency)} ・ 語彙 ${bandText(band.lexical)} ・ 文法 ${bandText(band.grammar)}</p>
+    <p class="muted small">AI が文字から出した目安です（発音は入っていません）</p>
+    ${tip ? `<div class="band-tip-line"><p class="label">${bandText(aim)} にするためのひとこと</p><p>💡 ${esc(tip)}</p></div>` : ""}
+  </section>`;
+}
+
+// What was said with the light corrections, and why.
+const ieltsFixesHtml = (c) => (c.corrections || []).map((fix) => `<div class="fix">
+    <p class="change" lang="en"><del>${esc(fix.before)}</del><span class="arrow" aria-label="を">→</span><ins>${esc(fix.after)}</ins></p>
+    <p>${esc(fix.why)}</p>
+  </div>`).join("");
 
 function renderPart1Result(round) {
   const local = state.ielts?.part === 1 && state.ielts.round === round ? state.ielts.results : [];
@@ -4417,21 +4477,35 @@ function renderPart1Result(round) {
   ];
   const sending = local.some((r) => r.status === "sending");
   const failed = local.some((r) => r.status === "error");
+  const result = (state.me.ieltsRounds || {})[round];
+  const working = state.ieltsWorking?.[round];
+  const aiError = state.aiError[`ielts-r${round}`];
+  const banner = sending ? "先生に送っています…" : failed ? "送れなかった録音があります"
+    : working ? `<span class="spinner" aria-hidden="true"></span>添削中…（1分ほど）` : local.length ? "✅ おつかれさまでした！ 先生に届きました" : "";
   app.innerHTML = `${topbar("Part 1 練習", "#/ielts")}
     <main class="wrap stack">
-      ${local.length ? `<p class="debate-goal ${sending || failed ? "" : "done"}">${sending ? "先生に送っています…" : failed ? "送れなかった録音があります" : "✅ おつかれさまでした！ 先生に届きました"}</p>` : ""}
+      ${banner ? `<p class="debate-goal ${sending || failed || working ? "" : "done"}">${banner}</p>` : ""}
+      ${result ? bandHtml(result.band, result.band_tip) : ""}
+      ${!result && !working && state.me.ai && rows.length && !sending && !failed ? `
+        ${aiError ? `<p class="notice bad">${esc(aiError)}</p>` : ""}
+        <button type="button" class="btn block" id="round-correct">${aiError ? "もう一度ためす" : "添削してもらう"}</button>` : ""}
       ${rows.length ? rows.map((r, i) => {
         const pace = part1Pace(r.seconds || 0);
         const src = r.status === "sent" && r.answer?.audio ? withParams(`/api/ielts/${r.answer.id}/audio`) : r.url;
+        const c = r.answer?.correction;
         return `<section class="card stack ielts-answer">
           <p class="ielts-q" lang="en"><span class="muted">Q${i + 1}.</span> ${esc(r.q.en)}</p>
           ${src ? `<audio controls preload="none" class="rec-audio" src="${src}"></audio>` : `<p class="muted small">録音はありません（90日たつと消えます）</p>`}
           <div class="badges">${r.seconds ? `<span class="badge ${pace.cls === "good" ? "done" : pace.cls === "long" ? "waiting" : ""}">${Math.round(r.seconds)}秒</span>` : ""}
             ${r.status === "sending" ? `<span class="muted small"><span class="spinner" aria-hidden="true"></span>送っています</span>` : ""}
             ${r.status === "error" ? `<span class="muted small">${esc(r.error)}</span><button type="button" class="btn secondary small-btn" data-retry="${local.indexOf(r)}">もう一度送る</button>` : ""}</div>
+          ${c ? `<p class="journal-text diff" lang="en">${diffHtml(r.answer.body, c.corrected)}</p>
+            ${ieltsFixesHtml(c)}
+            ${c.tip ? `<p class="ielts-tip">💡 ${esc(c.tip)}</p>` : ""}`
+            : result && r.answer ? `<p class="muted small">声が聞きとれませんでした</p>` : ""}
         </section>`;
       }).join("") : emptyState("見つかりません。")}
-      <p class="ielts-hint">💡 聞き直して：<b>答え → 理由・例</b> になっている？</p>
+      ${result ? "" : `<p class="ielts-hint">💡 聞き直して：<b>答え → 理由・例</b> になっている？</p>`}
       <a class="btn block" href="#/ielts/p1">もう一度 Part 1</a>
       <a class="btn secondary block" href="#/ielts">IELTS スピーキングへ</a>
     </main>`;
@@ -4439,6 +4513,7 @@ function renderPart1Result(round) {
     local[Number(button.dataset.retry)].retry();
     renderPart1Result(round);
   }));
+  document.getElementById("round-correct")?.addEventListener("click", () => correctRound(round));
 }
 
 // ----- Part 2 -----
@@ -4548,7 +4623,7 @@ function renderPart2Speak() {
           ${pace ? `<p class="center"><span class="badge ${pace.cls === "good" ? "done" : "waiting"}">話した時間 ${clockText(I.seconds * 1000)}</span></p>` : ""}
           ${pace && pace.cls !== "good" ? `<p class="muted small center">本番は <b>1分半〜2分</b> 話せるとよい</p>` : ""}
           <button type="button" class="btn block" id="p2-send" ${I.phase === "sending" ? "disabled" : ""}>${I.phase === "sending"
-            ? `<span class="spinner" aria-hidden="true"></span>送っています…` : "先生に送る"}</button>
+            ? `<span class="spinner" aria-hidden="true"></span>${state.me.ai ? "文字起こしと添削中…（1分ほど）" : "送っています…"}` : "先生に送る"}</button>
           ${I.phase === "review" ? `<button type="button" class="btn ghost block" id="rec-again">録りなおす</button>` : ""}` : ""}
       </section>
     </main>`;
@@ -4610,6 +4685,20 @@ function renderPart2Speak() {
   }
 }
 
+// The cue card's lines (3 points and the explain line) with whether the talk covered them.
+const POINT_MARKS = { yes: ["ok", "✓"], short: ["short", "△"], no: ["no", "✗"] };
+function pointsHtml(card, points) {
+  if (!card || !points?.length) return "";
+  const lines = [...card.points, card.explain];
+  return `<section class="card stack"><p class="label">カードの質問</p>
+    <ul class="checks" lang="en">${lines.map((line, i) => {
+      const [cls, mark] = POINT_MARKS[points[i]] || ["", "・"];
+      return `<li><span class="${cls}">${mark}</span>${esc(line)}${points[i] === "short" ? ` <span class="muted small" lang="ja">（短い）</span>` : points[i] === "no" ? ` <span class="muted small" lang="ja">（話していない）</span>` : ""}</li>`;
+    }).join("")}</ul>
+  </section>`;
+}
+const wordCount = (text) => String(text || "").split(/\s+/).filter((w) => /[A-Za-z]/.test(w)).length;
+
 function renderPart2Answer(id) {
   const a = (state.me.ieltsAnswers || []).find((x) => x.id === id);
   const card = a && PART2_CARDS.find((c) => c.key === findIeltsItem(a.key)?.card);
@@ -4618,19 +4707,45 @@ function renderPart2Answer(id) {
     return;
   }
   const fresh = Date.now() - Date.parse(a.created_at) < 10 * 60e3;
+  const c = a.correction;
+  const aiError = state.aiError[`ielts-a${a.id}`];
+  const words = wordCount(a.body);
   app.innerHTML = `${topbar(`Part 2 ・ ${formatDate(a.created_at)}`, "#/ielts")}
     <main class="wrap stack">
       ${fresh ? `<p class="debate-goal done">✅ おつかれさまでした！ 先生に届きました</p>` : ""}
       ${card ? cueCardHtml(card, { small: true }) : `<section class="card"><p class="cue-title" lang="en">${esc(a.question)}</p></section>`}
+      ${c ? bandHtml(c.band, c.band_tip) : ""}
       <section class="card stack">
-        <p class="label">🎤 録音${a.seconds ? ` ・ ${clockText(a.seconds * 1000)}` : ""}</p>
+        <p class="label">🎤 録音${a.seconds ? ` ・ ${clockText(a.seconds * 1000)}` : ""}${words ? ` ・ ${words}語` : ""}</p>
         ${a.audio ? `<audio controls preload="none" class="rec-audio" src="${withParams(`/api/ielts/${a.id}/audio`)}"></audio>` : `<p class="muted small">録音はありません（90日たつと消えます）</p>`}
       </section>
-      ${a.memo ? `<section class="card debate-memo-view"><p class="label">メモ</p><p>${noteHtml(a.memo)}</p></section>` : ""}
-      <p class="ielts-hint">💡 聞き直して：<b>カードの質問を全部</b> 話せた？</p>
+      ${c ? `${pointsHtml(card, c.points)}
+        <section class="card stack">
+          <h3>話したこと（添削）</h3>
+          <p class="journal-text diff" lang="en">${diffHtml(a.body, c.corrected)}</p>
+        </section>
+        ${c.corrections?.length ? `<section class="card stack"><h3>直したところ</h3>${ieltsFixesHtml(c)}</section>` : `<p class="notice good">直すところはありませんでした！</p>`}
+        ${c.tip ? `<p class="ielts-tip">💡 ${esc(c.tip)}</p>` : ""}`
+        : state.me.ai ? `${aiError ? `<p class="notice bad">${esc(aiError)}</p>` : ""}
+          <button type="button" class="btn block" id="retry">${aiError ? "もう一度ためす" : "添削してもらう"}</button>` : ""}
+      ${a.memo ? `<details class="card"><summary>メモを見る</summary><p style="margin-top:10px">${noteHtml(a.memo)}</p></details>` : ""}
+      ${c ? "" : `<p class="ielts-hint">💡 聞き直して：<b>カードの質問を全部</b> 話せた？</p>`}
       <a class="btn block" href="#/ielts/p2">次のお題へ</a>
       <a class="btn secondary block" href="#/ielts">IELTS スピーキングへ</a>
     </main>`;
+  const retry = document.getElementById("retry");
+  retry?.addEventListener("click", async () => {
+    retry.disabled = true;
+    retry.innerHTML = `<span class="spinner" aria-hidden="true"></span>文字起こしと添削中…（1分ほど）`;
+    try {
+      const result = await api(`/api/ielts/${a.id}/correct`, { method: "POST", body: {} });
+      Object.assign(a, result.answer);
+      state.aiError[`ielts-a${a.id}`] = result.ai_error;
+    } catch (error) {
+      state.aiError[`ielts-a${a.id}`] = error.message;
+    }
+    renderPart2Answer(id);
+  });
 }
 
 // ---------- 言い換え問題 ----------

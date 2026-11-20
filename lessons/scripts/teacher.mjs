@@ -310,7 +310,7 @@ function japanTime(iso) {
   return `${d.getUTCMonth() + 1}/${d.getUTCDate()} ${two(d.getUTCHours())}:${two(d.getUTCMinutes())}`;
 }
 
-const ERROR_KINDS = { journal: "日記の添削", judge: "AI の判定", rephrase: "言い換え問題の添削", debate: "話す・ディベート練習", speech: "音声", server: "サーバー", browser: "画面" };
+const ERROR_KINDS = { journal: "日記の添削", judge: "AI の判定", rephrase: "言い換え問題の添削", debate: "話す・ディベート練習", ielts: "IELTS スピーキング練習", speech: "音声", server: "サーバー", browser: "画面" };
 
 function errorLines(e) {
   const when = e.count > 1 ? `${japanTime(e.first_at)} 〜 ${japanTime(e.last_at)}（${e.count} 回）` : japanTime(e.last_at);
@@ -795,6 +795,14 @@ const commands = {
       const time = a.seconds ? `${Math.round(a.seconds)}秒` : "";
       console.log(`[${japanTime(a.created_at)}] Part ${a.part}　${a.question}　${time}${a.audio ? "" : "（録音は消えました）"}`);
       if (a.memo) console.log(`  メモ：${a.memo.replace(/\n/g, " / ")}`);
+      if (a.body) console.log(`  話したこと：${a.body}`);
+      const c = a.correction;
+      for (const fix of c?.corrections || []) console.log(`  ・${fix.before} → ${fix.after}（${fix.why}）`);
+      if (c?.tip) console.log(`  💡 ${c.tip}`);
+      const band = a.part === 2 ? c : (data.ieltsRounds || {})[a.round];
+      if (band?.band && (a.part === 2 || a === list.findLast((x) => x.round === a.round))) {
+        console.log(`  バンド目安 ${band.band.overall}（流暢さ ${band.band.fluency}・語彙 ${band.band.lexical}・文法 ${band.band.grammar}。発音なし）💡 ${band.band_tip}`);
+      }
     }
   },
 
