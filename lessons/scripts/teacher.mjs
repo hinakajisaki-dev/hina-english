@@ -38,6 +38,8 @@
 // node scripts/teacher.mjs vocab-books なおみ [--set "1=ielts1" | --default]   (単語帳 per week instead of the shared one)
 // node scripts/teacher.mjs phrase-books なおみ [--set talk1 | --default]   (フレーズ: own books instead of スモールトーク)
 // node scripts/teacher.mjs talk-audio [--dry | --force | --out dir | --from dir]   (会話で復習: makes the missing voices with ElevenLabs)
+// node scripts/teacher.mjs listening なおみ [--add talk.md | --show 3 | --update 3 talk.md | --voices 3 | --delete 3] [--dry]
+//                                                                 (会話リスニング: long conversations, voiced with ElevenLabs)
 // node scripts/teacher.mjs vocab-pace なおみ [--week 2 --days 4 --size 40 | --off]   (fewer words a week, across the 単語帳)
 // node scripts/teacher.mjs write-practice なおみ [--on | --off]   (★ on 復習 examples and 書く練習)
 // node scripts/teacher.mjs toeic えいし [--on | --off]             (TOEIC単語 at the top of the home screen)
@@ -64,6 +66,9 @@ import { monthPhrases, pronMonths, studentMonths } from "../public/pron/phrases.
 import { talkAudioKey, talkLines, vocabBooks, weekBook, weekName } from "../public/vocab/words.js";
 import { ONLY_UNITS } from "../public/grammar/lessons.js";
 import { phraseBooks } from "../public/phrases/book.js";
+import {
+  LISTEN_VOICES, lineText, minutesLabel, parseTalk, talkFile, talkLines as listenLines, talkSeconds,
+} from "../public/listening/format.js";
 
 // Node's fetch only goes through the environment's proxy when asked to.
 if ((process.env.HTTPS_PROXY || process.env.https_proxy) && !process.env.NODE_USE_ENV_PROXY) {
@@ -119,7 +124,10 @@ async function api(path, { method = "GET", body } = {}) {
 const TALK_VOICE_IDS = { mia: "cgSgspJ2msm6clMCkdW9", ken: "bIHbv24MWmeRgasZH58o", tom: "iP95p4xoKVk53GoZ742B" }; // Jessica, Will, Chris (talk/v1)
 const TALK_MODEL = "eleven_multilingual_v2";
 
-async function elevenLabs(line) {
+// 会話リスニング: a little livelier, at the natural speed (the student can slow it down).
+const LISTEN_VOICE_SETTINGS = { stability: 0.4, similarity_boost: 0.75, style: 0.15, speed: 1 };
+
+async function elevenLabs(line, settings = { stability: 0.5, similarity_boost: 0.75, speed: 0.9 }) {
   const response = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${TALK_VOICE_IDS[line.who]}?output_format=mp3_44100_128`, {
     method: "POST",
     headers: { "xi-api-key": process.env.ELEVENLABS_API_KEY || "from-proxy", "Content-Type": "application/json", Accept: "audio/mpeg" },
@@ -129,7 +137,7 @@ async function elevenLabs(line) {
       // The lines around it, so it sounds like part of the talk.
       previous_text: line.before || undefined,
       next_text: line.after || undefined,
-      voice_settings: { stability: 0.5, similarity_boost: 0.75, speed: 0.9 },
+      voice_settings: settings,
     }),
   }).catch((error) => stop(`ElevenLabs につながりません：${error.cause?.message || error.message}`));
   if (!response.ok) stop(`ElevenLabs のエラー ${response.status}：${(await response.text()).slice(0, 300)}`);
@@ -143,6 +151,39 @@ async function upload(path, audio) {
     body: audio,
   });
   if (!response.ok) stop((await response.json().catch(() => ({}))).error || `エラー ${response.status}`);
+}
+
+// ---------- 会話リスニング ----------
+
+// A talk at a glance: its parts and lines, the length and how much ElevenLabs reads.
+function talkLinesOf(talk) {
+  const lines = listenLines(talk);
+  const people = [...new Set(lines.map((l) => (l.name === LISTEN_VOICES[l.who] ? l.name : `${l.name}（${LISTEN_VOICES[l.who]} の声）`)))];
+  return [
+    `「${talk.title}」 ${minutesLabel(talkSeconds(talk))}・${talk.parts.length}パート・${lines.length}文・${lines.reduce((n, l) => n + lineText(l.en).length, 0)} 文字`,
+    `話す人：${people.join("、")}`,
+    ...talk.parts.map((part, p) => `  Part ${p + 1} ${part.title || ""}（${part.lines.length}文）  ${lineText(part.lines[0].en).slice(0, 50)}`),
+  ].join("\n");
+}
+
+// The voices still missing in a talk, made with ElevenLabs (the lines around
+// each, so it sounds like one conversation) and put in the app (R2).
+async function makeListenVoices(talk) {
+  const lines = listenLines(talk);
+  const missing = lines.filter((l) => !l.audio);
+  if (!missing.length) return console.log(`声はもう全部あります（${lines.length}文）。`);
+  console.log(`声を作ります：${missing.length}文・${missing.reduce((n, l) => n + lineText(l.en).length, 0)} 文字`);
+  for (const [i, line] of missing.entries()) {
+    const text = lineText(line.en);
+    const audio = await elevenLabs({
+      who: line.who, text,
+      before: lines.slice(Math.max(0, line.index - 2), line.index).map((l) => lineText(l.en)).join(" "),
+      after: lines[line.index + 1] ? lineText(lines[line.index + 1].en) : "",
+    }, LISTEN_VOICE_SETTINGS);
+    await upload(`/api/teacher/listening/${talk.id}/audio?part=${line.part}&line=${line.line}`, audio);
+    console.log(`${i + 1} / ${missing.length}  ${line.name}: ${text.slice(0, 60)}`);
+  }
+  console.log("声を入れました。");
 }
 
 // Options (--week 2, --publish) and the rest, in order.
@@ -865,6 +906,51 @@ const commands = {
       console.log(`${i + 1} / ${missing.length}  ${line.who}: ${line.text}`);
     }
     console.log(options.out ? `${options.out} に保存しました。` : "音声を入れました。");
+  },
+
+  // 会話リスニング (public/listening/format.js): the student's long conversations.
+  //   listening なおみ                       the list
+  //   listening なおみ --add talk.md [--dry]  a new talk (then its voices, with ElevenLabs)
+  //   listening なおみ --show 3               a talk as text (to change it)
+  //   listening なおみ --update 3 talk.md [--dry]   change it (lines still the same keep their voice)
+  //   listening なおみ --voices 3             make the voices still missing
+  //   listening なおみ --delete 3
+  async listening([name, file], options) {
+    const student = await findStudent(name);
+    const talkId = (value) => {
+      if (!/^\d+$/.test(String(value || ""))) stop("会話の番号を入れてください（listening 名前 で出る [3] の数字）。");
+      const found = list.find((t) => t.id === Number(value));
+      if (!found) stop(`${student.name}さんに、会話 [${value}] はありません。`);
+      return found.id;
+    };
+    const { listening: list = [] } = await studentData(student);
+    if (options.add || options.update) {
+      const text = readText(options.add || file || stop("会話のファイルを入れてください。"));
+      const { talk, errors } = parseTalk(text);
+      if (errors.length) stop(`会話のファイルに直すところがあります：\n${errors.join("\n")}`);
+      const id = options.update ? talkId(options.update) : null;
+      console.log(talkLinesOf(talk));
+      if (options.dry) return console.log("\n（--dry なので、まだ入れていません）");
+      const saved = id
+        ? (await api(`/api/teacher/listening/${id}`, { method: "PUT", body: { talk } })).talk
+        : (await api(`/api/teacher/students/${student.id}/listening`, { method: "POST", body: { talk } })).talk;
+      console.log(`\n${student.name}さんに、会話 [${saved.id}]「${saved.title}」を${id ? "直しました" : "入れました（生徒のホームに「会話リスニング」が出ます）"}。`);
+      return makeListenVoices(saved);
+    }
+    if (options.show) {
+      const { talk } = await api(`/api/teacher/listening/${talkId(options.show)}`);
+      return process.stdout.write(talkFile(talk));
+    }
+    if (options.voices) return makeListenVoices((await api(`/api/teacher/listening/${talkId(options.voices)}`)).talk);
+    if (options.delete) {
+      const id = talkId(options.delete);
+      await api(`/api/teacher/listening/${id}`, { method: "DELETE" });
+      return console.log(`会話 [${id}]「${list.find((t) => t.id === id).title}」を消しました（声も消えます）。`);
+    }
+    console.log(`# ${student.name}さんの会話リスニング（${list.length}）`);
+    for (const t of list) {
+      console.log(`[${t.id}] ${t.title}　${minutesLabel(t.seconds)}・${t.parts}パート・${t.lines}文・声 ${t.voiced}/${t.lines}・${t.plays}回きいた${t.played_at ? `（最後 ${japanTime(t.played_at)}）` : ""}`);
+    }
   },
 
   async "grammar-units"([name], options) {

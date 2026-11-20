@@ -1,5 +1,6 @@
 // D1 schema and small query helpers. Tables are created on first use, so a
 // fresh database needs no migration step.
+import { talkSummary } from "../public/listening/format.js";
 
 const SCHEMA = [
   `CREATE TABLE IF NOT EXISTS students (
@@ -289,6 +290,21 @@ const SCHEMA = [
     updated_at TEXT NOT NULL,
     PRIMARY KEY (student_id, word_key, example)
   )`,
+  // 会話リスニング (public/listening/format.js): a long conversation for one student,
+  // in parts. body is JSON { title, parts: [{ title, lines: [{ name, who, en, ja,
+  // audio, sec }] }] }: audio is the R2 key of the line's voice (FILES, under
+  // listen/<student_id>/<id>/) and sec its length; the audio itself is never here.
+  // plays: how many times the student heard it all the way through.
+  `CREATE TABLE IF NOT EXISTS listen_talks (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    student_id INTEGER NOT NULL REFERENCES students(id) ON DELETE CASCADE,
+    body TEXT NOT NULL,
+    plays INTEGER NOT NULL DEFAULT 0,
+    played_at TEXT,
+    created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL
+  )`,
+  `CREATE INDEX IF NOT EXISTS listen_talks_student ON listen_talks(student_id, id)`,
   // Problems the app ran into, for the teacher's error chat (src/errors.js).
   // dedupe: what makes two problems the same one; seen_at: when the error chat
   // last looked at it; done_at/done_note: when and how it was fixed.
@@ -456,7 +472,7 @@ export function noteRow(row) {
 export async function studentBundle(db, studentId) {
   const [
     items, progress, lessonRows, reviewRows, testRows, phraseReviewRows, phraseTestRows, pronRows, studyRows, journals, plan,
-    menus, settings, lessonDays, rephraseRows, starRows, grammarReviewRows, debateRows, rephraseStarRows, ieltsRows,
+    menus, settings, lessonDays, rephraseRows, starRows, grammarReviewRows, debateRows, rephraseStarRows, ieltsRows, listenRows,
   ] = await Promise.all([
     all(db, `SELECT * FROM items WHERE student_id = ? ORDER BY id`, studentId),
     all(db, `SELECT * FROM progress WHERE student_id = ?`, studentId),
@@ -489,6 +505,7 @@ export async function studentBundle(db, studentId) {
     all(db, `SELECT * FROM debate_answers WHERE student_id = ? ORDER BY id DESC LIMIT 30`, studentId),
     all(db, `SELECT item_id, created_at FROM rephrase_stars WHERE student_id = ? ORDER BY created_at`, studentId),
     all(db, `SELECT * FROM ielts_answers WHERE student_id = ? ORDER BY id DESC LIMIT 200`, studentId),
+    all(db, `SELECT * FROM listen_talks WHERE student_id = ? ORDER BY id`, studentId),
   ]);
   const setting = (name) => {
     const row = settings.find((r) => r.name === name);
@@ -551,5 +568,7 @@ export async function studentBundle(db, studentId) {
     ieltsAnswers: ieltsRows.map(ieltsRow),
     grammarReview,
     stars: starRows.map(starRow),
+    // 会話リスニング: the list (a talk itself is fetched when it is opened).
+    listening: listenRows.map((row) => talkSummary(row, JSON.parse(row.body))),
   };
 }

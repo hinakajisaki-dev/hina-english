@@ -687,6 +687,56 @@ body.quiz-open .wrap { padding-bottom: 62vh; }
 .day-head span { font-family: var(--en); font-size: 13px; font-weight: 700; color: var(--muted); }
 .day-head.done span { color: var(--good); }
 
+/* 会話リスニング: a long talk in parts. The player on top (全部きく, the bar by
+   part, くり返し and the speed), then the parts; 🔊 beside each line. The
+   English and Japanese are hidden until the student shows them. */
+.listen-item { display: flex; align-items: center; gap: 12px; text-decoration: none; color: inherit; }
+.listen-item > div { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.listen-item .go { color: var(--muted); font-size: 22px; line-height: 1; }
+.listen-icon {
+  flex: none; width: 48px; height: 48px; border-radius: 14px; background: var(--accent-soft);
+  display: flex; align-items: center; justify-content: center; font-size: 24px;
+}
+.listen-player { display: flex; flex-direction: column; gap: 12px; }
+.listen-all svg { width: 18px; height: 18px; margin-right: 6px; vertical-align: -3px; }
+.listen-bar { display: grid; gap: 4px; }
+.listen-bar span { height: 8px; border-radius: 999px; background: var(--sky-soft); overflow: hidden; }
+.listen-bar i { display: block; height: 100%; width: 0; background: var(--accent); transition: width .3s; }
+.listen-time { display: flex; justify-content: space-between; font-family: var(--en); font-size: 12px; color: var(--muted); margin-top: -8px; }
+.listen-controls { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+.listen-controls .chip-toggle { padding: 8px 14px; }
+.listen-controls .chip-toggle[aria-pressed="true"] { background: var(--accent-soft); border-color: var(--accent); color: var(--accent-text); }
+.listen-show { display: flex; justify-content: center; gap: 8px; }
+.listen-tip { margin-top: -4px; }
+.listen-show { margin-bottom: 4px; }
+.listen:not(.no-en) .listen-tip { display: none; }
+.listen-part { display: flex; flex-direction: column; gap: 12px; padding-top: 10px; padding-bottom: 10px; }
+.listen-part-head { display: flex; align-items: center; gap: 8px; }
+.listen-part-name {
+  flex: 1; min-width: 0; min-height: 44px; display: flex; align-items: center; gap: 10px; text-align: left;
+  border: 0; background: transparent; padding: 0; font: inherit; color: var(--ink); cursor: pointer;
+}
+.listen-part-name::after { content: "›"; margin-left: auto; color: var(--muted); font-size: 22px; line-height: 1; transition: transform .15s; }
+.listen-part-name[aria-expanded="true"]::after { transform: rotate(90deg); }
+.listen-part-no { flex: none; font-family: var(--en); font-size: 12px; font-weight: 800; color: var(--muted); }
+.round-btn {
+  flex: none; width: 44px; height: 44px; border-radius: 50%; border: 0; cursor: pointer;
+  background: var(--accent-soft); color: var(--accent-text); font-size: 15px; line-height: 1;
+}
+.round-btn.on { background: var(--accent); color: var(--on-accent); }
+.listen .bubble { cursor: default; max-width: calc(100% - 50px); }
+.listen .talk-line.v-ken .bubble { background: var(--cream); }
+.listen .talk-line.v-mia .bubble { background: var(--sky-soft); }
+.listen .talk-line.v-tom .bubble { background: var(--pink); }
+.listen .bubble .ja:empty, .listen .bubble .dots { display: none; }
+.listen.no-en .bubble .en, .listen.no-ja .bubble .ja { display: none; }
+.listen.no-en.no-ja .bubble .dots { display: block; color: var(--muted); letter-spacing: 2px; font-size: 14px; }
+.listen-say {
+  flex: none; width: 44px; height: 44px; border-radius: 50%; border: 0; cursor: pointer;
+  background: var(--accent-soft); color: var(--accent-text); display: flex; align-items: center; justify-content: center;
+}
+.listen-say svg { width: 20px; height: 20px; }
+.listen-say.loading { opacity: .5; }
 /* IELTS スピーキング練習: the tile at the top of home, the rules, Part 1 and Part 2. */
 .ielts-tile { border: 2px solid var(--sky); }
 .ielts-rules { margin: 0; padding-left: 1.2em; line-height: 1.8; }
